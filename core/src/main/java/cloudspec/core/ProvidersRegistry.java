@@ -1,7 +1,5 @@
 package cloudspec.core;
 
-import cloudspec.core.Provider;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
