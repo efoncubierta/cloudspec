@@ -1,6 +1,6 @@
 package cloudspec;
 
-import cloudspec.spec.CloudSpec;
+import cloudspec.core.spec.CloudSpec;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -22,7 +22,7 @@ public class CloudSpecMain {
         CloudSpec spec = loader.load(is);
 
         // run spec
-        CloudSpecValidator runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner();
+        CloudSpecRunner runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner();
         runner.validate(spec);
     }
 }

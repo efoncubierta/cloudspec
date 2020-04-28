@@ -1,9 +1,9 @@
 package cloudspec;
 
-import cloudspec.evaluator.EqualExprEvaluator;
-import cloudspec.evaluator.ExprEvaluator;
-import cloudspec.evaluator.InExprEvaluator;
-import cloudspec.spec.*;
+import cloudspec.core.evaluator.EqualExprEvaluator;
+import cloudspec.core.evaluator.ExprEvaluator;
+import cloudspec.core.evaluator.InExprEvaluator;
+import cloudspec.core.spec.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

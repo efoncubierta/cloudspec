@@ -13,4 +13,17 @@
 
     <artifactId>cloudspec-core</artifactId>
 
+    <properties>
+        <jcdp.version>4.0.1</jcdp.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.diogonunes</groupId>
+            <artifactId>JCDP</artifactId>
+            <version>${jcdp.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
 </project>

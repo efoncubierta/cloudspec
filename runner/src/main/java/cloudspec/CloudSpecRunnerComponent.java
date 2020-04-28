@@ -7,5 +7,5 @@ import javax.inject.Singleton;
 @Singleton
 @Component(modules = CloudSpecRunnerModule.class)
 public interface CloudSpecRunnerComponent {
-    CloudSpecValidator buildCloudSpecRunner();
+    CloudSpecRunner buildCloudSpecRunner();
 }
