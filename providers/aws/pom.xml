@@ -5,13 +5,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.cloudverse</groupId>
+    <groupId>cloudspec</groupId>
     <artifactId>cloudspec-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../../parent</relativePath>
   </parent>
 
   <artifactId>cloudspec-aws</artifactId>
+
+  <name>CloudSpec AWS Provider</name>
+  <description>CloudSpec AWS Provider</description>
 
   <properties>
     <aws.sdk.version>2.13.3</aws.sdk.version>
@@ -31,7 +34,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.cloudverse</groupId>
+      <groupId>cloudspec</groupId>
       <artifactId>cloudspec-core</artifactId>
       <version>${project.version}</version>
     </dependency>

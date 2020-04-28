@@ -5,13 +5,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.cloudverse</groupId>
+    <groupId>cloudspec</groupId>
     <artifactId>cloudspec-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
 
   <artifactId>cloudspec-runner</artifactId>
+
+  <name>CloudSpec Runner</name>
+  <description>CloudSpec Runner</description>
 
   <properties>
     <dagger.version>2.27</dagger.version>
@@ -23,14 +26,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.cloudverse</groupId>
+      <groupId>cloudspec</groupId>
       <artifactId>cloudspec-loader</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
-      <groupId>io.cloudverse</groupId>
+      <groupId>cloudspec</groupId>
       <artifactId>cloudspec-aws</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>

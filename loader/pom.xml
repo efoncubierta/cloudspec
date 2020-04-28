@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.cloudverse</groupId>
+    <groupId>cloudspec</groupId>
     <artifactId>cloudspec-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
@@ -13,9 +13,12 @@
 
   <artifactId>cloudspec-loader</artifactId>
 
+  <name>CloudSpec Loader Library</name>
+  <description>CloudSpec Loader Library</description>
+
   <dependencies>
     <dependency>
-      <groupId>io.cloudverse</groupId>
+      <groupId>cloudspec</groupId>
       <artifactId>cloudspec-core</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>

@@ -5,12 +5,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.cloudverse</groupId>
+    <groupId>cloudspec</groupId>
     <artifactId>cloudspec-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
 
   <artifactId>cloudspec-core</artifactId>
+
+  <name>CloudSpec Core Library</name>
+  <description>CloudSpec Core Library</description>
 
 </project>
