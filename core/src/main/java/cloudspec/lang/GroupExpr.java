@@ -23,8 +23,32 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core.evaluator;
+package cloudspec.lang;
 
-public interface ExprEvaluator<T> {
-    Boolean eval(T attributeValue);
+import java.util.List;
+
+public class GroupExpr {
+    private final String name;
+    private final List<RuleExpr> rules;
+
+    public GroupExpr(String name, List<RuleExpr> rules) {
+        this.name = name;
+        this.rules = rules;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<RuleExpr> getRules() {
+        return rules;
+    }
+
+    @Override
+    public String toString() {
+        return "SpecGroup{" +
+                "name='" + name + '\'' +
+                ", rules=" + rules +
+                '}';
+    }
 }

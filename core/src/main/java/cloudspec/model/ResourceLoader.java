@@ -23,10 +23,12 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.model;
 
-public class BaseResourceFunction extends BaseResourceField implements ResourceFunction {
-    public BaseResourceFunction(String name) {
-        super(name);
-    }
+import cloudspec.model.Resource;
+
+import java.util.List;
+
+public interface ResourceLoader {
+    List<Resource> load();
 }

@@ -25,7 +25,7 @@
  */
 package cloudspec.preload;
 
-import cloudspec.core.CloudSpecRuntimeException;
+import cloudspec.CloudSpecRuntimeException;
 
 public class CloudSpecPreloaderException extends CloudSpecRuntimeException {
 

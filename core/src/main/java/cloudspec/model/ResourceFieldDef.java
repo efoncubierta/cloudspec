@@ -23,18 +23,22 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core.evaluator;
+package cloudspec.model;
 
-public class EqualExprEvaluator<T> implements ExprEvaluator<T> {
-    private final T value;
-    private final Boolean not;
+public abstract class ResourceFieldDef {
+    private final String name;
+    private final String description;
 
-    public EqualExprEvaluator(T value, Boolean not) {
-        this.value = value;
-        this.not = not;
+    protected ResourceFieldDef(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
-    public Boolean eval(T attributeValue) {
-        return not ^ attributeValue.equals(value);
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

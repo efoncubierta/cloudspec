@@ -25,7 +25,7 @@
  */
 package cloudspec;
 
-import cloudspec.core.spec.CloudSpec;
+import cloudspec.lang.CloudSpec;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;

@@ -25,10 +25,10 @@
  */
 package cloudspec.preflight;
 
-import cloudspec.core.Provider;
-import cloudspec.core.ProvidersRegistry;
-import cloudspec.core.ResourceDef;
-import cloudspec.core.spec.*;
+import cloudspec.lang.*;
+import cloudspec.model.Provider;
+import cloudspec.ProvidersRegistry;
+import cloudspec.model.ResourceDef;
 
 import java.util.List;
 import java.util.Objects;

@@ -23,17 +23,19 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.model;
 
-public abstract class BaseResourceField implements ResourceField {
-    private final String name;
+public abstract class BaseResourceAttribute extends BaseResourceField implements ResourceAttribute {
+    private final Object value;
 
-    protected BaseResourceField(String name) {
-        this.name = name;
+    public BaseResourceAttribute(String name, Object value) {
+        super(name);
+
+        this.value = value;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Object getValue() {
+        return value;
     }
 }

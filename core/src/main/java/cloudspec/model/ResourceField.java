@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.model;
 
-public enum ResourceFieldType {
-    ATTRIBUTE, FUNCTION
+public interface ResourceField {
+    String getName();
 }

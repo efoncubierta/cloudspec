@@ -23,17 +23,10 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.model;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface Provider {
-    String getProviderName();
-
-    default Optional<ResourceDef> getResourceDef(String resourceFQName) {
-        return getResourceDefs().stream().filter(resourceDef -> resourceDef.getFQName().equals(resourceFQName)).findFirst();
+public class ResourceFunctionDef extends ResourceFieldDef {
+    public ResourceFunctionDef(String name, String description) {
+        super(name, description);
     }
-
-    List<ResourceDef> getResourceDefs();
 }

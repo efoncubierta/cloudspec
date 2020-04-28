@@ -23,10 +23,8 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.model;
 
-public class BooleanResourceAttribute extends BaseResourceAttribute {
-    public BooleanResourceAttribute(String name, Boolean value) {
-        super(name, value);
-    }
+public enum ResourceFieldType {
+    ATTRIBUTE, FUNCTION
 }

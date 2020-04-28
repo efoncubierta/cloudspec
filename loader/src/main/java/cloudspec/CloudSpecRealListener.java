@@ -25,10 +25,10 @@
  */
 package cloudspec;
 
-import cloudspec.core.evaluator.EqualExprEvaluator;
-import cloudspec.core.evaluator.ExprEvaluator;
-import cloudspec.core.evaluator.InExprEvaluator;
-import cloudspec.core.spec.*;
+import cloudspec.lang.evaluator.EqualExprEvaluator;
+import cloudspec.lang.evaluator.ExprEvaluator;
+import cloudspec.lang.evaluator.InExprEvaluator;
+import cloudspec.lang.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

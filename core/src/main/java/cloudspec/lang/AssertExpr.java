@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core.spec;
+package cloudspec.lang;
 
-import cloudspec.core.evaluator.ExprEvaluator;
+import cloudspec.lang.evaluator.ExprEvaluator;
 
-public class WithExpr {
+public class AssertExpr {
     private final String attribute;
     private final ExprEvaluator<Object> evaluator;
 
-    public WithExpr(String attribute, ExprEvaluator<Object> evaluator) {
+    public AssertExpr(String attribute, ExprEvaluator<Object> evaluator) {
         this.attribute = attribute;
         this.evaluator = evaluator;
     }
@@ -46,7 +46,7 @@ public class WithExpr {
 
     @Override
     public String toString() {
-        return "WithExpr{" +
+        return "AssertExpr{" +
                 "attribute='" + attribute + '\'' +
                 ", evaluator=" + evaluator +
                 '}';

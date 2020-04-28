@@ -26,7 +26,6 @@
 package cloudspec;
 
 import cloudspec.aws.AWSProvider;
-import cloudspec.core.ProvidersRegistry;
 import cloudspec.preflight.CloudSpecPreflight;
 import cloudspec.preload.CloudSpecPreloader;
 import cloudspec.validator.CloudSpecValidator;

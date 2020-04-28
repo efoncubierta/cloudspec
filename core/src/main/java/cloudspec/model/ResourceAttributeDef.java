@@ -23,46 +23,24 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core.spec;
+package cloudspec.model;
 
-import java.util.List;
+public class ResourceAttributeDef extends ResourceFieldDef {
+    private final ResourceAttributeType attributeType;
+    private final Boolean isArray;
 
-public class RuleExpr {
-    private final String title;
-    private final String resourceTypeFQName;
-    private final List<WithExpr> withs;
-    private final List<AssertExpr> asserts;
+    public ResourceAttributeDef(String name, String description, ResourceAttributeType attributeType, Boolean isArray) {
+        super(name, description);
 
-    public RuleExpr(String title, String resourceTypeFQName, List<WithExpr> withs, List<AssertExpr> asserts) {
-        this.title = title;
-        this.resourceTypeFQName = resourceTypeFQName;
-        this.withs = withs;
-        this.asserts = asserts;
+        this.attributeType = attributeType;
+        this.isArray = isArray;
     }
 
-    public String getTitle() {
-        return title;
+    public ResourceAttributeType getAttributeType() {
+        return attributeType;
     }
 
-    public String getResourceTypeFQName() {
-        return resourceTypeFQName;
-    }
-
-    public List<WithExpr> getWiths() {
-        return withs;
-    }
-
-    public List<AssertExpr> getAsserts() {
-        return asserts;
-    }
-
-    @Override
-    public String toString() {
-        return "SpecRule{" +
-                "title='" + title + '\'' +
-                ", resourceFQName='" + resourceTypeFQName + '\'' +
-                ", withs=" + withs +
-                ", asserts=" + asserts +
-                '}';
+    public Boolean isArray() {
+        return isArray;
     }
 }

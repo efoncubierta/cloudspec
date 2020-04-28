@@ -25,7 +25,7 @@
  */
 package cloudspec.preflight;
 
-import cloudspec.core.CloudSpecRuntimeException;
+import cloudspec.CloudSpecRuntimeException;
 
 public class CloudSpecPreflightException extends CloudSpecRuntimeException {
     public CloudSpecPreflightException(String message) {

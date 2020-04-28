@@ -23,10 +23,8 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.lang.evaluator;
 
-public enum ResourceAttributeType {
-    STRING,
-    BOOLEAN,
-    INTEGER
+public interface ExprEvaluator<T> {
+    Boolean eval(T attributeValue);
 }

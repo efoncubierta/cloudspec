@@ -25,9 +25,8 @@
  */
 package cloudspec;
 
-import cloudspec.core.Provider;
-import cloudspec.core.ProvidersRegistry;
-import cloudspec.core.spec.CloudSpec;
+import cloudspec.model.Provider;
+import cloudspec.lang.CloudSpec;
 import cloudspec.preflight.CloudSpecPreflight;
 import cloudspec.preload.CloudSpecPreloader;
 import cloudspec.validator.CloudSpecValidator;

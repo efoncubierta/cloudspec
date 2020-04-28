@@ -25,9 +25,9 @@
  */
 package cloudspec.aws;
 
-import cloudspec.core.ResourceAttributeDef;
-import cloudspec.core.ResourceAttributeType;
-import cloudspec.core.ResourceDef;
+import cloudspec.model.ResourceAttributeDef;
+import cloudspec.model.ResourceAttributeType;
+import cloudspec.model.ResourceDef;
 
 public abstract class AWSResourceDef implements ResourceDef {
     public static final String PROVIDER_NAME = "aws";

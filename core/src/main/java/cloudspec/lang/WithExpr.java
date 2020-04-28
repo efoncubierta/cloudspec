@@ -23,19 +23,32 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.lang;
 
-public abstract class BaseResourceAttribute extends BaseResourceField implements ResourceAttribute {
-    private final Object value;
+import cloudspec.lang.evaluator.ExprEvaluator;
 
-    public BaseResourceAttribute(String name, Object value) {
-        super(name);
+public class WithExpr {
+    private final String attribute;
+    private final ExprEvaluator<Object> evaluator;
 
-        this.value = value;
+    public WithExpr(String attribute, ExprEvaluator<Object> evaluator) {
+        this.attribute = attribute;
+        this.evaluator = evaluator;
+    }
+
+    public String getAttribute() {
+        return attribute;
+    }
+
+    public ExprEvaluator<Object> getEvaluator() {
+        return evaluator;
     }
 
     @Override
-    public Object getValue() {
-        return value;
+    public String toString() {
+        return "WithExpr{" +
+                "attribute='" + attribute + '\'' +
+                ", evaluator=" + evaluator +
+                '}';
     }
 }

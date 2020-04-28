@@ -26,9 +26,9 @@
 package cloudspec.aws.ec2;
 
 import cloudspec.aws.AWSResourceDef;
-import cloudspec.core.ResourceAttribute;
-import cloudspec.core.ResourceFunction;
-import cloudspec.core.StringResourceAttribute;
+import cloudspec.model.ResourceAttribute;
+import cloudspec.model.ResourceFunction;
+import cloudspec.model.StringResourceAttribute;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -25,8 +25,8 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.core.Resource;
-import cloudspec.core.ResourceLoader;
+import cloudspec.model.Resource;
+import cloudspec.model.ResourceLoader;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;

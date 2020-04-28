@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core.evaluator;
+package cloudspec.lang.evaluator;
 
 import java.util.List;
 

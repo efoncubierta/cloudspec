@@ -23,24 +23,17 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.model;
 
-public class ResourceAttributeDef extends ResourceFieldDef {
-    private final ResourceAttributeType attributeType;
-    private final Boolean isArray;
+import java.util.List;
+import java.util.Optional;
 
-    public ResourceAttributeDef(String name, String description, ResourceAttributeType attributeType, Boolean isArray) {
-        super(name, description);
+public interface Provider {
+    String getProviderName();
 
-        this.attributeType = attributeType;
-        this.isArray = isArray;
+    default Optional<ResourceDef> getResourceDef(String resourceFQName) {
+        return getResourceDefs().stream().filter(resourceDef -> resourceDef.getFQName().equals(resourceFQName)).findFirst();
     }
 
-    public ResourceAttributeType getAttributeType() {
-        return attributeType;
-    }
-
-    public Boolean isArray() {
-        return isArray;
-    }
+    List<ResourceDef> getResourceDefs();
 }

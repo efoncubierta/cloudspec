@@ -25,7 +25,7 @@
  */
 package cloudspec.aws;
 
-import cloudspec.core.Resource;
+import cloudspec.model.Resource;
 
 public abstract class AWSResource implements Resource {
 }

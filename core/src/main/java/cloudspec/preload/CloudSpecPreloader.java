@@ -25,12 +25,12 @@
  */
 package cloudspec.preload;
 
-import cloudspec.core.Provider;
-import cloudspec.core.ProvidersRegistry;
-import cloudspec.core.ResourceDef;
-import cloudspec.core.spec.CloudSpec;
-import cloudspec.core.spec.GroupExpr;
-import cloudspec.core.spec.RuleExpr;
+import cloudspec.model.Provider;
+import cloudspec.ProvidersRegistry;
+import cloudspec.model.ResourceDef;
+import cloudspec.lang.CloudSpec;
+import cloudspec.lang.GroupExpr;
+import cloudspec.lang.RuleExpr;
 
 import java.util.List;
 import java.util.Objects;

@@ -25,8 +25,12 @@
  */
 package cloudspec.validator;
 
-import cloudspec.core.*;
-import cloudspec.core.spec.*;
+import cloudspec.ProvidersRegistry;
+import cloudspec.lang.*;
+import cloudspec.model.Provider;
+import cloudspec.model.Resource;
+import cloudspec.model.ResourceAttribute;
+import cloudspec.model.ResourceDef;
 import cloudspec.preload.CloudSpecPreloaderException;
 
 import java.util.List;

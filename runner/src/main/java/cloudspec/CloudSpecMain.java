@@ -25,7 +25,7 @@
  */
 package cloudspec;
 
-import cloudspec.core.spec.CloudSpec;
+import cloudspec.lang.CloudSpec;
 
 import java.io.FileInputStream;
 import java.io.InputStream;

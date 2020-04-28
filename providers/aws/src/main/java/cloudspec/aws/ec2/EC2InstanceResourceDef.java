@@ -25,10 +25,10 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.core.ResourceAttributeDef;
-import cloudspec.core.ResourceAttributeType;
-import cloudspec.core.ResourceFunctionDef;
-import cloudspec.core.ResourceLoader;
+import cloudspec.model.ResourceAttributeDef;
+import cloudspec.model.ResourceAttributeType;
+import cloudspec.model.ResourceFunctionDef;
+import cloudspec.model.ResourceLoader;
 
 import java.util.Arrays;
 import java.util.List;

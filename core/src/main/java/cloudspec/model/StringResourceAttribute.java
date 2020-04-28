@@ -23,10 +23,10 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.core;
+package cloudspec.model;
 
-public class IntegerResourceAttribute extends BaseResourceAttribute {
-    public IntegerResourceAttribute(String name, Integer value) {
+public class StringResourceAttribute extends BaseResourceAttribute {
+    public StringResourceAttribute(String name, String value) {
         super(name, value);
     }
 }

@@ -25,7 +25,7 @@
  */
 package cloudspec.validator;
 
-import cloudspec.core.CloudSpecRuntimeException;
+import cloudspec.CloudSpecRuntimeException;
 
 public class CloudSpecValidatorException extends CloudSpecRuntimeException {
     public CloudSpecValidatorException(String message) {

@@ -26,8 +26,8 @@
 package cloudspec.aws.ec2;
 
 import cloudspec.aws.AWSResourceDef;
-import cloudspec.core.ResourceAttributeDef;
-import cloudspec.core.ResourceAttributeType;
+import cloudspec.model.ResourceAttributeDef;
+import cloudspec.model.ResourceAttributeType;
 
 public abstract class EC2ResourceDef extends AWSResourceDef {
     public static final String GROUP_NAME = "ec2";

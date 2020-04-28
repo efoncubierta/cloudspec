@@ -27,8 +27,8 @@ package cloudspec.aws;
 
 import cloudspec.aws.ec2.EC2InstanceLoader;
 import cloudspec.aws.ec2.EC2InstanceResourceDef;
-import cloudspec.core.Provider;
-import cloudspec.core.ResourceDef;
+import cloudspec.model.Provider;
+import cloudspec.model.ResourceDef;
 
 import java.util.Arrays;
 import java.util.List;
