@@ -26,6 +26,7 @@
 package cloudspec;
 
 import cloudspec.model.Provider;
+import cloudspec.model.ResourceFqn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,10 @@ import java.util.Optional;
 
 public class ProvidersRegistry {
     private final List<Provider> providers = new ArrayList<>();
+
+    public Optional<Provider> getProvider(ResourceFqn resourceFqn) {
+        return getProvider(resourceFqn.getProviderName());
+    }
 
     public Optional<Provider> getProvider(String providerName) {
         return getProviders().stream().filter(provider -> provider.getProviderName().equals(providerName)).findFirst();

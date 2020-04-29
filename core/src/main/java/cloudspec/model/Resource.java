@@ -42,7 +42,7 @@ public interface Resource {
      *
      * @return Resource fully-qualified name.
      */
-    String getResourceTypeFqn();
+    ResourceFqn getResourceFqn();
 
     /**
      * Get a resource's property.

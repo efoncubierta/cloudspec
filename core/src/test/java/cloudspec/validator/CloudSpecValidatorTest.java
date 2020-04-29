@@ -25,19 +25,34 @@
  */
 package cloudspec.validator;
 
+import cloudspec.model.ResourceFqn;
+import cloudspec.service.ResourceService;
 import cloudspec.util.CloudSpecTestUtils;
-import cloudspec.util.ProviderTestUtils;
+import cloudspec.util.ResourceTestUtils;
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class CloudSpecValidatorTest {
+    public static final ResourceService TEST_RESOURCE_SERVICE = mock(ResourceService.class);
 
+    static {
+        when(TEST_RESOURCE_SERVICE.getResourceDef(ResourceTestUtils.TEST_RESOURCE_FQN))
+                .thenReturn(Optional.of(ResourceTestUtils.TEST_RESOURCE_DEF));
+    }
 
     @Test
     public void shouldValidateAWellDefinedCloudSpec() {
-        CloudSpecValidator validator = new CloudSpecValidator(ProviderTestUtils.TEST_PROVIDERS_REGISTRY);
+        ResourceFqn resourceFqn1 = new ResourceFqn("a", "b", "c");
+        ResourceFqn resourceFqn2 = new ResourceFqn("a", "b", "c");
+
+        assertEquals(resourceFqn1, resourceFqn2);
+        CloudSpecValidator validator = new CloudSpecValidator(TEST_RESOURCE_SERVICE);
 
         CloudSpecValidatorResult result = validator.validate(CloudSpecTestUtils.TEST_SPEC);
 

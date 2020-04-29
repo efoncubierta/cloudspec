@@ -29,15 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResourceDef {
-    String getProviderName();
-
-    String getGroupName();
-
-    String getResourceName();
-
-    default String getFqn() {
-        return String.format("%s:%s:%s", getProviderName(), getGroupName(), getResourceName());
-    }
+    ResourceFqn getFqn();
 
     default Optional<PropertyDef> getPropertyDef(String propertyName) {
         return getPropertyDefs().stream().filter(def -> def.getName().equals(propertyName)).findFirst();

@@ -23,32 +23,52 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.util;
+package cloudspec.model;
 
-import cloudspec.ProvidersRegistry;
-import cloudspec.model.Provider;
+public class ResourceFqn {
+    private final String providerName;
+    private final String groupName;
+    private final String resourceName;
 
-import java.util.Collections;
-import java.util.Optional;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-public class ProviderTestUtils {
-    public static final String TEST_PROVIDER_NAME = "myprovider";
-
-    public static final Provider TEST_PROVIDER = mock(Provider.class);
-
-    static {
-        // test provider
-        when(TEST_PROVIDER.getProviderName()).thenReturn(TEST_PROVIDER_NAME);
-        when(TEST_PROVIDER.getResourceDefs()).thenReturn(Collections.singletonList(ResourceTestUtils.TEST_RESOURCE_DEF));
+    public ResourceFqn(String providerName, String groupName, String resourceName) {
+        this.providerName = providerName;
+        this.groupName = groupName;
+        this.resourceName = resourceName;
     }
 
-    public static final ProvidersRegistry TEST_PROVIDERS_REGISTRY = mock(ProvidersRegistry.class);
+    public String getProviderName() {
+        return providerName;
+    }
 
-    static {
-        when(TEST_PROVIDERS_REGISTRY.getProvider(TEST_PROVIDER_NAME)).thenReturn(Optional.of(TEST_PROVIDER));
-        when(TEST_PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(TEST_PROVIDER));
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public static ResourceFqn fromString(String resourceFqn) {
+        // TODO manage null or malformed strings
+        String[] parts = resourceFqn.split(":");
+        return new ResourceFqn(parts[0], parts[1], parts[2]);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof ResourceFqn)) {
+            return false;
+        }
+
+        return toString().equals(obj.toString());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s:%s:%s", providerName, groupName, resourceName);
     }
 }

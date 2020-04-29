@@ -25,16 +25,14 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.model.FunctionDef;
-import cloudspec.model.PropertyDef;
-import cloudspec.model.PropertyType;
-import cloudspec.model.ResourceLoader;
+import cloudspec.model.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class EC2InstanceResourceDef extends EC2ResourceDef {
     public static final String RESOURCE_NAME = "instance";
+    public static final ResourceFqn RESOURCE_FQN = new ResourceFqn(PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME);
     public static final String PROP_INSTANCE_ID = "instance_id";
     public static final String PROP_INSTANCE_TYPE = "instance_type";
 
@@ -55,8 +53,8 @@ public class EC2InstanceResourceDef extends EC2ResourceDef {
     }
 
     @Override
-    public String getResourceName() {
-        return RESOURCE_NAME;
+    public ResourceFqn getFqn() {
+        return RESOURCE_FQN;
     }
 
     @Override

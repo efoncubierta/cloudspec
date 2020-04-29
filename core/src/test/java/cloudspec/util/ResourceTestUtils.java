@@ -36,9 +36,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ResourceTestUtils {
-    public static final String TEST_RESOURCE_TYPE_GROUP = "mygroup";
-    public static final String TEST_RESOURCE_TYPE_NAME = "myresource";
-    public static final String TEST_RESOURCE_TYPE_FQN = String.format("%s:%s:%s", ProviderTestUtils.TEST_PROVIDER_NAME, TEST_RESOURCE_TYPE_GROUP, TEST_RESOURCE_TYPE_NAME);
+    public static final String TEST_RESOURCE_GROUP = "mygroup";
+    public static final String TEST_RESOURCE_NAME = "myresource";
+    public static final ResourceFqn TEST_RESOURCE_FQN = new ResourceFqn(ProviderTestUtils.TEST_PROVIDER_NAME, TEST_RESOURCE_GROUP, TEST_RESOURCE_NAME);
     public static final String TEST_INTEGER_PROPERTY_NAME = "integer_property";
     public static final String TEST_STRING_PROPERTY_NAME = "string_property";
     public static final String TEST_BOOLEAN_PROPERTY_NAME = "boolean_property";
@@ -106,7 +106,7 @@ public class ResourceTestUtils {
     public static final List<Function> TEST_FUNCTIONS = Collections.emptyList();
 
     static {
-        when(TEST_RESOURCE.getResourceTypeFqn()).thenReturn(TEST_RESOURCE_TYPE_FQN);
+        when(TEST_RESOURCE.getResourceFqn()).thenReturn(TEST_RESOURCE_FQN);
         when(TEST_RESOURCE.getProperty(TEST_INTEGER_PROPERTY_NAME)).thenReturn(Optional.of(TEST_INTEGER_PROPERTY));
         when(TEST_RESOURCE.getProperty(TEST_STRING_PROPERTY_NAME)).thenReturn(Optional.of(TEST_STRING_PROPERTY));
         when(TEST_RESOURCE.getProperty(TEST_BOOLEAN_PROPERTY_NAME)).thenReturn(Optional.of(TEST_BOOLEAN_PROPERTY));
@@ -121,7 +121,7 @@ public class ResourceTestUtils {
     }
 
     static {
-        when(TEST_RESOURCE_DEF.getFqn()).thenReturn(TEST_RESOURCE_TYPE_FQN);
+        when(TEST_RESOURCE_DEF.getFqn()).thenReturn(TEST_RESOURCE_FQN);
         when(TEST_RESOURCE_DEF.getPropertyDef(TEST_INTEGER_PROPERTY_NAME)).thenReturn(Optional.of(TEST_INTEGER_PROPERTY_DEF));
         when(TEST_RESOURCE_DEF.getPropertyDef(TEST_STRING_PROPERTY_NAME)).thenReturn(Optional.of(TEST_STRING_PROPERTY_DEF));
         when(TEST_RESOURCE_DEF.getPropertyDef(TEST_BOOLEAN_PROPERTY_NAME)).thenReturn(Optional.of(TEST_BOOLEAN_PROPERTY_DEF));

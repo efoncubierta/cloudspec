@@ -25,22 +25,22 @@
  */
 package cloudspec.validator;
 
-import cloudspec.ProvidersRegistry;
 import cloudspec.lang.*;
 import cloudspec.model.Property;
-import cloudspec.model.Provider;
 import cloudspec.model.Resource;
 import cloudspec.model.ResourceDef;
+import cloudspec.model.ResourceFqn;
+import cloudspec.service.ResourceService;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CloudSpecValidator {
-    private final ProvidersRegistry providersRegistry;
+    private final ResourceService resourceService;
 
-    public CloudSpecValidator(ProvidersRegistry providersRegistry) {
-        this.providersRegistry = providersRegistry;
+    public CloudSpecValidator(ResourceService resourceService) {
+        this.resourceService = resourceService;
     }
 
     public CloudSpecValidatorResult validate(CloudSpec spec) {
@@ -61,25 +61,15 @@ public class CloudSpecValidator {
 
     private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
         try {
-            String providerName = rule.getResourceTypeFqn().split(":")[0];
-
-            // lookup provider
-            Optional<Provider> providerOpt = providersRegistry.getProvider(providerName);
-            if (!providerOpt.isPresent()) {
-                return new CloudSpecValidatorResult.RuleResult(
-                        rule.getName(),
-                        Boolean.FALSE,
-                        String.format("Provider '%s' not found.", providerName)
-                );
-            }
+            ResourceFqn resouceFqn = ResourceFqn.fromString(rule.getResourceFqn());
 
             // lookup resource definition
-            Optional<ResourceDef> resourceDefOpt = providerOpt.get().getResourceDef(rule.getResourceTypeFqn());
+            Optional<ResourceDef> resourceDefOpt = resourceService.getResourceDef(resouceFqn);
             if (!resourceDefOpt.isPresent()) {
                 return new CloudSpecValidatorResult.RuleResult(
                         rule.getName(),
                         Boolean.FALSE,
-                        String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn())
+                        String.format("Resouce %s does not exist.", rule.getResourceFqn())
                 );
             }
 
@@ -125,14 +115,14 @@ public class CloudSpecValidator {
         if (!propertyOpt.isPresent()) {
             return new ValidateExprResult(
                     Boolean.FALSE,
-                    String.format("Property %s not found on resource of type %s", assertExpr.getPropertyName(), resource.getResourceTypeFqn())
+                    String.format("Property %s not found on resource of type %s", assertExpr.getPropertyName(), resource.getResourceFqn())
             );
         }
 
         if (!assertExpr.getEvaluator().eval(propertyOpt.get().getValue())) {
             return new ValidateExprResult(
                     Boolean.FALSE,
-                    String.format("Assert expression evaluated false", assertExpr.getPropertyName(), resource.getResourceTypeFqn())
+                    String.format("Assert expression evaluated false", assertExpr.getPropertyName(), resource.getResourceFqn())
             );
         }
 

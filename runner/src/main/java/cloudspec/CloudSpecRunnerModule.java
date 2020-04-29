@@ -28,6 +28,7 @@ package cloudspec;
 import cloudspec.aws.AWSProvider;
 import cloudspec.preflight.CloudSpecPreflight;
 import cloudspec.preload.CloudSpecPreloader;
+import cloudspec.service.ResourceService;
 import cloudspec.validator.CloudSpecValidator;
 import dagger.Module;
 import dagger.Provides;
@@ -55,20 +56,26 @@ public class CloudSpecRunnerModule {
 
     @Provides
     @Singleton
-    public static CloudSpecPreflight provideCloudSpecPreflight(ProvidersRegistry providersRegistry) {
-        return new CloudSpecPreflight(providersRegistry);
+    public static CloudSpecPreflight provideCloudSpecPreflight(ResourceService resourceService) {
+        return new CloudSpecPreflight(resourceService);
     }
 
     @Provides
     @Singleton
-    public static CloudSpecPreloader provideCloudSpecPreloader(ProvidersRegistry providersRegistry) {
-        return new CloudSpecPreloader(providersRegistry);
+    public static CloudSpecPreloader provideCloudSpecPreloader(ResourceService resourceService) {
+        return new CloudSpecPreloader(resourceService);
     }
 
     @Provides
     @Singleton
-    public static CloudSpecValidator provideCloudSpecValidator(ProvidersRegistry providersRegistry) {
-        return new CloudSpecValidator(providersRegistry);
+    public static CloudSpecValidator provideCloudSpecValidator(ResourceService resourceService) {
+        return new CloudSpecValidator(resourceService);
+    }
+
+    @Provides
+    @Singleton
+    public static ResourceService provideResourceService(ProvidersRegistry providersRegistry) {
+        return new ResourceService(providersRegistry);
     }
 
     @Provides

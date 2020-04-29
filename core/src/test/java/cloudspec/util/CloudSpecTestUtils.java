@@ -46,7 +46,7 @@ public class CloudSpecTestUtils {
 
     public static final RuleExpr TEST_RULE_EXPR = new RuleExpr(
             TEST_SPEC_RULE_NAME,
-            ResourceTestUtils.TEST_RESOURCE_TYPE_FQN,
+            ResourceTestUtils.TEST_RESOURCE_FQN.toString(),
             TEST_WITH_EXPRS,
             TEST_ASSERT_EXPRS);
 

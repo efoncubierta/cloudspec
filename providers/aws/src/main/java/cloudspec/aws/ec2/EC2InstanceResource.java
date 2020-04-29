@@ -25,10 +25,10 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.aws.AWSProvider;
 import cloudspec.aws.AWSResourceDef;
-import cloudspec.model.Property;
 import cloudspec.model.Function;
+import cloudspec.model.Property;
+import cloudspec.model.ResourceFqn;
 import cloudspec.model.StringProperty;
 
 import java.util.ArrayList;
@@ -78,13 +78,8 @@ public class EC2InstanceResource extends EC2Resource {
     }
 
     @Override
-    public String getResourceTypeFqn() {
-        return String.format(
-                "%s:%s:%s",
-                AWSProvider.PROVIDER_NAME,
-                EC2ResourceDef.GROUP_NAME,
-                EC2InstanceResourceDef.RESOURCE_NAME
-        );
+    public ResourceFqn getResourceFqn() {
+        return EC2InstanceResourceDef.RESOURCE_FQN;
     }
 
     @Override

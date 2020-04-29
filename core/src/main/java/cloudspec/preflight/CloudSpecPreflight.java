@@ -25,19 +25,19 @@
  */
 package cloudspec.preflight;
 
-import cloudspec.ProvidersRegistry;
 import cloudspec.lang.*;
-import cloudspec.model.Provider;
 import cloudspec.model.ResourceDef;
+import cloudspec.model.ResourceFqn;
+import cloudspec.service.ResourceService;
 
 import java.util.List;
 import java.util.Optional;
 
 public class CloudSpecPreflight {
-    private final ProvidersRegistry providersRegistry;
+    private final ResourceService resourceService;
 
-    public CloudSpecPreflight(ProvidersRegistry providersRegistry) {
-        this.providersRegistry = providersRegistry;
+    public CloudSpecPreflight(ResourceService resourceService) {
+        this.resourceService = resourceService;
     }
 
     public void preflight(CloudSpec spec) {
@@ -59,18 +59,12 @@ public class CloudSpecPreflight {
     }
 
     private void preflightRule(RuleExpr rule) {
-        String providerName = rule.getResourceTypeFqn().split(":")[0];
-
-        // lookup provider
-        Optional<Provider> providerOpt = providersRegistry.getProvider(providerName);
-        if (!providerOpt.isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Provider '%s' not found.", providerName));
-        }
+        ResourceFqn resouceFqn = ResourceFqn.fromString(rule.getResourceFqn());
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = providerOpt.get().getResourceDef(rule.getResourceTypeFqn());
+        Optional<ResourceDef> resourceDefOpt = resourceService.getResourceDef(resouceFqn);
         if (!resourceDefOpt.isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn()));
+            throw new CloudSpecPreflightException(String.format("Resource %s is not supported.", rule.getResourceFqn()));
         }
 
         // preflight withs and asserts

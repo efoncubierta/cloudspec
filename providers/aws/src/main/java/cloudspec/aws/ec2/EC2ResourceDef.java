@@ -38,9 +38,4 @@ public abstract class EC2ResourceDef extends AWSResourceDef {
             PROP_VPC_ID,
             "VPC id",
             PropertyType.STRING, Boolean.FALSE);
-
-    @Override
-    public String getGroupName() {
-        return GROUP_NAME;
-    }
 }

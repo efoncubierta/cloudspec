@@ -48,9 +48,4 @@ public abstract class AWSResourceDef implements ResourceDef {
             PropertyType.STRING,
             Boolean.FALSE
     );
-
-    @Override
-    public String getProviderName() {
-        return PROVIDER_NAME;
-    }
 }

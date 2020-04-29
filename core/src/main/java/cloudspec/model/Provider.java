@@ -45,16 +45,6 @@ public interface Provider {
     String getProviderName();
 
     /**
-     * Get a resource definition of this provider.
-     *
-     * @param resourceTypeFqn Resource fully-qualified name.
-     * @return Optional resource definition.
-     */
-    default Optional<ResourceDef> getResourceDef(String resourceTypeFqn) {
-        return getResourceDefs().stream().filter(resourceDef -> resourceDef.getFqn().equals(resourceTypeFqn)).findFirst();
-    }
-
-    /**
      * Get a list of all resource definitions of this provider.
      *
      * @return List of resource definitions.
