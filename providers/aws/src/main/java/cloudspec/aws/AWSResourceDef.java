@@ -25,27 +25,27 @@
  */
 package cloudspec.aws;
 
-import cloudspec.model.ResourceAttributeDef;
-import cloudspec.model.ResourceAttributeType;
+import cloudspec.model.PropertyDef;
+import cloudspec.model.PropertyType;
 import cloudspec.model.ResourceDef;
 
 public abstract class AWSResourceDef implements ResourceDef {
     public static final String PROVIDER_NAME = "aws";
 
-    public static final String ATTR_REGION = "region";
-    public static final String ATTR_AVAILABILITY_ZONE = "availability_zone";
+    public static final String PROP_REGION = "region";
+    public static final String PROP_AVAILABILITY_ZONE = "availability_zone";
 
-    public static final ResourceAttributeDef ATTR_DEF_REGION = new ResourceAttributeDef(
-            ATTR_REGION,
+    public static final PropertyDef PROP_DEF_REGION = new PropertyDef(
+            PROP_REGION,
             "AWS Region",
-            ResourceAttributeType.STRING,
+            PropertyType.STRING,
             Boolean.FALSE
     );
 
-    public static final ResourceAttributeDef ATTR_DEF_AVAILABILITY_ZONE = new ResourceAttributeDef(
-            ATTR_AVAILABILITY_ZONE,
+    public static final PropertyDef PROP_DEF_AVAILABILITY_ZONE = new PropertyDef(
+            PROP_AVAILABILITY_ZONE,
             "AWS Availability Zone",
-            ResourceAttributeType.STRING,
+            PropertyType.STRING,
             Boolean.FALSE
     );
 

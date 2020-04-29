@@ -25,9 +25,9 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.model.ResourceAttributeDef;
-import cloudspec.model.ResourceAttributeType;
-import cloudspec.model.ResourceFunctionDef;
+import cloudspec.model.FunctionDef;
+import cloudspec.model.PropertyDef;
+import cloudspec.model.PropertyType;
 import cloudspec.model.ResourceLoader;
 
 import java.util.Arrays;
@@ -35,18 +35,18 @@ import java.util.List;
 
 public class EC2InstanceResourceDef extends EC2ResourceDef {
     public static final String RESOURCE_NAME = "instance";
-    public static final String ATTR_INSTANCE_ID = "instance_id";
-    public static final String ATTR_INSTANCE_TYPE = "instance_type";
+    public static final String PROP_INSTANCE_ID = "instance_id";
+    public static final String PROP_INSTANCE_TYPE = "instance_type";
 
-    public final ResourceAttributeDef ATTR_DEF_INSTANCE_ID = new ResourceAttributeDef(
-            ATTR_INSTANCE_ID,
+    public final PropertyDef PROP_DEF_INSTANCE_ID = new PropertyDef(
+            PROP_INSTANCE_ID,
             "Instance ID",
-            ResourceAttributeType.STRING, Boolean.FALSE);
+            PropertyType.STRING, Boolean.FALSE);
 
-    public final ResourceAttributeDef ATTR_DEF_INSTANCE_TYPE = new ResourceAttributeDef(
-            ATTR_INSTANCE_TYPE,
+    public final PropertyDef PROP_DEF_INSTANCE_TYPE = new PropertyDef(
+            PROP_INSTANCE_TYPE,
             "Instance type",
-            ResourceAttributeType.STRING, Boolean.FALSE);
+            PropertyType.STRING, Boolean.FALSE);
 
     private final EC2InstanceLoader loader;
 
@@ -60,18 +60,18 @@ public class EC2InstanceResourceDef extends EC2ResourceDef {
     }
 
     @Override
-    public List<ResourceAttributeDef> getAttributesDefinitions() {
+    public List<PropertyDef> getPropertyDefs() {
         return Arrays.asList(
-                ATTR_DEF_REGION,
-                ATTR_DEF_AVAILABILITY_ZONE,
-                ATTR_DEF_INSTANCE_ID,
-                ATTR_DEF_INSTANCE_TYPE,
-                ATTR_DEF_VPC_ID
+                PROP_DEF_REGION,
+                PROP_DEF_AVAILABILITY_ZONE,
+                PROP_DEF_INSTANCE_ID,
+                PROP_DEF_INSTANCE_TYPE,
+                PROP_DEF_VPC_ID
         );
     }
 
     @Override
-    public List<ResourceFunctionDef> getFunctionsDefinitions() {
+    public List<FunctionDef> getFunctionDefs() {
         return Arrays.asList();
     }
 

@@ -25,16 +25,35 @@
  */
 package cloudspec.lang.evaluator;
 
+/**
+ * Evaluator for 'equal' expressions.
+ * <p>
+ * Evaluate if a property's value is equal to a predefined one.
+ * <p>
+ * - property == 'some_value'
+ * - property != 'some_value'
+ * - property EQUAL TO 'some_value'
+ * - property NOT EQUAL TO 'some_value'
+ *
+ * @param <T> Type of the property.
+ */
 public class EqualExprEvaluator<T> implements ExprEvaluator<T> {
     private final T value;
     private final Boolean not;
 
+    /**
+     * Constructor.
+     *
+     * @param value Value to be compared with the property's value.
+     * @param not   Flag to negate the expression. If true, it'll evaluate 'not equal to'.
+     */
     public EqualExprEvaluator(T value, Boolean not) {
         this.value = value;
         this.not = not;
     }
 
-    public Boolean eval(T attributeValue) {
-        return not ^ attributeValue.equals(value);
+    @Override
+    public Boolean eval(T propertyValue) {
+        return not ^ propertyValue.equals(value);
     }
 }

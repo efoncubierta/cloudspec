@@ -27,16 +27,33 @@ package cloudspec.lang.evaluator;
 
 import java.util.List;
 
+/**
+ * Evaluator for 'in' expressions.
+ * <p>
+ * Evaluate if an property's value is in a list of predefined values.
+ * <p>
+ * - property IN [1, 2, 3]
+ * - property NOT IN [1, 2, 3]
+ *
+ * @param <T> Type of the property.
+ */
 public class InExprEvaluator<T> implements ExprEvaluator<T> {
     private final List<T> values;
     private final Boolean not;
 
+    /**
+     * Constructor.
+     *
+     * @param values List of values to be compared with the property's value.
+     * @param not    Flag to negate the expression. If true, it'll evaluate 'not equal to'.
+     */
     public InExprEvaluator(List<T> values, Boolean not) {
         this.values = values;
         this.not = not;
     }
 
-    public Boolean eval(T attributeValue) {
-        return not ^ values.contains(attributeValue);
+    @Override
+    public Boolean eval(T propertyValue) {
+        return not ^ values.contains(propertyValue);
     }
 }

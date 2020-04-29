@@ -25,8 +25,8 @@
  */
 package cloudspec.model;
 
-public class StringResourceAttribute extends BaseResourceAttribute {
-    public StringResourceAttribute(String name, String value) {
-        super(name, value);
+public class FunctionDef extends MemberDef {
+    public FunctionDef(String name, String description) {
+        super(name, description);
     }
 }

@@ -25,22 +25,26 @@
  */
 package cloudspec.model;
 
-public class ResourceAttributeDef extends ResourceFieldDef {
-    private final ResourceAttributeType attributeType;
-    private final Boolean isArray;
+/**
+ * Base class for classes implementing {@link Property}.
+ */
+public abstract class BaseProperty extends BaseMember implements Property {
+    private final Object value;
 
-    public ResourceAttributeDef(String name, String description, ResourceAttributeType attributeType, Boolean isArray) {
-        super(name, description);
+    /**
+     * Constructor.
+     *
+     * @param name  Property's name.
+     * @param value Property's value.
+     */
+    public BaseProperty(String name, Object value) {
+        super(name);
 
-        this.attributeType = attributeType;
-        this.isArray = isArray;
+        this.value = value;
     }
 
-    public ResourceAttributeType getAttributeType() {
-        return attributeType;
-    }
-
-    public Boolean isArray() {
-        return isArray;
+    @Override
+    public Object getValue() {
+        return value;
     }
 }

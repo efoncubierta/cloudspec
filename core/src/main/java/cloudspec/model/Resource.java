@@ -28,16 +28,53 @@ package cloudspec.model;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define a CloudSpec's resource.
+ * <p>
+ * A resource is anything that can be evaluated. It can be an EC2 instance, an S3 bucket, an entire service, etc.
+ * Resources have members, that can be either properties or functions.
+ * <p>
+ * Resources are provided by the providers.
+ */
 public interface Resource {
-    default Optional<ResourceAttribute> getAttribute(String attributeName) {
-        return getAttributes().stream().filter(attribute -> attribute.getName().equals(attributeName)).findFirst();
+    /**
+     * Get resource's fully-qualified name.
+     *
+     * @return Resource fully-qualified name.
+     */
+    String getResourceTypeFqn();
+
+    /**
+     * Get a resource's property.
+     *
+     * @param propertyName Property's name.
+     * @return Optional property.
+     */
+    default Optional<Property> getProperty(String propertyName) {
+        return getProperties().stream().filter(property -> property.getName().equals(propertyName)).findFirst();
     }
 
-    List<ResourceAttribute> getAttributes();
+    /**
+     * Get all resource's properties.
+     *
+     * @return List of properties.
+     */
+    List<Property> getProperties();
 
-    default Optional<ResourceFunction> getFunction(String functionName) {
+    /**
+     * Get a resource's function.
+     *
+     * @param functionName Function's name.
+     * @return Optional function.
+     */
+    default Optional<Function> getFunction(String functionName) {
         return getFunctions().stream().filter(function -> function.getName().equals(functionName)).findFirst();
     }
 
-    List<ResourceFunction> getFunctions();
+    /**
+     * Get all resource's functions.
+     *
+     * @return List of functions.
+     */
+    List<Function> getFunctions();
 }

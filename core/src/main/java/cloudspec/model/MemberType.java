@@ -25,8 +25,6 @@
  */
 package cloudspec.model;
 
-public class IntegerResourceAttribute extends BaseResourceAttribute {
-    public IntegerResourceAttribute(String name, Integer value) {
-        super(name, value);
-    }
+public enum MemberType {
+    PROPERTY, FUNCTION
 }

@@ -29,7 +29,7 @@ import cloudspec.ProvidersRegistry;
 import cloudspec.lang.*;
 import cloudspec.model.Provider;
 import cloudspec.model.Resource;
-import cloudspec.model.ResourceAttribute;
+import cloudspec.model.Property;
 import cloudspec.model.ResourceDef;
 import cloudspec.preload.CloudSpecPreloaderException;
 
@@ -63,7 +63,7 @@ public class CloudSpecValidator {
 
     public CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
         try {
-            String providerName = rule.getResourceTypeFQName().split(":")[0];
+            String providerName = rule.getResourceTypeFqn().split(":")[0];
 
             // lookup provider
             Provider provider = providersRegistry.getProvider(providerName);
@@ -72,9 +72,9 @@ public class CloudSpecValidator {
             }
 
             // lookup resource definition
-            Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFQName());
+            Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFqn());
             if (!resourceDefOpt.isPresent()) {
-                throw new CloudSpecPreloaderException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFQName()));
+                throw new CloudSpecPreloaderException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn()));
             }
 
             Boolean result = resourceDefOpt.get()
@@ -83,9 +83,9 @@ public class CloudSpecValidator {
                     .stream()
                     .anyMatch(resource -> validateResource(resource, rule.getWiths(), rule.getAsserts()));
 
-            return new CloudSpecValidatorResult.RuleResult(rule.getTitle(), result);
+            return new CloudSpecValidatorResult.RuleResult(rule.getName(), result);
         } catch (RuntimeException exception) {
-            return new CloudSpecValidatorResult.RuleResult(rule.getTitle(), Boolean.FALSE, exception.getMessage(), exception);
+            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, exception.getMessage(), exception);
         }
     }
 
@@ -98,8 +98,8 @@ public class CloudSpecValidator {
     }
 
     private Boolean validateWith(Resource resource, WithExpr withExpr) {
-        Optional<ResourceAttribute> attributeOpt = resource.getAttribute(withExpr.getAttribute());
-        return attributeOpt.isPresent() ? withExpr.getEvaluator().eval(attributeOpt.get().getValue()) : Boolean.FALSE;
+        Optional<Property> propertyOpt = resource.getProperty(withExpr.getPropertyName());
+        return propertyOpt.isPresent() ? withExpr.getEvaluator().eval(propertyOpt.get().getValue()) : Boolean.FALSE;
     }
 
     private Boolean validateAsserts(Resource resource, List<AssertExpr> assertExprs) {
@@ -107,7 +107,7 @@ public class CloudSpecValidator {
     }
 
     private Boolean validateAssert(Resource resource, AssertExpr assertExpr) {
-        Optional<ResourceAttribute> attributeOpt = resource.getAttribute(assertExpr.getAttribute());
-        return attributeOpt.isPresent() ? assertExpr.getEvaluator().eval(attributeOpt.get().getValue()) : Boolean.FALSE;
+        Optional<Property> propertyOpt = resource.getProperty(assertExpr.getPropertyName());
+        return propertyOpt.isPresent() ? assertExpr.getEvaluator().eval(propertyOpt.get().getValue()) : Boolean.FALSE;
     }
 }

@@ -25,8 +25,6 @@
  */
 package cloudspec.model;
 
-public class BooleanResourceAttribute extends BaseResourceAttribute {
-    public BooleanResourceAttribute(String name, Boolean value) {
-        super(name, value);
-    }
+public interface Member {
+    String getName();
 }

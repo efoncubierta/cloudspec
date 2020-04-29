@@ -27,19 +27,40 @@ package cloudspec.lang;
 
 import java.util.List;
 
+/**
+ * Define a group expression.
+ * <p>
+ * Rules in a spec are grouped in groups.
+ */
 public class GroupExpr {
     private final String name;
     private final List<RuleExpr> rules;
 
+    /**
+     * Constructor.
+     *
+     * @param name  Group's name.
+     * @param rules List of rules.
+     */
     public GroupExpr(String name, List<RuleExpr> rules) {
         this.name = name;
         this.rules = rules;
     }
 
+    /**
+     * Get group's name.
+     *
+     * @return Group name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get group's list of rules.
+     *
+     * @return List of rules.
+     */
     public List<RuleExpr> getRules() {
         return rules;
     }

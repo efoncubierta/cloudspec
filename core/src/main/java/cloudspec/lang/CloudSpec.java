@@ -27,19 +27,38 @@ package cloudspec.lang;
 
 import java.util.List;
 
+/**
+ * Define the structure of a Cloud Spec.
+ */
 public class CloudSpec {
     private final String name;
     private final List<GroupExpr> groups;
 
+    /**
+     * Constructor.
+     *
+     * @param name   Spec's name.
+     * @param groups List of groups of rules.
+     */
     public CloudSpec(String name, List<GroupExpr> groups) {
         this.name = name;
         this.groups = groups;
     }
 
+    /**
+     * Get the spec's name.
+     *
+     * @return Spec's name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get the spec's list of groups of rules.
+     *
+     * @return List of groups.
+     */
     public List<GroupExpr> getGroups() {
         return groups;
     }

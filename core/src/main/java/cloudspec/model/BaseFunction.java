@@ -25,6 +25,16 @@
  */
 package cloudspec.model;
 
-public interface ResourceAttribute extends ResourceField {
-    Object getValue();
+/**
+ * Base class for classes implementing {@link Function}.
+ */
+public abstract class BaseFunction extends BaseMember implements Function {
+    /**
+     * Constructor.
+     *
+     * @param name Function's name.
+     */
+    public BaseFunction(String name) {
+        super(name);
+    }
 }

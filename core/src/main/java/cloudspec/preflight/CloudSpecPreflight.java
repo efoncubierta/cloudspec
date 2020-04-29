@@ -25,9 +25,9 @@
  */
 package cloudspec.preflight;
 
+import cloudspec.ProvidersRegistry;
 import cloudspec.lang.*;
 import cloudspec.model.Provider;
-import cloudspec.ProvidersRegistry;
 import cloudspec.model.ResourceDef;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public class CloudSpecPreflight {
     }
 
     private void preflightRule(RuleExpr rule) {
-        String providerName = rule.getResourceTypeFQName().split(":")[0];
+        String providerName = rule.getResourceTypeFqn().split(":")[0];
 
         // lookup provider
         Provider provider = providersRegistry.getProvider(providerName);
@@ -69,9 +69,9 @@ public class CloudSpecPreflight {
         }
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFQName());
+        Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFqn());
         if (!resourceDefOpt.isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFQName()));
+            throw new CloudSpecPreflightException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn()));
         }
 
         // preflight withs and asserts
@@ -80,16 +80,16 @@ public class CloudSpecPreflight {
     }
 
     private void preflightWiths(ResourceDef resourceDef, List<WithExpr> withExprs) {
-        withExprs.forEach(withExpr -> preflightAttribute(resourceDef, withExpr.getAttribute()));
+        withExprs.forEach(withExpr -> preflightProperty(resourceDef, withExpr.getPropertyName()));
     }
 
     private void preflightAsserts(ResourceDef resourceDef, List<AssertExpr> assertExprs) {
-        assertExprs.forEach(assertExpr -> preflightAttribute(resourceDef, assertExpr.getAttribute()));
+        assertExprs.forEach(assertExpr -> preflightProperty(resourceDef, assertExpr.getPropertyName()));
     }
 
-    private void preflightAttribute(ResourceDef resourceDef, String attributeFQName) {
-        if (!resourceDef.getAttributeDefinition(attributeFQName).isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Resource type '%s' does not define attribute '%s'.", resourceDef.getFQName(), attributeFQName));
+    private void preflightProperty(ResourceDef resourceDef, String propertyName) {
+        if (!resourceDef.getPropertyDef(propertyName).isPresent()) {
+            throw new CloudSpecPreflightException(String.format("Resource type '%s' does not define property '%s'.", resourceDef.getFqn(), propertyName));
         }
     }
 }

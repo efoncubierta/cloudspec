@@ -28,12 +28,36 @@ package cloudspec.model;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define a CloudSpec's provider.
+ * <p>
+ * A provider provides CloudSpec with resource definitions and resource loaders. Providers must implement
+ * this class, that will be instantiated into the {@link cloudspec.ProvidersRegistry}.
+ * <p>
+ * Note to future: providers will also provide new expressions and functions to CloudSpec.
+ */
 public interface Provider {
+    /**
+     * Get the provider's name.
+     *
+     * @return Provider's name.
+     */
     String getProviderName();
 
-    default Optional<ResourceDef> getResourceDef(String resourceFQName) {
-        return getResourceDefs().stream().filter(resourceDef -> resourceDef.getFQName().equals(resourceFQName)).findFirst();
+    /**
+     * Get a resource definition of this provider.
+     *
+     * @param resourceTypeFqn Resource fully-qualified name.
+     * @return Optional resource definition.
+     */
+    default Optional<ResourceDef> getResourceDef(String resourceTypeFqn) {
+        return getResourceDefs().stream().filter(resourceDef -> resourceDef.getFqn().equals(resourceTypeFqn)).findFirst();
     }
 
+    /**
+     * Get a list of all resource definitions of this provider.
+     *
+     * @return List of resource definitions.
+     */
     List<ResourceDef> getResourceDefs();
 }

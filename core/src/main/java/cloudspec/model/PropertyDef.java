@@ -25,6 +25,22 @@
  */
 package cloudspec.model;
 
-public interface ResourceFunction extends ResourceField {
+public class PropertyDef extends MemberDef {
+    private final PropertyType propertyType;
+    private final Boolean isArray;
 
+    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
+        super(name, description);
+
+        this.propertyType = propertyType;
+        this.isArray = isArray;
+    }
+
+    public PropertyType getPropertyType() {
+        return propertyType;
+    }
+
+    public Boolean isArray() {
+        return isArray;
+    }
 }

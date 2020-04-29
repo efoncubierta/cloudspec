@@ -25,6 +25,23 @@
  */
 package cloudspec.model;
 
-public enum ResourceFieldType {
-    ATTRIBUTE, FUNCTION
+/**
+ * Base class for classes implementing {@link Member}.
+ */
+public abstract class BaseMember implements Member {
+    private final String name;
+
+    /**
+     * Constructor.
+     *
+     * @param name Member's name.
+     */
+    protected BaseMember(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }

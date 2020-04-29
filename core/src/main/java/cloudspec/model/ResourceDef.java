@@ -35,21 +35,21 @@ public interface ResourceDef {
 
     String getResourceName();
 
-    default String getFQName() {
+    default String getFqn() {
         return String.format("%s:%s:%s", getProviderName(), getGroupName(), getResourceName());
     }
 
-    default Optional<ResourceAttributeDef> getAttributeDefinition(String attributeName) {
-        return getAttributesDefinitions().stream().filter(def -> def.getName().equals(attributeName)).findFirst();
+    default Optional<PropertyDef> getPropertyDef(String propertyName) {
+        return getPropertyDefs().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
     }
 
-    List<ResourceAttributeDef> getAttributesDefinitions();
+    List<PropertyDef> getPropertyDefs();
 
-    default Optional<ResourceFunctionDef> getFunctionDefinition(String functionName) {
-        return getFunctionsDefinitions().stream().filter(def -> def.getName().equals(functionName)).findFirst();
+    default Optional<FunctionDef> getFunctionDef(String functionName) {
+        return getFunctionDefs().stream().filter(def -> def.getName().equals(functionName)).findFirst();
     }
 
-    List<ResourceFunctionDef> getFunctionsDefinitions();
+    List<FunctionDef> getFunctionDefs();
 
     ResourceLoader getResourceLoader();
 }

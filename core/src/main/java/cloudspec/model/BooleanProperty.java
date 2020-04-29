@@ -25,17 +25,17 @@
  */
 package cloudspec.model;
 
-public abstract class BaseResourceAttribute extends BaseResourceField implements ResourceAttribute {
-    private final Object value;
-
-    public BaseResourceAttribute(String name, Object value) {
-        super(name);
-
-        this.value = value;
-    }
-
-    @Override
-    public Object getValue() {
-        return value;
+/**
+ * Define a property of type 'boolean'.
+ */
+public class BooleanProperty extends BaseProperty {
+    /**
+     * Constructor.
+     *
+     * @param name  Property's name.
+     * @param value Property's value.
+     */
+    public BooleanProperty(String name, Boolean value) {
+        super(name, value);
     }
 }

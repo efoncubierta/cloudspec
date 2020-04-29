@@ -25,6 +25,19 @@
  */
 package cloudspec.lang.evaluator;
 
+/**
+ * Define an expression evaluator.
+ *
+ * An expression evaluator validates whether or not a property matches the expressions.
+ *
+ * @param <T> Type of the property.
+ */
 public interface ExprEvaluator<T> {
-    Boolean eval(T attributeValue);
+    /**
+     * Evaluate expression against a property's value.
+     *
+     * @param propertyValue Property's value.
+     * @return True if property's value matches the expression. False otherwise.
+     */
+    Boolean eval(T propertyValue);
 }

@@ -25,8 +25,17 @@
  */
 package cloudspec.model;
 
-public class ResourceFunctionDef extends ResourceFieldDef {
-    public ResourceFunctionDef(String name, String description) {
-        super(name, description);
+/**
+ * Define an property of type 'integer'.
+ */
+public class IntegerProperty extends BaseProperty {
+    /**
+     * Constructor.
+     *
+     * @param name  Property's name.
+     * @param value Property's value.
+     */
+    public IntegerProperty(String name, Integer value) {
+        super(name, value);
     }
 }

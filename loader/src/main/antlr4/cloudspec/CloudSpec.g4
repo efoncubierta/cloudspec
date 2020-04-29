@@ -8,15 +8,15 @@ groupDecl: GROUP STRING ruleDecl+;
 
 ruleDecl: RULE STRING onDecl assertDecl*;
 
-onDecl: ON ENTITY_REF withDecl*;
+onDecl: ON RESOURCE_TYPE_FQN withDecl*;
 
-withDecl: WITH ATTRIBUTE_NAME withExpr;
+withDecl: WITH PROPERTY_NAME withExpr;
 
-assertDecl: ASSERT ATTRIBUTE_NAME (mustExpr | shouldExpr);
+assertDecl: ASSERT PROPERTY_NAME (mustExpr | shouldExpr);
 
 // Expressions
 
-// With ATTRIBUTE_NAME
+// With PROPERTY_NAME
 //   == B
 //   != B
 //   EQUAL TO B
@@ -24,7 +24,7 @@ assertDecl: ASSERT ATTRIBUTE_NAME (mustExpr | shouldExpr);
 //   IN [B]
 //   NOT IN [B]
 
-// Assert ATTRIBUTE_NAME
+// Assert PROPERTY_NAME
 //   BE == B
 //   BE != B
 //   BE EQUAL TO B
@@ -96,12 +96,12 @@ fragment LETTERS: [a-zA-Z]+;
 fragment ALPHANUM: [a-zA-Z0-9];
 fragment ALPHANUMS: [a-zA-Z0-9]+;
 
-// Entity and attribute references
-ENTITY_REF: PROVIDER_NAMESPACE (':' GROUP_NAMESPACE)? ':' ENTITY_NAME;
+// Resource and member references
+RESOURCE_TYPE_FQN: PROVIDER_NAMESPACE (':' GROUP_NAMESPACE)? ':' RESOURCE_TYPE;
 fragment PROVIDER_NAMESPACE: LETTER ALPHANUM*;
 fragment GROUP_NAMESPACE: LETTER ALPHANUM*;
-fragment ENTITY_NAME: LETTER ALPHANUM*;
-ATTRIBUTE_NAME: [a-zA-Z0-9_]+;
+fragment RESOURCE_TYPE: LETTER ALPHANUM*;
+PROPERTY_NAME: [a-zA-Z0-9_]+;
 
 WS: [ \t\r\n]+ -> skip;
 SL_COMMENT: '//' .*? '\n' -> skip;

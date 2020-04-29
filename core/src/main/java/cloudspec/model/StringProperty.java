@@ -25,8 +25,17 @@
  */
 package cloudspec.model;
 
-public enum ResourceAttributeType {
-    STRING,
-    BOOLEAN,
-    INTEGER
+/**
+ * Define a property of type 'string'.
+ */
+public class StringProperty extends BaseProperty {
+    /**
+     * Constructor.
+     *
+     * @param name  Property's name.
+     * @param value Property's value.
+     */
+    public StringProperty(String name, String value) {
+        super(name, value);
+    }
 }

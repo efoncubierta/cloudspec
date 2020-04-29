@@ -25,10 +25,10 @@
  */
 package cloudspec;
 
+import cloudspec.lang.*;
 import cloudspec.lang.evaluator.EqualExprEvaluator;
 import cloudspec.lang.evaluator.ExprEvaluator;
 import cloudspec.lang.evaluator.InExprEvaluator;
-import cloudspec.lang.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,16 +50,16 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
     private List<RuleExpr> currentGroupRules;
 
     // current rule
-    private String currentRuleTitle;
-    private String currentRuleResourceTypeFQName;
-    private List<WithExpr> currentRuleWiths;
-    private List<AssertExpr> currentRuleAsserts;
+    private String currentRuleName;
+    private String currentRuleResourceTypeFqn;
+    private List<WithExpr> currentRuleWithExprs;
+    private List<AssertExpr> currentRuleAssertExprs;
 
     // current width
-    private String currentWithAttribute;
+    private String currentWithPropertyName;
 
     // current assert
-    private String currentAssertAttribute;
+    private String currentAssertPropertyName;
 
     // evaluator
     private ExprEvaluator<Object> currentEvaluator;
@@ -93,83 +93,83 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
 
     @Override
     public void enterRuleDecl(CloudSpecParser.RuleDeclContext ctx) {
-        currentRuleTitle = stripQuotes(ctx.STRING().getText());
-        currentRuleWiths = new ArrayList<>();
-        currentRuleAsserts = new ArrayList<>();
+        currentRuleName = stripQuotes(ctx.STRING().getText());
+        currentRuleWithExprs = new ArrayList<>();
+        currentRuleAssertExprs = new ArrayList<>();
     }
 
     @Override
     public void exitRuleDecl(CloudSpecParser.RuleDeclContext ctx) {
-        currentGroupRules.add(new RuleExpr(currentRuleTitle, currentRuleResourceTypeFQName, currentRuleWiths, currentRuleAsserts));
+        currentGroupRules.add(new RuleExpr(currentRuleName, currentRuleResourceTypeFqn, currentRuleWithExprs, currentRuleAssertExprs));
     }
 
     @Override
     public void enterOnDecl(CloudSpecParser.OnDeclContext ctx) {
-        currentRuleResourceTypeFQName = ctx.ENTITY_REF().getText();
+        currentRuleResourceTypeFqn = ctx.RESOURCE_TYPE_FQN().getText();
     }
 
     @Override
     public void enterWithDecl(CloudSpecParser.WithDeclContext ctx) {
-        currentWithAttribute = stripQuotes(ctx.ATTRIBUTE_NAME().getText());
+        currentWithPropertyName = stripQuotes(ctx.PROPERTY_NAME().getText());
         currentEvaluator = null;
         currentValues = new ArrayList<Object>();
     }
 
     @Override
     public void exitWithDecl(CloudSpecParser.WithDeclContext ctx) {
-        currentRuleWiths.add(new WithExpr(currentWithAttribute, currentEvaluator));
+        currentRuleWithExprs.add(new WithExpr(currentWithPropertyName, currentEvaluator));
     }
 
     @Override
     public void enterAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
-        currentAssertAttribute = stripQuotes(ctx.ATTRIBUTE_NAME().getText());
+        currentAssertPropertyName = stripQuotes(ctx.PROPERTY_NAME().getText());
         currentEvaluator = null;
-        currentValues = new ArrayList<Object>();
+        currentValues = new ArrayList<>();
     }
 
     @Override
     public void exitAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
-        currentRuleAsserts.add(new AssertExpr(currentAssertAttribute, currentEvaluator));
+        currentRuleAssertExprs.add(new AssertExpr(currentAssertPropertyName, currentEvaluator));
     }
 
     @Override
     public void exitWithEqualExpr(CloudSpecParser.WithEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<Object>(currentValues.get(0), Boolean.FALSE);
+        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.FALSE);
     }
 
     @Override
     public void exitWithNotEqualExpr(CloudSpecParser.WithNotEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<Object>(currentValues.get(0), Boolean.TRUE);
+        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.TRUE);
     }
 
     @Override
     public void exitWithInExpr(CloudSpecParser.WithInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<Object>(currentValues, Boolean.FALSE);
+        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.FALSE);
     }
 
     @Override
     public void exitWithNotInExpr(CloudSpecParser.WithNotInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<Object>(currentValues, Boolean.TRUE);
+        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.TRUE);
     }
 
     @Override
     public void exitAssertEqualExpr(CloudSpecParser.AssertEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<Object>(currentValues.get(0), Boolean.FALSE);
+        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.FALSE);
     }
 
     @Override
     public void exitAssertNotEqualExpr(CloudSpecParser.AssertNotEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<Object>(currentValues.get(0), Boolean.TRUE);
+        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.TRUE);
     }
 
     @Override
     public void exitAssertInExpr(CloudSpecParser.AssertInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<Object>(currentValues, Boolean.FALSE);
+        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.FALSE);
     }
 
     @Override
     public void exitAssertNotInExpr(CloudSpecParser.AssertNotInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<Object>(currentValues, Boolean.TRUE);
+        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.TRUE);
     }
 
     @Override

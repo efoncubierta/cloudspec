@@ -27,19 +27,40 @@ package cloudspec.lang;
 
 import cloudspec.lang.evaluator.ExprEvaluator;
 
+/**
+ * Define an 'assert' expression.
+ * <p>
+ * Assert expressions ares used to validate resources.
+ */
 public class AssertExpr {
-    private final String attribute;
+    private final String propertyName;
     private final ExprEvaluator<Object> evaluator;
 
-    public AssertExpr(String attribute, ExprEvaluator<Object> evaluator) {
-        this.attribute = attribute;
+    /**
+     * Constructor.
+     *
+     * @param propertyName Resource's property that will be evaluated.
+     * @param evaluator    Expression evaluator.
+     */
+    public AssertExpr(String propertyName, ExprEvaluator<Object> evaluator) {
+        this.propertyName = propertyName;
         this.evaluator = evaluator;
     }
 
-    public String getAttribute() {
-        return attribute;
+    /**
+     * Get the resource's property name that will be evaluated.
+     *
+     * @return Property name.
+     */
+    public String getPropertyName() {
+        return propertyName;
     }
 
+    /**
+     * Get the expression evaluator.
+     *
+     * @return Expression evaluator.
+     */
     public ExprEvaluator<Object> getEvaluator() {
         return evaluator;
     }
@@ -47,7 +68,7 @@ public class AssertExpr {
     @Override
     public String toString() {
         return "AssertExpr{" +
-                "attribute='" + attribute + '\'' +
+                "propertyName='" + propertyName + '\'' +
                 ", evaluator=" + evaluator +
                 '}';
     }

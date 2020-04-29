@@ -62,7 +62,7 @@ public class CloudSpecPreloader {
     }
 
     private void preloadRule(RuleExpr rule) {
-        String providerName = rule.getResourceTypeFQName().split(":")[0];
+        String providerName = rule.getResourceTypeFqn().split(":")[0];
 
         // lookup provider
         Provider provider = providersRegistry.getProvider(providerName);
@@ -71,9 +71,9 @@ public class CloudSpecPreloader {
         }
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFQName());
+        Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFqn());
         if (!resourceDefOpt.isPresent()) {
-            throw new CloudSpecPreloaderException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFQName()));
+            throw new CloudSpecPreloaderException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn()));
         }
 
         // load resources

@@ -25,15 +25,20 @@
  */
 package cloudspec.model;
 
-public abstract class BaseResourceField implements ResourceField {
+public abstract class MemberDef {
     private final String name;
+    private final String description;
 
-    protected BaseResourceField(String name) {
+    protected MemberDef(String name, String description) {
         this.name = name;
+        this.description = description;
     }
 
-    @Override
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

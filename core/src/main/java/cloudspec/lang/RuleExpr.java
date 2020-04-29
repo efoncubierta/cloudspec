@@ -27,31 +27,64 @@ package cloudspec.lang;
 
 import java.util.List;
 
+/**
+ * Define a rule expression.
+ * <p>
+ * A rule filters and validates resources.
+ */
 public class RuleExpr {
-    private final String title;
-    private final String resourceTypeFQName;
+    private final String name;
+    private final String resourceTypeFqn;
     private final List<WithExpr> withs;
     private final List<AssertExpr> asserts;
 
-    public RuleExpr(String title, String resourceTypeFQName, List<WithExpr> withs, List<AssertExpr> asserts) {
-        this.title = title;
-        this.resourceTypeFQName = resourceTypeFQName;
+    /**
+     * Constructor.
+     *
+     * @param name            Rules' name.
+     * @param resourceTypeFqn Fully-qualified name of the resource the rule applies to.
+     * @param withs           List of 'with' expressions to filter the resources.
+     * @param asserts         List of 'assert' expressions to validate the resources.
+     */
+    public RuleExpr(String name, String resourceTypeFqn, List<WithExpr> withs, List<AssertExpr> asserts) {
+        this.name = name;
+        this.resourceTypeFqn = resourceTypeFqn;
         this.withs = withs;
         this.asserts = asserts;
     }
 
-    public String getTitle() {
-        return title;
+    /**
+     * Get the rule's name.
+     *
+     * @return Rule's name.
+     */
+    public String getName() {
+        return name;
     }
 
-    public String getResourceTypeFQName() {
-        return resourceTypeFQName;
+    /**
+     * Get the fully-qualified name of the resource the rule applies to.
+     *
+     * @return Resource's FQ name.
+     */
+    public String getResourceTypeFqn() {
+        return resourceTypeFqn;
     }
 
+    /**
+     * Get the rule's 'with' expressions.
+     *
+     * @return List of with expressions.
+     */
     public List<WithExpr> getWiths() {
         return withs;
     }
 
+    /**
+     * Get the rule's 'assert' expressions.
+     *
+     * @return List of assert expressions.
+     */
     public List<AssertExpr> getAsserts() {
         return asserts;
     }
@@ -59,8 +92,8 @@ public class RuleExpr {
     @Override
     public String toString() {
         return "SpecRule{" +
-                "title='" + title + '\'' +
-                ", resourceFQName='" + resourceTypeFQName + '\'' +
+                "name='" + name + '\'' +
+                ", resourceTypeFqn='" + resourceTypeFqn + '\'' +
                 ", withs=" + withs +
                 ", asserts=" + asserts +
                 '}';

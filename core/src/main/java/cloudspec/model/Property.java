@@ -25,6 +25,11 @@
  */
 package cloudspec.model;
 
-public interface ResourceField {
-    String getName();
+/**
+ * Define a resource property.
+ *
+ *
+ */
+public interface Property extends Member {
+    Object getValue();
 }

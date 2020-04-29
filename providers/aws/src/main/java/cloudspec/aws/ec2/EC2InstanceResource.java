@@ -25,64 +25,75 @@
  */
 package cloudspec.aws.ec2;
 
+import cloudspec.aws.AWSProvider;
 import cloudspec.aws.AWSResourceDef;
-import cloudspec.model.ResourceAttribute;
-import cloudspec.model.ResourceFunction;
-import cloudspec.model.StringResourceAttribute;
+import cloudspec.model.Property;
+import cloudspec.model.Function;
+import cloudspec.model.StringProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EC2InstanceResource extends EC2Resource {
-    private final List<ResourceAttribute> attributes = new ArrayList<>();
-    private final List<ResourceFunction> functions = new ArrayList<>();
+    private final List<Property> properties = new ArrayList<>();
+    private final List<Function> functions = new ArrayList<>();
 
     public EC2InstanceResource(String region, String availabilityZone, String instanceId, String instanceType, String vpcId) {
         // TODO manage null values
 
-        attributes.add(
-                new StringResourceAttribute(
-                        AWSResourceDef.ATTR_REGION,
+        properties.add(
+                new StringProperty(
+                        AWSResourceDef.PROP_REGION,
                         region
                 )
         );
 
-        attributes.add(
-                new StringResourceAttribute(
-                        AWSResourceDef.ATTR_AVAILABILITY_ZONE,
+        properties.add(
+                new StringProperty(
+                        AWSResourceDef.PROP_AVAILABILITY_ZONE,
                         availabilityZone
                 )
         );
 
-        attributes.add(
-                new StringResourceAttribute(
-                        EC2InstanceResourceDef.ATTR_INSTANCE_ID,
+        properties.add(
+                new StringProperty(
+                        EC2InstanceResourceDef.PROP_INSTANCE_ID,
                         instanceId
                 )
         );
 
-        attributes.add(
-                new StringResourceAttribute(
-                        EC2InstanceResourceDef.ATTR_INSTANCE_TYPE,
+        properties.add(
+                new StringProperty(
+                        EC2InstanceResourceDef.PROP_INSTANCE_TYPE,
                         instanceType
                 )
         );
 
-        attributes.add(
-                new StringResourceAttribute(
-                        EC2InstanceResourceDef.ATTR_VPC_ID,
+        properties.add(
+                new StringProperty(
+                        EC2InstanceResourceDef.PROP_VPC_ID,
                         vpcId
                 )
         );
     }
 
     @Override
-    public List<ResourceAttribute> getAttributes() {
-        return attributes;
+    public String getResourceTypeFqn() {
+        return String.format(
+                "%s:%s:%s",
+                AWSProvider.PROVIDER_NAME,
+                EC2ResourceDef.GROUP_NAME,
+                EC2InstanceResourceDef.RESOURCE_NAME
+        );
     }
 
     @Override
-    public List<ResourceFunction> getFunctions() {
+    public List<Property> getProperties() {
+        return properties;
+    }
+
+    @Override
+    public List<Function> getFunctions() {
         return functions;
     }
 }
