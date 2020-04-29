@@ -23,31 +23,38 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec;
+package cloudspec.validator;
 
-import cloudspec.model.Provider;
+import cloudspec.util.CloudSpecTestUtils;
 import cloudspec.util.ProviderTestUtils;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.Optional;
+import static org.junit.Assert.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class ProvidersRegistryTest {
+public class CloudSpecValidatorTest {
+
+
     @Test
-    public void shouldRegisterProvider() {
-        ProvidersRegistry registry = new ProvidersRegistry();
+    public void shouldValidateAWellDefinedCloudSpec() {
+        CloudSpecValidator validator = new CloudSpecValidator(ProviderTestUtils.TEST_PROVIDERS_REGISTRY);
 
-        registry.register(ProviderTestUtils.TEST_PROVIDER);
+        CloudSpecValidatorResult result = validator.validate(CloudSpecTestUtils.TEST_SPEC);
 
-        Optional<Provider> providerOpt = registry.getProvider(ProviderTestUtils.TEST_PROVIDER_NAME);
-        assertTrue(providerOpt.isPresent());
-        assertEquals(ProviderTestUtils.TEST_PROVIDER_NAME, providerOpt.get().getProviderName());
+        assertEquals(CloudSpecTestUtils.TEST_SPEC_NAME, result.getSpecName());
+        assertEquals(1, result.getGroupResults().size());
 
-        List<Provider> providers = registry.getProviders();
-        assertEquals(1, providers.size());
-        assertEquals(ProviderTestUtils.TEST_PROVIDER_NAME, providers.get(0).getProviderName());
+        result.getGroupResults().forEach(groupResult -> {
+            assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupResult.getGroupName());
+            assertEquals(1, groupResult.getRuleResults().size());
+
+            groupResult.getRuleResults().forEach(ruleResult -> {
+                assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.getRuleName());
+                assertTrue(ruleResult.isSuccess());
+                assertFalse(ruleResult.isError());
+                assertFalse(ruleResult.getReason().isPresent());
+                assertFalse(ruleResult.getThrowable().isPresent());
+            });
+        });
     }
 }

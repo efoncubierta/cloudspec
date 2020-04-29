@@ -23,30 +23,20 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec;
+package cloudspec.util;
 
-import cloudspec.model.Provider;
+import cloudspec.lang.evaluator.ExprEvaluator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class ProvidersRegistry {
-    private final List<Provider> providers = new ArrayList<>();
+public class ExprEvaluatorTestUtils {
+    public static final ExprEvaluator<Object> TRUE_EVALUATOR = mock(ExprEvaluator.class);
+    public static final ExprEvaluator<Object> FALSE_EVALUATOR = mock(ExprEvaluator.class);
 
-    public Optional<Provider> getProvider(String providerName) {
-        return getProviders().stream().filter(provider -> provider.getProviderName().equals(providerName)).findFirst();
-    }
-
-    public List<Provider> getProviders() {
-        return providers;
-    }
-
-    public void register(Provider provider) {
-        // filter out existing provider
-        providers.removeIf(p -> provider.getProviderName().equals(p.getProviderName()));
-
-        // register new provider
-        providers.add(provider);
+    static {
+        when(TRUE_EVALUATOR.eval(any())).thenReturn(Boolean.TRUE);
+        when(FALSE_EVALUATOR.eval(any())).thenReturn(Boolean.FALSE);
     }
 }

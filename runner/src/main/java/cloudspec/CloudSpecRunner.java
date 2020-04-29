@@ -25,8 +25,8 @@
  */
 package cloudspec;
 
-import cloudspec.model.Provider;
 import cloudspec.lang.CloudSpec;
+import cloudspec.model.Provider;
 import cloudspec.preflight.CloudSpecPreflight;
 import cloudspec.preload.CloudSpecPreloader;
 import cloudspec.validator.CloudSpecValidator;
@@ -111,7 +111,14 @@ public class CloudSpecRunner {
 
         if (ruleResult.isError()) {
             System.out.println("");
-            cp.println(ruleResult.getThrowable().getMessage(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+
+            if (ruleResult.getThrowable().isPresent()) {
+                cp.println(ruleResult.getThrowable().get().getMessage(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+            } else if (ruleResult.getReason().isPresent()) {
+                cp.println(ruleResult.getReason().get(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+            } else {
+                cp.println("Unknown", Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+            }
         }
     }
 

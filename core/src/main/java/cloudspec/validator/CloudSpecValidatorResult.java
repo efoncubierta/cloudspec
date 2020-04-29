@@ -26,6 +26,7 @@
 package cloudspec.validator;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CloudSpecValidatorResult {
     private final String specName;
@@ -65,18 +66,22 @@ public class CloudSpecValidatorResult {
     public static class RuleResult {
         private final String ruleName;
         private final Boolean success;
-        private final String reason;
-        private final Throwable throwable;
+        private final Optional<String> reason;
+        private final Optional<Throwable> throwable;
 
         public RuleResult(String ruleName, Boolean success) {
-            this(ruleName, success, "", null);
+            this(ruleName, success, null, null);
+        }
+
+        public RuleResult(String ruleName, Boolean success, String reason) {
+            this(ruleName, success, reason, null);
         }
 
         public RuleResult(String ruleName, Boolean success, String reason, Throwable throwable) {
             this.ruleName = ruleName;
             this.success = success;
-            this.reason = reason;
-            this.throwable = throwable;
+            this.reason = reason != null ? Optional.of(reason) : Optional.empty();
+            this.throwable = throwable != null ? Optional.of(throwable) : Optional.empty();
         }
 
         public String getRuleName() {
@@ -91,11 +96,11 @@ public class CloudSpecValidatorResult {
             return !isSuccess();
         }
 
-        public String getReason() {
+        public Optional<String> getReason() {
             return reason;
         }
 
-        public Throwable getThrowable() {
+        public Optional<Throwable> getThrowable() {
             return throwable;
         }
     }

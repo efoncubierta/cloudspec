@@ -65,13 +65,13 @@ public class CloudSpecPreloader {
         String providerName = rule.getResourceTypeFqn().split(":")[0];
 
         // lookup provider
-        Provider provider = providersRegistry.getProvider(providerName);
-        if (Objects.isNull(provider)) {
+        Optional<Provider> providerOpt = providersRegistry.getProvider(providerName);
+        if (!providerOpt.isPresent()) {
             throw new CloudSpecPreloaderException(String.format("Provider '%s' not found.", providerName));
         }
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFqn());
+        Optional<ResourceDef> resourceDefOpt = providerOpt.get().getResourceDef(rule.getResourceTypeFqn());
         if (!resourceDefOpt.isPresent()) {
             throw new CloudSpecPreloaderException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn()));
         }

@@ -31,7 +31,6 @@ import cloudspec.model.Provider;
 import cloudspec.model.ResourceDef;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class CloudSpecPreflight {
@@ -63,13 +62,13 @@ public class CloudSpecPreflight {
         String providerName = rule.getResourceTypeFqn().split(":")[0];
 
         // lookup provider
-        Provider provider = providersRegistry.getProvider(providerName);
-        if (Objects.isNull(provider)) {
+        Optional<Provider> providerOpt = providersRegistry.getProvider(providerName);
+        if (!providerOpt.isPresent()) {
             throw new CloudSpecPreflightException(String.format("Provider '%s' not found.", providerName));
         }
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFqn());
+        Optional<ResourceDef> resourceDefOpt = providerOpt.get().getResourceDef(rule.getResourceTypeFqn());
         if (!resourceDefOpt.isPresent()) {
             throw new CloudSpecPreflightException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn()));
         }

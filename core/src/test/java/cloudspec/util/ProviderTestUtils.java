@@ -23,16 +23,33 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.validator;
+package cloudspec.util;
 
-import cloudspec.CloudSpecRuntimeException;
+import cloudspec.ProvidersRegistry;
+import cloudspec.model.Provider;
 
-public class CloudSpecValidatorException extends CloudSpecRuntimeException {
-    public CloudSpecValidatorException(String message) {
-        super(message);
+import java.util.Collections;
+import java.util.Optional;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class ProviderTestUtils {
+    public static final String TEST_PROVIDER_NAME = "myprovider";
+
+    public static final Provider TEST_PROVIDER = mock(Provider.class);
+
+    static {
+        // test provider
+        when(TEST_PROVIDER.getProviderName()).thenReturn(TEST_PROVIDER_NAME);
+        when(TEST_PROVIDER.getResourceDef(ResourceTestUtils.TEST_RESOURCE_TYPE_FQN)).thenReturn(Optional.of(ResourceTestUtils.TEST_RESOURCE_DEF));
+        when(TEST_PROVIDER.getResourceDefs()).thenReturn(Collections.singletonList(ResourceTestUtils.TEST_RESOURCE_DEF));
     }
 
-    public CloudSpecValidatorException(String message, Throwable cause) {
-        super(message, cause);
+    public static final ProvidersRegistry TEST_PROVIDERS_REGISTRY = mock(ProvidersRegistry.class);
+
+    static {
+        when(TEST_PROVIDERS_REGISTRY.getProvider(TEST_PROVIDER_NAME)).thenReturn(Optional.of(TEST_PROVIDER));
+        when(TEST_PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(TEST_PROVIDER));
     }
 }

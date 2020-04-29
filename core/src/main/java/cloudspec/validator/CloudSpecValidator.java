@@ -27,14 +27,12 @@ package cloudspec.validator;
 
 import cloudspec.ProvidersRegistry;
 import cloudspec.lang.*;
+import cloudspec.model.Property;
 import cloudspec.model.Provider;
 import cloudspec.model.Resource;
-import cloudspec.model.Property;
 import cloudspec.model.ResourceDef;
-import cloudspec.preload.CloudSpecPreloaderException;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -61,53 +59,97 @@ public class CloudSpecValidator {
         return rules.stream().map(this::validateRule).collect(Collectors.toList());
     }
 
-    public CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
+    private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
         try {
             String providerName = rule.getResourceTypeFqn().split(":")[0];
 
             // lookup provider
-            Provider provider = providersRegistry.getProvider(providerName);
-            if (Objects.isNull(provider)) {
-                throw new CloudSpecPreloaderException(String.format("Provider '%s' not found.", providerName));
+            Optional<Provider> providerOpt = providersRegistry.getProvider(providerName);
+            if (!providerOpt.isPresent()) {
+                return new CloudSpecValidatorResult.RuleResult(
+                        rule.getName(),
+                        Boolean.FALSE,
+                        String.format("Provider '%s' not found.", providerName)
+                );
             }
 
             // lookup resource definition
-            Optional<ResourceDef> resourceDefOpt = provider.getResourceDef(rule.getResourceTypeFqn());
+            Optional<ResourceDef> resourceDefOpt = providerOpt.get().getResourceDef(rule.getResourceTypeFqn());
             if (!resourceDefOpt.isPresent()) {
-                throw new CloudSpecPreloaderException(String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn()));
+                return new CloudSpecValidatorResult.RuleResult(
+                        rule.getName(),
+                        Boolean.FALSE,
+                        String.format("Rule validator for resource of type %s not found.", rule.getResourceTypeFqn())
+                );
             }
 
-            Boolean result = resourceDefOpt.get()
+            List<ValidateExprResult> errors = resourceDefOpt.get()
                     .getResourceLoader()
                     .load()
                     .stream()
-                    .anyMatch(resource -> validateResource(resource, rule.getWiths(), rule.getAsserts()));
+                    .filter(resource -> validateWithExprs(resource, rule.getWiths()))
+                    .flatMap(resource -> validateAssertExprs(resource, rule.getAsserts()).stream())
+                    .filter(result -> !result.success)
+                    .collect(Collectors.toList());
 
-            return new CloudSpecValidatorResult.RuleResult(rule.getName(), result);
+            if (errors.size() > 0) {
+                return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, errors.get(0).message);
+            }
+
+            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.TRUE);
         } catch (RuntimeException exception) {
-            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, exception.getMessage(), exception);
+            throw exception;
+            //return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, exception.getMessage(), exception);
         }
     }
 
-    private Boolean validateResource(Resource resource, List<WithExpr> withExpr, List<AssertExpr> assertExpr) {
-        return validateWiths(resource, withExpr) && validateAsserts(resource, assertExpr);
+    private Boolean validateWithExprs(Resource resource, List<WithExpr> withExpr) {
+        return withExpr.stream().allMatch(with -> validateWithExpr(resource, with));
     }
 
-    private Boolean validateWiths(Resource resource, List<WithExpr> withExpr) {
-        return withExpr.stream().allMatch(with -> validateWith(resource, with));
-    }
-
-    private Boolean validateWith(Resource resource, WithExpr withExpr) {
+    private Boolean validateWithExpr(Resource resource, WithExpr withExpr) {
         Optional<Property> propertyOpt = resource.getProperty(withExpr.getPropertyName());
         return propertyOpt.isPresent() ? withExpr.getEvaluator().eval(propertyOpt.get().getValue()) : Boolean.FALSE;
     }
 
-    private Boolean validateAsserts(Resource resource, List<AssertExpr> assertExprs) {
-        return assertExprs.stream().allMatch(assertExpr -> validateAssert(resource, assertExpr));
+    private List<ValidateExprResult> validateAssertExprs(Resource resource, List<AssertExpr> assertExprs) {
+        return assertExprs
+                .stream()
+                .map(assertExpr -> validateAssertExpr(resource, assertExpr))
+                .collect(Collectors.toList());
     }
 
-    private Boolean validateAssert(Resource resource, AssertExpr assertExpr) {
+    private ValidateExprResult validateAssertExpr(Resource resource, AssertExpr assertExpr) {
         Optional<Property> propertyOpt = resource.getProperty(assertExpr.getPropertyName());
-        return propertyOpt.isPresent() ? assertExpr.getEvaluator().eval(propertyOpt.get().getValue()) : Boolean.FALSE;
+
+        if (!propertyOpt.isPresent()) {
+            return new ValidateExprResult(
+                    Boolean.FALSE,
+                    String.format("Property %s not found on resource of type %s", assertExpr.getPropertyName(), resource.getResourceTypeFqn())
+            );
+        }
+
+        if (!assertExpr.getEvaluator().eval(propertyOpt.get().getValue())) {
+            return new ValidateExprResult(
+                    Boolean.FALSE,
+                    String.format("Assert expression evaluated false", assertExpr.getPropertyName(), resource.getResourceTypeFqn())
+            );
+        }
+
+        return new ValidateExprResult(Boolean.TRUE);
+    }
+
+    private class ValidateExprResult {
+        private final Boolean success;
+        private final String message;
+
+        public ValidateExprResult(Boolean success) {
+            this(success, "");
+        }
+
+        public ValidateExprResult(Boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
     }
 }
