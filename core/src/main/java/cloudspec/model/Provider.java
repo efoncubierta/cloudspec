@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,13 @@
  */
 package cloudspec.model;
 
+import cloudspec.annotation.ProviderDefinition;
+import cloudspec.annotation.ResourceDefinition;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Define a CloudSpec's provider.
@@ -35,18 +41,47 @@ import java.util.List;
  * <p>
  * Note to future: providers will also provide new expressions and functions to CloudSpec.
  */
-public interface Provider {
-    /**
-     * Get the provider's name.
-     *
-     * @return Provider's name.
-     */
-    String getProviderName();
+public abstract class Provider {
+    private final String name;
+    private final String description;
+    private final List<ResourceDef> resourceDefs;
 
-    /**
-     * Get a list of all resource definitions of this provider.
-     *
-     * @return List of resource definitions.
-     */
-    List<ResourceDef> getResourceDefs();
+    public Provider() {
+        // check the class is annotated
+        if (!this.getClass().isAnnotationPresent(ProviderDefinition.class)) {
+            throw new RuntimeException(
+                    String.format("Provider class %s is not annotated with @ProviderDefinition", this.getClass().getCanonicalName())
+            );
+        }
+
+        ProviderDefinition providerDefinition = this.getClass().getAnnotation(ProviderDefinition.class);
+        this.name = providerDefinition.name();
+        this.description = providerDefinition.description();
+
+        this.resourceDefs = Stream.of(providerDefinition.resources())
+                .filter(resourceClass -> resourceClass.isAnnotationPresent(ResourceDefinition.class))
+                .map(ResourceReflectionUtil::toResourceDef)
+                .collect(Collectors.toList());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Optional<ResourceDef> getResourceDef(ResourceFqn resourceFqn) {
+        return getResourceDefs()
+                .stream()
+                .filter(resourceDef -> resourceDef.getResourceFqn().equals(resourceFqn))
+                .findFirst();
+    }
+
+    public List<ResourceDef> getResourceDefs() {
+        return resourceDefs;
+    }
+
+    public abstract List<Resource> getResources(ResourceFqn resourceFqn);
 }

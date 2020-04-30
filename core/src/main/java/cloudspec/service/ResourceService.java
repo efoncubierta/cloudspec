@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,12 +26,12 @@
 package cloudspec.service;
 
 import cloudspec.ProvidersRegistry;
-import cloudspec.model.Provider;
+import cloudspec.model.Resource;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceFqn;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -40,7 +40,7 @@ import java.util.Optional;
  * This service class imports all resource definitions from the providers registry.
  */
 public class ResourceService {
-    private final Map<ResourceFqn, ResourceDef> resourceDefMap = new HashMap<>();
+    private final ProvidersRegistry providersRegistry;
 
     /**
      * Constructor.
@@ -48,25 +48,7 @@ public class ResourceService {
      * @param providersRegistry Provider's registry.
      */
     public ResourceService(ProvidersRegistry providersRegistry) {
-        providersRegistry.getProviders().forEach(this::importProvider);
-    }
-
-    /**
-     * Import provider.
-     *
-     * @param provider Provider.
-     */
-    private void importProvider(Provider provider) {
-        provider.getResourceDefs().forEach(this::importResourceDef);
-    }
-
-    /**
-     * Import resource definition.
-     *
-     * @param resourceDef Resource definition.
-     */
-    private void importResourceDef(ResourceDef resourceDef) {
-        resourceDefMap.put(resourceDef.getFqn(), resourceDef);
+        this.providersRegistry = providersRegistry;
     }
 
     /**
@@ -76,6 +58,19 @@ public class ResourceService {
      * @return Optional resource definition.
      */
     public Optional<ResourceDef> getResourceDef(ResourceFqn resourceFqn) {
-        return Optional.ofNullable(resourceDefMap.get(resourceFqn));
+        return providersRegistry.getProvider(resourceFqn.getProviderName())
+                .flatMap(provider -> provider.getResourceDef(resourceFqn));
+    }
+
+    /**
+     * Get resources of a particular type.
+     *
+     * @param resourceFqn Resource FQN.
+     * @return List of resources.
+     */
+    public List<Resource> getResources(ResourceFqn resourceFqn) {
+        return providersRegistry.getProvider(resourceFqn.getProviderName())
+                .map(provider -> provider.getResources(resourceFqn))
+                .orElse(Collections.emptyList());
     }
 }

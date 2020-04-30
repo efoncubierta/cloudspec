@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,6 +24,8 @@
  * #L%
  */
 package cloudspec.model;
+
+import cloudspec.annotation.ResourceDefinition;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,13 +38,34 @@ import java.util.Optional;
  * <p>
  * Resources are provided by the providers.
  */
-public interface Resource {
+public abstract class Resource {
+    private final ResourceFqn resourceFqn;
+
+    public Resource() {
+        // check the class is annotated
+        if (!this.getClass().isAnnotationPresent(ResourceDefinition.class)) {
+            throw new RuntimeException(
+                    String.format("Resource class %s is not annotated with @ResourceDefinition", this.getClass().getCanonicalName())
+            );
+        }
+
+        // get resource definition
+        ResourceDefinition resourceDefAnnotation = this.getClass().getAnnotation(ResourceDefinition.class);
+        this.resourceFqn = new ResourceFqn(
+                resourceDefAnnotation.provider(),
+                resourceDefAnnotation.group(),
+                resourceDefAnnotation.name()
+        );
+    }
+
     /**
      * Get resource's fully-qualified name.
      *
      * @return Resource fully-qualified name.
      */
-    ResourceFqn getResourceFqn();
+    public ResourceFqn getResourceFqn() {
+        return resourceFqn;
+    }
 
     /**
      * Get a resource's property.
@@ -50,7 +73,7 @@ public interface Resource {
      * @param propertyName Property's name.
      * @return Optional property.
      */
-    default Optional<Property> getProperty(String propertyName) {
+    public Optional<Property> getProperty(String propertyName) {
         return getProperties().stream().filter(property -> property.getName().equals(propertyName)).findFirst();
     }
 
@@ -59,7 +82,9 @@ public interface Resource {
      *
      * @return List of properties.
      */
-    List<Property> getProperties();
+    public List<Property> getProperties() {
+        return ResourceReflectionUtil.toProperties(this);
+    }
 
     /**
      * Get a resource's function.
@@ -67,7 +92,7 @@ public interface Resource {
      * @param functionName Function's name.
      * @return Optional function.
      */
-    default Optional<Function> getFunction(String functionName) {
+    public Optional<Function> getFunction(String functionName) {
         return getFunctions().stream().filter(function -> function.getName().equals(functionName)).findFirst();
     }
 
@@ -76,5 +101,7 @@ public interface Resource {
      *
      * @return List of functions.
      */
-    List<Function> getFunctions();
+    public List<Function> getFunctions() {
+        return ResourceReflectionUtil.toFunctions(this);
+    }
 }

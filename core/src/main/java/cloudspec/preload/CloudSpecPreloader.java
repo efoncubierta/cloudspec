@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,12 +28,10 @@ package cloudspec.preload;
 import cloudspec.lang.CloudSpec;
 import cloudspec.lang.GroupExpr;
 import cloudspec.lang.RuleExpr;
-import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceFqn;
 import cloudspec.service.ResourceService;
 
 import java.util.List;
-import java.util.Optional;
 
 public class CloudSpecPreloader {
     private final ResourceService resourceService;
@@ -63,15 +61,7 @@ public class CloudSpecPreloader {
     private void preloadRule(RuleExpr rule) {
         ResourceFqn resourceFqn = ResourceFqn.fromString(rule.getResourceFqn());
 
-        // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = resourceService.getResourceDef(resourceFqn);
-        if (!resourceDefOpt.isPresent()) {
-            throw new CloudSpecPreloaderException(String.format("Resource %s is not supported.", rule.getResourceFqn()));
-        }
-
         // load resources
-        resourceDefOpt.get()
-                .getResourceLoader()
-                .load();
+        resourceService.getResources(resourceFqn);
     }
 }

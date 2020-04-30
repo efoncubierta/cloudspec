@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,70 +25,73 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.aws.AWSResourceDef;
-import cloudspec.model.Function;
-import cloudspec.model.Property;
-import cloudspec.model.ResourceFqn;
-import cloudspec.model.StringProperty;
+import cloudspec.annotation.PropertyDefinition;
+import cloudspec.annotation.ResourceDefinition;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@ResourceDefinition(
+        provider = "aws",
+        group = "ec2",
+        name = "instance",
+        description = "EC2 Instance"
+)
 public class EC2InstanceResource extends EC2Resource {
-    private final List<Property> properties = new ArrayList<>();
-    private final List<Function> functions = new ArrayList<>();
+    @PropertyDefinition(
+            name = "region",
+            description = "AWS Region"
+    )
+    private final String region;
 
-    public EC2InstanceResource(String region, String availabilityZone, String instanceId, String instanceType, String vpcId) {
-        // TODO manage null values
+    @PropertyDefinition(
+            name = "availability_zone",
+            description = "AWS Availability Zone"
+    )
+    private final String availabilityZone;
 
-        properties.add(
-                new StringProperty(
-                        AWSResourceDef.PROP_REGION,
-                        region
-                )
-        );
+    @PropertyDefinition(
+            name = "instance_id",
+            description = "EC2 Instance ID"
+    )
+    private final String instanceId;
 
-        properties.add(
-                new StringProperty(
-                        AWSResourceDef.PROP_AVAILABILITY_ZONE,
-                        availabilityZone
-                )
-        );
+    @PropertyDefinition(
+            name = "instance_type",
+            description = "EC2 Instance Type"
+    )
+    private final String instanceType;
 
-        properties.add(
-                new StringProperty(
-                        EC2InstanceResourceDef.PROP_INSTANCE_ID,
-                        instanceId
-                )
-        );
+    @PropertyDefinition(
+            name = "vpc_id",
+            description = "VPC ID"
+    )
+    private final String vpcId;
 
-        properties.add(
-                new StringProperty(
-                        EC2InstanceResourceDef.PROP_INSTANCE_TYPE,
-                        instanceType
-                )
-        );
-
-        properties.add(
-                new StringProperty(
-                        EC2InstanceResourceDef.PROP_VPC_ID,
-                        vpcId
-                )
-        );
+    public EC2InstanceResource(String accountId, String region, String availabilityZone,
+                               String instanceId, String instanceType, String vpcId) {
+        super(accountId);
+        this.region = region;
+        this.availabilityZone = availabilityZone;
+        this.instanceId = instanceId;
+        this.instanceType = instanceType;
+        this.vpcId = vpcId;
     }
 
-    @Override
-    public ResourceFqn getResourceFqn() {
-        return EC2InstanceResourceDef.RESOURCE_FQN;
+    public String getRegion() {
+        return region;
     }
 
-    @Override
-    public List<Property> getProperties() {
-        return properties;
+    public String getAvailabilityZone() {
+        return availabilityZone;
     }
 
-    @Override
-    public List<Function> getFunctions() {
-        return functions;
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public String getInstanceType() {
+        return instanceType;
+    }
+
+    public String getVpcId() {
+        return vpcId;
     }
 }

@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,20 +28,34 @@ package cloudspec.model;
 import java.util.List;
 import java.util.Optional;
 
-public interface ResourceDef {
-    ResourceFqn getFqn();
+public class ResourceDef {
+    private final ResourceFqn resourceFqn;
+    private final List<PropertyDef> properties;
+    private final List<FunctionDef> functions;
 
-    default Optional<PropertyDef> getPropertyDef(String propertyName) {
-        return getPropertyDefs().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
+    public ResourceDef(ResourceFqn resourceFqn, List<PropertyDef> properties, List<FunctionDef> functions) {
+        this.resourceFqn = resourceFqn;
+        this.properties = properties;
+        this.functions = functions;
     }
 
-    List<PropertyDef> getPropertyDefs();
-
-    default Optional<FunctionDef> getFunctionDef(String functionName) {
-        return getFunctionDefs().stream().filter(def -> def.getName().equals(functionName)).findFirst();
+    public ResourceFqn getResourceFqn() {
+        return resourceFqn;
     }
 
-    List<FunctionDef> getFunctionDefs();
+    public Optional<PropertyDef> getProperty(String propertyName) {
+        return getProperties().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
+    }
 
-    ResourceLoader getResourceLoader();
+    public List<PropertyDef> getProperties() {
+        return properties;
+    }
+
+    public Optional<FunctionDef> getFunction(String functionName) {
+        return getFunctions().stream().filter(def -> def.getName().equals(functionName)).findFirst();
+    }
+
+    public List<FunctionDef> getFunctions() {
+        return functions;
+    }
 }

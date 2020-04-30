@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec AWS Provider
+ * CloudSpec Core Library
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,29 +23,17 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws;
+package cloudspec.annotation;
 
-import cloudspec.model.PropertyDef;
-import cloudspec.model.PropertyType;
-import cloudspec.model.ResourceDef;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public abstract class AWSResourceDef implements ResourceDef {
-    public static final String PROVIDER_NAME = "aws";
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FunctionDefinition {
+    String name();
 
-    public static final String PROP_REGION = "region";
-    public static final String PROP_AVAILABILITY_ZONE = "availability_zone";
-
-    public static final PropertyDef PROP_DEF_REGION = new PropertyDef(
-            PROP_REGION,
-            "AWS Region",
-            PropertyType.STRING,
-            Boolean.FALSE
-    );
-
-    public static final PropertyDef PROP_DEF_AVAILABILITY_ZONE = new PropertyDef(
-            PROP_AVAILABILITY_ZONE,
-            "AWS Availability Zone",
-            PropertyType.STRING,
-            Boolean.FALSE
-    );
+    String description();
 }

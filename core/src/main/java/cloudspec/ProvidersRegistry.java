@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,7 +40,7 @@ public class ProvidersRegistry {
     }
 
     public Optional<Provider> getProvider(String providerName) {
-        return getProviders().stream().filter(provider -> provider.getProviderName().equals(providerName)).findFirst();
+        return getProviders().stream().filter(provider -> provider.getName().equals(providerName)).findFirst();
     }
 
     public List<Provider> getProviders() {
@@ -49,7 +49,7 @@ public class ProvidersRegistry {
 
     public void register(Provider provider) {
         // filter out existing provider
-        providers.removeIf(p -> provider.getProviderName().equals(p.getProviderName()));
+        providers.removeIf(p -> provider.getName().equals(p.getName()));
 
         // register new provider
         providers.add(provider);

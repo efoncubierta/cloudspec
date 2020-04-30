@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,28 +25,34 @@
  */
 package cloudspec.aws;
 
+import cloudspec.annotation.ProviderDefinition;
 import cloudspec.aws.ec2.EC2InstanceLoader;
-import cloudspec.aws.ec2.EC2InstanceResourceDef;
+import cloudspec.aws.ec2.EC2InstanceResource;
 import cloudspec.model.Provider;
-import cloudspec.model.ResourceDef;
+import cloudspec.model.Resource;
+import cloudspec.model.ResourceFqn;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class AWSProvider implements Provider {
-    public static final String PROVIDER_NAME = "aws";
-
-    public static final List<ResourceDef> resourceDefs = Arrays.asList(
-            new EC2InstanceResourceDef(new EC2InstanceLoader())
+@ProviderDefinition(
+        name = "aws",
+        description = "Amazon Web Services",
+        resources = {EC2InstanceResource.class}
+)
+public class AWSProvider extends Provider {
+    public static final ResourceFqn EC2_INSTANCE_FQN = new ResourceFqn(
+            "aws", "ec2", "instance"
     );
 
-    @Override
-    public String getProviderName() {
-        return PROVIDER_NAME;
-    }
+    private final EC2InstanceLoader ec2InstanceLoader = new EC2InstanceLoader();
 
     @Override
-    public List<ResourceDef> getResourceDefs() {
-        return resourceDefs;
+    public List<Resource> getResources(ResourceFqn resourceFqn) {
+        if (EC2_INSTANCE_FQN.equals(resourceFqn)) {
+            return ec2InstanceLoader.load();
+        }
+
+        return Collections.emptyList();
     }
 }

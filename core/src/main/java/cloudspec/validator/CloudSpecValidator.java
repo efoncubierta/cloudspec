@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,6 @@ package cloudspec.validator;
 import cloudspec.lang.*;
 import cloudspec.model.Property;
 import cloudspec.model.Resource;
-import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceFqn;
 import cloudspec.service.ResourceService;
 
@@ -61,21 +60,9 @@ public class CloudSpecValidator {
 
     private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
         try {
-            ResourceFqn resouceFqn = ResourceFqn.fromString(rule.getResourceFqn());
+            ResourceFqn resourceFqn = ResourceFqn.fromString(rule.getResourceFqn());
 
-            // lookup resource definition
-            Optional<ResourceDef> resourceDefOpt = resourceService.getResourceDef(resouceFqn);
-            if (!resourceDefOpt.isPresent()) {
-                return new CloudSpecValidatorResult.RuleResult(
-                        rule.getName(),
-                        Boolean.FALSE,
-                        String.format("Resouce %s does not exist.", rule.getResourceFqn())
-                );
-            }
-
-            List<ValidateExprResult> errors = resourceDefOpt.get()
-                    .getResourceLoader()
-                    .load()
+            List<ValidateExprResult> errors = resourceService.getResources(resourceFqn)
                     .stream()
                     .filter(resource -> validateWithExprs(resource, rule.getWiths()))
                     .flatMap(resource -> validateAssertExprs(resource, rule.getAsserts()).stream())

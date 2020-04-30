@@ -23,8 +23,21 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.annotation;
 
-public enum MemberType {
-    PROPERTY, FUNCTION
+import cloudspec.model.Resource;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ProviderDefinition {
+    String name();
+
+    String description();
+
+    Class<? extends Resource>[] resources();
 }

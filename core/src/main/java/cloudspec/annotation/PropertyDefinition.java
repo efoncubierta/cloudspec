@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec AWS Provider
+ * CloudSpec Core Library
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,19 +23,17 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws.ec2;
+package cloudspec.annotation;
 
-import cloudspec.aws.AWSResourceDef;
-import cloudspec.model.PropertyDef;
-import cloudspec.model.PropertyType;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public abstract class EC2ResourceDef extends AWSResourceDef {
-    public static final String GROUP_NAME = "ec2";
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PropertyDefinition {
+    String name();
 
-    public static final String PROP_VPC_ID = "vpc_id";
-
-    public static final PropertyDef PROP_DEF_VPC_ID = new PropertyDef(
-            PROP_VPC_ID,
-            "VPC id",
-            PropertyType.STRING, Boolean.FALSE);
+    String description();
 }

@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -104,7 +104,6 @@ public class ResourceTestUtils {
             TEST_BOOLEAN_PROPERTY
     );
     public static final List<Function> TEST_FUNCTIONS = Collections.emptyList();
-    public static final ResourceLoader TEST_RESOURCE_LOADER = mock(ResourceLoader.class);
 
     static {
         when(TEST_RESOURCE.getResourceFqn()).thenReturn(TEST_RESOURCE_FQN);
@@ -116,16 +115,11 @@ public class ResourceTestUtils {
     }
 
     static {
-        when(TEST_RESOURCE_LOADER.load()).thenReturn(Collections.singletonList(TEST_RESOURCE));
-    }
-
-    static {
-        when(TEST_RESOURCE_DEF.getFqn()).thenReturn(TEST_RESOURCE_FQN);
-        when(TEST_RESOURCE_DEF.getPropertyDef(TEST_INTEGER_PROPERTY_NAME)).thenReturn(Optional.of(TEST_INTEGER_PROPERTY_DEF));
-        when(TEST_RESOURCE_DEF.getPropertyDef(TEST_STRING_PROPERTY_NAME)).thenReturn(Optional.of(TEST_STRING_PROPERTY_DEF));
-        when(TEST_RESOURCE_DEF.getPropertyDef(TEST_BOOLEAN_PROPERTY_NAME)).thenReturn(Optional.of(TEST_BOOLEAN_PROPERTY_DEF));
-        when(TEST_RESOURCE_DEF.getPropertyDefs()).thenReturn(TEST_PROPERTY_DEFS);
-        when(TEST_RESOURCE_DEF.getFunctionDefs()).thenReturn(TEST_FUNCTION_DEFS);
-        when(TEST_RESOURCE_DEF.getResourceLoader()).thenReturn(TEST_RESOURCE_LOADER);
+        when(TEST_RESOURCE_DEF.getResourceFqn()).thenReturn(TEST_RESOURCE_FQN);
+        when(TEST_RESOURCE_DEF.getProperty(TEST_INTEGER_PROPERTY_NAME)).thenReturn(Optional.of(TEST_INTEGER_PROPERTY_DEF));
+        when(TEST_RESOURCE_DEF.getProperty(TEST_STRING_PROPERTY_NAME)).thenReturn(Optional.of(TEST_STRING_PROPERTY_DEF));
+        when(TEST_RESOURCE_DEF.getProperty(TEST_BOOLEAN_PROPERTY_NAME)).thenReturn(Optional.of(TEST_BOOLEAN_PROPERTY_DEF));
+        when(TEST_RESOURCE_DEF.getProperties()).thenReturn(TEST_PROPERTY_DEFS);
+        when(TEST_RESOURCE_DEF.getFunctions()).thenReturn(TEST_FUNCTION_DEFS);
     }
 }
