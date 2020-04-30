@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -97,16 +97,16 @@ public class CloudSpecValidator {
         return withExpr.stream().allMatch(with -> validateWithExpr(resource, with));
     }
 
-    private Boolean validateWithExpr(Resource resource, WithExpr withExpr) {
-        Optional<Property> propertyOpt = resource.getProperty(withExpr.getPropertyName());
-        return propertyOpt.isPresent() ? withExpr.getEvaluator().eval(propertyOpt.get().getValue()) : Boolean.FALSE;
-    }
-
     private List<ValidateExprResult> validateAssertExprs(Resource resource, List<AssertExpr> assertExprs) {
         return assertExprs
                 .stream()
                 .map(assertExpr -> validateAssertExpr(resource, assertExpr))
                 .collect(Collectors.toList());
+    }
+
+    private Boolean validateWithExpr(Resource resource, WithExpr withExpr) {
+        Optional<Property> propertyOpt = resource.getProperty(withExpr.getPropertyName());
+        return propertyOpt.isPresent() ? withExpr.getEvaluator().eval(propertyOpt.get().getValue()) : Boolean.FALSE;
     }
 
     private ValidateExprResult validateAssertExpr(Resource resource, AssertExpr assertExpr) {

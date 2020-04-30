@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -83,17 +83,17 @@ public class CloudSpecRunner {
         System.out.println("");
     }
 
-    private void printProviders() {
-        List<String> providersNames = providersRegistry.getProviders().stream().map(Provider::getProviderName).collect(Collectors.toList());
-
-        System.out.println(String.format("Providers: %s", String.join(", ", providersNames)));
-    }
-
     private void printResult(CloudSpecValidatorResult result) {
         // print out spec name
         cp.println(result.getSpecName(), Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.NONE);
 
         result.getGroupResults().forEach(this::printGroupResult);
+    }
+
+    private void printProviders() {
+        List<String> providersNames = providersRegistry.getProviders().stream().map(Provider::getProviderName).collect(Collectors.toList());
+
+        System.out.println(String.format("Providers: %s", String.join(", ", providersNames)));
     }
 
     private void printGroupResult(CloudSpecValidatorResult.GroupResult groupResult) {

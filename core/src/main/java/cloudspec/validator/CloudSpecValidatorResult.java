@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -73,10 +73,6 @@ public class CloudSpecValidatorResult {
             this(ruleName, success, null, null);
         }
 
-        public RuleResult(String ruleName, Boolean success, String reason) {
-            this(ruleName, success, reason, null);
-        }
-
         public RuleResult(String ruleName, Boolean success, String reason, Throwable throwable) {
             this.ruleName = ruleName;
             this.success = success;
@@ -84,16 +80,20 @@ public class CloudSpecValidatorResult {
             this.throwable = throwable != null ? Optional.of(throwable) : Optional.empty();
         }
 
+        public RuleResult(String ruleName, Boolean success, String reason) {
+            this(ruleName, success, reason, null);
+        }
+
         public String getRuleName() {
             return ruleName;
         }
 
-        public Boolean isSuccess() {
-            return success;
-        }
-
         public Boolean isError() {
             return !isSuccess();
+        }
+
+        public Boolean isSuccess() {
+            return success;
         }
 
         public Optional<String> getReason() {
