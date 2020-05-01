@@ -25,69 +25,53 @@
  */
 package cloudspec.model;
 
-import cloudspec.annotation.ProviderDefinition;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
 
 public class ProviderTest {
-    public static final String PROVIDER_NAME = "myprovider";
-    public static final String PROVIDER_DESCRIPTION = "My provider";
+    public static final Provider TEST_PROVIDER = new MyProvider();
 
     @Test
     public void shouldBuildProviderFromAnnotation() {
-        Provider provider = new MyProvider();
+        assertNotNull(TEST_PROVIDER.getName());
+        assertEquals(MyProvider.PROVIDER_NAME, TEST_PROVIDER.getName());
 
-        assertNotNull(provider.getName());
-        assertEquals(PROVIDER_NAME, provider.getName());
+        assertNotNull(TEST_PROVIDER.getDescription());
+        assertEquals(MyProvider.PROVIDER_DESCRIPTION, TEST_PROVIDER.getDescription());
 
-        assertNotNull(provider.getDescription());
-        assertEquals(PROVIDER_DESCRIPTION, provider.getDescription());
+        assertNotNull(TEST_PROVIDER.getResourceDefs());
+        assertEquals(1, TEST_PROVIDER.getResourceDefs().size());
 
-        assertNotNull(provider.getResourceDefs());
-        assertEquals(1, provider.getResourceDefs().size());
-
-        ResourceDef resourceDef = provider.getResourceDefs().get(0);
-        assertEquals(ResourceTest.RESOURCE_FQN, resourceDef.getResourceFqn());
+        ResourceDef resourceDef = TEST_PROVIDER.getResourceDefs().get(0);
+        assertEquals(MyResource.RESOURCE_FQN, resourceDef.getResourceFqn());
 
         assertNotNull(resourceDef.getProperties());
         assertEquals(3, resourceDef.getProperties().size());
 
-        Optional<PropertyDef> integerPropertyDef = resourceDef.getProperty(ResourceTest.PROP_INTEGER_NAME);
+        Optional<PropertyDef> integerPropertyDef = resourceDef.getProperty(MyResource.PROP_INTEGER_NAME);
         assertNotNull(integerPropertyDef);
         assertTrue(integerPropertyDef.isPresent());
-        assertEquals(ResourceTest.PROP_INTEGER_NAME, integerPropertyDef.get().getName());
-        assertEquals(ResourceTest.PROP_INTEGER_DESCRIPTION, integerPropertyDef.get().getDescription());
-        assertEquals(ResourceTest.PROP_INTEGER_TYPE, integerPropertyDef.get().getPropertyType());
+        assertEquals(MyResource.PROP_INTEGER_NAME, integerPropertyDef.get().getName());
+        assertEquals(MyResource.PROP_INTEGER_DESCRIPTION, integerPropertyDef.get().getDescription());
+        assertEquals(MyResource.PROP_INTEGER_TYPE, integerPropertyDef.get().getPropertyType());
 
-        Optional<PropertyDef> stringPropertyDef = resourceDef.getProperty(ResourceTest.PROP_STRING_NAME);
+        Optional<PropertyDef> stringPropertyDef = resourceDef.getProperty(MyResource.PROP_STRING_NAME);
         assertNotNull(stringPropertyDef);
         assertTrue(stringPropertyDef.isPresent());
-        assertEquals(ResourceTest.PROP_STRING_NAME, stringPropertyDef.get().getName());
-        assertEquals(ResourceTest.PROP_STRING_DESCRIPTION, stringPropertyDef.get().getDescription());
-        assertEquals(ResourceTest.PROP_STRING_TYPE, stringPropertyDef.get().getPropertyType());
+        assertEquals(MyResource.PROP_STRING_NAME, stringPropertyDef.get().getName());
+        assertEquals(MyResource.PROP_STRING_DESCRIPTION, stringPropertyDef.get().getDescription());
+        assertEquals(MyResource.PROP_STRING_TYPE, stringPropertyDef.get().getPropertyType());
 
-        Optional<PropertyDef> booleanPropertyDef = resourceDef.getProperty(ResourceTest.PROP_BOOLEAN_NAME);
+        Optional<PropertyDef> booleanPropertyDef = resourceDef.getProperty(MyResource.PROP_BOOLEAN_NAME);
         assertNotNull(booleanPropertyDef);
         assertTrue(booleanPropertyDef.isPresent());
-        assertEquals(ResourceTest.PROP_BOOLEAN_NAME, booleanPropertyDef.get().getName());
-        assertEquals(ResourceTest.PROP_BOOLEAN_DESCRIPTION, booleanPropertyDef.get().getDescription());
-        assertEquals(ResourceTest.PROP_BOOLEAN_TYPE, booleanPropertyDef.get().getPropertyType());
+        assertEquals(MyResource.PROP_BOOLEAN_NAME, booleanPropertyDef.get().getName());
+        assertEquals(MyResource.PROP_BOOLEAN_DESCRIPTION, booleanPropertyDef.get().getDescription());
+        assertEquals(MyResource.PROP_BOOLEAN_TYPE, booleanPropertyDef.get().getPropertyType());
     }
 
-    @ProviderDefinition(
-            name = PROVIDER_NAME,
-            description = PROVIDER_DESCRIPTION,
-            resources = {ResourceTest.MyResource.class}
-    )
-    private class MyProvider extends Provider {
-        @Override
-        public List<Resource> getResources(ResourceFqn resourceFqn) {
-            return Collections.emptyList();
-        }
-    }
+
 }

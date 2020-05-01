@@ -25,8 +25,12 @@
  */
 package cloudspec.model;
 
+import cloudspec.annotation.ProviderDefinition;
+import cloudspec.annotation.ResourceDefinition;
+
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Define a CloudSpec's provider.
@@ -36,19 +40,41 @@ import java.util.Optional;
  * <p>
  * Note to future: providers will also provide new expressions and functions to CloudSpec.
  */
-public interface Provider {
-    String getName();
+public abstract class BaseProvider implements Provider {
+    private final String name;
+    private final String description;
+    private final List<ResourceDef> resourceDefs;
 
-    String getDescription();
+    public BaseProvider() {
+        // check the class is annotated
+        if (!this.getClass().isAnnotationPresent(ProviderDefinition.class)) {
+            throw new RuntimeException(
+                    String.format("Provider class %s is not annotated with @ProviderDefinition", this.getClass().getCanonicalName())
+            );
+        }
 
-    default Optional<ResourceDef> getResourceDef(ResourceFqn resourceFqn) {
-        return getResourceDefs()
-                .stream()
-                .filter(resourceDef -> resourceDef.getResourceFqn().equals(resourceFqn))
-                .findFirst();
+        ProviderDefinition providerDefinition = this.getClass().getAnnotation(ProviderDefinition.class);
+        this.name = providerDefinition.name();
+        this.description = providerDefinition.description();
+
+        this.resourceDefs = Stream.of(providerDefinition.resources())
+                .filter(resourceClass -> resourceClass.isAnnotationPresent(ResourceDefinition.class))
+                .map(ResourceReflectionUtil::toResourceDef)
+                .collect(Collectors.toList());
     }
 
-    List<ResourceDef> getResourceDefs();
+    @Override
+    public String getName() {
+        return name;
+    }
 
-    List<? extends Resource> getResources(ResourceFqn resourceFqn);
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public List<ResourceDef> getResourceDefs() {
+        return resourceDefs;
+    }
 }

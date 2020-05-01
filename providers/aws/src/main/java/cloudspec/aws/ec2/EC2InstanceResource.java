@@ -27,14 +27,22 @@ package cloudspec.aws.ec2;
 
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
+import cloudspec.model.ResourceFqn;
+
+import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "instance",
+        provider = PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2InstanceResource.RESOURCE_NAME,
         description = "EC2 Instance"
 )
 public class EC2InstanceResource extends EC2Resource {
+    public static final String RESOURCE_NAME = "instance";
+    public static final ResourceFqn FQN = new ResourceFqn(
+            PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
+    );
+
     @PropertyDefinition(
             name = "region",
             description = "AWS Region"

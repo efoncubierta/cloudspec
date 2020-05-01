@@ -25,8 +25,9 @@
  */
 package cloudspec.model;
 
+import cloudspec.annotation.ResourceDefinition;
+
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Define a CloudSpec's resource.
@@ -36,45 +37,38 @@ import java.util.Optional;
  * <p>
  * Resources are provided by the providers.
  */
-public interface Resource {
-    /**
-     * Get resource's fully-qualified name.
-     *
-     * @return Resource fully-qualified name.
-     */
-    ResourceFqn getResourceFqn();
+public abstract class BaseResource implements Resource {
+    private final ResourceFqn resourceFqn;
 
-    /**
-     * Get a resource's property.
-     *
-     * @param propertyName Property's name.
-     * @return Optional property.
-     */
-    default Optional<Property> getProperty(String propertyName) {
-        return getProperties().stream().filter(property -> property.getName().equals(propertyName)).findFirst();
+    protected BaseResource() {
+        // check the class is annotated
+        if (!this.getClass().isAnnotationPresent(ResourceDefinition.class)) {
+            throw new RuntimeException(
+                    String.format("Resource class %s is not annotated with @ResourceDefinition", this.getClass().getCanonicalName())
+            );
+        }
+
+        // get resource definition
+        ResourceDefinition resourceDefAnnotation = this.getClass().getAnnotation(ResourceDefinition.class);
+        this.resourceFqn = new ResourceFqn(
+                resourceDefAnnotation.provider(),
+                resourceDefAnnotation.group(),
+                resourceDefAnnotation.name()
+        );
     }
 
-    /**
-     * Get all resource's properties.
-     *
-     * @return List of properties.
-     */
-    List<Property> getProperties();
-
-    /**
-     * Get a resource's function.
-     *
-     * @param functionName Function's name.
-     * @return Optional function.
-     */
-    default Optional<Function> getFunction(String functionName) {
-        return getFunctions().stream().filter(function -> function.getName().equals(functionName)).findFirst();
+    @Override
+    public ResourceFqn getResourceFqn() {
+        return resourceFqn;
     }
 
-    /**
-     * Get all resource's functions.
-     *
-     * @return List of functions.
-     */
-    List<Function> getFunctions();
+    @Override
+    public List<Property> getProperties() {
+        return ResourceReflectionUtil.toProperties(this);
+    }
+
+    @Override
+    public List<Function> getFunctions() {
+        return ResourceReflectionUtil.toFunctions(this);
+    }
 }

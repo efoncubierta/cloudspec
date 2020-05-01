@@ -26,9 +26,9 @@
 package cloudspec.aws;
 
 import cloudspec.annotation.PropertyDefinition;
-import cloudspec.model.Resource;
+import cloudspec.model.BaseResource;
 
-public class AWSResource extends Resource {
+public class AWSResource extends BaseResource {
     @PropertyDefinition(
             name = "account_id",
             description = "AWS Account ID"

@@ -27,7 +27,6 @@ package cloudspec.model;
 
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.model.*;
 
 import java.lang.reflect.Field;
 import java.util.Collections;

@@ -25,8 +25,9 @@
  */
 package cloudspec;
 
+import cloudspec.model.MyProvider;
 import cloudspec.model.Provider;
-import cloudspec.util.ProviderTestUtils;
+import cloudspec.model.ProviderTest;
 import org.junit.Test;
 
 import java.util.List;
@@ -40,14 +41,14 @@ public class ProvidersRegistryTest {
     public void shouldRegisterProvider() {
         ProvidersRegistry registry = new ProvidersRegistry();
 
-        registry.register(ProviderTestUtils.TEST_PROVIDER);
+        registry.register(ProviderTest.TEST_PROVIDER);
 
-        Optional<Provider> providerOpt = registry.getProvider(ProviderTestUtils.TEST_PROVIDER_NAME);
+        Optional<Provider> providerOpt = registry.getProvider(MyProvider.PROVIDER_NAME);
         assertTrue(providerOpt.isPresent());
-        assertEquals(ProviderTestUtils.TEST_PROVIDER_NAME, providerOpt.get().getName());
+        assertEquals(MyProvider.PROVIDER_NAME, providerOpt.get().getName());
 
         List<Provider> providers = registry.getProviders();
         assertEquals(1, providers.size());
-        assertEquals(ProviderTestUtils.TEST_PROVIDER_NAME, providers.get(0).getName());
+        assertEquals(MyProvider.PROVIDER_NAME, providers.get(0).getName());
     }
 }

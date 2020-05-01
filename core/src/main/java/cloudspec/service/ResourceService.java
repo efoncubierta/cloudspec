@@ -68,7 +68,7 @@ public class ResourceService {
      * @param resourceFqn Resource FQN.
      * @return List of resources.
      */
-    public List<Resource> getResources(ResourceFqn resourceFqn) {
+    public List<? extends Resource> getResources(ResourceFqn resourceFqn) {
         return providersRegistry.getProvider(resourceFqn.getProviderName())
                 .map(provider -> provider.getResources(resourceFqn))
                 .orElse(Collections.emptyList());

@@ -28,9 +28,7 @@ package cloudspec.aws;
 import cloudspec.annotation.ProviderDefinition;
 import cloudspec.aws.ec2.EC2InstanceLoader;
 import cloudspec.aws.ec2.EC2InstanceResource;
-import cloudspec.model.Provider;
-import cloudspec.model.Resource;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,16 +38,14 @@ import java.util.List;
         description = "Amazon Web Services",
         resources = {EC2InstanceResource.class}
 )
-public class AWSProvider extends Provider {
-    public static final ResourceFqn EC2_INSTANCE_FQN = new ResourceFqn(
-            "aws", "ec2", "instance"
-    );
+public class AWSProvider extends BaseProvider {
+    public static final String PROVIDER_NAME = "aws";
 
     private final EC2InstanceLoader ec2InstanceLoader = new EC2InstanceLoader();
 
     @Override
-    public List<Resource> getResources(ResourceFqn resourceFqn) {
-        if (EC2_INSTANCE_FQN.equals(resourceFqn)) {
+    public List<? extends Resource> getResources(ResourceFqn resourceFqn) {
+        if (EC2InstanceResource.FQN.equals(resourceFqn)) {
             return ec2InstanceLoader.load();
         }
 

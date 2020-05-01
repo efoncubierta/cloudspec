@@ -23,32 +23,24 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.util;
+package cloudspec.model;
 
-import cloudspec.ProvidersRegistry;
-import cloudspec.model.Provider;
+import cloudspec.annotation.ProviderDefinition;
 
 import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+@ProviderDefinition(
+        name = MyProvider.PROVIDER_NAME,
+        description = MyProvider.PROVIDER_DESCRIPTION,
+        resources = {MyResource.class}
+)
+public class MyProvider extends BaseProvider {
+    public static final String PROVIDER_NAME = "myprovider";
+    public static final String PROVIDER_DESCRIPTION = "My provider";
 
-public class ProviderTestUtils {
-    public static final String TEST_PROVIDER_NAME = "myprovider";
-
-    public static final Provider TEST_PROVIDER = mock(Provider.class);
-    public static final ProvidersRegistry TEST_PROVIDERS_REGISTRY = mock(ProvidersRegistry.class);
-
-    static {
-        // test provider
-        when(TEST_PROVIDER.getName()).thenReturn(TEST_PROVIDER_NAME);
-        when(TEST_PROVIDER.getResourceDefs()).thenReturn(Collections.singletonList(ResourceTestUtils.TEST_RESOURCE_DEF));
-        when(TEST_PROVIDER.getResources(ResourceTestUtils.TEST_RESOURCE_FQN)).thenReturn(Collections.singletonList(ResourceTestUtils.TEST_RESOURCE));
-    }
-
-    static {
-        when(TEST_PROVIDERS_REGISTRY.getProvider(TEST_PROVIDER_NAME)).thenReturn(Optional.of(TEST_PROVIDER));
-        when(TEST_PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(TEST_PROVIDER));
+    @Override
+    public List<Resource> getResources(ResourceFqn resourceFqn) {
+        return Collections.emptyList();
     }
 }

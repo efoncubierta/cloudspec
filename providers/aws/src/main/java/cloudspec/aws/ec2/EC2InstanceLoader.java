@@ -25,7 +25,6 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.model.Resource;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
@@ -38,19 +37,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2InstanceLoader {
-    private List<Resource> instances;
+    private List<EC2InstanceResource> instances;
 
-    public List<Resource> load() {
+    public List<EC2InstanceResource> load() {
         if (instances != null) {
             return instances;
         }
 
-        DescribeRegionsResponse response = getEc2Client(Optional.empty()).describeRegions();
-        instances = response
-                .regions()
-                .stream()
-                .flatMap(region -> loadFromRegion(region).stream())
-                .collect(Collectors.toList());
+        Ec2Client ec2Client = getEc2Client(Optional.empty());
+
+        try {
+            instances = getAllInstances(ec2Client);
+        } finally {
+            IoUtils.closeQuietly(ec2Client, null);
+        }
 
         return instances;
     }
@@ -59,7 +59,17 @@ public class EC2InstanceLoader {
         return regionOpt.isPresent() ? Ec2Client.builder().region(Region.of(regionOpt.get())).build() : Ec2Client.create();
     }
 
-    private List<Resource> loadFromRegion(software.amazon.awssdk.services.ec2.model.Region region) {
+    private List<EC2InstanceResource> getAllInstances(Ec2Client ec2Client) {
+        DescribeRegionsResponse response = ec2Client.describeRegions();
+        return response
+                .regions()
+                .stream()
+                .flatMap(region -> getAllInstancesInRegion(region).stream())
+                .collect(Collectors.toList());
+    }
+
+
+    private List<EC2InstanceResource> getAllInstancesInRegion(software.amazon.awssdk.services.ec2.model.Region region) {
         Ec2Client client = getEc2Client(Optional.of(region.regionName()));
 
         try {
@@ -67,14 +77,14 @@ public class EC2InstanceLoader {
             return response.reservations()
                     .stream()
                     .flatMap(reservation -> reservation.instances().stream())
-                    .map(instance -> mapToResource(region.regionName(), instance))
+                    .map(instance -> toResource(region.regionName(), instance))
                     .collect(Collectors.toList());
         } finally {
             IoUtils.closeQuietly(client, null);
         }
     }
 
-    private Resource mapToResource(String regionName, Instance instance) {
+    private EC2InstanceResource toResource(String regionName, Instance instance) {
         return new EC2InstanceResource("", regionName, "", instance.instanceId(), instance.instanceType().toString(), instance.vpcId());
     }
 }

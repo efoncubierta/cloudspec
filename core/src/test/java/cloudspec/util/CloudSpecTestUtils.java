@@ -26,6 +26,7 @@
 package cloudspec.util;
 
 import cloudspec.lang.*;
+import cloudspec.model.MyResource;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,17 +37,17 @@ public class CloudSpecTestUtils {
     public static final String TEST_SPEC_GROUP_NAME = "mygroup";
     public static final String TEST_SPEC_RULE_NAME = "myrule";
 
-    public static final List<WithExpr> TEST_WITH_EXPRS = ResourceTestUtils.TEST_PROPERTY_DEFS.stream()
+    public static final List<WithExpr> TEST_WITH_EXPRS = MyResource.RESOURCE_DEF.getProperties().stream()
             .map(propertyDef -> new WithExpr(propertyDef.getName(), ExprEvaluatorTestUtils.TRUE_EVALUATOR))
             .collect(Collectors.toList());
 
-    public static final List<AssertExpr> TEST_ASSERT_EXPRS = ResourceTestUtils.TEST_PROPERTY_DEFS.stream()
+    public static final List<AssertExpr> TEST_ASSERT_EXPRS = MyResource.RESOURCE_DEF.getProperties().stream()
             .map(propertyDef -> new AssertExpr(propertyDef.getName(), ExprEvaluatorTestUtils.TRUE_EVALUATOR))
             .collect(Collectors.toList());
 
     public static final RuleExpr TEST_RULE_EXPR = new RuleExpr(
             TEST_SPEC_RULE_NAME,
-            ResourceTestUtils.TEST_RESOURCE_FQN.toString(),
+            MyResource.RESOURCE_FQN.toString(),
             TEST_WITH_EXPRS,
             TEST_ASSERT_EXPRS);
 
