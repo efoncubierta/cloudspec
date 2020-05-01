@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class EC2InstanceLoader {
+public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource> {
     private List<EC2InstanceResource> instances;
 
     public List<EC2InstanceResource> load() {

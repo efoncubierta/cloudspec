@@ -23,42 +23,50 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws;
+package cloudspec.aws.s3;
 
-import cloudspec.annotation.ProviderDefinition;
-import cloudspec.aws.ec2.EC2InstanceLoader;
-import cloudspec.aws.ec2.EC2InstanceResource;
-import cloudspec.aws.s3.S3BucketLoader;
-import cloudspec.aws.s3.S3BucketResource;
-import cloudspec.model.BaseProvider;
-import cloudspec.model.Resource;
+import cloudspec.annotation.PropertyDefinition;
+import cloudspec.annotation.ResourceDefinition;
+import cloudspec.aws.AWSProvider;
 import cloudspec.model.ResourceFqn;
 
-import java.util.*;
+import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
-@ProviderDefinition(
-        name = "aws",
-        description = "Amazon Web Services",
-        resources = {EC2InstanceResource.class, S3BucketResource.class}
+@ResourceDefinition(
+        provider = AWSProvider.PROVIDER_NAME,
+        group = S3Resource.GROUP_NAME,
+        name = S3BucketResource.RESOURCE_NAME,
+        description = "S3 Bucket"
 )
-public class AWSProvider extends BaseProvider {
-    public static final String PROVIDER_NAME = "aws";
+public class S3BucketResource extends S3Resource {
+    public static final String RESOURCE_NAME = "bucket";
+    public static final ResourceFqn FQN = new ResourceFqn(
+            PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
+    );
 
-    private final Map<String, AWSResourceLoader<?>> loaders = new HashMap<>();
+    @PropertyDefinition(
+            name = "region",
+            description = "AWS Region"
+    )
+    private final String region;
 
-    {
-        loaders.put(EC2InstanceResource.FQN.toString(), new EC2InstanceLoader());
-        loaders.put(S3BucketResource.FQN.toString(), new S3BucketLoader());
+    @PropertyDefinition(
+            name = "bucket_name",
+            description = "Bucket name"
+    )
+    private final String bucketName;
+
+    public S3BucketResource(String accountId, String region, String bucketName) {
+        super(accountId);
+        this.region = region;
+        this.bucketName = bucketName;
     }
 
-    @Override
-    public List<? extends Resource> getResources(ResourceFqn resourceFqn) {
-        return getLoader(resourceFqn)
-                .map(AWSResourceLoader::load)
-                .orElse(Collections.emptyList());
+    public String getRegion() {
+        return region;
     }
 
-    private Optional<AWSResourceLoader<?>> getLoader(ResourceFqn resourceFqn) {
-        return Optional.ofNullable(loaders.get(resourceFqn.toString()));
+    public String getBucketName() {
+        return bucketName;
     }
 }
