@@ -25,6 +25,7 @@
  */
 package cloudspec.aws.s3;
 
+import cloudspec.aws.IAWSClientsProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.GetBucketLocationRequest;
@@ -37,12 +38,19 @@ import java.util.stream.Collectors;
 public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
     private List<S3BucketResource> buckets;
 
+    private final IAWSClientsProvider clientsProvider;
+
+    public S3BucketLoader(IAWSClientsProvider clientsProvider) {
+        this.clientsProvider = clientsProvider;
+    }
+
     public List<S3BucketResource> load() {
         if (buckets != null) {
             return buckets;
         }
 
-        S3Client s3Client = getS3Client();
+        S3Client s3Client = clientsProvider.getS3Client();
+
         try {
             ListBucketsResponse response = s3Client.listBuckets();
             buckets = response.buckets()
@@ -54,10 +62,6 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
         }
 
         return buckets;
-    }
-
-    private S3Client getS3Client() {
-        return S3Client.create();
     }
 
     private S3BucketResource toResource(S3Client s3Client, Bucket bucket) {

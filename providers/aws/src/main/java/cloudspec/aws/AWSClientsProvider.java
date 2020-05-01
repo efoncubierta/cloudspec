@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec Core Library
+ * CloudSpec AWS Provider
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
@@ -23,52 +23,42 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.aws;
 
-public class ResourceFqn {
-    private final String providerName;
-    private final String groupName;
-    private final String resourceName;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.ec2.Ec2Client;
+import software.amazon.awssdk.services.iam.IamClient;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
-    public ResourceFqn(String providerName, String groupName, String resourceName) {
-        this.providerName = providerName;
-        this.groupName = groupName;
-        this.resourceName = resourceName;
-    }
-
-    public static ResourceFqn fromString(String resourceFqn) {
-        // TODO manage null or malformed strings
-        String[] parts = resourceFqn.split(":");
-        return new ResourceFqn(parts[0], parts[1], parts[2]);
-    }
-
-    public String getProviderName() {
-        return providerName;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public String getResourceName() {
-        return resourceName;
+public class AWSClientsProvider implements IAWSClientsProvider {
+    @Override
+    public IamClient getIamClient() {
+        return IamClient.builder().build();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof ResourceFqn)) {
-            return false;
-        }
-
-        return toString().equals(obj.toString());
+    public Ec2Client getEc2Client() {
+        return Ec2Client.create();
     }
 
     @Override
-    public String toString() {
-        return String.format("%s:%s:%s", providerName, groupName, resourceName);
+    public Ec2Client getEc2ClientForRegion(String region) {
+        return Ec2Client.builder().region(Region.of(region)).build();
+    }
+
+    @Override
+    public S3Client getS3Client() {
+        return S3Client.create();
+    }
+
+    @Override
+    public SqsClient getSqsClient() {
+        return SqsClient.create();
+    }
+
+    @Override
+    public SqsClient getSqsClientForRegion(String region) {
+        return SqsClient.builder().region(Region.of(region)).build();
     }
 }

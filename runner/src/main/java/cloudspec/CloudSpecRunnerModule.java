@@ -25,7 +25,9 @@
  */
 package cloudspec;
 
+import cloudspec.aws.AWSClientsProvider;
 import cloudspec.aws.AWSProvider;
+import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.preflight.CloudSpecPreflight;
 import cloudspec.preload.CloudSpecPreloader;
 import cloudspec.service.ResourceService;
@@ -50,8 +52,14 @@ public class CloudSpecRunnerModule {
 
     @Provides
     @Singleton
-    public static AWSProvider provideAWSProvider() {
-        return new AWSProvider();
+    public static AWSProvider provideAWSProvider(IAWSClientsProvider clientsProvider) {
+        return new AWSProvider(clientsProvider);
+    }
+
+    @Provides
+    @Singleton
+    public static IAWSClientsProvider provideAWSClientsProvider() {
+        return new AWSClientsProvider();
     }
 
     @Provides

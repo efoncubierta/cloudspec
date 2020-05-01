@@ -44,11 +44,15 @@ import java.util.*;
 public class AWSProvider extends BaseProvider {
     public static final String PROVIDER_NAME = "aws";
 
+    private final IAWSClientsProvider clientsProvider;
+
     private final Map<String, AWSResourceLoader<?>> loaders = new HashMap<>();
 
-    {
-        loaders.put(EC2InstanceResource.FQN.toString(), new EC2InstanceLoader());
-        loaders.put(S3BucketResource.FQN.toString(), new S3BucketLoader());
+    public AWSProvider(IAWSClientsProvider clientsProvider) {
+        this.clientsProvider = clientsProvider;
+
+        loaders.put(EC2InstanceResource.FQN.toString(), new EC2InstanceLoader(clientsProvider));
+        loaders.put(S3BucketResource.FQN.toString(), new S3BucketLoader(clientsProvider));
     }
 
     @Override

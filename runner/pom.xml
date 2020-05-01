@@ -17,9 +17,7 @@
   <description>CloudSpec Runner</description>
 
   <properties>
-    <dagger.version>2.27</dagger.version>
     <jcdp.version>4.0.1</jcdp.version>
-    <log4j.version>2.13.2</log4j.version>
 
     <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
   </properties>
@@ -42,8 +40,6 @@
     <dependency>
       <groupId>com.google.dagger</groupId>
       <artifactId>dagger</artifactId>
-      <version>${dagger.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -56,20 +52,14 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>${log4j.version}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>${log4j.version}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>${log4j.version}</version>
-      <scope>compile</scope>
     </dependency>
 
   </dependencies>

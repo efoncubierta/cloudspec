@@ -25,7 +25,7 @@
  */
 package cloudspec.aws.ec2;
 
-import software.amazon.awssdk.regions.Region;
+import cloudspec.aws.IAWSClientsProvider;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeRegionsResponse;
@@ -33,18 +33,23 @@ import software.amazon.awssdk.services.ec2.model.Instance;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource> {
     private List<EC2InstanceResource> instances;
+
+    private final IAWSClientsProvider clientsProvider;
+
+    public EC2InstanceLoader(IAWSClientsProvider clientsProvider) {
+        this.clientsProvider = clientsProvider;
+    }
 
     public List<EC2InstanceResource> load() {
         if (instances != null) {
             return instances;
         }
 
-        Ec2Client ec2Client = getEc2Client(Optional.empty());
+        Ec2Client ec2Client = clientsProvider.getEc2Client();
 
         try {
             instances = getAllInstances(ec2Client);
@@ -53,10 +58,6 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
         }
 
         return instances;
-    }
-
-    private Ec2Client getEc2Client(Optional<String> regionOpt) {
-        return regionOpt.isPresent() ? Ec2Client.builder().region(Region.of(regionOpt.get())).build() : Ec2Client.create();
     }
 
     private List<EC2InstanceResource> getAllInstances(Ec2Client ec2Client) {
@@ -70,7 +71,7 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
 
 
     private List<EC2InstanceResource> getAllInstancesInRegion(software.amazon.awssdk.services.ec2.model.Region region) {
-        Ec2Client client = getEc2Client(Optional.of(region.regionName()));
+        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
 
         try {
             DescribeInstancesResponse response = client.describeInstances();
