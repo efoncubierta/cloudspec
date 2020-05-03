@@ -56,6 +56,11 @@ public class MyResource extends BaseResource {
     public static final PropertyType PROP_BOOLEAN_TYPE = PropertyType.BOOLEAN;
     public static final Boolean PROP_BOOLEAN_VALUE = Boolean.TRUE;
 
+    public static final String PROP_MAP_NAME = "map_property";
+    public static final String PROP_MAP_DESCRIPTION = "Map property";
+    public static final PropertyType PROP_MAP_TYPE = PropertyType.MAP;
+    public static final MyPojo PROP_MAP_VALUE = new MyPojo(PROP_INTEGER_VALUE, PROP_STRING_VALUE, PROP_BOOLEAN_VALUE);
+
     @PropertyDefinition(
             name = PROP_INTEGER_NAME,
             description = PROP_INTEGER_DESCRIPTION
@@ -74,10 +79,17 @@ public class MyResource extends BaseResource {
     )
     private final Boolean booleanProperty;
 
+    @PropertyDefinition(
+            name = PROP_MAP_NAME,
+            description = PROP_MAP_DESCRIPTION
+    )
+    private final MyPojo mapProperty;
+
     public MyResource(Integer integerProperty, String stringProperty, Boolean booleanProperty) {
         this.integerProperty = integerProperty;
         this.stringProperty = stringProperty;
         this.booleanProperty = booleanProperty;
+        this.mapProperty = new MyPojo(integerProperty, stringProperty, booleanProperty);
     }
 
     public Integer getIntegerProperty() {
@@ -90,5 +102,9 @@ public class MyResource extends BaseResource {
 
     public Boolean getBooleanProperty() {
         return booleanProperty;
+    }
+
+    public MyPojo getMapProperty() {
+        return mapProperty;
     }
 }

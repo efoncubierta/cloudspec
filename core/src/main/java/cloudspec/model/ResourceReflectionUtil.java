@@ -30,13 +30,19 @@ import cloudspec.annotation.ResourceDefinition;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ResourceReflectionUtil {
-    public static List<Property> toProperties(Resource resource) {
-        return Stream.of(resource.getClass().getDeclaredFields())
+    public static List<Property> resourceToProperties(Resource resource) {
+        return toProperties(resource);
+    }
+
+    private static List<Property> toProperties(Object obj) {
+        return Stream.of(obj.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
                 .map(field -> {
                     PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
@@ -45,7 +51,7 @@ public class ResourceReflectionUtil {
                         String name = propertyDefAnnotation.name();
 
                         field.setAccessible(true);
-                        Object value = field.get(resource);
+                        Object value = field.get(obj);
                         field.setAccessible(true);
 
                         if (value instanceof String) {
@@ -54,13 +60,23 @@ public class ResourceReflectionUtil {
                             return new IntegerProperty(name, (Integer) value);
                         } else if (value instanceof Boolean) {
                             return new BooleanProperty(name, (Boolean) value);
+                        } else {
+                            List<Property> properties = toProperties(value);
+                            if (properties.size() > 0) {
+                                Map<String, Property> propertiesMap = new HashMap<String, Property>();
+                                properties.forEach(property -> {
+                                    propertiesMap.put(property.getName(), property);
+                                });
+
+                                return new MapProperty(name, propertiesMap);
+                            }
                         }
 
                         throw new RuntimeException(
                                 String.format(
-                                        "Type of property %s in class %s is not supported",
+                                        "Type of property %s in class %s is not supported, or does not have field annotated with @PropertyDefinition",
                                         field.getName(),
-                                        resource.getClass().getCanonicalName()
+                                        obj.getClass().getCanonicalName()
                                 )
                         );
                     } catch (IllegalAccessException exception) {
@@ -68,7 +84,7 @@ public class ResourceReflectionUtil {
                                 String.format(
                                         "Could not obtain value from property %s in class %s",
                                         field.getName(),
-                                        resource.getClass().getCanonicalName()
+                                        obj.getClass().getCanonicalName()
                                 )
                         );
                     }
@@ -82,12 +98,8 @@ public class ResourceReflectionUtil {
     public static ResourceDef toResourceDef(Class<? extends Resource> resourceClass) {
         ResourceDefinition resourceDefinition = resourceClass.getAnnotation(ResourceDefinition.class);
 
-        List<PropertyDef> properties = Stream.of(resourceClass.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
-                .map(field -> toPropertyDef(resourceClass, field))
-                .collect(Collectors.toList());
-
-        List<FunctionDef> functions = Collections.emptyList();
+        List<PropertyDef> properties = toPropertydefs(resourceClass);
+        List<FunctionDef> functions = toFunctionDefs(resourceClass);
 
         return new ResourceDef(new ResourceFqn(
                 resourceDefinition.provider(),
@@ -96,7 +108,14 @@ public class ResourceReflectionUtil {
         ), properties, functions);
     }
 
-    private static PropertyDef toPropertyDef(Class<? extends Resource> resourceClass, Field field) {
+    private static List<PropertyDef> toPropertydefs(Class<?> clazz) {
+        return Stream.of(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
+                .map(field -> toPropertyDef(clazz, field))
+                .collect(Collectors.toList());
+    }
+
+    private static PropertyDef toPropertyDef(Class<?> resourceClass, Field field) {
         PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
 
         Class<?> type = field.getType();
@@ -119,14 +138,30 @@ public class ResourceReflectionUtil {
                     propertyDefAnnotation.description(),
                     PropertyType.BOOLEAN,
                     Boolean.FALSE);
+        } else {
+            // check if type has @PropertyDefinition annotations
+            List<PropertyDef> properties = toPropertydefs(type);
+            if (properties.size() > 0) {
+                return new PropertyDef(
+                        propertyDefAnnotation.name(),
+                        propertyDefAnnotation.description(),
+                        PropertyType.MAP,
+                        Boolean.FALSE,
+                        properties
+                );
+            }
         }
 
         throw new RuntimeException(
                 String.format(
-                        "Type of property %s in class %s is not supported",
+                        "Type of property %s in class %s is not supported, or does not have field annotated with @PropertyDefinition",
                         field.getName(),
                         resourceClass.getCanonicalName()
                 )
         );
+    }
+
+    private static List<FunctionDef> toFunctionDefs(Class<?> clazz) {
+        return Collections.emptyList();
     }
 }

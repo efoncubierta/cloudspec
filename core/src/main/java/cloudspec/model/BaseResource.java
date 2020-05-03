@@ -64,7 +64,7 @@ public abstract class BaseResource implements Resource {
 
     @Override
     public List<Property> getProperties() {
-        return ResourceReflectionUtil.toProperties(this);
+        return ResourceReflectionUtil.resourceToProperties(this);
     }
 
     @Override

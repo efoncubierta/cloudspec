@@ -42,7 +42,7 @@ public class ResourceTest {
         assertEquals(MyResource.RESOURCE_FQN, resource.getResourceFqn());
 
         assertNotNull(resource.getProperties());
-        assertEquals(3, resource.getProperties().size());
+        assertEquals(4, resource.getProperties().size());
 
         Optional<Property> integerProperty = resource.getProperty(MyResource.PROP_INTEGER_NAME);
         assertNotNull(integerProperty);
@@ -58,6 +58,15 @@ public class ResourceTest {
         assertNotNull(booleanProperty);
         assertTrue(booleanProperty.isPresent());
         assertEquals(MyResource.PROP_BOOLEAN_VALUE, booleanProperty.get().getValue());
+
+        Optional<Property> mapPropertyOpt = resource.getProperty(MyResource.PROP_MAP_NAME);
+        assertNotNull(mapPropertyOpt);
+        assertTrue(mapPropertyOpt.isPresent());
+
+        MapProperty mapProperty = (MapProperty) mapPropertyOpt.get();
+        assertTrue(mapProperty.getProperty(MyResource.PROP_INTEGER_NAME).isPresent());;
+        assertEquals(MyResource.PROP_MAP_VALUE.getIntegerProperty(),
+                mapProperty.getProperty(MyResource.PROP_INTEGER_NAME).get().getValue());
 
         assertNotNull(resource.getFunctions());
         assertEquals(0, resource.getFunctions().size());

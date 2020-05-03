@@ -49,7 +49,7 @@ public class ProviderTest {
         assertEquals(MyResource.RESOURCE_FQN, resourceDef.getResourceFqn());
 
         assertNotNull(resourceDef.getProperties());
-        assertEquals(3, resourceDef.getProperties().size());
+        assertEquals(4, resourceDef.getProperties().size());
 
         Optional<PropertyDef> integerPropertyDef = resourceDef.getProperty(MyResource.PROP_INTEGER_NAME);
         assertNotNull(integerPropertyDef);
@@ -71,6 +71,16 @@ public class ProviderTest {
         assertEquals(MyResource.PROP_BOOLEAN_NAME, booleanPropertyDef.get().getName());
         assertEquals(MyResource.PROP_BOOLEAN_DESCRIPTION, booleanPropertyDef.get().getDescription());
         assertEquals(MyResource.PROP_BOOLEAN_TYPE, booleanPropertyDef.get().getPropertyType());
+
+        Optional<PropertyDef> mapPropertyDef = resourceDef.getProperty(MyResource.PROP_MAP_NAME);
+        assertNotNull(mapPropertyDef);
+        assertTrue(mapPropertyDef.isPresent());
+        assertEquals(MyResource.PROP_MAP_NAME, mapPropertyDef.get().getName());
+        assertEquals(MyResource.PROP_MAP_DESCRIPTION, mapPropertyDef.get().getDescription());
+        assertEquals(MyResource.PROP_MAP_TYPE, mapPropertyDef.get().getPropertyType());
+
+        assertNotNull(resourceDef.getFunctions());
+        assertEquals(0, resourceDef.getFunctions().size());
     }
 
 

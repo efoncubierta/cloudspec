@@ -25,26 +25,42 @@
  */
 package cloudspec.model;
 
-/**
- * Base class for classes implementing {@link Property}.
- */
-public abstract class BaseProperty extends BaseMember implements Property {
-    private final Object value;
+import cloudspec.annotation.PropertyDefinition;
 
-    /**
-     * Constructor.
-     *
-     * @param name  Property's name.
-     * @param value Property's value.
-     */
-    protected BaseProperty(String name, Object value) {
-        super(name);
+public class MyPojo {
+    @PropertyDefinition(
+            name = MyResource.PROP_INTEGER_NAME,
+            description = MyResource.PROP_INTEGER_DESCRIPTION
+    )
+    private final Integer integerProperty;
 
-        this.value = value;
+    @PropertyDefinition(
+            name = MyResource.PROP_STRING_NAME,
+            description = MyResource.PROP_STRING_DESCRIPTION
+    )
+    private final String stringProperty;
+
+    @PropertyDefinition(
+            name = MyResource.PROP_BOOLEAN_NAME,
+            description = MyResource.PROP_BOOLEAN_DESCRIPTION
+    )
+    private final Boolean booleanProperty;
+
+    public MyPojo(Integer integerProperty, String stringProperty, Boolean booleanProperty) {
+        this.integerProperty = integerProperty;
+        this.stringProperty = stringProperty;
+        this.booleanProperty = booleanProperty;
     }
 
-    @Override
-    public Object getValue() {
-        return value;
+    public Integer getIntegerProperty() {
+        return integerProperty;
+    }
+
+    public String getStringProperty() {
+        return stringProperty;
+    }
+
+    public Boolean getBooleanProperty() {
+        return booleanProperty;
     }
 }

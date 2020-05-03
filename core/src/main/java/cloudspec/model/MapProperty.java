@@ -25,26 +25,31 @@
  */
 package cloudspec.model;
 
-/**
- * Base class for classes implementing {@link Property}.
- */
-public abstract class BaseProperty extends BaseMember implements Property {
-    private final Object value;
+import java.util.Map;
+import java.util.Optional;
 
+/**
+ * Define a property of type 'map'.
+ */
+public class MapProperty extends BaseProperty {
     /**
      * Constructor.
      *
      * @param name  Property's name.
      * @param value Property's value.
      */
-    protected BaseProperty(String name, Object value) {
-        super(name);
-
-        this.value = value;
+    public MapProperty(String name, Map<String, Property> value) {
+        super(name, value);
     }
 
-    @Override
-    public Object getValue() {
-        return value;
+    /**
+     * Get a property by its name.
+     *
+     * @param name Property name.
+     * @return Property value.
+     */
+    public Optional<Property> getProperty(String name) {
+        Map<String, Property> properties = (Map<String, Property>) getValue();
+        return Optional.ofNullable(properties.get(name));
     }
 }

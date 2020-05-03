@@ -25,15 +25,24 @@
  */
 package cloudspec.model;
 
+import java.util.Collections;
+import java.util.List;
+
 public class PropertyDef extends MemberDef {
     private final PropertyType propertyType;
     private final Boolean isArray;
+    private final List<PropertyDef> propertyDefs;
 
     public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
+        this(name, description, propertyType, isArray, Collections.emptyList());
+    }
+
+    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray, List<PropertyDef> propertyDefs) {
         super(name, description);
 
         this.propertyType = propertyType;
         this.isArray = isArray;
+        this.propertyDefs = propertyDefs;
     }
 
     public PropertyType getPropertyType() {
@@ -42,5 +51,9 @@ public class PropertyDef extends MemberDef {
 
     public Boolean isArray() {
         return isArray;
+    }
+
+    public List<PropertyDef> getPropertyDefs() {
+        return propertyDefs;
     }
 }
