@@ -30,9 +30,7 @@ import cloudspec.annotation.ResourceDefinition;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,33 +40,28 @@ public class ResourceReflectionUtil {
     }
 
     private static List<Property> toProperties(Object obj) {
+        return toProperties(obj, "");
+    }
+
+    private static List<Property> toProperties(Object obj, String prefix) {
         return Stream.of(obj.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
-                .map(field -> {
+                .flatMap(field -> {
                     PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
 
                     try {
-                        String name = propertyDefAnnotation.name();
+                        String name = String.format("%s%s", prefix, propertyDefAnnotation.name());
 
                         field.setAccessible(true);
                         Object value = field.get(obj);
                         field.setAccessible(true);
 
-                        if (value instanceof String) {
-                            return new StringProperty(name, (String) value);
-                        } else if (value instanceof Integer) {
-                            return new IntegerProperty(name, (Integer) value);
-                        } else if (value instanceof Boolean) {
-                            return new BooleanProperty(name, (Boolean) value);
+                        if (value instanceof String || value instanceof Integer || value instanceof Boolean) {
+                            return Stream.of(new Property(name, value));
                         } else {
-                            List<Property> properties = toProperties(value);
+                            List<Property> properties = toProperties(value, name + ".");
                             if (properties.size() > 0) {
-                                Map<String, Property> propertiesMap = new HashMap<String, Property>();
-                                properties.forEach(property -> {
-                                    propertiesMap.put(property.getName(), property);
-                                });
-
-                                return new MapProperty(name, propertiesMap);
+                                return properties.stream();
                             }
                         }
 

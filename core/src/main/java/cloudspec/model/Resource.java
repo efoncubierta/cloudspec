@@ -51,7 +51,10 @@ public interface Resource {
      * @return Optional property.
      */
     default Optional<Property> getProperty(String propertyName) {
-        return getProperties().stream().filter(property -> property.getName().equals(propertyName)).findFirst();
+        return getProperties()
+                .stream()
+                .filter(p -> p.getName().equals(propertyName))
+                .findFirst();
     }
 
     /**

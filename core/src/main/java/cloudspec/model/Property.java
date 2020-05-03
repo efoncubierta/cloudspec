@@ -28,6 +28,22 @@ package cloudspec.model;
 /**
  * Define a resource property.
  */
-public interface Property extends Member {
-    Object getValue();
+public class Property extends BaseMember {
+    private final Object value;
+
+    /**
+     * Constructor.
+     *
+     * @param name  Property's name.
+     * @param value Property's value.
+     */
+    public Property(String name, Object value) {
+        super(name);
+
+        this.value = value;
+    }
+
+    public Object getValue() {
+        return value;
+    }
 }
