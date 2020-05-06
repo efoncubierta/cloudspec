@@ -25,6 +25,20 @@
  */
 package cloudspec.model;
 
-public interface Function extends Member {
+public class Function extends BaseMember {
+    /**
+     * Constructor.
+     *
+     * @param name Function's name.
+     */
+    public Function(String name) {
+        super(name);
+    }
 
+    @Override
+    public String toString() {
+        return "Property{" +
+                "name=" + getName() +
+                '}';
+    }
 }

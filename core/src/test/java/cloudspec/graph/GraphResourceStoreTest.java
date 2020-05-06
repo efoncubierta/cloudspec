@@ -23,33 +23,29 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.graph;
 
-public class PropertyDef extends MemberDef {
-    private final PropertyType propertyType;
-    private final Boolean isArray;
+import cloudspec.model.Resource;
+import cloudspec.util.ModelTestUtils;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Test;
 
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        super(name, description);
-        this.propertyType = propertyType;
-        this.isArray = isArray;
-    }
+import java.util.Optional;
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    public Boolean isArray() {
-        return isArray;
-    }
+public class GraphResourceStoreTest {
+    @Test
+    public void shouldAddAndGetResource() {
+        GraphResourceStore store = new GraphResourceStore(TinkerGraph.open());
 
-    @Override
-    public String toString() {
-        return "PropertyDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
-                '}';
+        store.addResource(ModelTestUtils.RESOURCE);
+
+        Optional<Resource> resourceOpt = store.getResource(ModelTestUtils.RESOURCE.getFqn(), ModelTestUtils.RESOURCE.getResourceId());
+        assertNotNull(resourceOpt);
+        assertTrue(resourceOpt.isPresent());
+
+        ModelTestUtils.compareResources(ModelTestUtils.RESOURCE, resourceOpt.get());
     }
 }

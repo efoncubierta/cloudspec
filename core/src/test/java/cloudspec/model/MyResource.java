@@ -25,71 +25,49 @@
  */
 package cloudspec.model;
 
+import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
+import cloudspec.util.ProviderDataUtil;
+import cloudspec.util.ModelTestUtils;
 
 @ResourceDefinition(
-        provider = MyProvider.PROVIDER_NAME,
-        group = MyResource.RESOURCE_GROUP,
-        name = MyResource.RESOURCE_NAME,
-        description = MyResource.RESOURCE_DESCRIPTION
+        provider = ProviderDataUtil.PROVIDER_NAME,
+        group = ModelTestUtils.RESOURCE_GROUP,
+        name = ModelTestUtils.RESOURCE_NAME,
+        description = ModelTestUtils.RESOURCE_DESCRIPTION
 )
-public class MyResource extends BaseResource {
-    public static final String RESOURCE_GROUP = "mygroup";
-    public static final String RESOURCE_NAME = "myresource";
-    public static final ResourceFqn RESOURCE_FQN = new ResourceFqn(MyProvider.PROVIDER_NAME, RESOURCE_GROUP, RESOURCE_NAME);
-    public static final String RESOURCE_DESCRIPTION = "My resource";
-    public static final ResourceDef RESOURCE_DEF = ResourceReflectionUtil.toResourceDef(MyResource.class);
-
-    public static final String PROP_INTEGER_NAME = "integer_property";
-    public static final String PROP_INTEGER_DESCRIPTION = "Integer property";
-    public static final PropertyType PROP_INTEGER_TYPE = PropertyType.INTEGER;
-    public static final Integer PROP_INTEGER_VALUE = 1;
-
-    public static final String PROP_STRING_NAME = "string_property";
-    public static final String PROP_STRING_DESCRIPTION = "String property";
-    public static final PropertyType PROP_STRING_TYPE = PropertyType.STRING;
-    public static final String PROP_STRING_VALUE = "foo";
-
-    public static final String PROP_BOOLEAN_NAME = "boolean_property";
-    public static final String PROP_BOOLEAN_DESCRIPTION = "Boolean property";
-    public static final PropertyType PROP_BOOLEAN_TYPE = PropertyType.BOOLEAN;
-    public static final Boolean PROP_BOOLEAN_VALUE = Boolean.TRUE;
-
-    public static final String PROP_MAP_NAME = "map_property";
-    public static final String PROP_MAP_DESCRIPTION = "Map property";
-    public static final PropertyType PROP_MAP_TYPE = PropertyType.MAP;
-    public static final MyPojo PROP_MAP_VALUE = new MyPojo(PROP_INTEGER_VALUE, PROP_STRING_VALUE, PROP_BOOLEAN_VALUE);
+public class MyResource {
+    @IdDefinition
+    private final String id;
 
     @PropertyDefinition(
-            name = PROP_INTEGER_NAME,
-            description = PROP_INTEGER_DESCRIPTION
+            name = ModelTestUtils.PROP_INTEGER_NAME,
+            description = ModelTestUtils.PROP_INTEGER_DESCRIPTION
     )
     private final Integer integerProperty;
 
     @PropertyDefinition(
-            name = PROP_STRING_NAME,
-            description = PROP_STRING_DESCRIPTION
+            name = ModelTestUtils.PROP_STRING_NAME,
+            description = ModelTestUtils.PROP_STRING_DESCRIPTION
     )
     private final String stringProperty;
 
     @PropertyDefinition(
-            name = PROP_BOOLEAN_NAME,
-            description = PROP_BOOLEAN_DESCRIPTION
+            name = ModelTestUtils.PROP_BOOLEAN_NAME,
+            description = ModelTestUtils.PROP_BOOLEAN_DESCRIPTION
     )
     private final Boolean booleanProperty;
 
-    @PropertyDefinition(
-            name = PROP_MAP_NAME,
-            description = PROP_MAP_DESCRIPTION
-    )
-    private final MyPojo mapProperty;
-
-    public MyResource(Integer integerProperty, String stringProperty, Boolean booleanProperty) {
+    public MyResource(String id, Integer integerProperty, String stringProperty, Boolean booleanProperty) {
+        this.id = id;
         this.integerProperty = integerProperty;
         this.stringProperty = stringProperty;
         this.booleanProperty = booleanProperty;
-        this.mapProperty = new MyPojo(integerProperty, stringProperty, booleanProperty);
+    }
+
+    public String getId() {
+        return id;
     }
 
     public Integer getIntegerProperty() {
@@ -102,9 +80,5 @@ public class MyResource extends BaseResource {
 
     public Boolean getBooleanProperty() {
         return booleanProperty;
-    }
-
-    public MyPojo getMapProperty() {
-        return mapProperty;
     }
 }

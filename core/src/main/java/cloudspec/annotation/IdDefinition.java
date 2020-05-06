@@ -23,33 +23,14 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.annotation;
 
-public class PropertyDef extends MemberDef {
-    private final PropertyType propertyType;
-    private final Boolean isArray;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        super(name, description);
-        this.propertyType = propertyType;
-        this.isArray = isArray;
-    }
-
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
-
-    public Boolean isArray() {
-        return isArray;
-    }
-
-    @Override
-    public String toString() {
-        return "PropertyDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
-                '}';
-    }
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface IdDefinition {
 }

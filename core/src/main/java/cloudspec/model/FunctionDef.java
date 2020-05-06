@@ -29,4 +29,12 @@ public class FunctionDef extends MemberDef {
     public FunctionDef(String name, String description) {
         super(name, description);
     }
+
+    @Override
+    public String toString() {
+        return "FunctionDef{" +
+                "name=" + getName() +
+                ", description=" + getDescription() +
+                '}';
+    }
 }

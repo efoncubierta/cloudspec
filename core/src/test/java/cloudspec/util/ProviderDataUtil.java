@@ -23,45 +23,9 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.preload;
+package cloudspec.util;
 
-import cloudspec.lang.CloudSpec;
-import cloudspec.lang.GroupExpr;
-import cloudspec.lang.RuleExpr;
-import cloudspec.model.ResourceFqn;
-import cloudspec.service.ResourceService;
-
-import java.util.List;
-
-public class CloudSpecPreloader {
-    private final ResourceService resourceService;
-
-    public CloudSpecPreloader(ResourceService resourceService) {
-        this.resourceService = resourceService;
-    }
-
-    public void preload(CloudSpec spec) {
-        System.out.println("CloudSpec Preloader");
-
-        preloadGroups(spec.getGroups());
-    }
-
-    private void preloadGroups(List<GroupExpr> groups) {
-        groups.stream().forEach(this::preloadGroup);
-    }
-
-    private void preloadGroup(GroupExpr group) {
-        preloadRules(group.getRules());
-    }
-
-    private void preloadRules(List<RuleExpr> rules) {
-        rules.stream().forEach(this::preloadRule);
-    }
-
-    private void preloadRule(RuleExpr rule) {
-        ResourceFqn resourceFqn = ResourceFqn.fromString(rule.getResourceFqn());
-
-        // load resources
-        resourceService.getResources(resourceFqn);
-    }
+public class ProviderDataUtil {
+    public static final String PROVIDER_NAME = "myprovider";
+    public static final String PROVIDER_DESCRIPTION = "My provider";
 }

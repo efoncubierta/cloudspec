@@ -28,16 +28,16 @@ package cloudspec.preflight;
 import cloudspec.lang.*;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceFqn;
-import cloudspec.service.ResourceService;
+import cloudspec.store.ResourceDefStore;
 
 import java.util.List;
 import java.util.Optional;
 
 public class CloudSpecPreflight {
-    private final ResourceService resourceService;
+    private final ResourceDefStore resourceDefStore;
 
-    public CloudSpecPreflight(ResourceService resourceService) {
-        this.resourceService = resourceService;
+    public CloudSpecPreflight(ResourceDefStore resourceDefStore) {
+        this.resourceDefStore = resourceDefStore;
     }
 
     public void preflight(CloudSpec spec) {
@@ -47,7 +47,7 @@ public class CloudSpecPreflight {
     }
 
     private void preflightGroups(List<GroupExpr> groups) {
-        groups.stream().forEach(this::preflightGroup);
+        groups.forEach(this::preflightGroup);
     }
 
     private void preflightGroup(GroupExpr group) {
@@ -55,16 +55,16 @@ public class CloudSpecPreflight {
     }
 
     private void preflightRules(List<RuleExpr> rules) {
-        rules.stream().forEach(this::preflightRule);
+        rules.forEach(this::preflightRule);
     }
 
     private void preflightRule(RuleExpr rule) {
         ResourceFqn resouceFqn = ResourceFqn.fromString(rule.getResourceFqn());
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = resourceService.getResourceDef(resouceFqn);
+        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(resouceFqn);
         if (!resourceDefOpt.isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Resource %s is not supported.", rule.getResourceFqn()));
+            throw new CloudSpecPreflightException(String.format("Resource of type '%s' is not supported.", rule.getResourceFqn()));
         }
 
         // preflight withs and asserts

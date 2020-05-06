@@ -23,33 +23,12 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.lang.predicate;
 
-public class PropertyDef extends MemberDef {
-    private final PropertyType propertyType;
-    private final Boolean isArray;
-
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        super(name, description);
-        this.propertyType = propertyType;
-        this.isArray = isArray;
-    }
-
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
-
-    public Boolean isArray() {
-        return isArray;
-    }
-
-    @Override
-    public String toString() {
-        return "PropertyDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
-                '}';
-    }
+/**
+ * Define a predicate for 'with' and 'assert' expressions.
+ * <p>
+ * A predicate defines how a expression must be evaluated.
+ */
+public interface Predicate {
 }

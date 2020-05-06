@@ -23,33 +23,18 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.store;
 
-public class PropertyDef extends MemberDef {
-    private final PropertyType propertyType;
-    private final Boolean isArray;
+import cloudspec.model.Resource;
+import cloudspec.model.ResourceFqn;
 
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        super(name, description);
-        this.propertyType = propertyType;
-        this.isArray = isArray;
-    }
+import java.util.List;
+import java.util.Optional;
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
+public interface ResourceStore {
+    void addResource(Resource resource);
 
-    public Boolean isArray() {
-        return isArray;
-    }
+    Optional<Resource> getResource(ResourceFqn resourceFqn, String id);
 
-    @Override
-    public String toString() {
-        return "PropertyDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
-                '}';
-    }
+    List<Resource> getResourcesByType(ResourceFqn resourceFqn);
 }

@@ -31,7 +31,6 @@ import cloudspec.aws.ec2.EC2InstanceResource;
 import cloudspec.aws.s3.S3BucketLoader;
 import cloudspec.aws.s3.S3BucketResource;
 import cloudspec.model.BaseProvider;
-import cloudspec.model.Resource;
 import cloudspec.model.ResourceFqn;
 
 import java.util.*;
@@ -44,19 +43,15 @@ import java.util.*;
 public class AWSProvider extends BaseProvider {
     public static final String PROVIDER_NAME = "aws";
 
-    private final IAWSClientsProvider clientsProvider;
-
     private final Map<String, AWSResourceLoader<?>> loaders = new HashMap<>();
 
     public AWSProvider(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
-
         loaders.put(EC2InstanceResource.FQN.toString(), new EC2InstanceLoader(clientsProvider));
         loaders.put(S3BucketResource.FQN.toString(), new S3BucketLoader(clientsProvider));
     }
 
     @Override
-    public List<? extends Resource> getResources(ResourceFqn resourceFqn) {
+    public List<?> getResources(ResourceFqn resourceFqn) {
         return getLoader(resourceFqn)
                 .map(AWSResourceLoader::load)
                 .orElse(Collections.emptyList());

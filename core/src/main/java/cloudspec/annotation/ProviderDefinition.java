@@ -39,5 +39,5 @@ public @interface ProviderDefinition {
 
     String description();
 
-    Class<? extends Resource>[] resources();
+    Class<?>[] resources();
 }

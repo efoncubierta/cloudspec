@@ -23,17 +23,8 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.preload;
+package cloudspec.lang.predicate;
 
-import cloudspec.CloudSpecRuntimeException;
+public class IdentityPredicate implements Predicate {
 
-public class CloudSpecPreloaderException extends CloudSpecRuntimeException {
-
-    public CloudSpecPreloaderException(String message) {
-        super(message);
-    }
-
-    public CloudSpecPreloaderException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
-    private List<S3BucketResource> buckets;
-
     private final IAWSClientsProvider clientsProvider;
 
     public S3BucketLoader(IAWSClientsProvider clientsProvider) {
@@ -45,23 +43,17 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
     }
 
     public List<S3BucketResource> load() {
-        if (buckets != null) {
-            return buckets;
-        }
-
         S3Client s3Client = clientsProvider.getS3Client();
 
         try {
             ListBucketsResponse response = s3Client.listBuckets();
-            buckets = response.buckets()
+            return response.buckets()
                     .stream()
                     .map(bucket -> toResource(s3Client, bucket))
                     .collect(Collectors.toList());
         } finally {
             IoUtils.closeQuietly(s3Client, null);
         }
-
-        return buckets;
     }
 
     private S3BucketResource toResource(S3Client s3Client, Bucket bucket) {

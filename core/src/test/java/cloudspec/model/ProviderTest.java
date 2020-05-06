@@ -25,11 +25,12 @@
  */
 package cloudspec.model;
 
+import cloudspec.util.ModelTestUtils;
+import cloudspec.util.ProviderDataUtil;
 import org.junit.Test;
 
-import java.util.Optional;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ProviderTest {
     public static final Provider TEST_PROVIDER = new MyProvider();
@@ -37,50 +38,15 @@ public class ProviderTest {
     @Test
     public void shouldBuildProviderFromAnnotation() {
         assertNotNull(TEST_PROVIDER.getName());
-        assertEquals(MyProvider.PROVIDER_NAME, TEST_PROVIDER.getName());
+        assertEquals(ProviderDataUtil.PROVIDER_NAME, TEST_PROVIDER.getName());
 
         assertNotNull(TEST_PROVIDER.getDescription());
-        assertEquals(MyProvider.PROVIDER_DESCRIPTION, TEST_PROVIDER.getDescription());
+        assertEquals(ProviderDataUtil.PROVIDER_DESCRIPTION, TEST_PROVIDER.getDescription());
 
         assertNotNull(TEST_PROVIDER.getResourceDefs());
         assertEquals(1, TEST_PROVIDER.getResourceDefs().size());
 
-        ResourceDef resourceDef = TEST_PROVIDER.getResourceDefs().get(0);
-        assertEquals(MyResource.RESOURCE_FQN, resourceDef.getResourceFqn());
-
-        assertNotNull(resourceDef.getProperties());
-        assertEquals(4, resourceDef.getProperties().size());
-
-        Optional<PropertyDef> integerPropertyDef = resourceDef.getProperty(MyResource.PROP_INTEGER_NAME);
-        assertNotNull(integerPropertyDef);
-        assertTrue(integerPropertyDef.isPresent());
-        assertEquals(MyResource.PROP_INTEGER_NAME, integerPropertyDef.get().getName());
-        assertEquals(MyResource.PROP_INTEGER_DESCRIPTION, integerPropertyDef.get().getDescription());
-        assertEquals(MyResource.PROP_INTEGER_TYPE, integerPropertyDef.get().getPropertyType());
-
-        Optional<PropertyDef> stringPropertyDef = resourceDef.getProperty(MyResource.PROP_STRING_NAME);
-        assertNotNull(stringPropertyDef);
-        assertTrue(stringPropertyDef.isPresent());
-        assertEquals(MyResource.PROP_STRING_NAME, stringPropertyDef.get().getName());
-        assertEquals(MyResource.PROP_STRING_DESCRIPTION, stringPropertyDef.get().getDescription());
-        assertEquals(MyResource.PROP_STRING_TYPE, stringPropertyDef.get().getPropertyType());
-
-        Optional<PropertyDef> booleanPropertyDef = resourceDef.getProperty(MyResource.PROP_BOOLEAN_NAME);
-        assertNotNull(booleanPropertyDef);
-        assertTrue(booleanPropertyDef.isPresent());
-        assertEquals(MyResource.PROP_BOOLEAN_NAME, booleanPropertyDef.get().getName());
-        assertEquals(MyResource.PROP_BOOLEAN_DESCRIPTION, booleanPropertyDef.get().getDescription());
-        assertEquals(MyResource.PROP_BOOLEAN_TYPE, booleanPropertyDef.get().getPropertyType());
-
-        Optional<PropertyDef> mapPropertyDef = resourceDef.getProperty(MyResource.PROP_MAP_NAME);
-        assertNotNull(mapPropertyDef);
-        assertTrue(mapPropertyDef.isPresent());
-        assertEquals(MyResource.PROP_MAP_NAME, mapPropertyDef.get().getName());
-        assertEquals(MyResource.PROP_MAP_DESCRIPTION, mapPropertyDef.get().getDescription());
-        assertEquals(MyResource.PROP_MAP_TYPE, mapPropertyDef.get().getPropertyType());
-
-        assertNotNull(resourceDef.getFunctions());
-        assertEquals(0, resourceDef.getFunctions().size());
+        ModelTestUtils.compareResourceDefs(ModelTestUtils.RESOURCE_DEF, TEST_PROVIDER.getResourceDefs().get(0));
     }
 
 

@@ -23,44 +23,29 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.graph;
 
-import cloudspec.annotation.PropertyDefinition;
+import cloudspec.model.ResourceDef;
+import cloudspec.util.ModelTestUtils;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Test;
 
-public class MyPojo {
-    @PropertyDefinition(
-            name = MyResource.PROP_INTEGER_NAME,
-            description = MyResource.PROP_INTEGER_DESCRIPTION
-    )
-    private final Integer integerProperty;
+import java.util.Optional;
 
-    @PropertyDefinition(
-            name = MyResource.PROP_STRING_NAME,
-            description = MyResource.PROP_STRING_DESCRIPTION
-    )
-    private final String stringProperty;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @PropertyDefinition(
-            name = MyResource.PROP_BOOLEAN_NAME,
-            description = MyResource.PROP_BOOLEAN_DESCRIPTION
-    )
-    private final Boolean booleanProperty;
+public class GraphResourceDefStoreTest {
+    @Test
+    public void shouldAddAndGetResourceDef() {
+        GraphResourceDefStore store = new GraphResourceDefStore(TinkerGraph.open());
 
-    public MyPojo(Integer integerProperty, String stringProperty, Boolean booleanProperty) {
-        this.integerProperty = integerProperty;
-        this.stringProperty = stringProperty;
-        this.booleanProperty = booleanProperty;
-    }
+        store.addResourceDef(ModelTestUtils.RESOURCE_DEF);
 
-    public Integer getIntegerProperty() {
-        return integerProperty;
-    }
+        Optional<ResourceDef> resourceDefOpt = store.getResourceDef(ModelTestUtils.RESOURCE_FQN);
+        assertNotNull(resourceDefOpt);
+        assertTrue(resourceDefOpt.isPresent());
 
-    public String getStringProperty() {
-        return stringProperty;
-    }
-
-    public Boolean getBooleanProperty() {
-        return booleanProperty;
+        ModelTestUtils.compareResourceDefs(ModelTestUtils.RESOURCE_DEF, resourceDefOpt.get());
     }
 }

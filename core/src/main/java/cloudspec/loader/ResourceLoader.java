@@ -23,54 +23,51 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.service;
+package cloudspec.loader;
 
 import cloudspec.ProvidersRegistry;
-import cloudspec.model.Resource;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceReflectionUtil;
+import cloudspec.store.ResourceDefStore;
+import cloudspec.store.ResourceStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-/**
- * Service class to manage resources.
- * <p>
- * This service class imports all resource definitions from the providers registry.
- */
-public class ResourceService {
+public class ResourceLoader {
+    private final Logger LOGGER = LoggerFactory.getLogger(ResourceLoader.class);
+
     private final ProvidersRegistry providersRegistry;
+    private final ResourceDefStore resourceDefStore;
+    private final ResourceStore resourceStore;
 
-    /**
-     * Constructor.
-     *
-     * @param providersRegistry Provider's registry.
-     */
-    public ResourceService(ProvidersRegistry providersRegistry) {
+    public ResourceLoader(ProvidersRegistry providersRegistry,
+                          ResourceDefStore resourceDefStore,
+                          ResourceStore resourceStore) {
         this.providersRegistry = providersRegistry;
+        this.resourceDefStore = resourceDefStore;
+        this.resourceStore = resourceStore;
     }
 
-    /**
-     * Get a resource definition of this provider.
-     *
-     * @param resourceFqn Resource fully-qualified name.
-     * @return Optional resource definition.
-     */
-    public Optional<ResourceDef> getResourceDef(ResourceFqn resourceFqn) {
-        return providersRegistry.getProvider(resourceFqn.getProviderName())
-                .flatMap(provider -> provider.getResourceDef(resourceFqn));
+    public void load() {
+        resourceDefStore.getResourceDefs()
+                .stream()
+                .map(ResourceDef::getResourceFqn)
+                .forEach(this::loadResourcesByType);
     }
 
-    /**
-     * Get resources of a particular type.
-     *
-     * @param resourceFqn Resource FQN.
-     * @return List of resources.
-     */
-    public List<? extends Resource> getResources(ResourceFqn resourceFqn) {
-        return providersRegistry.getProvider(resourceFqn.getProviderName())
-                .map(provider -> provider.getResources(resourceFqn))
-                .orElse(Collections.emptyList());
+    private void loadResourcesByType(ResourceFqn resourceFqn) {
+        LOGGER.debug("Loading resources of type '{}'", resourceFqn);
+
+        providersRegistry.getProvider(resourceFqn.getProviderName())
+                .map(provider -> provider.getResources(resourceFqn).stream())
+                .orElse(Stream.empty())
+                .map(ResourceReflectionUtil::toResource)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(resourceStore::addResource);
     }
 }

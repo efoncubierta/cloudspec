@@ -26,9 +26,10 @@
 package cloudspec;
 
 import cloudspec.lang.*;
-import cloudspec.lang.evaluator.EqualExprEvaluator;
-import cloudspec.lang.evaluator.ExprEvaluator;
-import cloudspec.lang.evaluator.InExprEvaluator;
+import cloudspec.lang.predicate.EqualPredicate;
+import cloudspec.lang.predicate.NotPredicate;
+import cloudspec.lang.predicate.Predicate;
+import cloudspec.lang.predicate.WithinPredicate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +63,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
     private String currentAssertPropertyName;
 
     // evaluator
-    private ExprEvaluator<Object> currentEvaluator;
+    private Predicate currentPredicate;
     private List<Object> currentValues;
 
     public CloudSpec getCloudSpec() {
@@ -111,65 +112,65 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
     @Override
     public void enterWithDecl(CloudSpecParser.WithDeclContext ctx) {
         currentWithPropertyName = stripQuotes(ctx.PROPERTY_NAME().getText());
-        currentEvaluator = null;
+        currentPredicate = null;
         currentValues = new ArrayList<Object>();
     }
 
     @Override
     public void exitWithDecl(CloudSpecParser.WithDeclContext ctx) {
-        currentRuleWithExprs.add(new WithExpr(currentWithPropertyName, currentEvaluator));
+        currentRuleWithExprs.add(new WithExpr(currentWithPropertyName, currentPredicate));
     }
 
     @Override
     public void enterAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
         currentAssertPropertyName = stripQuotes(ctx.PROPERTY_NAME().getText());
-        currentEvaluator = null;
+        currentPredicate = null;
         currentValues = new ArrayList<>();
     }
 
     @Override
     public void exitAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
-        currentRuleAssertExprs.add(new AssertExpr(currentAssertPropertyName, currentEvaluator));
+        currentRuleAssertExprs.add(new AssertExpr(currentAssertPropertyName, currentPredicate));
     }
 
     @Override
-    public void exitWithEqualExpr(CloudSpecParser.WithEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.FALSE);
+    public void exitWithEqualPredicate(CloudSpecParser.WithEqualPredicateContext ctx) {
+        currentPredicate = new EqualPredicate<>(currentValues.get(0));
     }
 
     @Override
-    public void exitWithNotEqualExpr(CloudSpecParser.WithNotEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.TRUE);
+    public void exitWithNotEqualPredicate(CloudSpecParser.WithNotEqualPredicateContext ctx) {
+        currentPredicate = new NotPredicate(new EqualPredicate<>(currentValues.get(0)));
     }
 
     @Override
-    public void exitWithInExpr(CloudSpecParser.WithInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.FALSE);
+    public void exitWithWithinPredicate(CloudSpecParser.WithWithinPredicateContext ctx) {
+        currentPredicate = new WithinPredicate<>(currentValues);
     }
 
     @Override
-    public void exitWithNotInExpr(CloudSpecParser.WithNotInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.TRUE);
+    public void exitWithNotWithinPredicate(CloudSpecParser.WithNotWithinPredicateContext ctx) {
+        currentPredicate = new NotPredicate(new WithinPredicate<>(currentValues));
     }
 
     @Override
-    public void exitAssertEqualExpr(CloudSpecParser.AssertEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.FALSE);
+    public void exitAssertEqualPredicate(CloudSpecParser.AssertEqualPredicateContext ctx) {
+        currentPredicate = new EqualPredicate<>(currentValues.get(0));
     }
 
     @Override
-    public void exitAssertNotEqualExpr(CloudSpecParser.AssertNotEqualExprContext ctx) {
-        currentEvaluator = new EqualExprEvaluator<>(currentValues.get(0), Boolean.TRUE);
+    public void exitAssertNotEqualPredicate(CloudSpecParser.AssertNotEqualPredicateContext ctx) {
+        currentPredicate = new NotPredicate(new EqualPredicate<>(currentValues.get(0)));
     }
 
     @Override
-    public void exitAssertInExpr(CloudSpecParser.AssertInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.FALSE);
+    public void exitAssertWithinPredicate(CloudSpecParser.AssertWithinPredicateContext ctx) {
+        currentPredicate = new WithinPredicate<>(currentValues);
     }
 
     @Override
-    public void exitAssertNotInExpr(CloudSpecParser.AssertNotInExprContext ctx) {
-        currentEvaluator = new InExprEvaluator<>(currentValues, Boolean.TRUE);
+    public void exitAssertNotWithinPredicate(CloudSpecParser.AssertNotWithinPredicateContext ctx) {
+        currentPredicate = new NotPredicate(new WithinPredicate<>(currentValues));
     }
 
     @Override

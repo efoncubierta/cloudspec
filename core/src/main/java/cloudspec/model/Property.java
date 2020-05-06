@@ -46,4 +46,12 @@ public class Property extends BaseMember {
     public Object getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "Property{" +
+                "name=" + getName() +
+                ", value=" + value +
+                '}';
+    }
 }

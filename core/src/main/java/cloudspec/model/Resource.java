@@ -36,13 +36,36 @@ import java.util.Optional;
  * <p>
  * Resources are provided by the providers.
  */
-public interface Resource {
+public class Resource {
+    private final ResourceFqn resourceFqn;
+    private final String resourceId;
+    private final List<Property> properties;
+    private final List<Function> functions;
+
+    public Resource(ResourceFqn resourceFqn, String resourceId, List<Property> properties, List<Function> functions) {
+        this.resourceFqn = resourceFqn;
+        this.resourceId = resourceId;
+        this.properties = properties;
+        this.functions = functions;
+    }
+
     /**
      * Get resource's fully-qualified name.
      *
      * @return Resource fully-qualified name.
      */
-    ResourceFqn getResourceFqn();
+    public ResourceFqn getFqn() {
+        return resourceFqn;
+    }
+
+    /**
+     * Get resource ID.
+     *
+     * @return Resource ID.
+     */
+    public String getResourceId() {
+        return resourceId;
+    }
 
     /**
      * Get a resource's property.
@@ -50,7 +73,7 @@ public interface Resource {
      * @param propertyName Property's name.
      * @return Optional property.
      */
-    default Optional<Property> getProperty(String propertyName) {
+    public Optional<Property> getProperty(String propertyName) {
         return getProperties()
                 .stream()
                 .filter(p -> p.getName().equals(propertyName))
@@ -62,7 +85,9 @@ public interface Resource {
      *
      * @return List of properties.
      */
-    List<Property> getProperties();
+    public List<Property> getProperties() {
+        return properties;
+    }
 
     /**
      * Get a resource's function.
@@ -70,7 +95,7 @@ public interface Resource {
      * @param functionName Function's name.
      * @return Optional function.
      */
-    default Optional<Function> getFunction(String functionName) {
+    public Optional<Function> getFunction(String functionName) {
         return getFunctions().stream().filter(function -> function.getName().equals(functionName)).findFirst();
     }
 
@@ -79,5 +104,17 @@ public interface Resource {
      *
      * @return List of functions.
      */
-    List<Function> getFunctions();
+    public List<Function> getFunctions() {
+        return functions;
+    }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "resourceFqn=" + resourceFqn +
+                ", resourceId='" + resourceId + '\'' +
+                ", properties=" + properties +
+                ", functions=" + functions +
+                '}';
+    }
 }

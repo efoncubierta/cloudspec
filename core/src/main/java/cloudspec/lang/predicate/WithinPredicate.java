@@ -23,37 +23,37 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.lang.evaluator;
+package cloudspec.lang.predicate;
 
 import java.util.List;
 
 /**
- * Evaluator for 'in' expressions.
+ * Within predicate..
  * <p>
- * Evaluate if an property's value is in a list of predefined values.
+ * Check whether a property value is in a list of predefined values.
  * <p>
  * - property IN [1, 2, 3]
- * - property NOT IN [1, 2, 3]
  *
  * @param <T> Type of the property.
  */
-public class InExprEvaluator<T> implements ExprEvaluator<T> {
+public class WithinPredicate<T> implements Predicate {
     private final List<T> values;
-    private final Boolean not;
 
     /**
      * Constructor.
      *
-     * @param values List of values to be compared with the property's value.
-     * @param not    Flag to negate the expression. If true, it'll evaluate 'not equal to'.
+     * @param values List of values to be compared with the property value.
      */
-    public InExprEvaluator(List<T> values, Boolean not) {
+    public WithinPredicate(List<T> values) {
         this.values = values;
-        this.not = not;
     }
 
-    @Override
-    public Boolean eval(T propertyValue) {
-        return not ^ values.contains(propertyValue);
+    /**
+     * Get list of values.
+     *
+     * @return List of values.
+     */
+    public List<T> getValues() {
+        return values;
     }
 }

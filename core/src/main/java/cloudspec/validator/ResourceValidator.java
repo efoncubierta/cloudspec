@@ -23,33 +23,14 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.validator;
 
-public class PropertyDef extends MemberDef {
-    private final PropertyType propertyType;
-    private final Boolean isArray;
+import cloudspec.lang.AssertExpr;
+import cloudspec.lang.WithExpr;
+import cloudspec.model.ResourceFqn;
 
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        super(name, description);
-        this.propertyType = propertyType;
-        this.isArray = isArray;
-    }
+import java.util.List;
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
-
-    public Boolean isArray() {
-        return isArray;
-    }
-
-    @Override
-    public String toString() {
-        return "PropertyDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
-                '}';
-    }
+public interface ResourceValidator {
+    List<ResourceValidatorResult> validate(ResourceFqn resourceFqn, List<WithExpr> withExprs, List<AssertExpr> assertExprs);
 }

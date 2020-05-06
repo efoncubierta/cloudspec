@@ -32,16 +32,16 @@ assertDecl: ASSERT PROPERTY_NAME (mustExpr | shouldExpr);
 //   BE IN [B]
 //   NOT BE IN [B]
 
-withExpr: IS? ('==' | EQUAL TO) value             # WithEqualExpr
-        | IS? ('!=' | NOT EQUAL TO) value         # WithNotEqualExpr
-        | IS? IN array                            # WithInExpr
-        | IS? NOT IN array                        # WithNotInExpr
+withExpr: IS? ('==' | EQUAL TO) value             # WithEqualPredicate
+        | IS? ('!=' | NOT EQUAL TO) value         # WithNotEqualPredicate
+        | IS? WITHIN array                        # WithWithinPredicate
+        | IS? NOT WITHIN array                    # WithNotWithinPredicate
         ;
 
-assertExpr: BE ('==' | EQUAL TO) value           # AssertEqualExpr
-          | (BE '!=' | NOT BE EQUAL TO) value    # AssertNotEqualExpr
-          | BE IN array                          # AssertInExpr
-          | NOT BE IN array                      # AssertNotInExpr
+assertExpr: BE ('==' | EQUAL TO) value           # AssertEqualPredicate
+          | (BE '!=' | NOT BE EQUAL TO) value    # AssertNotEqualPredicate
+          | BE WITHIN array                      # AssertWithinPredicate
+          | NOT BE WITHIN array                  # AssertNotWithinPredicate
           ;
 
 mustExpr: MUST assertExpr;
@@ -61,7 +61,7 @@ RULE: [Rr][Uu][Ll][Ee];
 ON: [Oo][Nn];
 WITH: [Ww][Ii][Tt][Hh];
 ASSERT: [Aa][Ss][Ss][Ee][Rr][Tt];
-IN: [Ii][Nn];
+WITHIN: [Ww][Ii][Tt][Hh][Ii][Nn];
 IS: [Ii][Ss];
 EQUAL: [Ee][Qq][Uu][Aa][Ll];
 MUST: [Mm][Uu][Ss][Tt];

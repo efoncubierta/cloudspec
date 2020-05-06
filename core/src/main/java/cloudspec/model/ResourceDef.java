@@ -30,17 +30,28 @@ import java.util.Optional;
 
 public class ResourceDef {
     private final ResourceFqn resourceFqn;
+    private final String description;
     private final List<PropertyDef> properties;
     private final List<FunctionDef> functions;
 
-    public ResourceDef(ResourceFqn resourceFqn, List<PropertyDef> properties, List<FunctionDef> functions) {
+    public ResourceDef(ResourceFqn resourceFqn, String description, List<PropertyDef> properties, List<FunctionDef> functions) {
         this.resourceFqn = resourceFqn;
+        this.description = description;
         this.properties = properties;
         this.functions = functions;
     }
 
     public ResourceFqn getResourceFqn() {
         return resourceFqn;
+    }
+
+    /**
+     * Get resource's description.
+     *
+     * @return Resource description.
+     */
+    public String getDescription() {
+        return description;
     }
 
     public Optional<PropertyDef> getProperty(String propertyName) {
@@ -57,5 +68,15 @@ public class ResourceDef {
 
     public List<FunctionDef> getFunctions() {
         return functions;
+    }
+
+    @Override
+    public String toString() {
+        return "ResourceDef{" +
+                "resourceFqn=" + resourceFqn +
+                ", description='" + description + '\'' +
+                ", properties=" + properties +
+                ", functions=" + functions +
+                '}';
     }
 }

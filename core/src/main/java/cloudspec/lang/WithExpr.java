@@ -25,7 +25,7 @@
  */
 package cloudspec.lang;
 
-import cloudspec.lang.evaluator.ExprEvaluator;
+import cloudspec.lang.predicate.Predicate;
 
 /**
  * Define a 'with' expression.
@@ -34,17 +34,17 @@ import cloudspec.lang.evaluator.ExprEvaluator;
  */
 public class WithExpr {
     private final String propertyName;
-    private final ExprEvaluator<Object> evaluator;
+    private final Predicate predicate;
 
     /**
      * Constructor.
      *
      * @param propertyName Resource's property that will be evaluated.
-     * @param evaluator    Expression evaluator.
+     * @param predicate    Predicate.
      */
-    public WithExpr(String propertyName, ExprEvaluator<Object> evaluator) {
+    public WithExpr(String propertyName, Predicate predicate) {
         this.propertyName = propertyName;
-        this.evaluator = evaluator;
+        this.predicate = predicate;
     }
 
     /**
@@ -57,19 +57,19 @@ public class WithExpr {
     }
 
     /**
-     * Get the expression evaluator.
+     * Get the predicate.
      *
-     * @return Expression evaluator.
+     * @return Predicate.
      */
-    public ExprEvaluator<Object> getEvaluator() {
-        return evaluator;
+    public Predicate getPredicate() {
+        return predicate;
     }
 
     @Override
     public String toString() {
         return "WithExpr{" +
                 "propertyName='" + propertyName + '\'' +
-                ", evaluator=" + evaluator +
+                ", predicate=" + predicate +
                 '}';
     }
 }

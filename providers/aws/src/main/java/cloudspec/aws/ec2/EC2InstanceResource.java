@@ -25,8 +25,10 @@
  */
 package cloudspec.aws.ec2;
 
+import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
+import cloudspec.aws.vpc.VpcSubnetResource;
 import cloudspec.model.ResourceFqn;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
@@ -55,6 +57,7 @@ public class EC2InstanceResource extends EC2Resource {
     )
     private final String availabilityZone;
 
+    @IdDefinition
     @PropertyDefinition(
             name = "instance_id",
             description = "EC2 Instance ID"
@@ -68,19 +71,19 @@ public class EC2InstanceResource extends EC2Resource {
     private final String instanceType;
 
     @PropertyDefinition(
-            name = "vpc_id",
-            description = "VPC ID"
+            name = "subnet",
+            description = "Subnet"
     )
-    private final String vpcId;
+    private final String subnetId;
 
     public EC2InstanceResource(String accountId, String region, String availabilityZone,
-                               String instanceId, String instanceType, String vpcId) {
+                               String instanceId, String instanceType, String subnetId) {
         super(accountId);
         this.region = region;
         this.availabilityZone = availabilityZone;
         this.instanceId = instanceId;
         this.instanceType = instanceType;
-        this.vpcId = vpcId;
+        this.subnetId = subnetId;
     }
 
     public String getRegion() {
@@ -99,7 +102,7 @@ public class EC2InstanceResource extends EC2Resource {
         return instanceType;
     }
 
-    public String getVpcId() {
-        return vpcId;
+    public String getSubnetId() {
+        return subnetId;
     }
 }

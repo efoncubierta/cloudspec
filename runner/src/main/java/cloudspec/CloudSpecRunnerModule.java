@@ -28,12 +28,16 @@ package cloudspec;
 import cloudspec.aws.AWSClientsProvider;
 import cloudspec.aws.AWSProvider;
 import cloudspec.aws.IAWSClientsProvider;
-import cloudspec.preflight.CloudSpecPreflight;
-import cloudspec.preload.CloudSpecPreloader;
-import cloudspec.service.ResourceService;
-import cloudspec.validator.CloudSpecValidator;
+import cloudspec.graph.GraphResourceDefStore;
+import cloudspec.graph.GraphResourceStore;
+import cloudspec.graph.GraphResourceValidator;
+import cloudspec.store.ResourceDefStore;
+import cloudspec.store.ResourceStore;
+import cloudspec.validator.ResourceValidator;
 import dagger.Module;
 import dagger.Provides;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import javax.inject.Singleton;
 
@@ -64,26 +68,35 @@ public class CloudSpecRunnerModule {
 
     @Provides
     @Singleton
-    public static CloudSpecPreflight provideCloudSpecPreflight(ResourceService resourceService) {
-        return new CloudSpecPreflight(resourceService);
+    public static CloudSpecManager provideCloudSpecManager(ProvidersRegistry providersRegistry,
+                                                           ResourceDefStore resourceDefStore,
+                                                           ResourceStore resourceStore,
+                                                           ResourceValidator resourceValidator) {
+        return new CloudSpecManager(providersRegistry, resourceDefStore, resourceStore, resourceValidator);
     }
 
     @Provides
     @Singleton
-    public static CloudSpecPreloader provideCloudSpecPreloader(ResourceService resourceService) {
-        return new CloudSpecPreloader(resourceService);
+    public static ResourceDefStore provideResourceDefStore(Graph graph) {
+        return new GraphResourceDefStore(graph);
     }
 
     @Provides
     @Singleton
-    public static CloudSpecValidator provideCloudSpecValidator(ResourceService resourceService) {
-        return new CloudSpecValidator(resourceService);
+    public static ResourceStore provideResourceStore(Graph graph) {
+        return new GraphResourceStore(graph);
     }
 
     @Provides
     @Singleton
-    public static ResourceService provideResourceService(ProvidersRegistry providersRegistry) {
-        return new ResourceService(providersRegistry);
+    public static ResourceValidator provideResourceValidator(Graph graph) {
+        return new GraphResourceValidator(graph);
+    }
+
+    @Provides
+    @Singleton
+    public static Graph provideGraph() {
+        return TinkerGraph.open();
     }
 
     @Provides

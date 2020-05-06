@@ -25,47 +25,34 @@
  */
 package cloudspec.validator;
 
-import cloudspec.model.MyResource;
-import cloudspec.model.ResourceFqn;
-import cloudspec.service.ResourceService;
-import cloudspec.util.CloudSpecTestUtils;
-import org.junit.Test;
-
-import java.util.Optional;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-
 public class CloudSpecValidatorTest {
-    public static final ResourceService TEST_RESOURCE_SERVICE = mock(ResourceService.class);
-
-    static {
-        when(TEST_RESOURCE_SERVICE.getResourceDef(MyResource.RESOURCE_FQN))
-                .thenReturn(Optional.of(MyResource.RESOURCE_DEF));
-    }
-
-    @Test
-    public void shouldValidateAWellDefinedCloudSpec() {
-        CloudSpecValidator validator = new CloudSpecValidator(TEST_RESOURCE_SERVICE);
-
-        CloudSpecValidatorResult result = validator.validate(CloudSpecTestUtils.TEST_SPEC);
-
-        assertEquals(CloudSpecTestUtils.TEST_SPEC_NAME, result.getSpecName());
-        assertEquals(1, result.getGroupResults().size());
-
-        result.getGroupResults().forEach(groupResult -> {
-            assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupResult.getGroupName());
-            assertEquals(1, groupResult.getRuleResults().size());
-
-            groupResult.getRuleResults().forEach(ruleResult -> {
-                assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.getRuleName());
-                assertTrue(ruleResult.isSuccess());
-                assertFalse(ruleResult.isError());
-                assertFalse(ruleResult.getReason().isPresent());
-                assertFalse(ruleResult.getThrowable().isPresent());
-            });
-        });
-    }
+//    public static final ResourceService TEST_RESOURCE_SERVICE = mock(ResourceService.class);
+//
+//    static {
+//        when(TEST_RESOURCE_SERVICE.getResourceDef(MyResource.RESOURCE_FQN))
+//                .thenReturn(Optional.of(MyResource.RESOURCE_DEF));
+//    }
+//
+//    @Test
+//    public void shouldValidateAWellDefinedCloudSpec() {
+//        CloudSpecValidator validator = new CloudSpecValidator(TEST_RESOURCE_SERVICE);
+//
+//        CloudSpecValidatorResult result = validator.validate(CloudSpecTestUtils.TEST_SPEC);
+//
+//        assertEquals(CloudSpecTestUtils.TEST_SPEC_NAME, result.getSpecName());
+//        assertEquals(1, result.getGroupResults().size());
+//
+//        result.getGroupResults().forEach(groupResult -> {
+//            assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupResult.getGroupName());
+//            assertEquals(1, groupResult.getRuleResults().size());
+//
+//            groupResult.getRuleResults().forEach(ruleResult -> {
+//                assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.getRuleName());
+//                assertTrue(ruleResult.isSuccess());
+//                assertFalse(ruleResult.isError());
+//                assertFalse(ruleResult.getReason().isPresent());
+//                assertFalse(ruleResult.getThrowable().isPresent());
+//            });
+//        });
+//    }
 }

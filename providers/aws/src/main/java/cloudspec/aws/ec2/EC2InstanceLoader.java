@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource> {
-    private List<EC2InstanceResource> instances;
-
     private final IAWSClientsProvider clientsProvider;
 
     public EC2InstanceLoader(IAWSClientsProvider clientsProvider) {
@@ -45,19 +43,13 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
     }
 
     public List<EC2InstanceResource> load() {
-        if (instances != null) {
-            return instances;
-        }
-
         Ec2Client ec2Client = clientsProvider.getEc2Client();
 
         try {
-            instances = getAllInstances(ec2Client);
+            return getAllInstances(ec2Client);
         } finally {
             IoUtils.closeQuietly(ec2Client, null);
         }
-
-        return instances;
     }
 
     private List<EC2InstanceResource> getAllInstances(Ec2Client ec2Client) {

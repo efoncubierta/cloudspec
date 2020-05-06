@@ -23,21 +23,31 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.lang.evaluator;
+package cloudspec.lang.predicate;
 
 /**
- * Define an expression evaluator.
+ * Equal predicate.
  * <p>
- * An expression evaluator validates whether or not a property matches the expressions.
+ * Check whether a property value is equal to a predefined one.
+ * <p>
+ * - property == 'some_value'
+ * - property EQUAL TO 'some_value'
  *
  * @param <T> Type of the property.
  */
-public interface ExprEvaluator<T> {
+public class EqualPredicate<T> implements Predicate {
+    private final T value;
+
     /**
-     * Evaluate expression against a property's value.
+     * Constructor.
      *
-     * @param propertyValue Property's value.
-     * @return True if property's value matches the expression. False otherwise.
+     * @param value Value to be compared with the property's value.
      */
-    Boolean eval(T propertyValue);
+    public EqualPredicate(T value) {
+        this.value = value;
+    }
+
+    public T getValue() {
+        return value;
+    }
 }

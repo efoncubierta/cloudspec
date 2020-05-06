@@ -27,9 +27,6 @@ package cloudspec;
 
 import cloudspec.lang.CloudSpec;
 import cloudspec.model.Provider;
-import cloudspec.preflight.CloudSpecPreflight;
-import cloudspec.preload.CloudSpecPreloader;
-import cloudspec.validator.CloudSpecValidator;
 import cloudspec.validator.CloudSpecValidatorResult;
 import com.diogonunes.jcdp.color.ColoredPrinter;
 import com.diogonunes.jcdp.color.api.Ansi;
@@ -43,31 +40,30 @@ public class CloudSpecRunner {
 
     private final String version;
     private final ProvidersRegistry providersRegistry;
-    private final CloudSpecPreflight cloudSpecPreflight;
-    private final CloudSpecPreloader cloudSpecPreloader;
-    private final CloudSpecValidator cloudSpecValidator;
+    private final CloudSpecManager cloudSpecManager;
 
     @Inject
-    public CloudSpecRunner(String version, ProvidersRegistry providersRegistry, CloudSpecPreflight cloudSpecPreflight, CloudSpecPreloader cloudSpecPreloader, CloudSpecValidator cloudSpecValidator) {
+    public CloudSpecRunner(String version, ProvidersRegistry providersRegistry, CloudSpecManager cloudSpecManager) {
         this.version = version;
         this.providersRegistry = providersRegistry;
-        this.cloudSpecPreflight = cloudSpecPreflight;
-        this.cloudSpecPreloader = cloudSpecPreloader;
-        this.cloudSpecValidator = cloudSpecValidator;
+        this.cloudSpecManager = cloudSpecManager;
     }
 
     public void validate(CloudSpec spec) {
         printBanner();
 
         try {
-            // preflight spec
-            cloudSpecPreflight.preflight(spec);
+            // init manager
+            cloudSpecManager.init();
 
-            // preload resources
-            cloudSpecPreloader.preload(spec);
+            // preflight spec
+            cloudSpecManager.preflight(spec);
+
+            // load resources
+            cloudSpecManager.loadResources();
 
             // validate spec
-            printResult(cloudSpecValidator.validate(spec));
+            printResult(cloudSpecManager.validate(spec));
         } catch (RuntimeException exception) {
             // manage unhandled exceptions
             System.out.println("");

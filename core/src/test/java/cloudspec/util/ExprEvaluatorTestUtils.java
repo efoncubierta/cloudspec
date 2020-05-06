@@ -25,18 +25,18 @@
  */
 package cloudspec.util;
 
-import cloudspec.lang.evaluator.ExprEvaluator;
+import cloudspec.lang.predicate.Predicate;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ExprEvaluatorTestUtils {
-    public static final ExprEvaluator<Object> TRUE_EVALUATOR = mock(ExprEvaluator.class);
-    public static final ExprEvaluator<Object> FALSE_EVALUATOR = mock(ExprEvaluator.class);
-
-    static {
-        when(TRUE_EVALUATOR.eval(any())).thenReturn(Boolean.TRUE);
-        when(FALSE_EVALUATOR.eval(any())).thenReturn(Boolean.FALSE);
-    }
+//    public static final Predicate<Object> TRUE_EVALUATOR = mock(Predicate.class);
+//    public static final Predicate<Object> FALSE_EVALUATOR = mock(Predicate.class);
+//
+//    static {
+//        when(TRUE_EVALUATOR.eval(any())).thenReturn(Boolean.TRUE);
+//        when(FALSE_EVALUATOR.eval(any())).thenReturn(Boolean.FALSE);
+//    }
 }

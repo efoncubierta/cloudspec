@@ -23,33 +23,32 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.loader;
 
-public class PropertyDef extends MemberDef {
-    private final PropertyType propertyType;
-    private final Boolean isArray;
+import cloudspec.ProvidersRegistry;
+import cloudspec.model.MyProvider;
+import cloudspec.store.ResourceDefStore;
+import cloudspec.store.ResourceStore;
+import org.junit.Test;
 
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        super(name, description);
-        this.propertyType = propertyType;
-        this.isArray = isArray;
+import java.util.Collections;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class ResourceLoaderTest {
+    public static final ProvidersRegistry PROVIDERS_REGISTRY = mock(ProvidersRegistry.class);
+    public static final ResourceDefStore RESOURCE_DEF_STORE = mock(ResourceDefStore.class);
+    public static final ResourceStore RESOURCE_STORE = mock(ResourceStore.class);
+
+    static {
+        when(PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(new MyProvider()));
     }
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
+    @Test
+    public void shouldLoadResources() {
+        ResourceLoader resourceLoader = new ResourceLoader(PROVIDERS_REGISTRY, RESOURCE_DEF_STORE, RESOURCE_STORE);
 
-    public Boolean isArray() {
-        return isArray;
-    }
-
-    @Override
-    public String toString() {
-        return "PropertyDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
-                '}';
+        resourceLoader.load();;
     }
 }

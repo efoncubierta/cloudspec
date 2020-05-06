@@ -23,18 +23,31 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.lang.predicate;
 
 /**
- * Base class for classes implementing {@link Function}.
+ * Not predicate.
+ * <p>
+ * Negate another predicate.
  */
-public abstract class BaseFunction extends BaseMember implements Function {
+public class NotPredicate implements Predicate {
+    private final Predicate predicate;
+
     /**
      * Constructor.
      *
-     * @param name Function's name.
+     * @param predicate Predicate.
      */
-    public BaseFunction(String name) {
-        super(name);
+    public NotPredicate(Predicate predicate) {
+        this.predicate = predicate;
+    }
+
+    /**
+     * Get predicate.
+     *
+     * @return Predicate.
+     */
+    public Predicate getPredicate() {
+        return predicate;
     }
 }

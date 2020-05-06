@@ -50,5 +50,5 @@ public interface Provider {
 
     List<ResourceDef> getResourceDefs();
 
-    List<? extends Resource> getResources(ResourceFqn resourceFqn);
+    List<?> getResources(ResourceFqn resourceFqn);
 }

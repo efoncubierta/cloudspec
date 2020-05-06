@@ -26,21 +26,19 @@
 package cloudspec.model;
 
 import cloudspec.annotation.ProviderDefinition;
+import cloudspec.util.ProviderDataUtil;
 
 import java.util.Collections;
 import java.util.List;
 
 @ProviderDefinition(
-        name = MyProvider.PROVIDER_NAME,
-        description = MyProvider.PROVIDER_DESCRIPTION,
+        name = ProviderDataUtil.PROVIDER_NAME,
+        description = ProviderDataUtil.PROVIDER_DESCRIPTION,
         resources = {MyResource.class}
 )
 public class MyProvider extends BaseProvider {
-    public static final String PROVIDER_NAME = "myprovider";
-    public static final String PROVIDER_DESCRIPTION = "My provider";
-
     @Override
-    public List<Resource> getResources(ResourceFqn resourceFqn) {
+    public List<Object> getResources(ResourceFqn resourceFqn) {
         return Collections.emptyList();
     }
 }

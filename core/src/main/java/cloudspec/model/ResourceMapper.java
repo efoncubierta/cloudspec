@@ -25,31 +25,8 @@
  */
 package cloudspec.model;
 
-public class PropertyDef extends MemberDef {
-    private final PropertyType propertyType;
-    private final Boolean isArray;
+import cloudspec.annotation.ResourceDefinition;
 
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        super(name, description);
-        this.propertyType = propertyType;
-        this.isArray = isArray;
-    }
+public class ResourceMapper {
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
-
-    public Boolean isArray() {
-        return isArray;
-    }
-
-    @Override
-    public String toString() {
-        return "PropertyDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
-                '}';
-    }
 }

@@ -25,21 +25,19 @@
  */
 package cloudspec.validator;
 
-import cloudspec.lang.*;
-import cloudspec.model.Property;
-import cloudspec.model.Resource;
+import cloudspec.lang.CloudSpec;
+import cloudspec.lang.GroupExpr;
+import cloudspec.lang.RuleExpr;
 import cloudspec.model.ResourceFqn;
-import cloudspec.service.ResourceService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CloudSpecValidator {
-    private final ResourceService resourceService;
+    private final ResourceValidator resourceValidator;
 
-    public CloudSpecValidator(ResourceService resourceService) {
-        this.resourceService = resourceService;
+    public CloudSpecValidator(ResourceValidator resourceValidator) {
+        this.resourceValidator = resourceValidator;
     }
 
     public CloudSpecValidatorResult validate(CloudSpec spec) {
@@ -59,74 +57,20 @@ public class CloudSpecValidator {
     }
 
     private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
-        try {
-            ResourceFqn resourceFqn = ResourceFqn.fromString(rule.getResourceFqn());
+        // validate all resources
+        List<ResourceValidatorResult> errors = resourceValidator.validate(
+                ResourceFqn.fromString(rule.getResourceFqn()),
+                rule.getWiths(),
+                rule.getAsserts()
+        );
 
-            List<ValidateExprResult> errors = resourceService.getResources(resourceFqn)
-                    .stream()
-                    .filter(resource -> validateWithExprs(resource, rule.getWiths()))
-                    .flatMap(resource -> validateAssertExprs(resource, rule.getAsserts()).stream())
-                    .filter(result -> !result.success)
-                    .collect(Collectors.toList());
-
-            if (errors.size() > 0) {
-                return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, errors.get(0).message);
-            }
-
-            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.TRUE);
-        } catch (RuntimeException exception) {
-            throw exception;
-            //return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, exception.getMessage(), exception);
-        }
-    }
-
-    private Boolean validateWithExprs(Resource resource, List<WithExpr> withExpr) {
-        return withExpr.stream().allMatch(with -> validateWithExpr(resource, with));
-    }
-
-    private List<ValidateExprResult> validateAssertExprs(Resource resource, List<AssertExpr> assertExprs) {
-        return assertExprs
-                .stream()
-                .map(assertExpr -> validateAssertExpr(resource, assertExpr))
-                .collect(Collectors.toList());
-    }
-
-    private Boolean validateWithExpr(Resource resource, WithExpr withExpr) {
-        Optional<Property> propertyOpt = resource.getProperty(withExpr.getPropertyName());
-        return propertyOpt.isPresent() ? withExpr.getEvaluator().eval(propertyOpt.get().getValue()) : Boolean.FALSE;
-    }
-
-    private ValidateExprResult validateAssertExpr(Resource resource, AssertExpr assertExpr) {
-        Optional<Property> propertyOpt = resource.getProperty(assertExpr.getPropertyName());
-
-        if (!propertyOpt.isPresent()) {
-            return new ValidateExprResult(
-                    Boolean.FALSE,
-                    String.format("Property %s not found on resource of type %s", assertExpr.getPropertyName(), resource.getResourceFqn())
-            );
+        // check for errors
+        if (errors.size() > 0) {
+            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, errors.get(0).getMessage());
         }
 
-        if (!assertExpr.getEvaluator().eval(propertyOpt.get().getValue())) {
-            return new ValidateExprResult(
-                    Boolean.FALSE,
-                    String.format("Assert expression evaluated false", assertExpr.getPropertyName(), resource.getResourceFqn())
-            );
-        }
-
-        return new ValidateExprResult(Boolean.TRUE);
+        // return success
+        return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.TRUE);
     }
 
-    private class ValidateExprResult {
-        private final Boolean success;
-        private final String message;
-
-        public ValidateExprResult(Boolean success) {
-            this(success, "");
-        }
-
-        public ValidateExprResult(Boolean success, String message) {
-            this.success = success;
-            this.message = message;
-        }
-    }
 }
