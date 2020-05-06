@@ -113,16 +113,16 @@ public class ModelTestUtils {
             assertEquals(propertyDef1.isArray(), propertyDef2Opt.get().isArray());
         });
 
-        assertNotNull(resourceDef1.getFunctions());
-        assertNotNull(resourceDef2.getFunctions());
-        assertEquals(resourceDef1.getFunctions().size(), resourceDef2.getFunctions().size());
+        assertNotNull(resourceDef1.getAssociations());
+        assertNotNull(resourceDef2.getAssociations());
+        assertEquals(resourceDef1.getAssociations().size(), resourceDef2.getAssociations().size());
 
-        resourceDef1.getFunctions().forEach(functionDef1 -> {
-            Optional<FunctionDef> functionDef2Opt = resourceDef1.getFunction(functionDef1.getName());
+        resourceDef1.getAssociations().forEach(associationDef1 -> {
+            Optional<AssociationDef> functionDef2Opt = resourceDef1.getAssociation(associationDef1.getName());
             assertNotNull(functionDef2Opt);
             assertTrue(functionDef2Opt.isPresent());
-            assertEquals(functionDef1.getName(), functionDef2Opt.get().getName());
-            assertEquals(functionDef1.getDescription(), functionDef2Opt.get().getDescription());
+            assertEquals(associationDef1.getName(), functionDef2Opt.get().getName());
+            assertEquals(associationDef1.getDescription(), functionDef2Opt.get().getDescription());
         });
     }
 
@@ -141,15 +141,15 @@ public class ModelTestUtils {
             assertEquals(property1.getValue(), property2Opt.get().getValue());
         });
 
-        assertNotNull(resource1.getFunctions());
-        assertNotNull(resource2.getFunctions());
-        assertEquals(resource1.getFunctions().size(), resource2.getFunctions().size());
+        assertNotNull(resource1.getAssociations());
+        assertNotNull(resource2.getAssociations());
+        assertEquals(resource1.getAssociations().size(), resource2.getAssociations().size());
 
-        resource1.getFunctions().forEach(function1 -> {
-            Optional<Function> function2Opt = resource1.getFunction(function1.getName());
+        resource1.getAssociations().forEach(association1 -> {
+            Optional<Association> function2Opt = resource1.getAssociation(association1.getName());
             assertNotNull(function2Opt);
             assertTrue(function2Opt.isPresent());
-            assertEquals(function1.getName(), function2Opt.get().getName());
+            assertEquals(association1.getName(), function2Opt.get().getName());
         });
     }
 }

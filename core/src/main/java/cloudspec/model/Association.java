@@ -23,17 +23,22 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.annotation;
+package cloudspec.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class Association extends BaseMember {
+    /**
+     * Constructor.
+     *
+     * @param name Association's name.
+     */
+    public Association(String name) {
+        super(name);
+    }
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface FunctionDefinition {
-    String name();
-
-    String description();
+    @Override
+    public String toString() {
+        return "Property{" +
+                "name=" + getName() +
+                '}';
+    }
 }

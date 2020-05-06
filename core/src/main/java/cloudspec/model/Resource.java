@@ -32,7 +32,7 @@ import java.util.Optional;
  * Define a CloudSpec's resource.
  * <p>
  * A resource is anything that can be evaluated. It can be an EC2 instance, an S3 bucket, an entire service, etc.
- * Resources have members, that can be either properties or functions.
+ * Resources have members, that can be either properties or associations.
  * <p>
  * Resources are provided by the providers.
  */
@@ -40,13 +40,13 @@ public class Resource {
     private final ResourceFqn resourceFqn;
     private final String resourceId;
     private final List<Property> properties;
-    private final List<Function> functions;
+    private final List<Association> associations;
 
-    public Resource(ResourceFqn resourceFqn, String resourceId, List<Property> properties, List<Function> functions) {
+    public Resource(ResourceFqn resourceFqn, String resourceId, List<Property> properties, List<Association> associations) {
         this.resourceFqn = resourceFqn;
         this.resourceId = resourceId;
         this.properties = properties;
-        this.functions = functions;
+        this.associations = associations;
     }
 
     /**
@@ -90,22 +90,22 @@ public class Resource {
     }
 
     /**
-     * Get a resource's function.
+     * Get a resource's association.
      *
-     * @param functionName Function's name.
-     * @return Optional function.
+     * @param associationName Association's name.
+     * @return Optional association.
      */
-    public Optional<Function> getFunction(String functionName) {
-        return getFunctions().stream().filter(function -> function.getName().equals(functionName)).findFirst();
+    public Optional<Association> getAssociation(String associationName) {
+        return getAssociations().stream().filter(association -> association.getName().equals(associationName)).findFirst();
     }
 
     /**
-     * Get all resource's functions.
+     * Get all resource's associations.
      *
-     * @return List of functions.
+     * @return List of associations.
      */
-    public List<Function> getFunctions() {
-        return functions;
+    public List<Association> getAssociations() {
+        return associations;
     }
 
     @Override
@@ -114,7 +114,7 @@ public class Resource {
                 "resourceFqn=" + resourceFqn +
                 ", resourceId='" + resourceId + '\'' +
                 ", properties=" + properties +
-                ", functions=" + functions +
+                ", associations=" + associations +
                 '}';
     }
 }

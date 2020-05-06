@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * A provider provides CloudSpec with resource definitions and resource loaders. Providers must implement
  * this class, that will be instantiated into the {@link cloudspec.ProvidersRegistry}.
  * <p>
- * Note to future: providers will also provide new expressions and functions to CloudSpec.
+ * Note to future: providers will also provide new expressions o CloudSpec.
  */
 public abstract class BaseProvider implements Provider {
     private final String name;

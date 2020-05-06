@@ -25,20 +25,16 @@
  */
 package cloudspec.model;
 
-public class Function extends BaseMember {
-    /**
-     * Constructor.
-     *
-     * @param name Function's name.
-     */
-    public Function(String name) {
-        super(name);
+public class AssociationDef extends MemberDef {
+    public AssociationDef(String name, String description) {
+        super(name, description);
     }
 
     @Override
     public String toString() {
-        return "Property{" +
+        return "AssociationDef{" +
                 "name=" + getName() +
+                ", description=" + getDescription() +
                 '}';
     }
 }

@@ -26,5 +26,5 @@
 package cloudspec.model;
 
 public enum MemberType {
-    PROPERTY, FUNCTION
+    PROPERTY, ASSOCIATION
 }

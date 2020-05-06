@@ -44,7 +44,7 @@ public class ResourceReflectionUtil {
                                 resourceFqn,
                                 resourceId,
                                 ResourceReflectionUtil.toProperties(obj),
-                                ResourceReflectionUtil.toFunctions(obj)
+                                ResourceReflectionUtil.toAssociations(obj)
                         )));
     }
 
@@ -131,7 +131,7 @@ public class ResourceReflectionUtil {
                 }).collect(Collectors.toList());
     }
 
-    public static List<Function> toFunctions(Object object) {
+    public static List<Association> toAssociations(Object object) {
         return Collections.emptyList();
     }
 
@@ -140,17 +140,17 @@ public class ResourceReflectionUtil {
 
         // TODO validate class is annotated
 
-        List<PropertyDef> properties = toPropertydefs(resourceClass);
-        List<FunctionDef> functions = toFunctionDefs(resourceClass);
+        List<PropertyDef> properties = toPropertyDefs(resourceClass);
+        List<AssociationDef> associations = toAssociationDefs(resourceClass);
 
         return new ResourceDef(new ResourceFqn(
                 resourceDefinition.provider(),
                 resourceDefinition.group(),
                 resourceDefinition.name()
-        ), resourceDefinition.description(), properties, functions);
+        ), resourceDefinition.description(), properties, associations);
     }
 
-    private static List<PropertyDef> toPropertydefs(Class<?> clazz) {
+    private static List<PropertyDef> toPropertyDefs(Class<?> clazz) {
         return Stream.of(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
                 .map(field -> toPropertyDef(clazz, field))
@@ -191,7 +191,7 @@ public class ResourceReflectionUtil {
         );
     }
 
-    private static List<FunctionDef> toFunctionDefs(Class<?> clazz) {
+    private static List<AssociationDef> toAssociationDefs(Class<?> clazz) {
         return Collections.emptyList();
     }
 }

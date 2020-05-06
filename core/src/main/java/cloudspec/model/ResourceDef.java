@@ -32,13 +32,13 @@ public class ResourceDef {
     private final ResourceFqn resourceFqn;
     private final String description;
     private final List<PropertyDef> properties;
-    private final List<FunctionDef> functions;
+    private final List<AssociationDef> associations;
 
-    public ResourceDef(ResourceFqn resourceFqn, String description, List<PropertyDef> properties, List<FunctionDef> functions) {
+    public ResourceDef(ResourceFqn resourceFqn, String description, List<PropertyDef> properties, List<AssociationDef> associations) {
         this.resourceFqn = resourceFqn;
         this.description = description;
         this.properties = properties;
-        this.functions = functions;
+        this.associations = associations;
     }
 
     public ResourceFqn getResourceFqn() {
@@ -62,12 +62,12 @@ public class ResourceDef {
         return properties;
     }
 
-    public Optional<FunctionDef> getFunction(String functionName) {
-        return getFunctions().stream().filter(def -> def.getName().equals(functionName)).findFirst();
+    public Optional<AssociationDef> getAssociation(String associationName) {
+        return getAssociations().stream().filter(def -> def.getName().equals(associationName)).findFirst();
     }
 
-    public List<FunctionDef> getFunctions() {
-        return functions;
+    public List<AssociationDef> getAssociations() {
+        return associations;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ResourceDef {
                 "resourceFqn=" + resourceFqn +
                 ", description='" + description + '\'' +
                 ", properties=" + properties +
-                ", functions=" + functions +
+                ", associations=" + associations +
                 '}';
     }
 }

@@ -23,18 +23,19 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.annotation;
 
-public class FunctionDef extends MemberDef {
-    public FunctionDef(String name, String description) {
-        super(name, description);
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    @Override
-    public String toString() {
-        return "FunctionDef{" +
-                "name=" + getName() +
-                ", description=" + getDescription() +
-                '}';
-    }
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AssociationDefinition {
+    String name();
+
+    String description();
+
+    String targetFqn();
 }

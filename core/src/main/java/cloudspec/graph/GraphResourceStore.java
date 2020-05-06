@@ -25,7 +25,7 @@
  */
 package cloudspec.graph;
 
-import cloudspec.model.Function;
+import cloudspec.model.Association;
 import cloudspec.model.Property;
 import cloudspec.model.Resource;
 import cloudspec.model.ResourceFqn;
@@ -47,9 +47,9 @@ public class GraphResourceStore implements ResourceStore {
 
     private static final String LABEL_RESOURCE = "resource";
     private static final String LABEL_PROPERTY = "property";
-    private static final String LABEL_FUNCTION = "function";
+    private static final String LABEL_ASSOCIATION = "association";
     private static final String LABEL_HAS_PROPERTY = "hasProperty";
-    private static final String LABEL_HAS_FUNCTION = "hasFunction";
+    private static final String LABEL_HAS_ASSOCIATION = "hasAssociation";
     private static final String PROPERTY_RESOURCE_ID = "resource_id";
     private static final String PROPERTY_FQN = "fqn";
     private static final String PROPERTY_NAME = "name";
@@ -79,7 +79,7 @@ public class GraphResourceStore implements ResourceStore {
                         (ResourceFqn) resourceMap.get(PROPERTY_FQN),
                         (String) resourceMap.get(PROPERTY_RESOURCE_ID),
                         getProperties(resourceFqn, id),
-                        getFunctions(resourceFqn, id)
+                        getAssociations(resourceFqn, id)
                 ))
                 .findFirst();
     }
@@ -100,17 +100,17 @@ public class GraphResourceStore implements ResourceStore {
                 .collect(Collectors.toList());
     }
 
-    private List<Function> getFunctions(ResourceFqn resourceFqn, String id) {
+    private List<Association> getAssociations(ResourceFqn resourceFqn, String id) {
         return gTraversal.V()
                 .has(LABEL_RESOURCE, PROPERTY_FQN, resourceFqn)
                 .has(PROPERTY_RESOURCE_ID, id)
-                .out(LABEL_HAS_FUNCTION)
+                .out(LABEL_HAS_ASSOCIATION)
                 .valueMap()
                 .by(unfold())
                 .toStream()
-                .peek(functionMap -> LOGGER.debug("- Found function '{}'", functionMap.get(PROPERTY_NAME)))
-                .map(functionMap -> new Function(
-                        (String) functionMap.get(PROPERTY_NAME)
+                .peek(associationMap -> LOGGER.debug("- Found association '{}'", associationMap.get(PROPERTY_NAME)))
+                .map(associationMap -> new Association(
+                        (String) associationMap.get(PROPERTY_NAME)
                 ))
                 .collect(Collectors.toList());
     }
@@ -129,7 +129,7 @@ public class GraphResourceStore implements ResourceStore {
                         (ResourceFqn) resourceDefMap.get(PROPERTY_FQN),
                         (String) resourceDefMap.get(PROPERTY_RESOURCE_ID),
                         getProperties(resourceFqn, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID)),
-                        getFunctions(resourceFqn, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID))
+                        getAssociations(resourceFqn, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID))
                 ))
                 .collect(Collectors.toList());
     }
@@ -151,12 +151,12 @@ public class GraphResourceStore implements ResourceStore {
                             .iterate();
                 });
 
-        // add function definitions
-        addFunctions(resource.getFunctions())
-                .forEach(functionVertex -> {
-                    gTraversal.addE(LABEL_HAS_FUNCTION)
+        // add association definitions
+        addAssociations(resource.getAssociations())
+                .forEach(associationVertex -> {
+                    gTraversal.addE(LABEL_HAS_ASSOCIATION)
                             .from(resourceVertex)
-                            .to(functionVertex)
+                            .to(associationVertex)
                             .iterate();
                 });
     }
@@ -178,20 +178,20 @@ public class GraphResourceStore implements ResourceStore {
                 .next();
     }
 
-    private List<Vertex> addFunctions(List<Function> functions) {
-        LOGGER.debug("- Found {} function(s)", functions.size());
+    private List<Vertex> addAssociations(List<Association> associations) {
+        LOGGER.debug("- Found {} association(s)", associations.size());
 
-        return functions
+        return associations
                 .stream()
-                .map(this::addFunction)
+                .map(this::addAssociation)
                 .collect(Collectors.toList());
     }
 
-    private Vertex addFunction(Function function) {
-        LOGGER.debug("- Adding function '{}'", function);
+    private Vertex addAssociation(Association association) {
+        LOGGER.debug("- Adding association '{}'", association);
 
-        return gTraversal.addV(LABEL_FUNCTION)
-                .property(PROPERTY_NAME, function.getName())
+        return gTraversal.addV(LABEL_ASSOCIATION)
+                .property(PROPERTY_NAME, association.getName())
                 .next();
     }
 }

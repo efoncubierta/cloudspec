@@ -44,9 +44,9 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
     private static final String LABEL_RESOURCE_DEF = "resourceDef";
     private static final String LABEL_PROPERTY_DEF = "propertyDef";
-    private static final String LABEL_FUNCTION_DEF = "functionDef";
+    private static final String LABEL_ASSOCIATION_DEF = "associationDef";
     private static final String LABEL_HAS_PROPERTY_DEF = "hasPropertyDef";
-    private static final String LABEL_HAS_FUNCTION_DEF = "hasFunctionDef";
+    private static final String LABEL_HAS_ASSOCIATION_DEF = "hasAssociationDef";
     private static final String PROPERTY_FQN = "fqn";
     private static final String PROPERTY_PROVIDER_NAME = "providerName";
     private static final String PROPERTY_GROUP_NAME = "groupName";
@@ -77,7 +77,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                         (ResourceFqn) resourceDefMap.get(PROPERTY_FQN),
                         (String) resourceDefMap.get(PROPERTY_DESCRIPTION),
                         getPropertyDefs(resourceFqn),
-                        getFunctionDefs(resourceFqn)
+                        getAssociationDefs(resourceFqn)
                 ))
                 .findFirst();
     }
@@ -99,17 +99,17 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .collect(Collectors.toList());
     }
 
-    private List<FunctionDef> getFunctionDefs(ResourceFqn resourceFqn) {
+    private List<AssociationDef> getAssociationDefs(ResourceFqn resourceFqn) {
         return gTraversal.V()
                 .has(LABEL_RESOURCE_DEF, PROPERTY_FQN, resourceFqn)
-                .out(LABEL_HAS_FUNCTION_DEF)
+                .out(LABEL_HAS_ASSOCIATION_DEF)
                 .valueMap()
                 .by(unfold())
                 .toStream()
-                .peek(functionDefMap -> LOGGER.debug("- Found function definition '{}'", functionDefMap.get(PROPERTY_NAME)))
-                .map(functionDefMap -> new FunctionDef(
-                        (String) functionDefMap.get(PROPERTY_NAME),
-                        (String) functionDefMap.get(PROPERTY_DESCRIPTION)
+                .peek(associationDefMap -> LOGGER.debug("- Found association definition '{}'", associationDefMap.get(PROPERTY_NAME)))
+                .map(associatinoDefMap -> new AssociationDef(
+                        (String) associatinoDefMap.get(PROPERTY_NAME),
+                        (String) associatinoDefMap.get(PROPERTY_DESCRIPTION)
                 ))
                 .collect(Collectors.toList());
     }
@@ -142,12 +142,12 @@ public class GraphResourceDefStore implements ResourceDefStore {
                             .iterate();
                 });
 
-        // add function definitions
-        addFunctionDefs(resourceDef.getFunctions())
-                .forEach(functionVertex -> {
-                    gTraversal.addE(LABEL_HAS_FUNCTION_DEF)
+        // add association definitions
+        addAssociationDefs(resourceDef.getAssociations())
+                .forEach(associationVertex -> {
+                    gTraversal.addE(LABEL_HAS_ASSOCIATION_DEF)
                             .from(resourceVertex)
-                            .to(functionVertex)
+                            .to(associationVertex)
                             .iterate();
                 });
     }
@@ -172,21 +172,21 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .next();
     }
 
-    private List<Vertex> addFunctionDefs(List<FunctionDef> functionDefs) {
-        LOGGER.debug("- Found {} function definition(s)", functionDefs.size());
+    private List<Vertex> addAssociationDefs(List<AssociationDef> associationDefs) {
+        LOGGER.debug("- Found {} association definition(s)", associationDefs.size());
 
-        return functionDefs
+        return associationDefs
                 .stream()
-                .map(this::addFunctionDef)
+                .map(this::addAssociationDef)
                 .collect(Collectors.toList());
     }
 
-    private Vertex addFunctionDef(FunctionDef functionDef) {
-        LOGGER.debug("- Adding function definition '{}'", functionDef);
+    private Vertex addAssociationDef(AssociationDef associationDef) {
+        LOGGER.debug("- Adding association definition '{}'", associationDef);
 
-        return gTraversal.addV(LABEL_FUNCTION_DEF)
-                .property(PROPERTY_NAME, functionDef.getName())
-                .property(PROPERTY_DESCRIPTION, functionDef.getDescription())
+        return gTraversal.addV(LABEL_ASSOCIATION_DEF)
+                .property(PROPERTY_NAME, associationDef.getName())
+                .property(PROPERTY_DESCRIPTION, associationDef.getDescription())
                 .next();
     }
 }
