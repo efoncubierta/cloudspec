@@ -68,7 +68,7 @@ public class CloudSpecValidator {
         }
 
         // validate all resources
-        List<ResourceValidatorResult> errors = resourceValidator.validate(
+        List<ResourceValidatorResult> errors = resourceValidator.validateAll(
                 resourceDefRefOpt.get(),
                 rule.getWiths(),
                 rule.getAsserts()

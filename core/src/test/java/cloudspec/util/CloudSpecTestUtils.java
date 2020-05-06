@@ -26,7 +26,7 @@
 package cloudspec.util;
 
 import cloudspec.lang.*;
-import cloudspec.lang.predicate.IdentityPredicate;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,11 +38,11 @@ public class CloudSpecTestUtils {
     public static final String TEST_SPEC_RULE_NAME = "myrule";
 
     public static final List<WithExpr> TEST_WITH_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new WithExpr(propertyDef.getName(), new IdentityPredicate()))
+            .map(propertyDef -> new WithExpr(propertyDef.getName(), P.eq(1)))
             .collect(Collectors.toList());
 
     public static final List<AssertExpr> TEST_ASSERT_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new AssertExpr(propertyDef.getName(), new IdentityPredicate()))
+            .map(propertyDef -> new AssertExpr(propertyDef.getName(), P.eq(1)))
             .collect(Collectors.toList());
 
     public static final RuleExpr TEST_RULE_EXPR = new RuleExpr(

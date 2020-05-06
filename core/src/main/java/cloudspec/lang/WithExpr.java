@@ -25,7 +25,7 @@
  */
 package cloudspec.lang;
 
-import cloudspec.lang.predicate.Predicate;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
 
 /**
  * Define a 'with' expression.
@@ -34,7 +34,7 @@ import cloudspec.lang.predicate.Predicate;
  */
 public class WithExpr {
     private final String propertyName;
-    private final Predicate predicate;
+    private final P<?> predicate;
 
     /**
      * Constructor.
@@ -42,7 +42,7 @@ public class WithExpr {
      * @param propertyName Resource's property that will be evaluated.
      * @param predicate    Predicate.
      */
-    public WithExpr(String propertyName, Predicate predicate) {
+    public WithExpr(String propertyName, P<?> predicate) {
         this.propertyName = propertyName;
         this.predicate = predicate;
     }
@@ -61,7 +61,7 @@ public class WithExpr {
      *
      * @return Predicate.
      */
-    public Predicate getPredicate() {
+    public P<?> getPredicate() {
         return predicate;
     }
 

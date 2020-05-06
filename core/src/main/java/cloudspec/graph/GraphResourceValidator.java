@@ -27,14 +27,9 @@ package cloudspec.graph;
 
 import cloudspec.lang.AssertExpr;
 import cloudspec.lang.WithExpr;
-import cloudspec.lang.predicate.EqualPredicate;
-import cloudspec.lang.predicate.NotPredicate;
-import cloudspec.lang.predicate.Predicate;
-import cloudspec.lang.predicate.WithinPredicate;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.validator.ResourceValidator;
 import cloudspec.validator.ResourceValidatorResult;
-import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -64,7 +59,12 @@ public class GraphResourceValidator implements ResourceValidator {
         this.gTraversal = graph.traversal();
     }
 
-    public List<ResourceValidatorResult> validate(ResourceDefRef resourceDefRef, List<WithExpr> withExprs, List<AssertExpr> assertExprs) {
+    @Override
+    public ResourceValidatorResult validateById(ResourceDefRef resourceDefRef, String resourceId, List<WithExpr> withExprs, List<AssertExpr> assertExprs) {
+        return null;
+    }
+
+    public List<ResourceValidatorResult> validateAll(ResourceDefRef resourceDefRef, List<WithExpr> withExprs, List<AssertExpr> assertExprs) {
         GraphTraversal<Vertex, Vertex> resourcesTraversal = gTraversal.V()
                 .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef.toString())
                 .as("r");
@@ -77,21 +77,7 @@ public class GraphResourceValidator implements ResourceValidator {
 
     private void addFilters(GraphTraversal<Vertex, Vertex> resourcesTraversal, List<WithExpr> withs) {
         withs.forEach(withExpr -> {
-            resourcesTraversal.has(withExpr.getPropertyName(), toGraphPredicate(withExpr.getPredicate()));
+            resourcesTraversal.has(withExpr.getPropertyName(), withExpr.getPredicate());
         });
-    }
-
-    private P<?> toGraphPredicate(Predicate exprPredicate) {
-        if (exprPredicate instanceof NotPredicate) {
-            return P.not(toGraphPredicate(((NotPredicate) exprPredicate).getPredicate()));
-        } else if (exprPredicate instanceof EqualPredicate<?>) {
-            return P.eq(((EqualPredicate<?>) exprPredicate).getValue());
-        } else if (exprPredicate instanceof WithinPredicate<?>) {
-            return P.within(((WithinPredicate<?>) exprPredicate).getValues());
-        }
-
-        throw new RuntimeException(
-                String.format("Predicate class %s is not supported.", exprPredicate.getClass().getCanonicalName())
-        );
     }
 }

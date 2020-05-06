@@ -23,41 +23,45 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.validator;
+package cloudspec.loader;
 
 import cloudspec.lang.AssertExpr;
+import cloudspec.lang.CloudSpec;
+import cloudspec.lang.RuleExpr;
 import cloudspec.lang.WithExpr;
 import cloudspec.model.ResourceDefRef;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
-/**
- * Define a resource validator.
- */
-public interface ResourceValidator {
-    /**
-     * Validate an individual resource.
-     *
-     * @param resourceDefRef Resource definition reference.
-     * @param resourceId     Resource id.
-     * @param withExprs      List of with expressions.
-     * @param assertExprs    List of assert expressions.
-     * @return Resource validator result.
-     */
-    ResourceValidatorResult validateById(ResourceDefRef resourceDefRef,
-                                         String resourceId,
-                                         List<WithExpr> withExprs,
-                                         List<AssertExpr> assertExprs);
+public class ResourceLoaderPlan {
+    private final Set<ResourceDefRef> resourceDefRefs = new HashSet<>();
 
-    /**
-     * Validate all resources of a kind.
-     *
-     * @param resourceDefRef Resource definition reference.
-     * @param withExprs      List of with expressions.
-     * @param assertExprs    List of assert expressions.
-     * @return List of resource validator results.
-     */
-    List<ResourceValidatorResult> validateAll(ResourceDefRef resourceDefRef,
-                                              List<WithExpr> withExprs,
-                                              List<AssertExpr> assertExprs);
+    public ResourceLoaderPlan(CloudSpec spec) {
+        spec.getGroups().stream()
+                .flatMap(groupExpr -> groupExpr.getRules().stream())
+                .forEach(this::processRule);
+    }
+
+    private void processRule(RuleExpr ruleExpr) {
+        Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(ruleExpr.getResourceDefRef());
+        if (!resourceDefRefOpt.isPresent()) {
+            // TODO manage error
+            throw new RuntimeException("Error");
+        }
+
+        resourceDefRefs.add(resourceDefRefOpt.get());
+
+        ruleExpr.getWiths().forEach(this::processWithExpr);
+        ruleExpr.getAsserts().forEach(this::processAssertExpr);
+    }
+
+    private void processWithExpr(WithExpr withExpr) {
+        // TODO get associations
+    }
+
+    private void processAssertExpr(AssertExpr assertExpr) {
+        // TODO get associations
+    }
 }

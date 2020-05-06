@@ -10,9 +10,9 @@ ruleDecl: RULE STRING onDecl assertDecl*;
 
 onDecl: ON RESOURCE_DEF_REF withDecl*;
 
-withDecl: WITH PROPERTY_NAME withExpr;
+withDecl: WITH PROPERTY_NAME withPredicate;
 
-assertDecl: ASSERT PROPERTY_NAME (mustExpr | shouldExpr);
+assertDecl: ASSERT PROPERTY_NAME (mustPredicate | shouldPredicate);
 
 // Expressions
 
@@ -32,20 +32,20 @@ assertDecl: ASSERT PROPERTY_NAME (mustExpr | shouldExpr);
 //   BE IN [B]
 //   NOT BE IN [B]
 
-withExpr: IS? ('==' | EQUAL TO) value             # WithEqualPredicate
-        | IS? ('!=' | NOT EQUAL TO) value         # WithNotEqualPredicate
-        | IS? WITHIN array                        # WithWithinPredicate
-        | IS? NOT WITHIN array                    # WithNotWithinPredicate
-        ;
+withPredicate: IS? ('==' | EQUAL TO) value             # WithEqualPredicate
+             | IS? ('!=' | NOT EQUAL TO) value         # WithNotEqualPredicate
+             | IS? WITHIN array                        # WithWithinPredicate
+             | IS? NOT WITHIN array                    # WithNotWithinPredicate
+             ;
 
-assertExpr: BE ('==' | EQUAL TO) value           # AssertEqualPredicate
-          | (BE '!=' | NOT BE EQUAL TO) value    # AssertNotEqualPredicate
-          | BE WITHIN array                      # AssertWithinPredicate
-          | NOT BE WITHIN array                  # AssertNotWithinPredicate
-          ;
+assertPredicate: BE ('==' | EQUAL TO) value           # AssertEqualPredicate
+               | (BE '!=' | NOT BE EQUAL TO) value    # AssertNotEqualPredicate
+               | BE WITHIN array                      # AssertWithinPredicate
+               | NOT BE WITHIN array                  # AssertNotWithinPredicate
+               ;
 
-mustExpr: MUST assertExpr;
-shouldExpr: SHOULD assertExpr;
+mustPredicate: MUST assertPredicate;
+shouldPredicate: SHOULD assertPredicate;
 
 value: STRING                    # StringValue
      | BOOLEAN                   # BooleanValue

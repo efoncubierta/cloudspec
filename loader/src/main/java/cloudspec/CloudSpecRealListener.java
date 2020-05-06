@@ -26,10 +26,7 @@
 package cloudspec;
 
 import cloudspec.lang.*;
-import cloudspec.lang.predicate.EqualPredicate;
-import cloudspec.lang.predicate.NotPredicate;
-import cloudspec.lang.predicate.Predicate;
-import cloudspec.lang.predicate.WithinPredicate;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +60,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
     private String currentAssertPropertyName;
 
     // evaluator
-    private Predicate currentPredicate;
+    private P<?> currentPredicate;
     private List<Object> currentValues;
 
     public CloudSpec getCloudSpec() {
@@ -135,42 +132,42 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
 
     @Override
     public void exitWithEqualPredicate(CloudSpecParser.WithEqualPredicateContext ctx) {
-        currentPredicate = new EqualPredicate<>(currentValues.get(0));
+        currentPredicate = P.eq(currentValues.get(0));
     }
 
     @Override
     public void exitWithNotEqualPredicate(CloudSpecParser.WithNotEqualPredicateContext ctx) {
-        currentPredicate = new NotPredicate(new EqualPredicate<>(currentValues.get(0)));
+        currentPredicate = P.neq(currentValues.get(0));
     }
 
     @Override
     public void exitWithWithinPredicate(CloudSpecParser.WithWithinPredicateContext ctx) {
-        currentPredicate = new WithinPredicate<>(currentValues);
+        currentPredicate = P.within(currentValues);
     }
 
     @Override
     public void exitWithNotWithinPredicate(CloudSpecParser.WithNotWithinPredicateContext ctx) {
-        currentPredicate = new NotPredicate(new WithinPredicate<>(currentValues));
+        currentPredicate = P.not(P.within(currentValues));
     }
 
     @Override
     public void exitAssertEqualPredicate(CloudSpecParser.AssertEqualPredicateContext ctx) {
-        currentPredicate = new EqualPredicate<>(currentValues.get(0));
+        currentPredicate = P.eq(currentValues.get(0));
     }
 
     @Override
     public void exitAssertNotEqualPredicate(CloudSpecParser.AssertNotEqualPredicateContext ctx) {
-        currentPredicate = new NotPredicate(new EqualPredicate<>(currentValues.get(0)));
+        currentPredicate = P.neq(currentValues.get(0));
     }
 
     @Override
     public void exitAssertWithinPredicate(CloudSpecParser.AssertWithinPredicateContext ctx) {
-        currentPredicate = new WithinPredicate<>(currentValues);
+        currentPredicate = P.within(currentValues);
     }
 
     @Override
     public void exitAssertNotWithinPredicate(CloudSpecParser.AssertNotWithinPredicateContext ctx) {
-        currentPredicate = new NotPredicate(new WithinPredicate<>(currentValues));
+        currentPredicate = P.not(P.within(currentValues));
     }
 
     @Override
