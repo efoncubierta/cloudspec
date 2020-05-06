@@ -89,7 +89,7 @@ public class EC2InstanceLoaderTest {
     public void shouldLoadResources() {
         EC2InstanceLoader loader = new EC2InstanceLoader(TEST_CLIENTS_PROVIDER);
 
-        List<EC2InstanceResource> resources = loader.load();
+        List<EC2InstanceResource> resources = loader.getAll();
 
         assertNotNull(resources);
         assertEquals(1, resources.size());

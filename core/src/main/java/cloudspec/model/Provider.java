@@ -37,10 +37,26 @@ import java.util.Optional;
  * Note to future: providers will also provide new expressions to CloudSpec.
  */
 public interface Provider {
+    /**
+     * Get provider name.
+     *
+     * @return Provider name.
+     */
     String getName();
 
+    /**
+     * Get provider description.
+     *
+     * @return Provider description.
+     */
     String getDescription();
 
+    /**
+     * Get a resource definition by its reference.
+     *
+     * @param resourceDefRef Resource definition reference.
+     * @return Optional resource definition.
+     */
     default Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef) {
         return getResourceDefs()
                 .stream()
@@ -48,7 +64,27 @@ public interface Provider {
                 .findFirst();
     }
 
+    /**
+     * Get all resource definitions the provider provides.
+     *
+     * @return List of resource definitions.
+     */
     List<ResourceDef> getResourceDefs();
 
+    /**
+     * Get all resources of a particular resource definition.
+     *
+     * @param resourceDefRef Resource definition reference.
+     * @return List of resources.
+     */
     List<?> getResources(ResourceDefRef resourceDefRef);
+
+    /**
+     * Get a resource by resource definition and id.
+     *
+     * @param resourceDefRef Resource definition reference.
+     * @param resourceId     Resource id.
+     * @return Optional resource.
+     */
+    Optional<?> getResource(ResourceDefRef resourceDefRef, String resourceId);
 }

@@ -32,10 +32,17 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class GraphResourceStoreTest {
+    @Test
+    public void shouldNotGetResourceThatDoesntExist() {
+        GraphResourceStore store = new GraphResourceStore(TinkerGraph.open());
+        Optional<Resource> resourceOpt = store.getResource(ModelTestUtils.RESOURCE_DEF_REF, ModelTestUtils.RESOURCE_ID);
+        assertNotNull(resourceOpt);
+        assertFalse(resourceOpt.isPresent());
+    }
+
     @Test
     public void shouldAddAndGetResource() {
         GraphResourceStore store = new GraphResourceStore(TinkerGraph.open());
@@ -45,7 +52,6 @@ public class GraphResourceStoreTest {
         Optional<Resource> resourceOpt = store.getResource(ModelTestUtils.RESOURCE.getResourceDefRef(), ModelTestUtils.RESOURCE.getResourceId());
         assertNotNull(resourceOpt);
         assertTrue(resourceOpt.isPresent());
-
-        ModelTestUtils.compareResources(ModelTestUtils.RESOURCE, resourceOpt.get());
+        assertEquals(ModelTestUtils.RESOURCE, resourceOpt.get());
     }
 }

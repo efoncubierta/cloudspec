@@ -29,7 +29,7 @@ import cloudspec.model.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -39,11 +39,17 @@ public class ModelTestUtils {
     public static final String PROVIDER_DESCRIPTION = "My provider";
 
     public static final String RESOURCE_GROUP = "mygroup";
+
     public static final String RESOURCE_NAME = "myresource";
-    public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(ProviderDataUtil.PROVIDER_NAME, RESOURCE_GROUP, RESOURCE_NAME);
     public static final String RESOURCE_DESCRIPTION = "My resource";
+    public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(ProviderDataUtil.PROVIDER_NAME, RESOURCE_GROUP, RESOURCE_NAME);
+
+    public static final String TARGET_RESOURCE_NAME = "mytargetresource";
+    public static final String TARGET_RESOURCE_DESCRIPTION = "My target resource";
+    public static final ResourceDefRef TARGET_RESOURCE_DEF_REF = new ResourceDefRef(ProviderDataUtil.PROVIDER_NAME, RESOURCE_GROUP, TARGET_RESOURCE_NAME);
 
     public static final String RESOURCE_ID = UUID.randomUUID().toString();
+    public static final String TARGET_RESOURCE_ID = UUID.randomUUID().toString();
 
     public static final String PROP_INTEGER_NAME = "integer_property";
     public static final String PROP_INTEGER_DESCRIPTION = "Integer property";
@@ -81,78 +87,75 @@ public class ModelTestUtils {
     );
     public static final Property PROP_BOOLEAN = new Property(PROP_BOOLEAN_NAME, PROP_BOOLEAN_VALUE);
 
+    public static final List<Property> PROPERTIES = Arrays.asList(PROP_INTEGER, PROP_STRING, PROP_BOOLEAN);
+    public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF);
+
+
     public static final String ASSOC_NAME = "myassociation";
     public static final String ASSOC_DESCRIPTION = "My association";
+    public static final AssociationDef ASSOCIATION_DEF = new AssociationDef(ASSOC_NAME, ASSOC_DESCRIPTION, TARGET_RESOURCE_DEF_REF);
+    public static final Association ASSOCIATION = new Association(ASSOC_NAME, TARGET_RESOURCE_DEF_REF, TARGET_RESOURCE_ID);
+    public static final List<Association> ASSOCIATIONS = Collections.singletonList(ASSOCIATION);
+    public static final List<AssociationDef> ASSOCIATION_DEFS = Collections.singletonList(ASSOCIATION_DEF);
 
     // test model objects
-    public static final Provider PROVIDER = new TestProvider();
     public static final ResourceDef RESOURCE_DEF = new ResourceDef(
             RESOURCE_DEF_REF,
             RESOURCE_DESCRIPTION,
-            Arrays.asList(PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF),
-            Collections.emptyList()
+            PROPERTY_DEFS,
+            ASSOCIATION_DEFS
     );
     public static final Resource RESOURCE = new Resource(
             RESOURCE_DEF_REF,
             RESOURCE_ID,
-            Arrays.asList(PROP_INTEGER, PROP_STRING, PROP_BOOLEAN),
-            Collections.emptyList()
+            PROPERTIES,
+            ASSOCIATIONS
     );
 
-    public static void compareResourceDefs(ResourceDef resourceDef1, ResourceDef resourceDef2) {
-        assertEquals(resourceDef1.getRef(), resourceDef2.getRef());
+    public static final Provider TEST_PROVIDER = new TestProvider();
+    public static final TestResource TEST_RESOURCE = new TestResource(RESOURCE_ID, PROP_INTEGER_VALUE, PROP_STRING_VALUE, PROP_BOOLEAN_VALUE, TARGET_RESOURCE_ID);
 
-        assertNotNull(resourceDef1.getProperties());
-        assertNotNull(resourceDef2.getProperties());
-        assertEquals(resourceDef1.getProperties().size(), resourceDef2.getProperties().size());
+    public static void compareProperties(List<Property> properties1, List<Property> properties2) {
+        assertNotNull(properties1);
+        assertNotNull(properties2);
+        assertEquals(properties1.size(), properties2.size());
 
-        resourceDef1.getProperties().forEach(propertyDef1 -> {
-            Optional<PropertyDef> propertyDef2Opt = resourceDef1.getProperty(propertyDef1.getName());
-            assertNotNull(propertyDef2Opt);
-            assertTrue(propertyDef2Opt.isPresent());
-            assertEquals(propertyDef1.getName(), propertyDef2Opt.get().getName());
-            assertEquals(propertyDef1.getDescription(), propertyDef2Opt.get().getDescription());
-            assertEquals(propertyDef1.getPropertyType(), propertyDef2Opt.get().getPropertyType());
-            assertEquals(propertyDef1.isArray(), propertyDef2Opt.get().isArray());
-        });
-
-        assertNotNull(resourceDef1.getAssociations());
-        assertNotNull(resourceDef2.getAssociations());
-        assertEquals(resourceDef1.getAssociations().size(), resourceDef2.getAssociations().size());
-
-        resourceDef1.getAssociations().forEach(associationDef1 -> {
-            Optional<AssociationDef> functionDef2Opt = resourceDef1.getAssociation(associationDef1.getName());
-            assertNotNull(functionDef2Opt);
-            assertTrue(functionDef2Opt.isPresent());
-            assertEquals(associationDef1.getName(), functionDef2Opt.get().getName());
-            assertEquals(associationDef1.getDescription(), functionDef2Opt.get().getDescription());
-        });
+        assertTrue(
+                properties1.stream().allMatch(property1 ->
+                        properties2.stream().anyMatch(property1::equals))
+        );
     }
 
-    public static void compareResources(Resource resource1, Resource resource2) {
-        assertEquals(resource1.getResourceDefRef(), resource2.getResourceDefRef());
+    public static void compareAssociations(List<Association> associations1, List<Association> associations2) {
+        assertNotNull(associations1);
+        assertNotNull(associations2);
+        assertEquals(associations1.size(), associations2.size());
 
-        assertNotNull(resource1.getProperties());
-        assertNotNull(resource2.getProperties());
-        assertEquals(resource1.getProperties().size(), resource2.getProperties().size());
+        assertTrue(
+                associations1.stream().allMatch(association1 ->
+                        associations2.stream().anyMatch(association1::equals))
+        );
+    }
 
-        resource1.getProperties().forEach(property1 -> {
-            Optional<Property> property2Opt = resource1.getProperty(property1.getName());
-            assertNotNull(property2Opt);
-            assertTrue(property2Opt.isPresent());
-            assertEquals(property1.getName(), property2Opt.get().getName());
-            assertEquals(property1.getValue(), property2Opt.get().getValue());
-        });
+    public static void comparePropertyDefs(List<PropertyDef> propertyDefs1, List<PropertyDef> propertyDefs2) {
+        assertNotNull(propertyDefs1);
+        assertNotNull(propertyDefs2);
+        assertEquals(propertyDefs1.size(), propertyDefs2.size());
 
-        assertNotNull(resource1.getAssociations());
-        assertNotNull(resource2.getAssociations());
-        assertEquals(resource1.getAssociations().size(), resource2.getAssociations().size());
+        assertTrue(
+                propertyDefs1.stream().allMatch(propertyDef1 ->
+                        propertyDefs2.stream().anyMatch(propertyDef1::equals))
+        );
+    }
 
-        resource1.getAssociations().forEach(association1 -> {
-            Optional<Association> function2Opt = resource1.getAssociation(association1.getName());
-            assertNotNull(function2Opt);
-            assertTrue(function2Opt.isPresent());
-            assertEquals(association1.getName(), function2Opt.get().getName());
-        });
+    public static void compareAssociationDefs(List<AssociationDef> associationDefs1, List<AssociationDef> associationDefs2) {
+        assertNotNull(associationDefs1);
+        assertNotNull(associationDefs2);
+        assertEquals(associationDefs1.size(), associationDefs2.size());
+
+        assertTrue(
+                associationDefs1.stream().allMatch(associationDef1 ->
+                        associationDefs2.stream().anyMatch(associationDef1::equals))
+        );
     }
 }

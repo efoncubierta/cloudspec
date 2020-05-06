@@ -31,6 +31,7 @@ import cloudspec.model.ResourceDefRef;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @ProviderDefinition(
         name = ProviderDataUtil.PROVIDER_NAME,
@@ -41,5 +42,10 @@ public class TestProvider extends BaseProvider {
     @Override
     public List<Object> getResources(ResourceDefRef resourceDefRef) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<?> getResource(ResourceDefRef resourceDefRef, String resourceId) {
+        return Optional.empty();
     }
 }

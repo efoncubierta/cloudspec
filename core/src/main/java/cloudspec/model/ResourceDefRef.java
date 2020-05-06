@@ -25,33 +25,66 @@
  */
 package cloudspec.model;
 
+import java.util.Optional;
+
+/**
+ * Define the reference of a resource definition.
+ */
 public class ResourceDefRef {
     private final String providerName;
     private final String groupName;
     private final String resourceName;
 
+    /**
+     * Constructor.
+     *
+     * @param providerName Provider name.
+     * @param groupName    Group name.
+     * @param resourceName Resource name.
+     */
     public ResourceDefRef(String providerName, String groupName, String resourceName) {
         this.providerName = providerName;
         this.groupName = groupName;
         this.resourceName = resourceName;
     }
 
-    public static ResourceDefRef fromString(String refString) {
-        // TODO manage null or malformed strings
-        String[] parts = refString.split(":");
-        return new ResourceDefRef(parts[0], parts[1], parts[2]);
-    }
-
+    /**
+     * Get provider name.
+     *
+     * @return Provider name.
+     */
     public String getProviderName() {
         return providerName;
     }
 
+    /**
+     * Get group name.
+     *
+     * @return Group name.
+     */
     public String getGroupName() {
         return groupName;
     }
 
+    /**
+     * Get resource name.
+     *
+     * @return Resource name.
+     */
     public String getResourceName() {
         return resourceName;
+    }
+
+    /**
+     * Build a resource definition reference object from string.
+     *
+     * @param refString Resource definition reference as string.
+     * @return Optional resource definition reference.
+     */
+    public static Optional<ResourceDefRef> fromString(String refString) {
+        // TODO manage null or malformed strings
+        String[] parts = refString.split(":");
+        return Optional.of(new ResourceDefRef(parts[0], parts[1], parts[2]));
     }
 
     @Override

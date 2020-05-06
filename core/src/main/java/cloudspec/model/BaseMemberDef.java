@@ -26,10 +26,24 @@
 package cloudspec.model;
 
 /**
- * Property type.
+ * Base class for classes implementing {@link Member}.
  */
-public enum PropertyType {
-    STRING,
-    BOOLEAN,
-    INTEGER
+public abstract class BaseMemberDef implements MemberDef {
+    private final String name;
+    private final String description;
+
+    protected BaseMemberDef(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
 }

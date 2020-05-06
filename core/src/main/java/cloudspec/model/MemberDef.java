@@ -25,20 +25,23 @@
  */
 package cloudspec.model;
 
-public abstract class MemberDef {
-    private final String name;
-    private final String description;
+/**
+ * Define a resource member definition.
+ * <p>
+ * Members of a resources must be defined to validate the integrity of the resource.
+ */
+public interface MemberDef {
+    /**
+     * Get member definition name.
+     *
+     * @return Member definition name.
+     */
+    String getName();
 
-    protected MemberDef(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
+    /**
+     * Get member definition description.
+     *
+     * @return Member definition description.
+     */
+    String getDescription();
 }

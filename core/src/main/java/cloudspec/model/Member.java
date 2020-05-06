@@ -25,6 +25,16 @@
  */
 package cloudspec.model;
 
+/**
+ * Define a member of a resource.
+ * <p>
+ * Resources have different types of members, like properties and associations.
+ */
 public interface Member {
+    /**
+     * Get member name.
+     *
+     * @return Member name.
+     */
     String getName();
 }

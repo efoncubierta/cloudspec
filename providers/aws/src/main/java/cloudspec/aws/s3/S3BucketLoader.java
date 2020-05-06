@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,6 +33,7 @@ import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
@@ -42,7 +43,14 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
         this.clientsProvider = clientsProvider;
     }
 
-    public List<S3BucketResource> load() {
+    @Override
+    public Optional<S3BucketResource> getById(String id) {
+        // TODO implement method
+        return Optional.empty();
+    }
+
+    @Override
+    public List<S3BucketResource> getAll() {
         S3Client s3Client = clientsProvider.getS3Client();
 
         try {

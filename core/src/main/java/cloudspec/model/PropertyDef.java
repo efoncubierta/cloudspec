@@ -25,22 +25,61 @@
  */
 package cloudspec.model;
 
-public class PropertyDef extends MemberDef {
+/**
+ * Define a property definition.
+ * <p>
+ * Properties must be defined so resources integrity can be validated.
+ */
+public class PropertyDef extends BaseMemberDef {
     private final PropertyType propertyType;
     private final Boolean isArray;
 
+    /**
+     * Constructor.
+     *
+     * @param name         Property name.
+     * @param description  Property description.
+     * @param propertyType Property type.
+     * @param isArray      Flag the property as multi-valued.
+     */
     public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
         super(name, description);
         this.propertyType = propertyType;
         this.isArray = isArray;
     }
 
+    /**
+     * Get the property type.
+     *
+     * @return Property type.
+     */
     public PropertyType getPropertyType() {
         return propertyType;
     }
 
+    /**
+     * Check if the property is multi-valued.
+     *
+     * @return True if the property is multi-valued. False otherwise.
+     */
     public Boolean isArray() {
         return isArray;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof PropertyDef)) {
+            return false;
+        }
+
+        return getName().equals(((PropertyDef) obj).getName()) &&
+                getDescription().equals(((PropertyDef) obj).getDescription()) &&
+                getPropertyType().equals(((PropertyDef) obj).getPropertyType()) &&
+                isArray().equals(((PropertyDef) obj).isArray());
     }
 
     @Override

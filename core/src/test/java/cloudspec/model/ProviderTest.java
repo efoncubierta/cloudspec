@@ -47,7 +47,7 @@ public class ProviderTest {
         assertNotNull(TEST_PROVIDER.getResourceDefs());
         assertEquals(1, TEST_PROVIDER.getResourceDefs().size());
 
-        ModelTestUtils.compareResourceDefs(ModelTestUtils.RESOURCE_DEF, TEST_PROVIDER.getResourceDefs().get(0));
+        assertEquals(ModelTestUtils.RESOURCE_DEF, TEST_PROVIDER.getResourceDefs().get(0));
     }
 
 

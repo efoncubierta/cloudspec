@@ -32,8 +32,8 @@ import cloudspec.annotation.ResourceDefinition;
 @ResourceDefinition(
         provider = ProviderDataUtil.PROVIDER_NAME,
         group = ModelTestUtils.RESOURCE_GROUP,
-        name = ModelTestUtils.RESOURCE_NAME,
-        description = ModelTestUtils.RESOURCE_DESCRIPTION
+        name = ModelTestUtils.TARGET_RESOURCE_NAME,
+        description = ModelTestUtils.TARGET_RESOURCE_DESCRIPTION
 )
 public class TestTargetResource {
     @IdDefinition

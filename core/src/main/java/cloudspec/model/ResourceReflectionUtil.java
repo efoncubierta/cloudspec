@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,22 +28,28 @@ package cloudspec.model;
 import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
-import cloudspec.annotation.ResourceDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Util to extract resource information out of annotated classes.
+ */
 public class ResourceReflectionUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceReflectionUtil.class);
 
+    /**
+     * Extract resource out of an object of a class annotated with @ResourceDefinition.
+     *
+     * @param obj Object.
+     * @return Optional resource.
+     */
     public static Optional<Resource> toResource(Object obj) {
-        return toResourceDefRef(obj.getClass())
+        return ResourceDefReflectionUtil.toResourceDefRef(obj.getClass())
                 .flatMap(resourceDefRef -> toResourceId(obj)
                         .map(resourceId -> new Resource(
                                 resourceDefRef,
@@ -53,62 +59,19 @@ public class ResourceReflectionUtil {
                         )));
     }
 
-    public static Optional<ResourceDefRef> toResourceDefRef(Class<?> clazz) {
-        if (!clazz.isAnnotationPresent(ResourceDefinition.class)) {
-            LOGGER.warn(
-                    "Cannot obtain resource definition ref of class '{}' because it is not annotated with @ResourceDefinition",
-                    clazz.getCanonicalName()
-            );
-            return Optional.empty();
-        }
-
-        ResourceDefinition resourceDefAnnotation = clazz.getAnnotation(ResourceDefinition.class);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Found @ResourceDefinition annotation in class '{}'. " +
-                            "Obtained provider={}, group={}, name={}",
-                    clazz.getCanonicalName(),
-                    resourceDefAnnotation.provider(),
-                    resourceDefAnnotation.group(),
-                    resourceDefAnnotation.name()
-            );
-        }
-
-        return Optional.of(new ResourceDefRef(
-                resourceDefAnnotation.provider(),
-                resourceDefAnnotation.group(),
-                resourceDefAnnotation.name()
-        ));
-    }
-
-    public static Optional<String> toResourceDescription(Class<?> clazz) {
-        if (!clazz.isAnnotationPresent(ResourceDefinition.class)) {
-            LOGGER.warn(
-                    "Cannot obtain description of class '{}' because it is not annotated with @ResourceDefinition",
-                    clazz.getCanonicalName()
-            );
-            return Optional.empty();
-        }
-
-        ResourceDefinition resourceDefAnnotation = clazz.getAnnotation(ResourceDefinition.class);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Found @ResourceDefinition annotation in class '{}'. " +
-                            "Obtained description={}",
-                    clazz.getCanonicalName(),
-                    resourceDefAnnotation.description()
-            );
-        }
-
-        return Optional.of(resourceDefAnnotation.description());
-    }
-
+    /**
+     * Extract resource id out of an object with a class annotated with @ResourceDefinition.
+     *
+     * @param obj Object.
+     * @return Optional resource id.
+     */
     public static Optional<String> toResourceId(Object obj) {
         return Stream.of(obj.getClass().getDeclaredFields())
                 .peek(field -> {
                     if (!field.isAnnotationPresent(IdDefinition.class)) {
                         LOGGER.warn(
-                                "Cannot obtain id of an object of class '{}' because it does not have a field annotated with @IdDefinition",
+                                "Cannot produce a resource id from object of class '{}' " +
+                                        "because it does not have a field annotated with @IdDefinition",
                                 obj.getClass().getCanonicalName()
                         );
                     }
@@ -141,11 +104,13 @@ public class ResourceReflectionUtil {
 
     }
 
+    /**
+     * Extract all properties out of fields annotated with @PropertyDefinition.
+     *
+     * @param obj Object.
+     * @return List of properties.
+     */
     public static List<Property> toProperties(Object obj) {
-        return toProperties(obj, "");
-    }
-
-    private static List<Property> toProperties(Object obj, String prefix) {
         return Stream.of(obj.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
                 .flatMap(field -> {
@@ -159,22 +124,20 @@ public class ResourceReflectionUtil {
                     PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
 
                     try {
-                        String name = String.format("%s%s", prefix, propertyDefAnnotation.name());
-
                         field.setAccessible(true);
                         Object value = field.get(obj);
                         field.setAccessible(true);
 
                         if (value instanceof String || value instanceof Integer || value instanceof Boolean) {
-                            return Stream.of(new Property(name, value));
+                            return Stream.of(new Property(propertyDefAnnotation.name(), value));
                         } else {
-                            List<Property> properties = toProperties(value, name + ".");
+                            List<Property> properties = toProperties(value);
                             if (properties.size() > 0) {
                                 return properties.stream();
                             }
                         }
 
-                        LOGGER.warn("Field type '{}' of property '{}' in class '{}' is not supported.",
+                        LOGGER.warn("Type {} of property '{}' in class {} is not supported",
                                 field.getType().getCanonicalName(),
                                 field.getName(),
                                 obj.getClass().getCanonicalName()
@@ -192,13 +155,19 @@ public class ResourceReflectionUtil {
                 }).collect(Collectors.toList());
     }
 
+    /**
+     * Extract all associations out of fields annotated with @AssociationDefinition.
+     *
+     * @param obj Object.
+     * @return List of associations.
+     */
     public static List<Association> toAssociations(Object obj) {
         return Stream.of(obj.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(AssociationDefinition.class))
                 .flatMap(field -> {
                     // validate field is a string
                     if (!field.getType().isAssignableFrom(String.class)) {
-                        LOGGER.warn("Field type '{}' of association '{}' in class '{}' is not supported.",
+                        LOGGER.warn("Type {} of association '{}' in class {} is not supported",
                                 field.getType().getCanonicalName(),
                                 field.getName(),
                                 obj.getClass().getCanonicalName()
@@ -209,7 +178,7 @@ public class ResourceReflectionUtil {
                     AssociationDefinition associationDefinitionAnnotation = field.getAnnotation(AssociationDefinition.class);
 
                     String associationName = associationDefinitionAnnotation.name();
-                    Optional<ResourceDefRef> resourceDefRefOptional = toResourceDefRef(associationDefinitionAnnotation.targetClass());
+                    Optional<ResourceDefRef> resourceDefRefOptional = ResourceDefReflectionUtil.toResourceDefRef(associationDefinitionAnnotation.targetClass());
 
                     // TODO add validation for association name and resourceDefRef
                     if (!resourceDefRefOptional.isPresent()) {
@@ -236,69 +205,5 @@ public class ResourceReflectionUtil {
                         );
                     }
                 }).collect(Collectors.toList());
-    }
-
-    public static Optional<ResourceDef> toResourceDef(Class<?> resourceClass) {
-        return toResourceDefRef(resourceClass).flatMap(resourceDefRef ->
-                toResourceDescription(resourceClass).map(resourceDescription ->
-                        new ResourceDef(resourceDefRef, resourceDescription, toPropertyDefs(resourceClass), toAssociationDefs(resourceClass))
-                )
-        );
-
-    }
-
-    private static List<PropertyDef> toPropertyDefs(Class<?> clazz) {
-        return Stream.of(clazz.getDeclaredFields())
-                .map(field -> toPropertyDef(clazz, field))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-    }
-
-    private static Optional<PropertyDef> toPropertyDef(Class<?> resourceClass, Field field) {
-        if (!field.isAnnotationPresent(PropertyDefinition.class)) {
-            return Optional.empty();
-        }
-
-        PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
-
-        Class<?> type = field.getType();
-
-        if (type.isAssignableFrom(String.class)) {
-            return Optional.of(
-                    new PropertyDef(
-                            propertyDefAnnotation.name(),
-                            propertyDefAnnotation.description(),
-                            PropertyType.STRING,
-                            Boolean.FALSE)
-            );
-        } else if (type.isAssignableFrom(Integer.class)) {
-            return Optional.of(
-                    new PropertyDef(
-                            propertyDefAnnotation.name(),
-                            propertyDefAnnotation.description(),
-                            PropertyType.INTEGER,
-                            Boolean.FALSE)
-            );
-        } else if (type.isAssignableFrom(Boolean.class)) {
-            return Optional.of(
-                    new PropertyDef(
-                            propertyDefAnnotation.name(),
-                            propertyDefAnnotation.description(),
-                            PropertyType.BOOLEAN,
-                            Boolean.FALSE)
-            );
-        }
-
-        LOGGER.warn("Type of property '{}' in class '{}' is not supported",
-                field.getName(),
-                resourceClass.getCanonicalName()
-        );
-
-        return Optional.empty();
-    }
-
-    private static List<AssociationDef> toAssociationDefs(Class<?> clazz) {
-        return Collections.emptyList();
     }
 }

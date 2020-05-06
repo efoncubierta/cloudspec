@@ -33,6 +33,7 @@ import software.amazon.awssdk.services.ec2.model.Instance;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource> {
@@ -42,7 +43,14 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
         this.clientsProvider = clientsProvider;
     }
 
-    public List<EC2InstanceResource> load() {
+    @Override
+    public Optional<EC2InstanceResource> getById(String id) {
+        // TODO implement method
+        return Optional.empty();
+    }
+
+    @Override
+    public List<EC2InstanceResource> getAll() {
         Ec2Client ec2Client = clientsProvider.getEc2Client();
 
         try {

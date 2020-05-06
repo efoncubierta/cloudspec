@@ -59,10 +59,15 @@ public class CloudSpecPreflight {
     }
 
     private void preflightRule(RuleExpr rule) {
-        ResourceDefRef resourceDefRef = ResourceDefRef.fromString(rule.getResourceDefRef());
+        Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(rule.getResourceDefRef());
+        if (!resourceDefRefOpt.isPresent()) {
+            throw new CloudSpecPreflightException(
+                    String.format("Malformed resource definition reference '%s'", rule.getResourceDefRef())
+            );
+        }
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(resourceDefRef);
+        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(resourceDefRefOpt.get());
         if (!resourceDefOpt.isPresent()) {
             throw new CloudSpecPreflightException(String.format("Resource of type '%s' is not supported.", rule.getResourceDefRef()));
         }

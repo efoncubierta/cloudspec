@@ -31,6 +31,7 @@ import cloudspec.lang.RuleExpr;
 import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CloudSpecValidator {
@@ -57,9 +58,18 @@ public class CloudSpecValidator {
     }
 
     private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
+        Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(rule.getResourceDefRef());
+        if(!resourceDefRefOpt.isPresent()) {
+            return new CloudSpecValidatorResult.RuleResult(
+                    rule.getName(),
+                    Boolean.FALSE,
+                    String.format("Malformed resource definition reference '%s'", rule.getResourceDefRef())
+            );
+        }
+
         // validate all resources
         List<ResourceValidatorResult> errors = resourceValidator.validate(
-                ResourceDefRef.fromString(rule.getResourceDefRef()),
+                resourceDefRefOpt.get(),
                 rule.getWiths(),
                 rule.getAsserts()
         );

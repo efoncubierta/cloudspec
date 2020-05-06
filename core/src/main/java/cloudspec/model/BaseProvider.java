@@ -34,18 +34,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Define a CloudSpec's provider.
- * <p>
- * A provider provides CloudSpec with resource definitions and resource loaders. Providers must implement
- * this class, that will be instantiated into the {@link cloudspec.ProvidersRegistry}.
- * <p>
- * Note to future: providers will also provide new expressions o CloudSpec.
+ * Base class for classes implementing {@link Provider}.
  */
 public abstract class BaseProvider implements Provider {
     private final String name;
     private final String description;
     private final List<ResourceDef> resourceDefs;
 
+    /**
+     * Constructor.
+     * <p>
+     * When a instance of a class implementing this class is constructed, all
+     * information related to the provider contained in the annotations are extracted.
+     */
     public BaseProvider() {
         // check the class is annotated
         if (!this.getClass().isAnnotationPresent(ProviderDefinition.class)) {
@@ -60,7 +61,7 @@ public abstract class BaseProvider implements Provider {
 
         this.resourceDefs = Stream.of(providerDefinition.resources())
                 .filter(resourceClass -> resourceClass.isAnnotationPresent(ResourceDefinition.class))
-                .map(ResourceReflectionUtil::toResourceDef)
+                .map(ResourceDefReflectionUtil::toResourceDef)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());

@@ -78,7 +78,7 @@ public class S3BucketLoaderTest {
     public void shouldLoadResources() {
         S3BucketLoader loader = new S3BucketLoader(TEST_CLIENTS_PROVIDER);
 
-        List<S3BucketResource> resources = loader.load();
+        List<S3BucketResource> resources = loader.getAll();
 
         assertNotNull(resources);
         assertEquals(1, resources.size());

@@ -107,10 +107,10 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .by(unfold())
                 .toStream()
                 .peek(associationDefMap -> LOGGER.debug("- Found association definition '{}'", associationDefMap.get(PROPERTY_NAME)))
-                .map(associatinoDefMap -> new AssociationDef(
-                        (String) associatinoDefMap.get(PROPERTY_NAME),
-                        (String) associatinoDefMap.get(PROPERTY_DESCRIPTION),
-                        (ResourceDefRef) associatinoDefMap.get(PROPERTY_RESOURCE_DEF_REF)
+                .map(associationDefMap -> new AssociationDef(
+                        (String) associationDefMap.get(PROPERTY_NAME),
+                        (String) associationDefMap.get(PROPERTY_DESCRIPTION),
+                        (ResourceDefRef) associationDefMap.get(PROPERTY_RESOURCE_DEF_REF)
                 ))
                 .collect(Collectors.toList());
     }
@@ -188,6 +188,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
         return gTraversal.addV(LABEL_ASSOCIATION_DEF)
                 .property(PROPERTY_NAME, associationDef.getName())
                 .property(PROPERTY_DESCRIPTION, associationDef.getDescription())
+                .property(PROPERTY_RESOURCE_DEF_REF, associationDef.getResourceDefRef())
                 .next();
     }
 }

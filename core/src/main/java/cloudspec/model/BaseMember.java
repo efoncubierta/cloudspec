@@ -34,7 +34,7 @@ public abstract class BaseMember implements Member {
     /**
      * Constructor.
      *
-     * @param name Member's name.
+     * @param name Member name.
      */
     protected BaseMember(String name) {
         this.name = name;

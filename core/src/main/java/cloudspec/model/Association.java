@@ -25,6 +25,12 @@
  */
 package cloudspec.model;
 
+/**
+ * Define a resource association.
+ * <p>
+ * Resources can be associated with other resources. For example, an EC2 instance is associated
+ * to a subnet, or an EBS volume. CloudSpec supports validation of resources by its associations.
+ */
 public class Association extends BaseMember {
     private final ResourceDefRef resourceDefRef;
     private final String resourceId;
@@ -32,7 +38,7 @@ public class Association extends BaseMember {
     /**
      * Constructor.
      *
-     * @param name Association's name.
+     * @param name Association name.
      */
     public Association(String name, ResourceDefRef resourceDefRef, String resourceId) {
         super(name);
@@ -40,12 +46,39 @@ public class Association extends BaseMember {
         this.resourceId = resourceId;
     }
 
+    /**
+     * Get the resource definition reference of the target resource.
+     *
+     * @return Resource definition reference.
+     */
     public ResourceDefRef getResourceDefRef() {
         return resourceDefRef;
     }
 
+    /**
+     * Get the resource id of the target resource.
+     *
+     * @return Resource id.
+     */
     public String getResourceId() {
         return resourceId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Association)) {
+            return false;
+        }
+
+        Association association = (Association) obj;
+
+        return getName().equals(association.getName()) &&
+                getResourceDefRef().equals(association.getResourceDefRef()) &&
+                getResourceId().equals(association.getResourceId());
     }
 
     @Override

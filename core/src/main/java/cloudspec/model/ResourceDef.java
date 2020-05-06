@@ -28,12 +28,25 @@ package cloudspec.model;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define a resource definition.
+ * <p>
+ * All resources to be validated must be defined beforehand.
+ */
 public class ResourceDef {
     private final ResourceDefRef ref;
     private final String description;
     private final List<PropertyDef> properties;
     private final List<AssociationDef> associations;
 
+    /**
+     * Constructor.
+     *
+     * @param ref          Resource definition reference.
+     * @param description  Resource description.
+     * @param properties   List of property definitions.
+     * @param associations List of association definitions.
+     */
     public ResourceDef(ResourceDefRef ref, String description, List<PropertyDef> properties, List<AssociationDef> associations) {
         this.ref = ref;
         this.description = description;
@@ -41,12 +54,17 @@ public class ResourceDef {
         this.associations = associations;
     }
 
+    /**
+     * Get resource definition reference.
+     *
+     * @return Resource definition reference.
+     */
     public ResourceDefRef getRef() {
         return ref;
     }
 
     /**
-     * Get resource's description.
+     * Get resource description.
      *
      * @return Resource description.
      */
@@ -54,20 +72,64 @@ public class ResourceDef {
         return description;
     }
 
+    /**
+     * Get a property definition by name.
+     *
+     * @param propertyName Property name.
+     * @return Optional property definition.
+     */
     public Optional<PropertyDef> getProperty(String propertyName) {
         return getProperties().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
     }
 
+    /**
+     * Get list of property definitions.
+     *
+     * @return List of property definitions.
+     */
     public List<PropertyDef> getProperties() {
         return properties;
     }
 
+    /**
+     * Get an association definition by name.
+     *
+     * @param associationName Association name.
+     * @return Optional association definition.
+     */
     public Optional<AssociationDef> getAssociation(String associationName) {
         return getAssociations().stream().filter(def -> def.getName().equals(associationName)).findFirst();
     }
 
+    /**
+     * Get list of association definitions.
+     *
+     * @return List of association definitions.
+     */
     public List<AssociationDef> getAssociations() {
         return associations;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof ResourceDef)) {
+            return false;
+        }
+
+        ResourceDef resourceDef = (ResourceDef) obj;
+
+        return getRef().equals(resourceDef.getRef()) &&
+                getDescription().equals(resourceDef.getDescription()) &&
+                getProperties().size() == resourceDef.getProperties().size() &&
+                getProperties().stream().allMatch(propertyDef ->
+                        resourceDef.getProperties().stream().anyMatch(propertyDef::equals)) &&
+                getAssociations().size() == resourceDef.getAssociations().size() &&
+                getAssociations().stream().allMatch(associationDef ->
+                        resourceDef.getAssociations().stream().anyMatch(associationDef::equals));
     }
 
     @Override

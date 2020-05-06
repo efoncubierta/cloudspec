@@ -25,16 +25,48 @@
  */
 package cloudspec.model;
 
-public class AssociationDef extends MemberDef {
+/**
+ * Define an association definition.
+ * <p>
+ * Associations must be defined so resources integrity can be validated.
+ */
+public class AssociationDef extends BaseMemberDef {
     private final ResourceDefRef resourceDefRef;
 
+    /**
+     * Constructor.
+     *
+     * @param name           Association name.
+     * @param description    Association description.
+     * @param resourceDefRef Resource definition reference of the target resource.
+     */
     public AssociationDef(String name, String description, ResourceDefRef resourceDefRef) {
         super(name, description);
         this.resourceDefRef = resourceDefRef;
     }
 
+    /**
+     * Get the resource definition reference of the target resource.
+     *
+     * @return Resource definition reference.
+     */
     public ResourceDefRef getResourceDefRef() {
         return resourceDefRef;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof AssociationDef)) {
+            return false;
+        }
+
+        return getName().equals(((AssociationDef) obj).getName()) &&
+                getDescription().equals(((AssociationDef) obj).getDescription()) &&
+                getResourceDefRef().equals(((AssociationDef) obj).getResourceDefRef());
     }
 
     @Override

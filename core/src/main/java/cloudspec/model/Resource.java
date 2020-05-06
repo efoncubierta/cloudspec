@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define a CloudSpec's resource.
+ * Define a CloudSpec resource.
  * <p>
  * A resource is anything that can be evaluated. It can be an EC2 instance, an S3 bucket, an entire service, etc.
  * Resources have members, that can be either properties or associations.
@@ -42,6 +42,14 @@ public class Resource {
     private final List<Property> properties;
     private final List<Association> associations;
 
+    /**
+     * Constructor.
+     *
+     * @param resourceDefRef Resource definition reference.
+     * @param resourceId     Resource id.
+     * @param properties     List of properties.
+     * @param associations   List of associations.
+     */
     public Resource(ResourceDefRef resourceDefRef, String resourceId, List<Property> properties, List<Association> associations) {
         this.resourceDefRef = resourceDefRef;
         this.resourceId = resourceId;
@@ -50,27 +58,27 @@ public class Resource {
     }
 
     /**
-     * Get resource's fully-qualified name.
+     * Get resource definition reference.
      *
-     * @return Resource fully-qualified name.
+     * @return Resource definition reference.
      */
     public ResourceDefRef getResourceDefRef() {
         return resourceDefRef;
     }
 
     /**
-     * Get resource ID.
+     * Get resource id.
      *
-     * @return Resource ID.
+     * @return Resource id.
      */
     public String getResourceId() {
         return resourceId;
     }
 
     /**
-     * Get a resource's property.
+     * Get a resource property by name.
      *
-     * @param propertyName Property's name.
+     * @param propertyName Property name.
      * @return Optional property.
      */
     public Optional<Property> getProperty(String propertyName) {
@@ -81,7 +89,7 @@ public class Resource {
     }
 
     /**
-     * Get all resource's properties.
+     * Get all resource properties.
      *
      * @return List of properties.
      */
@@ -90,9 +98,9 @@ public class Resource {
     }
 
     /**
-     * Get a resource's association.
+     * Get a resource association by name.
      *
-     * @param associationName Association's name.
+     * @param associationName Association name.
      * @return Optional association.
      */
     public Optional<Association> getAssociation(String associationName) {
@@ -106,6 +114,28 @@ public class Resource {
      */
     public List<Association> getAssociations() {
         return associations;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Resource)) {
+            return false;
+        }
+
+        Resource resource = (Resource) obj;
+
+        return getResourceDefRef().equals(resource.getResourceDefRef()) &&
+                getResourceId().equals(resource.getResourceId()) &&
+                getProperties().size() == resource.getProperties().size() &&
+                getProperties().stream().allMatch(property ->
+                        resource.getProperties().stream().anyMatch(property::equals)) &&
+                getAssociations().size() == resource.getAssociations().size() &&
+                getAssociations().stream().allMatch(associationDef ->
+                        resource.getAssociations().stream().anyMatch(associationDef::equals));
     }
 
     @Override

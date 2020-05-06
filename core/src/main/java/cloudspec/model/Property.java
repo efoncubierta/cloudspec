@@ -34,8 +34,8 @@ public class Property extends BaseMember {
     /**
      * Constructor.
      *
-     * @param name  Property's name.
-     * @param value Property's value.
+     * @param name  Property name.
+     * @param value Property value.
      */
     public Property(String name, Object value) {
         super(name);
@@ -43,8 +43,29 @@ public class Property extends BaseMember {
         this.value = value;
     }
 
+    /**
+     * Get property value.
+     *
+     * @return Property value.
+     */
     public Object getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Property)) {
+            return false;
+        }
+
+        Property property = (Property) obj;
+
+        return getName().equals(property.getName()) &&
+                getValue().equals(property.getValue());
     }
 
     @Override
