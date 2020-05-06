@@ -109,7 +109,8 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .peek(associationDefMap -> LOGGER.debug("- Found association definition '{}'", associationDefMap.get(PROPERTY_NAME)))
                 .map(associatinoDefMap -> new AssociationDef(
                         (String) associatinoDefMap.get(PROPERTY_NAME),
-                        (String) associatinoDefMap.get(PROPERTY_DESCRIPTION)
+                        (String) associatinoDefMap.get(PROPERTY_DESCRIPTION),
+                        (ResourceFqn) associatinoDefMap.get(PROPERTY_FQN)
                 ))
                 .collect(Collectors.toList());
     }

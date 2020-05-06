@@ -25,7 +25,6 @@
  */
 package cloudspec;
 
-import cloudspec.model.MyProvider;
 import cloudspec.model.Provider;
 import cloudspec.model.ProviderTest;
 import cloudspec.util.ModelTestUtils;

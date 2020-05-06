@@ -26,19 +26,34 @@
 package cloudspec.model;
 
 public class Association extends BaseMember {
+    private final ResourceFqn resourceFqn;
+    private final String resourceId;
+
     /**
      * Constructor.
      *
      * @param name Association's name.
      */
-    public Association(String name) {
+    public Association(String name, ResourceFqn resourceFqn, String resourceId) {
         super(name);
+        this.resourceFqn = resourceFqn;
+        this.resourceId = resourceId;
+    }
+
+    public ResourceFqn getResourceFqn() {
+        return resourceFqn;
+    }
+
+    public String getResourceId() {
+        return resourceId;
     }
 
     @Override
     public String toString() {
-        return "Property{" +
+        return "Association{" +
                 "name=" + getName() +
+                ", resourceFqn=" + resourceFqn +
+                ", resourceId=" + resourceId +
                 '}';
     }
 }

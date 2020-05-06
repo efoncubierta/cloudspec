@@ -29,6 +29,7 @@ import cloudspec.annotation.ProviderDefinition;
 import cloudspec.annotation.ResourceDefinition;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,6 +61,8 @@ public abstract class BaseProvider implements Provider {
         this.resourceDefs = Stream.of(providerDefinition.resources())
                 .filter(resourceClass -> resourceClass.isAnnotationPresent(ResourceDefinition.class))
                 .map(ResourceReflectionUtil::toResourceDef)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 

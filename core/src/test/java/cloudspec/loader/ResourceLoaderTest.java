@@ -26,7 +26,7 @@
 package cloudspec.loader;
 
 import cloudspec.ProvidersRegistry;
-import cloudspec.model.MyProvider;
+import cloudspec.util.TestProvider;
 import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class ResourceLoaderTest {
     public static final ResourceStore RESOURCE_STORE = mock(ResourceStore.class);
 
     static {
-        when(PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(new MyProvider()));
+        when(PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(new TestProvider()));
     }
 
     @Test

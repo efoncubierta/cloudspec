@@ -25,7 +25,7 @@
  */
 package cloudspec;
 
-import cloudspec.model.MyProvider;
+import cloudspec.util.TestProvider;
 import cloudspec.model.ProviderTest;
 import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
@@ -44,7 +44,7 @@ public class CloudSpecManagerTest {
     public static final ResourceValidator RESOURCE_VALIDATOR = mock(ResourceValidator.class);
 
     static {
-        when(PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(new MyProvider()));
+        when(PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(new TestProvider()));
     }
 
     @Test

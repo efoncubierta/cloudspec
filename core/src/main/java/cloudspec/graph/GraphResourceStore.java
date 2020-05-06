@@ -110,7 +110,9 @@ public class GraphResourceStore implements ResourceStore {
                 .toStream()
                 .peek(associationMap -> LOGGER.debug("- Found association '{}'", associationMap.get(PROPERTY_NAME)))
                 .map(associationMap -> new Association(
-                        (String) associationMap.get(PROPERTY_NAME)
+                        (String) associationMap.get(PROPERTY_NAME),
+                        (ResourceFqn) associationMap.get(PROPERTY_FQN),
+                        (String) associationMap.get(PROPERTY_RESOURCE_ID)
                 ))
                 .collect(Collectors.toList());
     }
@@ -192,6 +194,8 @@ public class GraphResourceStore implements ResourceStore {
 
         return gTraversal.addV(LABEL_ASSOCIATION)
                 .property(PROPERTY_NAME, association.getName())
+                .property(PROPERTY_FQN, association.getResourceFqn())
+                .property(PROPERTY_RESOURCE_ID, association.getResourceId())
                 .next();
     }
 }

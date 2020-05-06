@@ -23,8 +23,23 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.util;
 
-public enum MemberType {
-    PROPERTY, ASSOCIATION
+import cloudspec.annotation.ProviderDefinition;
+import cloudspec.model.BaseProvider;
+import cloudspec.model.ResourceFqn;
+
+import java.util.Collections;
+import java.util.List;
+
+@ProviderDefinition(
+        name = ProviderDataUtil.PROVIDER_NAME,
+        description = ProviderDataUtil.PROVIDER_DESCRIPTION,
+        resources = {TestResource.class}
+)
+public class TestProvider extends BaseProvider {
+    @Override
+    public List<Object> getResources(ResourceFqn resourceFqn) {
+        return Collections.emptyList();
+    }
 }

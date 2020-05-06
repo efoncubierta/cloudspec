@@ -26,6 +26,7 @@
 package cloudspec.model;
 
 import cloudspec.util.ModelTestUtils;
+import cloudspec.util.TestProvider;
 import cloudspec.util.ProviderDataUtil;
 import org.junit.Test;
 
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class ProviderTest {
-    public static final Provider TEST_PROVIDER = new MyProvider();
+    public static final Provider TEST_PROVIDER = new TestProvider();
 
     @Test
     public void shouldBuildProviderFromAnnotation() {

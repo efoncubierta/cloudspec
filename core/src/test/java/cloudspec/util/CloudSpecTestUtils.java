@@ -27,7 +27,6 @@ package cloudspec.util;
 
 import cloudspec.lang.*;
 import cloudspec.lang.predicate.IdentityPredicate;
-import cloudspec.model.MyResource;
 
 import java.util.Collections;
 import java.util.List;

@@ -23,13 +23,11 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.util;
 
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.util.ProviderDataUtil;
-import cloudspec.util.ModelTestUtils;
 
 @ResourceDefinition(
         provider = ProviderDataUtil.PROVIDER_NAME,
@@ -37,7 +35,7 @@ import cloudspec.util.ModelTestUtils;
         name = ModelTestUtils.RESOURCE_NAME,
         description = ModelTestUtils.RESOURCE_DESCRIPTION
 )
-public class MyResource {
+public class TestTargetResource {
     @IdDefinition
     private final String id;
 
@@ -59,7 +57,7 @@ public class MyResource {
     )
     private final Boolean booleanProperty;
 
-    public MyResource(String id, Integer integerProperty, String stringProperty, Boolean booleanProperty) {
+    public TestTargetResource(String id, Integer integerProperty, String stringProperty, Boolean booleanProperty) {
         this.id = id;
         this.integerProperty = integerProperty;
         this.stringProperty = stringProperty;

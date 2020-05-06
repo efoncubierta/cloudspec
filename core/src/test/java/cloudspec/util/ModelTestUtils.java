@@ -41,6 +41,7 @@ public class ModelTestUtils {
     public static final String RESOURCE_GROUP = "mygroup";
     public static final String RESOURCE_NAME = "myresource";
     public static final ResourceFqn RESOURCE_FQN = new ResourceFqn(ProviderDataUtil.PROVIDER_NAME, RESOURCE_GROUP, RESOURCE_NAME);
+    public static final String RESOURCE_FQN_STRING = RESOURCE_FQN.toString();
     public static final String RESOURCE_DESCRIPTION = "My resource";
 
     public static final String RESOURCE_ID = UUID.randomUUID().toString();
@@ -81,8 +82,11 @@ public class ModelTestUtils {
     );
     public static final Property PROP_BOOLEAN = new Property(PROP_BOOLEAN_NAME, PROP_BOOLEAN_VALUE);
 
+    public static final String ASSOC_NAME = "myassociation";
+    public static final String ASSOC_DESCRIPTION = "My association";
+
     // test model objects
-    public static final Provider PROVIDER = new MyProvider();
+    public static final Provider PROVIDER = new TestProvider();
     public static final ResourceDef RESOURCE_DEF = new ResourceDef(
             RESOURCE_FQN,
             RESOURCE_DESCRIPTION,
