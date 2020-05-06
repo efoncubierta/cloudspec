@@ -26,8 +26,8 @@
 package cloudspec.model;
 
 import cloudspec.util.ModelTestUtils;
-import cloudspec.util.TestProvider;
 import cloudspec.util.ProviderDataUtil;
+import cloudspec.util.TestProvider;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

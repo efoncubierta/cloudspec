@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2;
 
 import cloudspec.aws.IAWSClientsProvider;
-import cloudspec.aws.ec2.EC2InstanceLoader;
-import cloudspec.aws.ec2.EC2InstanceResource;
 import org.junit.Test;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;

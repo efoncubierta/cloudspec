@@ -25,12 +25,6 @@
  */
 package cloudspec.util;
 
-import cloudspec.lang.predicate.Predicate;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class ExprEvaluatorTestUtils {
 //    public static final Predicate<Object> TRUE_EVALUATOR = mock(Predicate.class);
 //    public static final Predicate<Object> FALSE_EVALUATOR = mock(Predicate.class);

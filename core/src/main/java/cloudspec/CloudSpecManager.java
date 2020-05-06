@@ -94,7 +94,7 @@ public class CloudSpecManager {
     public CloudSpecValidatorResult validate(CloudSpec spec) {
         mustBeInitiated();
 
-        return null;
+        return cloudSpecValidator.validate(spec);
     }
 
     private void mustBeInitiated() {

@@ -25,10 +25,10 @@
  */
 package cloudspec;
 
-import cloudspec.util.TestProvider;
 import cloudspec.model.ProviderTest;
 import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
+import cloudspec.util.TestProvider;
 import cloudspec.validator.ResourceValidator;
 import org.junit.Test;
 

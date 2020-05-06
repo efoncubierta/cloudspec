@@ -26,9 +26,9 @@
 package cloudspec.loader;
 
 import cloudspec.ProvidersRegistry;
-import cloudspec.util.TestProvider;
 import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
+import cloudspec.util.TestProvider;
 import org.junit.Test;
 
 import java.util.Collections;

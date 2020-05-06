@@ -25,7 +25,6 @@
  */
 package cloudspec.aws;
 
-import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 
 public class AWSResource {
