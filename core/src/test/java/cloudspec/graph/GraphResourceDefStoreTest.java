@@ -42,7 +42,7 @@ public class GraphResourceDefStoreTest {
 
         store.addResourceDef(ModelTestUtils.RESOURCE_DEF);
 
-        Optional<ResourceDef> resourceDefOpt = store.getResourceDef(ModelTestUtils.RESOURCE_FQN);
+        Optional<ResourceDef> resourceDefOpt = store.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF);
         assertNotNull(resourceDefOpt);
         assertTrue(resourceDefOpt.isPresent());
 

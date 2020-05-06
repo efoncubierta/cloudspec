@@ -31,7 +31,7 @@ import cloudspec.aws.ec2.EC2InstanceResource;
 import cloudspec.aws.s3.S3BucketLoader;
 import cloudspec.aws.s3.S3BucketResource;
 import cloudspec.model.BaseProvider;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 
 import java.util.*;
 
@@ -46,18 +46,18 @@ public class AWSProvider extends BaseProvider {
     private final Map<String, AWSResourceLoader<?>> loaders = new HashMap<>();
 
     public AWSProvider(IAWSClientsProvider clientsProvider) {
-        loaders.put(EC2InstanceResource.FQN.toString(), new EC2InstanceLoader(clientsProvider));
-        loaders.put(S3BucketResource.FQN.toString(), new S3BucketLoader(clientsProvider));
+        loaders.put(EC2InstanceResource.RESOURCE_DEF_REF.toString(), new EC2InstanceLoader(clientsProvider));
+        loaders.put(S3BucketResource.RESOURCE_DEF_REF.toString(), new S3BucketLoader(clientsProvider));
     }
 
     @Override
-    public List<?> getResources(ResourceFqn resourceFqn) {
-        return getLoader(resourceFqn)
+    public List<?> getResources(ResourceDefRef resourceDefRef) {
+        return getLoader(resourceDefRef)
                 .map(AWSResourceLoader::load)
                 .orElse(Collections.emptyList());
     }
 
-    private Optional<AWSResourceLoader<?>> getLoader(ResourceFqn resourceFqn) {
-        return Optional.ofNullable(loaders.get(resourceFqn.toString()));
+    private Optional<AWSResourceLoader<?>> getLoader(ResourceDefRef resourceDefRef) {
+        return Optional.ofNullable(loaders.get(resourceDefRef.toString()));
     }
 }

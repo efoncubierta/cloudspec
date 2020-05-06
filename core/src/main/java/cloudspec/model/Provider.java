@@ -41,14 +41,14 @@ public interface Provider {
 
     String getDescription();
 
-    default Optional<ResourceDef> getResourceDef(ResourceFqn resourceFqn) {
+    default Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef) {
         return getResourceDefs()
                 .stream()
-                .filter(resourceDef -> resourceDef.getResourceFqn().equals(resourceFqn))
+                .filter(resourceDef -> resourceDef.getRef().equals(resourceDefRef))
                 .findFirst();
     }
 
     List<ResourceDef> getResourceDefs();
 
-    List<?> getResources(ResourceFqn resourceFqn);
+    List<?> getResources(ResourceDefRef resourceDefRef);
 }

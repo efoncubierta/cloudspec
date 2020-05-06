@@ -8,7 +8,7 @@ groupDecl: GROUP STRING ruleDecl+;
 
 ruleDecl: RULE STRING onDecl assertDecl*;
 
-onDecl: ON RESOURCE_TYPE_FQN withDecl*;
+onDecl: ON RESOURCE_DEF_REF withDecl*;
 
 withDecl: WITH PROPERTY_NAME withExpr;
 
@@ -97,7 +97,7 @@ fragment ALPHANUM: [a-zA-Z0-9];
 fragment ALPHANUMS: [a-zA-Z0-9]+;
 
 // Resource and member references
-RESOURCE_TYPE_FQN: PROVIDER_NAMESPACE (':' GROUP_NAMESPACE)? ':' RESOURCE_TYPE;
+RESOURCE_DEF_REF: PROVIDER_NAMESPACE (':' GROUP_NAMESPACE)? ':' RESOURCE_TYPE;
 fragment PROVIDER_NAMESPACE: LETTER ALPHANUM*;
 fragment GROUP_NAMESPACE: LETTER ALPHANUM*;
 fragment RESOURCE_TYPE: LETTER ALPHANUM*;

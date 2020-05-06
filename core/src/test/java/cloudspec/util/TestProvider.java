@@ -27,7 +27,7 @@ package cloudspec.util;
 
 import cloudspec.annotation.ProviderDefinition;
 import cloudspec.model.BaseProvider;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +39,7 @@ import java.util.List;
 )
 public class TestProvider extends BaseProvider {
     @Override
-    public List<Object> getResources(ResourceFqn resourceFqn) {
+    public List<Object> getResources(ResourceDefRef resourceDefRef) {
         return Collections.emptyList();
     }
 }

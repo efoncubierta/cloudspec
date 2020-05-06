@@ -52,7 +52,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
 
     // current rule
     private String currentRuleName;
-    private String currentRuleResourceTypeFqn;
+    private String currentRuleResourceDefRef;
     private List<WithExpr> currentRuleWithExprs;
     private List<AssertExpr> currentRuleAssertExprs;
 
@@ -101,12 +101,12 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
 
     @Override
     public void exitRuleDecl(CloudSpecParser.RuleDeclContext ctx) {
-        currentGroupRules.add(new RuleExpr(currentRuleName, currentRuleResourceTypeFqn, currentRuleWithExprs, currentRuleAssertExprs));
+        currentGroupRules.add(new RuleExpr(currentRuleName, currentRuleResourceDefRef, currentRuleWithExprs, currentRuleAssertExprs));
     }
 
     @Override
     public void enterOnDecl(CloudSpecParser.OnDeclContext ctx) {
-        currentRuleResourceTypeFqn = ctx.RESOURCE_TYPE_FQN().getText();
+        currentRuleResourceDefRef = ctx.RESOURCE_DEF_REF().getText();
     }
 
     @Override

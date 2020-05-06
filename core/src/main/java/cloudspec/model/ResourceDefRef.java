@@ -25,21 +25,21 @@
  */
 package cloudspec.model;
 
-public class ResourceFqn {
+public class ResourceDefRef {
     private final String providerName;
     private final String groupName;
     private final String resourceName;
 
-    public ResourceFqn(String providerName, String groupName, String resourceName) {
+    public ResourceDefRef(String providerName, String groupName, String resourceName) {
         this.providerName = providerName;
         this.groupName = groupName;
         this.resourceName = resourceName;
     }
 
-    public static ResourceFqn fromString(String resourceFqn) {
+    public static ResourceDefRef fromString(String refString) {
         // TODO manage null or malformed strings
-        String[] parts = resourceFqn.split(":");
-        return new ResourceFqn(parts[0], parts[1], parts[2]);
+        String[] parts = refString.split(":");
+        return new ResourceDefRef(parts[0], parts[1], parts[2]);
     }
 
     public String getProviderName() {
@@ -60,7 +60,7 @@ public class ResourceFqn {
             return true;
         }
 
-        if (!(obj instanceof ResourceFqn)) {
+        if (!(obj instanceof ResourceDefRef)) {
             return false;
         }
 

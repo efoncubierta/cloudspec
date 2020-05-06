@@ -31,7 +31,7 @@ import cloudspec.lang.predicate.EqualPredicate;
 import cloudspec.lang.predicate.NotPredicate;
 import cloudspec.lang.predicate.Predicate;
 import cloudspec.lang.predicate.WithinPredicate;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 import cloudspec.validator.ResourceValidator;
 import cloudspec.validator.ResourceValidatorResult;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
@@ -50,7 +50,7 @@ public class GraphResourceValidator implements ResourceValidator {
     private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceValidator.class);
 
     private static final String LABEL_RESOURCE = "resource";
-    private static final String PROPERTY_FQN = "fqn";
+    private static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
 
     private final Graph graph;
     private final GraphTraversalSource gTraversal;
@@ -64,9 +64,9 @@ public class GraphResourceValidator implements ResourceValidator {
         this.gTraversal = graph.traversal();
     }
 
-    public List<ResourceValidatorResult> validate(ResourceFqn resourceFqn, List<WithExpr> withExprs, List<AssertExpr> assertExprs) {
+    public List<ResourceValidatorResult> validate(ResourceDefRef resourceDefRef, List<WithExpr> withExprs, List<AssertExpr> assertExprs) {
         GraphTraversal<Vertex, Vertex> resourcesTraversal = gTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_FQN, resourceFqn.toString())
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef.toString())
                 .as("r");
 
         addFilters(resourcesTraversal, withExprs);

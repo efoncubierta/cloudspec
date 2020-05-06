@@ -28,7 +28,7 @@ package cloudspec.validator;
 import cloudspec.lang.CloudSpec;
 import cloudspec.lang.GroupExpr;
 import cloudspec.lang.RuleExpr;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,7 +59,7 @@ public class CloudSpecValidator {
     private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
         // validate all resources
         List<ResourceValidatorResult> errors = resourceValidator.validate(
-                ResourceFqn.fromString(rule.getResourceFqn()),
+                ResourceDefRef.fromString(rule.getResourceDefRef()),
                 rule.getWiths(),
                 rule.getAsserts()
         );

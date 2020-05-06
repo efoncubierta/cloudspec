@@ -28,7 +28,7 @@ package cloudspec.aws.s3;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.AWSProvider;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -40,7 +40,7 @@ import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 )
 public class S3BucketResource extends S3Resource {
     public static final String RESOURCE_NAME = "bucket";
-    public static final ResourceFqn FQN = new ResourceFqn(
+    public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
 

@@ -26,7 +26,7 @@
 package cloudspec;
 
 import cloudspec.model.Provider;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +35,8 @@ import java.util.Optional;
 public class ProvidersRegistry {
     private final List<Provider> providers = new ArrayList<>();
 
-    public Optional<Provider> getProvider(ResourceFqn resourceFqn) {
-        return getProvider(resourceFqn.getProviderName());
+    public Optional<Provider> getProvider(ResourceDefRef resourceDefRef) {
+        return getProvider(resourceDefRef.getProviderName());
     }
 
     public Optional<Provider> getProvider(String providerName) {

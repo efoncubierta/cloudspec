@@ -27,7 +27,7 @@ package cloudspec.loader;
 
 import cloudspec.ProvidersRegistry;
 import cloudspec.model.ResourceDef;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 import cloudspec.model.ResourceReflectionUtil;
 import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
@@ -55,15 +55,15 @@ public class ResourceLoader {
     public void load() {
         resourceDefStore.getResourceDefs()
                 .stream()
-                .map(ResourceDef::getResourceFqn)
+                .map(ResourceDef::getRef)
                 .forEach(this::loadResourcesByType);
     }
 
-    private void loadResourcesByType(ResourceFqn resourceFqn) {
-        LOGGER.debug("Loading resources of type '{}'", resourceFqn);
+    private void loadResourcesByType(ResourceDefRef resourceDefRef) {
+        LOGGER.debug("Loading resources of type '{}'", resourceDefRef);
 
-        providersRegistry.getProvider(resourceFqn.getProviderName())
-                .map(provider -> provider.getResources(resourceFqn).stream())
+        providersRegistry.getProvider(resourceDefRef.getProviderName())
+                .map(provider -> provider.getResources(resourceDefRef).stream())
                 .orElse(Stream.empty())
                 .map(ResourceReflectionUtil::toResource)
                 .filter(Optional::isPresent)

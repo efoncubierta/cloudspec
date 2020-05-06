@@ -27,10 +27,10 @@ package cloudspec.validator;
 
 import cloudspec.lang.AssertExpr;
 import cloudspec.lang.WithExpr;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
 
 public interface ResourceValidator {
-    List<ResourceValidatorResult> validate(ResourceFqn resourceFqn, List<WithExpr> withExprs, List<AssertExpr> assertExprs);
+    List<ResourceValidatorResult> validate(ResourceDefRef resourceDefRef, List<WithExpr> withExprs, List<AssertExpr> assertExprs);
 }

@@ -40,8 +40,7 @@ public class ModelTestUtils {
 
     public static final String RESOURCE_GROUP = "mygroup";
     public static final String RESOURCE_NAME = "myresource";
-    public static final ResourceFqn RESOURCE_FQN = new ResourceFqn(ProviderDataUtil.PROVIDER_NAME, RESOURCE_GROUP, RESOURCE_NAME);
-    public static final String RESOURCE_FQN_STRING = RESOURCE_FQN.toString();
+    public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(ProviderDataUtil.PROVIDER_NAME, RESOURCE_GROUP, RESOURCE_NAME);
     public static final String RESOURCE_DESCRIPTION = "My resource";
 
     public static final String RESOURCE_ID = UUID.randomUUID().toString();
@@ -88,20 +87,20 @@ public class ModelTestUtils {
     // test model objects
     public static final Provider PROVIDER = new TestProvider();
     public static final ResourceDef RESOURCE_DEF = new ResourceDef(
-            RESOURCE_FQN,
+            RESOURCE_DEF_REF,
             RESOURCE_DESCRIPTION,
             Arrays.asList(PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF),
             Collections.emptyList()
     );
     public static final Resource RESOURCE = new Resource(
-            RESOURCE_FQN,
+            RESOURCE_DEF_REF,
             RESOURCE_ID,
             Arrays.asList(PROP_INTEGER, PROP_STRING, PROP_BOOLEAN),
             Collections.emptyList()
     );
 
     public static void compareResourceDefs(ResourceDef resourceDef1, ResourceDef resourceDef2) {
-        assertEquals(resourceDef1.getResourceFqn(), resourceDef2.getResourceFqn());
+        assertEquals(resourceDef1.getRef(), resourceDef2.getRef());
 
         assertNotNull(resourceDef1.getProperties());
         assertNotNull(resourceDef2.getProperties());
@@ -131,7 +130,7 @@ public class ModelTestUtils {
     }
 
     public static void compareResources(Resource resource1, Resource resource2) {
-        assertEquals(resource1.getFqn(), resource2.getFqn());
+        assertEquals(resource1.getResourceDefRef(), resource2.getResourceDefRef());
 
         assertNotNull(resource1.getProperties());
         assertNotNull(resource2.getProperties());

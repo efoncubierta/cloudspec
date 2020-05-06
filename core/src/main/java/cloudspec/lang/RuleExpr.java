@@ -34,21 +34,21 @@ import java.util.List;
  */
 public class RuleExpr {
     private final String name;
-    private final String resourceFqn;
+    private final String resourceDefRef;
     private final List<WithExpr> withs;
     private final List<AssertExpr> asserts;
 
     /**
      * Constructor.
      *
-     * @param name        Rules' name.
-     * @param resourceFqn Fully-qualified name of the resource the rule applies to.
-     * @param withs       List of 'with' expressions to filter the resources.
-     * @param asserts     List of 'assert' expressions to validate the resources.
+     * @param name           Rules' name.
+     * @param resourceDefRef Fully-qualified name of the resource type the rule applies to.
+     * @param withs          List of 'with' expressions to filter the resources.
+     * @param asserts        List of 'assert' expressions to validate the resources.
      */
-    public RuleExpr(String name, String resourceFqn, List<WithExpr> withs, List<AssertExpr> asserts) {
+    public RuleExpr(String name, String resourceDefRef, List<WithExpr> withs, List<AssertExpr> asserts) {
         this.name = name;
-        this.resourceFqn = resourceFqn;
+        this.resourceDefRef = resourceDefRef;
         this.withs = withs;
         this.asserts = asserts;
     }
@@ -67,8 +67,8 @@ public class RuleExpr {
      *
      * @return Resource's FQ name.
      */
-    public String getResourceFqn() {
-        return resourceFqn;
+    public String getResourceDefRef() {
+        return resourceDefRef;
     }
 
     /**
@@ -93,7 +93,7 @@ public class RuleExpr {
     public String toString() {
         return "SpecRule{" +
                 "name='" + name + '\'' +
-                ", resourceFqn='" + resourceFqn + '\'' +
+                ", resourceDefRef='" + resourceDefRef + '\'' +
                 ", withs=" + withs +
                 ", asserts=" + asserts +
                 '}';

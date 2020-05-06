@@ -28,7 +28,7 @@ package cloudspec.graph;
 import cloudspec.model.Association;
 import cloudspec.model.Property;
 import cloudspec.model.Resource;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceStore;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -50,8 +50,8 @@ public class GraphResourceStore implements ResourceStore {
     private static final String LABEL_ASSOCIATION = "association";
     private static final String LABEL_HAS_PROPERTY = "hasProperty";
     private static final String LABEL_HAS_ASSOCIATION = "hasAssociation";
-    private static final String PROPERTY_RESOURCE_ID = "resource_id";
-    private static final String PROPERTY_FQN = "fqn";
+    private static final String PROPERTY_RESOURCE_ID = "resourceId";
+    private static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
     private static final String PROPERTY_NAME = "name";
     private static final String PROPERTY_VALUE = "value";
 
@@ -64,29 +64,29 @@ public class GraphResourceStore implements ResourceStore {
     }
 
     @Override
-    public Optional<Resource> getResource(ResourceFqn resourceFqn, String id) {
-        LOGGER.debug("Getting resource '{}' with id '{}'", resourceFqn, id);
+    public Optional<Resource> getResource(ResourceDefRef resourceDefRef, String id) {
+        LOGGER.debug("Getting resource '{}' with id '{}'", resourceDefRef, id);
 
         return gTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_FQN, resourceFqn)
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .has(PROPERTY_RESOURCE_ID, id)
                 .valueMap()
                 .by(unfold())
                 .toStream()
                 .peek(resourceMap -> LOGGER.debug("- Found resource '{}' with id '{}'",
-                        resourceMap.get(PROPERTY_FQN), resourceMap.get(PROPERTY_RESOURCE_ID)))
+                        resourceMap.get(PROPERTY_RESOURCE_DEF_REF), resourceMap.get(PROPERTY_RESOURCE_ID)))
                 .map(resourceMap -> new Resource(
-                        (ResourceFqn) resourceMap.get(PROPERTY_FQN),
+                        (ResourceDefRef) resourceMap.get(PROPERTY_RESOURCE_DEF_REF),
                         (String) resourceMap.get(PROPERTY_RESOURCE_ID),
-                        getProperties(resourceFqn, id),
-                        getAssociations(resourceFqn, id)
+                        getProperties(resourceDefRef, id),
+                        getAssociations(resourceDefRef, id)
                 ))
                 .findFirst();
     }
 
-    private List<Property> getProperties(ResourceFqn resourceFqn, String id) {
+    private List<Property> getProperties(ResourceDefRef resourceDefRef, String id) {
         return gTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_FQN, resourceFqn)
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .has(PROPERTY_RESOURCE_ID, id)
                 .out(LABEL_HAS_PROPERTY)
                 .valueMap()
@@ -100,9 +100,9 @@ public class GraphResourceStore implements ResourceStore {
                 .collect(Collectors.toList());
     }
 
-    private List<Association> getAssociations(ResourceFqn resourceFqn, String id) {
+    private List<Association> getAssociations(ResourceDefRef resourceDefRef, String id) {
         return gTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_FQN, resourceFqn)
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .has(PROPERTY_RESOURCE_ID, id)
                 .out(LABEL_HAS_ASSOCIATION)
                 .valueMap()
@@ -111,36 +111,36 @@ public class GraphResourceStore implements ResourceStore {
                 .peek(associationMap -> LOGGER.debug("- Found association '{}'", associationMap.get(PROPERTY_NAME)))
                 .map(associationMap -> new Association(
                         (String) associationMap.get(PROPERTY_NAME),
-                        (ResourceFqn) associationMap.get(PROPERTY_FQN),
+                        (ResourceDefRef) associationMap.get(PROPERTY_RESOURCE_DEF_REF),
                         (String) associationMap.get(PROPERTY_RESOURCE_ID)
                 ))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Resource> getResourcesByType(ResourceFqn resourceFqn) {
-        LOGGER.debug("Getting all resources of type '{}'", resourceFqn);
+    public List<Resource> getResourcesByType(ResourceDefRef resourceDefRef) {
+        LOGGER.debug("Getting all resources of type '{}'", resourceDefRef);
 
         return gTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_FQN, resourceFqn)
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .valueMap()
                 .by(unfold())
                 .toStream()
-                .peek(resourceMap -> LOGGER.debug("- Found resource '{}' with id '{}'", resourceFqn, resourceMap.get(PROPERTY_RESOURCE_ID)))
+                .peek(resourceMap -> LOGGER.debug("- Found resource '{}' with id '{}'", resourceDefRef, resourceMap.get(PROPERTY_RESOURCE_ID)))
                 .map(resourceDefMap -> new Resource(
-                        (ResourceFqn) resourceDefMap.get(PROPERTY_FQN),
+                        (ResourceDefRef) resourceDefMap.get(PROPERTY_RESOURCE_DEF_REF),
                         (String) resourceDefMap.get(PROPERTY_RESOURCE_ID),
-                        getProperties(resourceFqn, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID)),
-                        getAssociations(resourceFqn, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID))
+                        getProperties(resourceDefRef, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID)),
+                        getAssociations(resourceDefRef, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID))
                 ))
                 .collect(Collectors.toList());
     }
 
     public void addResource(Resource resource) {
-        LOGGER.debug("Adding resource '{}' with id '{}'", resource.getFqn(), resource.getResourceId());
+        LOGGER.debug("Adding resource '{}' with id '{}'", resource.getResourceDefRef(), resource.getResourceId());
 
         Vertex resourceVertex = gTraversal.addV(LABEL_RESOURCE)
-                .property(PROPERTY_FQN, resource.getFqn())
+                .property(PROPERTY_RESOURCE_DEF_REF, resource.getResourceDefRef())
                 .property(PROPERTY_RESOURCE_ID, resource.getResourceId())
                 .next();
 
@@ -194,7 +194,7 @@ public class GraphResourceStore implements ResourceStore {
 
         return gTraversal.addV(LABEL_ASSOCIATION)
                 .property(PROPERTY_NAME, association.getName())
-                .property(PROPERTY_FQN, association.getResourceFqn())
+                .property(PROPERTY_RESOURCE_DEF_REF, association.getResourceDefRef())
                 .property(PROPERTY_RESOURCE_ID, association.getResourceId())
                 .next();
     }

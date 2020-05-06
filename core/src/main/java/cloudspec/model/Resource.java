@@ -37,13 +37,13 @@ import java.util.Optional;
  * Resources are provided by the providers.
  */
 public class Resource {
-    private final ResourceFqn resourceFqn;
+    private final ResourceDefRef resourceDefRef;
     private final String resourceId;
     private final List<Property> properties;
     private final List<Association> associations;
 
-    public Resource(ResourceFqn resourceFqn, String resourceId, List<Property> properties, List<Association> associations) {
-        this.resourceFqn = resourceFqn;
+    public Resource(ResourceDefRef resourceDefRef, String resourceId, List<Property> properties, List<Association> associations) {
+        this.resourceDefRef = resourceDefRef;
         this.resourceId = resourceId;
         this.properties = properties;
         this.associations = associations;
@@ -54,8 +54,8 @@ public class Resource {
      *
      * @return Resource fully-qualified name.
      */
-    public ResourceFqn getFqn() {
-        return resourceFqn;
+    public ResourceDefRef getResourceDefRef() {
+        return resourceDefRef;
     }
 
     /**
@@ -111,7 +111,7 @@ public class Resource {
     @Override
     public String toString() {
         return "Resource{" +
-                "resourceFqn=" + resourceFqn +
+                "resourceDefRef=" + resourceDefRef +
                 ", resourceId='" + resourceId + '\'' +
                 ", properties=" + properties +
                 ", associations=" + associations +

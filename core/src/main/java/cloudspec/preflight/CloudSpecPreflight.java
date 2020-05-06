@@ -27,7 +27,7 @@ package cloudspec.preflight;
 
 import cloudspec.lang.*;
 import cloudspec.model.ResourceDef;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
 
 import java.util.List;
@@ -59,12 +59,12 @@ public class CloudSpecPreflight {
     }
 
     private void preflightRule(RuleExpr rule) {
-        ResourceFqn resouceFqn = ResourceFqn.fromString(rule.getResourceFqn());
+        ResourceDefRef resourceDefRef = ResourceDefRef.fromString(rule.getResourceDefRef());
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(resouceFqn);
+        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(resourceDefRef);
         if (!resourceDefOpt.isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Resource of type '%s' is not supported.", rule.getResourceFqn()));
+            throw new CloudSpecPreflightException(String.format("Resource of type '%s' is not supported.", rule.getResourceDefRef()));
         }
 
         // preflight withs and asserts
@@ -82,7 +82,7 @@ public class CloudSpecPreflight {
 
     private void preflightProperty(ResourceDef resourceDef, String propertyName) {
         if (!resourceDef.getProperty(propertyName).isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Resource type '%s' does not define property '%s'.", resourceDef.getResourceFqn(), propertyName));
+            throw new CloudSpecPreflightException(String.format("Resource type '%s' does not define property '%s'.", resourceDef.getRef(), propertyName));
         }
     }
 }

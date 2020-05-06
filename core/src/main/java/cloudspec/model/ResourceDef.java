@@ -29,20 +29,20 @@ import java.util.List;
 import java.util.Optional;
 
 public class ResourceDef {
-    private final ResourceFqn resourceFqn;
+    private final ResourceDefRef ref;
     private final String description;
     private final List<PropertyDef> properties;
     private final List<AssociationDef> associations;
 
-    public ResourceDef(ResourceFqn resourceFqn, String description, List<PropertyDef> properties, List<AssociationDef> associations) {
-        this.resourceFqn = resourceFqn;
+    public ResourceDef(ResourceDefRef ref, String description, List<PropertyDef> properties, List<AssociationDef> associations) {
+        this.ref = ref;
         this.description = description;
         this.properties = properties;
         this.associations = associations;
     }
 
-    public ResourceFqn getResourceFqn() {
-        return resourceFqn;
+    public ResourceDefRef getRef() {
+        return ref;
     }
 
     /**
@@ -73,7 +73,7 @@ public class ResourceDef {
     @Override
     public String toString() {
         return "ResourceDef{" +
-                "resourceFqn=" + resourceFqn +
+                "ref=" + ref +
                 ", description='" + description + '\'' +
                 ", properties=" + properties +
                 ", associations=" + associations +

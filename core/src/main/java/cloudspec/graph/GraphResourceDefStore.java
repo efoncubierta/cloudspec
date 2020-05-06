@@ -47,7 +47,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
     private static final String LABEL_ASSOCIATION_DEF = "associationDef";
     private static final String LABEL_HAS_PROPERTY_DEF = "hasPropertyDef";
     private static final String LABEL_HAS_ASSOCIATION_DEF = "hasAssociationDef";
-    private static final String PROPERTY_FQN = "fqn";
+    private static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
     private static final String PROPERTY_PROVIDER_NAME = "providerName";
     private static final String PROPERTY_GROUP_NAME = "groupName";
     private static final String PROPERTY_NAME = "name";
@@ -64,27 +64,27 @@ public class GraphResourceDefStore implements ResourceDefStore {
     }
 
     @Override
-    public Optional<ResourceDef> getResourceDef(ResourceFqn resourceFqn) {
-        LOGGER.debug("Getting resource definition '{}'", resourceFqn);
+    public Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef) {
+        LOGGER.debug("Getting resource definition '{}'", resourceDefRef);
 
         return gTraversal.V()
-                .has(LABEL_RESOURCE_DEF, PROPERTY_FQN, resourceFqn)
+                .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .valueMap()
                 .by(unfold())
                 .toStream()
-                .peek(resourceDefMap -> LOGGER.debug("- Found resource definition '{}'", resourceDefMap.get(PROPERTY_FQN)))
+                .peek(resourceDefMap -> LOGGER.debug("- Found resource definition '{}'", resourceDefMap.get(PROPERTY_RESOURCE_DEF_REF)))
                 .map(resourceDefMap -> new ResourceDef(
-                        (ResourceFqn) resourceDefMap.get(PROPERTY_FQN),
+                        (ResourceDefRef) resourceDefMap.get(PROPERTY_RESOURCE_DEF_REF),
                         (String) resourceDefMap.get(PROPERTY_DESCRIPTION),
-                        getPropertyDefs(resourceFqn),
-                        getAssociationDefs(resourceFqn)
+                        getPropertyDefs(resourceDefRef),
+                        getAssociationDefs(resourceDefRef)
                 ))
                 .findFirst();
     }
 
-    private List<PropertyDef> getPropertyDefs(ResourceFqn resourceFqn) {
+    private List<PropertyDef> getPropertyDefs(ResourceDefRef resourceDefRef) {
         return gTraversal.V()
-                .has(LABEL_RESOURCE_DEF, PROPERTY_FQN, resourceFqn)
+                .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .out(LABEL_HAS_PROPERTY_DEF)
                 .valueMap()
                 .by(unfold())
@@ -99,9 +99,9 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .collect(Collectors.toList());
     }
 
-    private List<AssociationDef> getAssociationDefs(ResourceFqn resourceFqn) {
+    private List<AssociationDef> getAssociationDefs(ResourceDefRef resourceDefRef) {
         return gTraversal.V()
-                .has(LABEL_RESOURCE_DEF, PROPERTY_FQN, resourceFqn)
+                .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .out(LABEL_HAS_ASSOCIATION_DEF)
                 .valueMap()
                 .by(unfold())
@@ -110,7 +110,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .map(associatinoDefMap -> new AssociationDef(
                         (String) associatinoDefMap.get(PROPERTY_NAME),
                         (String) associatinoDefMap.get(PROPERTY_DESCRIPTION),
-                        (ResourceFqn) associatinoDefMap.get(PROPERTY_FQN)
+                        (ResourceDefRef) associatinoDefMap.get(PROPERTY_RESOURCE_DEF_REF)
                 ))
                 .collect(Collectors.toList());
     }
@@ -122,15 +122,15 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
     @Override
     public void addResourceDef(ResourceDef resourceDef) {
-        LOGGER.debug("Adding resource definition '{}'", resourceDef.getResourceFqn());
+        LOGGER.debug("Adding resource definition '{}'", resourceDef.getRef());
 
-        ResourceFqn fqn = resourceDef.getResourceFqn();
+        ResourceDefRef resourceDefRef = resourceDef.getRef();
 
         Vertex resourceVertex = gTraversal.addV(LABEL_RESOURCE_DEF)
-                .property(PROPERTY_PROVIDER_NAME, fqn.getProviderName())
-                .property(PROPERTY_GROUP_NAME, fqn.getGroupName())
-                .property(PROPERTY_NAME, fqn.getResourceName())
-                .property(PROPERTY_FQN, fqn)
+                .property(PROPERTY_PROVIDER_NAME, resourceDefRef.getProviderName())
+                .property(PROPERTY_GROUP_NAME, resourceDefRef.getGroupName())
+                .property(PROPERTY_NAME, resourceDefRef.getResourceName())
+                .property(PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .property(PROPERTY_DESCRIPTION, resourceDef.getDescription())
                 .next();
 

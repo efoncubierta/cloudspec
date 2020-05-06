@@ -26,7 +26,7 @@
 package cloudspec.model;
 
 public class Association extends BaseMember {
-    private final ResourceFqn resourceFqn;
+    private final ResourceDefRef resourceDefRef;
     private final String resourceId;
 
     /**
@@ -34,14 +34,14 @@ public class Association extends BaseMember {
      *
      * @param name Association's name.
      */
-    public Association(String name, ResourceFqn resourceFqn, String resourceId) {
+    public Association(String name, ResourceDefRef resourceDefRef, String resourceId) {
         super(name);
-        this.resourceFqn = resourceFqn;
+        this.resourceDefRef = resourceDefRef;
         this.resourceId = resourceId;
     }
 
-    public ResourceFqn getResourceFqn() {
-        return resourceFqn;
+    public ResourceDefRef getResourceDefRef() {
+        return resourceDefRef;
     }
 
     public String getResourceId() {
@@ -52,7 +52,7 @@ public class Association extends BaseMember {
     public String toString() {
         return "Association{" +
                 "name=" + getName() +
-                ", resourceFqn=" + resourceFqn +
+                ", resourceDefRef=" + resourceDefRef +
                 ", resourceId=" + resourceId +
                 '}';
     }

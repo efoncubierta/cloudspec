@@ -43,20 +43,20 @@ public class ResourceReflectionUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceReflectionUtil.class);
 
     public static Optional<Resource> toResource(Object obj) {
-        return toResourceFqn(obj.getClass())
-                .flatMap(resourceFqn -> toResourceId(obj)
+        return toResourceDefRef(obj.getClass())
+                .flatMap(resourceDefRef -> toResourceId(obj)
                         .map(resourceId -> new Resource(
-                                resourceFqn,
+                                resourceDefRef,
                                 resourceId,
                                 ResourceReflectionUtil.toProperties(obj),
                                 ResourceReflectionUtil.toAssociations(obj)
                         )));
     }
 
-    public static Optional<ResourceFqn> toResourceFqn(Class<?> clazz) {
+    public static Optional<ResourceDefRef> toResourceDefRef(Class<?> clazz) {
         if (!clazz.isAnnotationPresent(ResourceDefinition.class)) {
             LOGGER.warn(
-                    "Cannot obtain FQN of class '{}' because it is not annotated with @ResourceDefinition",
+                    "Cannot obtain resource definition ref of class '{}' because it is not annotated with @ResourceDefinition",
                     clazz.getCanonicalName()
             );
             return Optional.empty();
@@ -74,7 +74,7 @@ public class ResourceReflectionUtil {
             );
         }
 
-        return Optional.of(new ResourceFqn(
+        return Optional.of(new ResourceDefRef(
                 resourceDefAnnotation.provider(),
                 resourceDefAnnotation.group(),
                 resourceDefAnnotation.name()
@@ -209,10 +209,10 @@ public class ResourceReflectionUtil {
                     AssociationDefinition associationDefinitionAnnotation = field.getAnnotation(AssociationDefinition.class);
 
                     String associationName = associationDefinitionAnnotation.name();
-                    Optional<ResourceFqn> resourceFqn = toResourceFqn(associationDefinitionAnnotation.targetClass());
+                    Optional<ResourceDefRef> resourceDefRefOptional = toResourceDefRef(associationDefinitionAnnotation.targetClass());
 
-                    // TODO add validation for association name and resourceFqn
-                    if (!resourceFqn.isPresent()) {
+                    // TODO add validation for association name and resourceDefRef
+                    if (!resourceDefRefOptional.isPresent()) {
                         return Stream.empty();
                     }
 
@@ -223,7 +223,7 @@ public class ResourceReflectionUtil {
 
                         return Stream.of(new Association(
                                 associationName,
-                                resourceFqn.get(),
+                                resourceDefRefOptional.get(),
                                 id)
                         );
                     } catch (IllegalAccessException exception) {
@@ -239,9 +239,9 @@ public class ResourceReflectionUtil {
     }
 
     public static Optional<ResourceDef> toResourceDef(Class<?> resourceClass) {
-        return toResourceFqn(resourceClass).flatMap(resourceFqn ->
+        return toResourceDefRef(resourceClass).flatMap(resourceDefRef ->
                 toResourceDescription(resourceClass).map(resourceDescription ->
-                        new ResourceDef(resourceFqn, resourceDescription, toPropertyDefs(resourceClass), toAssociationDefs(resourceClass))
+                        new ResourceDef(resourceDefRef, resourceDescription, toPropertyDefs(resourceClass), toAssociationDefs(resourceClass))
                 )
         );
 

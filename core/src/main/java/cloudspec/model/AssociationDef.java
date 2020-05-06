@@ -26,15 +26,15 @@
 package cloudspec.model;
 
 public class AssociationDef extends MemberDef {
-    private final ResourceFqn resourceFqn;
+    private final ResourceDefRef resourceDefRef;
 
-    public AssociationDef(String name, String description, ResourceFqn resourceFqn) {
+    public AssociationDef(String name, String description, ResourceDefRef resourceDefRef) {
         super(name, description);
-        this.resourceFqn = resourceFqn;
+        this.resourceDefRef = resourceDefRef;
     }
 
-    public ResourceFqn getResourceFqn() {
-        return resourceFqn;
+    public ResourceDefRef getResourceDefRef() {
+        return resourceDefRef;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class AssociationDef extends MemberDef {
         return "AssociationDef{" +
                 "name=" + getName() +
                 ", description=" + getDescription() +
-                ", resourceFqn=" + resourceFqn +
+                ", resourceDefRef=" + resourceDefRef +
                 '}';
     }
 }

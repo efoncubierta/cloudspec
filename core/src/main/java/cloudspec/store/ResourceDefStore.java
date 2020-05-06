@@ -26,7 +26,7 @@
 package cloudspec.store;
 
 import cloudspec.model.ResourceDef;
-import cloudspec.model.ResourceFqn;
+import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import java.util.Optional;
 public interface ResourceDefStore {
     void addResourceDef(ResourceDef resourceDef);
 
-    Optional<ResourceDef> getResourceDef(ResourceFqn resourceFqn);
+    Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef);
 
     List<ResourceDef> getResourceDefs();
 }
