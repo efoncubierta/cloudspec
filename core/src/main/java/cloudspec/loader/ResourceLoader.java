@@ -28,7 +28,7 @@ package cloudspec.loader;
 import cloudspec.ProvidersRegistry;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceDefRef;
-import cloudspec.model.ResourceReflectionUtil;
+import cloudspec.annotation.ResourceReflectionUtil;
 import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
 import org.slf4j.Logger;

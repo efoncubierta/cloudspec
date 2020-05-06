@@ -25,8 +25,8 @@
  */
 package cloudspec.model;
 
+import cloudspec.annotation.ResourceReflectionUtil;
 import cloudspec.util.ModelTestUtils;
-import cloudspec.util.TestResource;
 import org.junit.Test;
 
 import java.util.List;

@@ -25,6 +25,7 @@
  */
 package cloudspec.model;
 
+import cloudspec.annotation.ResourceDefReflectionUtil;
 import cloudspec.util.ModelTestUtils;
 import cloudspec.util.TestResource;
 import org.junit.Test;

@@ -26,6 +26,7 @@
 package cloudspec.model;
 
 import cloudspec.annotation.ProviderDefinition;
+import cloudspec.annotation.ResourceDefReflectionUtil;
 import cloudspec.annotation.ResourceDefinition;
 
 import java.util.List;
