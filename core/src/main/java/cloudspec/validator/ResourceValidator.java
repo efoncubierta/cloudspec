@@ -25,8 +25,7 @@
  */
 package cloudspec.validator;
 
-import cloudspec.lang.AssertExpr;
-import cloudspec.lang.WithExpr;
+import cloudspec.lang.Statement;
 import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
@@ -36,28 +35,46 @@ import java.util.List;
  */
 public interface ResourceValidator {
     /**
-     * Validate an individual resource.
+     * Check whether a resource exists by its id.
      *
      * @param resourceDefRef Resource definition reference.
-     * @param resourceId     Resource id.
-     * @param withExprs      List of with expressions.
-     * @param assertExprs    List of assert expressions.
+     * @param resourceId Resource id.
+     * @return True if resource exists. False otherwise.
+     */
+    Boolean existById(ResourceDefRef resourceDefRef, String resourceId);
+
+    /**
+     * Check whether any resource exist.
+     *
+     * @param resourceDefRef Resource definition reference.
+     * @param filterStatement Filter statement.
+     * @return True if at least one resource exists. False otherwise.
+     */
+    Boolean existAny(ResourceDefRef resourceDefRef, Statement filterStatement);
+
+    /**
+     * Validate an individual resource.
+     *
+     * @param resourceDefRef  Resource definition reference.
+     * @param resourceId      Resource id.
+     * @param filterStatement Filter statement.
+     * @param assertStatement Assertion statement.
      * @return Resource validator result.
      */
     ResourceValidatorResult validateById(ResourceDefRef resourceDefRef,
                                          String resourceId,
-                                         List<WithExpr> withExprs,
-                                         List<AssertExpr> assertExprs);
+                                         Statement filterStatement,
+                                         Statement assertStatement);
 
     /**
      * Validate all resources of a kind.
      *
-     * @param resourceDefRef Resource definition reference.
-     * @param withExprs      List of with expressions.
-     * @param assertExprs    List of assert expressions.
+     * @param resourceDefRef  Resource definition reference.
+     * @param filterStatement Filter statement.
+     * @param assertStatement Assertion statement.
      * @return List of resource validator results.
      */
     List<ResourceValidatorResult> validateAll(ResourceDefRef resourceDefRef,
-                                              List<WithExpr> withExprs,
-                                              List<AssertExpr> assertExprs);
+                                              Statement filterStatement,
+                                              Statement assertStatement);
 }

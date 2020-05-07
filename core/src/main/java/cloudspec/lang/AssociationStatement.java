@@ -25,53 +25,28 @@
  */
 package cloudspec.lang;
 
-/**
- * Define an 'assert' expression.
- * <p>
- * Assert expressions ares used to validate resources.
- */
-public class AssertExpr {
+public class AssociationStatement implements Statement {
+    private final String associationName;
     private final Statement statement;
 
-    /**
-     * Constructor.
-     *
-     * @param statement Statement.
-     */
-    public AssertExpr(Statement statement) {
+    public AssociationStatement(String associationName, Statement statement) {
+        this.associationName = associationName;
         this.statement = statement;
     }
 
-    /**
-     * Get the statement.
-     *
-     * @return Statement.
-     */
+    public String getAssociationName() {
+        return associationName;
+    }
+
     public Statement getStatement() {
         return statement;
     }
 
     @Override
     public String toString() {
-        return "AssertExpr{" +
-                "statement=" + statement +
+        return "AssociationStatement{" +
+                "associationName='" + associationName + '\'' +
+                ", statements" + statement +
                 '}';
-    }
-
-    public static AssertExprBuilder builder() {
-        return new AssertExprBuilder();
-    }
-
-    public static class AssertExprBuilder {
-        private Statement statement;
-
-        public AssertExprBuilder setStatement(Statement statement) {
-            this.statement = statement;
-            return this;
-        }
-
-        public AssertExpr build() {
-            return new AssertExpr(statement);
-        }
     }
 }

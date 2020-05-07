@@ -45,15 +45,15 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold
 public class GraphResourceStore implements ResourceStore {
     private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceStore.class);
 
-    private static final String LABEL_RESOURCE = "resource";
-    private static final String LABEL_PROPERTY = "property";
-    private static final String LABEL_ASSOCIATION = "association";
-    private static final String LABEL_HAS_PROPERTY = "hasProperty";
-    private static final String LABEL_HAS_ASSOCIATION = "hasAssociation";
-    private static final String PROPERTY_RESOURCE_ID = "resourceId";
-    private static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
-    private static final String PROPERTY_NAME = "name";
-    private static final String PROPERTY_VALUE = "value";
+    public static final String LABEL_RESOURCE = "resource";
+    public static final String LABEL_PROPERTY = "property";
+    public static final String LABEL_ASSOCIATION = "association";
+    public static final String LABEL_HAS_PROPERTY = "hasProperty";
+    public static final String LABEL_HAS_ASSOCIATION = "hasAssociation";
+    public static final String PROPERTY_RESOURCE_ID = "resourceId";
+    public static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
+    public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_VALUE = "value";
 
     private final Graph graph;
     private final GraphTraversalSource gTraversal;

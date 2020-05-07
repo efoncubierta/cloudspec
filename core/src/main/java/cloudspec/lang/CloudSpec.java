@@ -25,6 +25,8 @@
  */
 package cloudspec.lang;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -69,5 +71,28 @@ public class CloudSpec {
                 "name='" + name + '\'' +
                 ", groups=" + groups +
                 '}';
+    }
+
+    public static CloudSpecBuilder builder() {
+        return new CloudSpecBuilder();
+    }
+
+    public static class CloudSpecBuilder {
+        private String name;
+        private List<GroupExpr> groups = new ArrayList<>();
+
+        public CloudSpecBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public CloudSpecBuilder addGroups(GroupExpr... groups) {
+            this.groups.addAll(Arrays.asList(groups));
+            return this;
+        }
+
+        public CloudSpec build() {
+            return new CloudSpec(name, groups);
+        }
     }
 }

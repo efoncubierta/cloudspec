@@ -42,18 +42,18 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold
 public class GraphResourceDefStore implements ResourceDefStore {
     private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceDefStore.class);
 
-    private static final String LABEL_RESOURCE_DEF = "resourceDef";
-    private static final String LABEL_PROPERTY_DEF = "propertyDef";
-    private static final String LABEL_ASSOCIATION_DEF = "associationDef";
-    private static final String LABEL_HAS_PROPERTY_DEF = "hasPropertyDef";
-    private static final String LABEL_HAS_ASSOCIATION_DEF = "hasAssociationDef";
-    private static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
-    private static final String PROPERTY_PROVIDER_NAME = "providerName";
-    private static final String PROPERTY_GROUP_NAME = "groupName";
-    private static final String PROPERTY_NAME = "name";
-    private static final String PROPERTY_DESCRIPTION = "description";
-    private static final String PROPERTY_TYPE = "type";
-    private static final String PROPERTY_IS_ARRAY = "isArray";
+    public static final String LABEL_RESOURCE_DEF = "resourceDef";
+    public static final String LABEL_PROPERTY_DEF = "propertyDef";
+    public static final String LABEL_ASSOCIATION_DEF = "associationDef";
+    public static final String LABEL_HAS_PROPERTY_DEF = "hasPropertyDef";
+    public static final String LABEL_HAS_ASSOCIATION_DEF = "hasAssociationDef";
+    public static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
+    public static final String PROPERTY_PROVIDER_NAME = "providerName";
+    public static final String PROPERTY_GROUP_NAME = "groupName";
+    public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_DESCRIPTION = "description";
+    public static final String PROPERTY_TYPE = "type";
+    public static final String PROPERTY_IS_ARRAY = "isArray";
 
     private final Graph graph;
     private final GraphTraversalSource gTraversal;

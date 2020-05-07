@@ -73,16 +73,16 @@ public class CloudSpecPreflight {
         }
 
         // preflight withs and asserts
-        preflightWiths(resourceDefOpt.get(), rule.getWiths());
-        preflightAsserts(resourceDefOpt.get(), rule.getAsserts());
+        preflightWith(resourceDefOpt.get(), rule.getWithExpr());
+        preflightAssert(resourceDefOpt.get(), rule.getAssertExpr());
     }
 
-    private void preflightWiths(ResourceDef resourceDef, List<WithExpr> withExprs) {
-        withExprs.forEach(withExpr -> preflightProperty(resourceDef, withExpr.getPropertyName()));
+    private void preflightWith(ResourceDef resourceDef, WithExpr withExpr) {
+//        withExprs.forEach(withExpr -> preflightProperty(resourceDef, withExpr.getPropertyName()));
     }
 
-    private void preflightAsserts(ResourceDef resourceDef, List<AssertExpr> assertExprs) {
-        assertExprs.forEach(assertExpr -> preflightProperty(resourceDef, assertExpr.getPropertyName()));
+    private void preflightAssert(ResourceDef resourceDef, AssertExpr assertExpr) {
+//        assertExprs.forEach(assertExpr -> preflightProperty(resourceDef, assertExpr.getPropertyName()));
     }
 
     private void preflightProperty(ResourceDef resourceDef, String propertyName) {

@@ -25,51 +25,53 @@
  */
 package cloudspec.lang;
 
-import org.apache.tinkerpop.gremlin.process.traversal.P;
-
 /**
  * Define a 'with' expression.
  * <p>
  * With expressions ares used to filter resources.
  */
 public class WithExpr {
-    private final String propertyName;
-    private final P<?> predicate;
+    private final Statement statement;
 
     /**
      * Constructor.
      *
-     * @param propertyName Resource's property that will be evaluated.
-     * @param predicate    Predicate.
+     * @param statement Predicate.
      */
-    public WithExpr(String propertyName, P<?> predicate) {
-        this.propertyName = propertyName;
-        this.predicate = predicate;
+    public WithExpr(Statement statement) {
+        this.statement = statement;
     }
 
     /**
-     * Get the resource's property name that will be evaluated.
+     * Get the statement.
      *
-     * @return Property name.
+     * @return Statement.
      */
-    public String getPropertyName() {
-        return propertyName;
-    }
-
-    /**
-     * Get the predicate.
-     *
-     * @return Predicate.
-     */
-    public P<?> getPredicate() {
-        return predicate;
+    public Statement getStatement() {
+        return statement;
     }
 
     @Override
     public String toString() {
         return "WithExpr{" +
-                "propertyName='" + propertyName + '\'' +
-                ", predicate=" + predicate +
+                "statement=" + statement +
                 '}';
+    }
+
+    public static WithExprBuilder builder() {
+        return new WithExprBuilder();
+    }
+
+    public static class WithExprBuilder {
+        private Statement statement;
+
+        public WithExprBuilder setStatement(Statement statement) {
+            this.statement = statement;
+            return this;
+        }
+
+        public WithExpr build() {
+            return new WithExpr(statement);
+        }
     }
 }

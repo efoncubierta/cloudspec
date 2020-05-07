@@ -53,8 +53,8 @@ public class ResourceLoaderPlan {
 
         resourceDefRefs.add(resourceDefRefOpt.get());
 
-        ruleExpr.getWiths().forEach(this::processWithExpr);
-        ruleExpr.getAsserts().forEach(this::processAssertExpr);
+//        ruleExpr.getWithExpr().forEach(this::processWithExpr);
+//        ruleExpr.getAssertExpr().forEach(this::processAssertExpr);
     }
 
     private void processWithExpr(WithExpr withExpr) {

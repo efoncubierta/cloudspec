@@ -111,6 +111,12 @@ public class ModelTestUtils {
             PROPERTIES,
             ASSOCIATIONS
     );
+    public static final Resource TARGET_RESOURCE = new Resource(
+            TARGET_RESOURCE_DEF_REF,
+            TARGET_RESOURCE_ID,
+            PROPERTIES,
+            Collections.emptyList()
+    );
 
     public static final Provider TEST_PROVIDER = new TestProvider();
     public static final TestResource TEST_RESOURCE = new TestResource(RESOURCE_ID, PROP_INTEGER_VALUE, PROP_STRING_VALUE, PROP_BOOLEAN_VALUE, TARGET_RESOURCE_ID);

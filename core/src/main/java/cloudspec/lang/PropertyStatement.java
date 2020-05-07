@@ -25,53 +25,30 @@
  */
 package cloudspec.lang;
 
-/**
- * Define an 'assert' expression.
- * <p>
- * Assert expressions ares used to validate resources.
- */
-public class AssertExpr {
-    private final Statement statement;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
 
-    /**
-     * Constructor.
-     *
-     * @param statement Statement.
-     */
-    public AssertExpr(Statement statement) {
-        this.statement = statement;
+public class PropertyStatement implements Statement {
+    private final String propertyName;
+    private final P<?> predicate;
+
+    public PropertyStatement(String propertyName, P<?> predicate) {
+        this.propertyName = propertyName;
+        this.predicate = predicate;
     }
 
-    /**
-     * Get the statement.
-     *
-     * @return Statement.
-     */
-    public Statement getStatement() {
-        return statement;
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    public P<?> getPredicate() {
+        return predicate;
     }
 
     @Override
     public String toString() {
-        return "AssertExpr{" +
-                "statement=" + statement +
+        return "PropertyStatement{" +
+                "propertyName='" + propertyName + '\'' +
+                ", predicate=" + predicate +
                 '}';
-    }
-
-    public static AssertExprBuilder builder() {
-        return new AssertExprBuilder();
-    }
-
-    public static class AssertExprBuilder {
-        private Statement statement;
-
-        public AssertExprBuilder setStatement(Statement statement) {
-            this.statement = statement;
-            return this;
-        }
-
-        public AssertExpr build() {
-            return new AssertExpr(statement);
-        }
     }
 }

@@ -26,6 +26,7 @@
 package cloudspec.util;
 
 import cloudspec.lang.*;
+import cloudspec.lang.PropertyStatement;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 
 import java.util.Collections;
@@ -38,18 +39,18 @@ public class CloudSpecTestUtils {
     public static final String TEST_SPEC_RULE_NAME = "myrule";
 
     public static final List<WithExpr> TEST_WITH_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new WithExpr(propertyDef.getName(), P.eq(1)))
+            .map(propertyDef -> new WithExpr(new PropertyStatement(propertyDef.getName(), P.eq(1))))
             .collect(Collectors.toList());
 
     public static final List<AssertExpr> TEST_ASSERT_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new AssertExpr(propertyDef.getName(), P.eq(1)))
+            .map(propertyDef -> new AssertExpr(new PropertyStatement(propertyDef.getName(), P.eq(1))))
             .collect(Collectors.toList());
 
     public static final RuleExpr TEST_RULE_EXPR = new RuleExpr(
             TEST_SPEC_RULE_NAME,
             ModelTestUtils.RESOURCE_DEF_REF.toString(),
-            TEST_WITH_EXPRS,
-            TEST_ASSERT_EXPRS);
+            TEST_WITH_EXPRS.get(0),
+            TEST_ASSERT_EXPRS.get(0));
 
     public static final GroupExpr TEST_GROUP_EXPR = new GroupExpr(
             TEST_SPEC_GROUP_NAME,

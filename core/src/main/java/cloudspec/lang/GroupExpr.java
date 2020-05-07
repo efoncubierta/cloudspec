@@ -25,6 +25,8 @@
  */
 package cloudspec.lang;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -71,5 +73,28 @@ public class GroupExpr {
                 "name='" + name + '\'' +
                 ", rules=" + rules +
                 '}';
+    }
+
+    public static GroupExprBuilder builder() {
+        return new GroupExprBuilder();
+    }
+
+    public static class GroupExprBuilder {
+        private String name;
+        private List<RuleExpr> rules = new ArrayList<>();
+
+        public GroupExprBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public GroupExprBuilder addRules(RuleExpr... rules) {
+            this.rules.addAll(Arrays.asList(rules));
+            return this;
+        }
+
+        public GroupExpr build() {
+            return new GroupExpr(name, rules);
+        }
     }
 }

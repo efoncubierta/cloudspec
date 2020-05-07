@@ -31,143 +31,167 @@ import org.apache.tinkerpop.gremlin.process.traversal.P;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 public class CloudSpecRealListener extends CloudSpecBaseListener {
     private static List<String> BOOLEAN_TRUE_VALUES = Arrays.asList("true", "enabled");
     // private static List<String> BOOLEAN_FALSE_VALUES = Arrays.asList("false", "disabled");
 
-    // current cloud spec
-    private CloudSpec currentCloudSpec;
-
     // current spec
-    private String currentSpecName;
-    private List<GroupExpr> currentSpecGroups;
+    private CloudSpec.CloudSpecBuilder currentCloudSpecBuilder;
 
     // current group
-    private String currentGroupName;
-    private List<RuleExpr> currentGroupRules;
+    private GroupExpr.GroupExprBuilder currentGroupBuilder;
 
     // current rule
-    private String currentRuleName;
-    private String currentRuleResourceDefRef;
-    private List<WithExpr> currentRuleWithExprs;
-    private List<AssertExpr> currentRuleAssertExprs;
+    private RuleExpr.RuleExprBuilder currentRuleBuilder;
 
     // current width
-    private String currentWithPropertyName;
+    private WithExpr.WithExprBuilder currentWithBuilder;
 
     // current assert
-    private String currentAssertPropertyName;
+    private AssertExpr.AssertExprBuilder currentAssertBuilder;
 
     // evaluator
-    private P<?> currentPredicate;
-    private List<Object> currentValues;
+    private Stack<String> currentMemberNames = new Stack<>();
+    private Stack<List<Statement>> currentStatements = new Stack<>();
+    private Stack<Object> currentValues = new Stack<>();
 
     public CloudSpec getCloudSpec() {
-        return currentCloudSpec;
+        return currentCloudSpecBuilder.build();
     }
 
     @Override
     public void enterSpecDecl(CloudSpecParser.SpecDeclContext ctx) {
-        currentSpecName = stripQuotes(ctx.STRING().getText());
-        currentSpecGroups = new ArrayList<GroupExpr>();
-    }
-
-    @Override
-    public void exitSpecDecl(CloudSpecParser.SpecDeclContext ctx) {
-        currentCloudSpec = new CloudSpec(currentSpecName, currentSpecGroups);
+        currentCloudSpecBuilder = CloudSpec.builder().setName(stripQuotes(ctx.STRING().getText()));
     }
 
     @Override
     public void enterGroupDecl(CloudSpecParser.GroupDeclContext ctx) {
-        currentGroupName = stripQuotes(ctx.STRING().getText());
-        currentGroupRules = new ArrayList<RuleExpr>();
+        currentGroupBuilder = GroupExpr.builder().setName(stripQuotes(ctx.STRING().getText()));
     }
 
     @Override
     public void exitGroupDecl(CloudSpecParser.GroupDeclContext ctx) {
-        currentSpecGroups.add(new GroupExpr(currentGroupName, currentGroupRules));
+        currentCloudSpecBuilder.addGroups(currentGroupBuilder.build());
     }
 
     @Override
     public void enterRuleDecl(CloudSpecParser.RuleDeclContext ctx) {
-        currentRuleName = stripQuotes(ctx.STRING().getText());
-        currentRuleWithExprs = new ArrayList<>();
-        currentRuleAssertExprs = new ArrayList<>();
+        currentRuleBuilder = RuleExpr.builder().setName(stripQuotes(ctx.STRING().getText()));
     }
 
     @Override
     public void exitRuleDecl(CloudSpecParser.RuleDeclContext ctx) {
-        currentGroupRules.add(new RuleExpr(currentRuleName, currentRuleResourceDefRef, currentRuleWithExprs, currentRuleAssertExprs));
+        currentGroupBuilder.addRules(currentRuleBuilder.build());
     }
 
     @Override
     public void enterOnDecl(CloudSpecParser.OnDeclContext ctx) {
-        currentRuleResourceDefRef = ctx.RESOURCE_DEF_REF().getText();
+        currentRuleBuilder.setResourceDefRef(ctx.RESOURCE_DEF_REF().getText());
     }
 
     @Override
     public void enterWithDecl(CloudSpecParser.WithDeclContext ctx) {
-        currentWithPropertyName = stripQuotes(ctx.PROPERTY_NAME().getText());
-        currentPredicate = null;
-        currentValues = new ArrayList<Object>();
+        currentWithBuilder = WithExpr.builder();
+        currentStatements.push(new ArrayList<>());
     }
 
     @Override
     public void exitWithDecl(CloudSpecParser.WithDeclContext ctx) {
-        currentRuleWithExprs.add(new WithExpr(currentWithPropertyName, currentPredicate));
+        currentWithBuilder.setStatement(currentStatements.pop().get(0));
+        currentRuleBuilder.setWithExpr(currentWithBuilder.build());
     }
 
     @Override
     public void enterAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
-        currentAssertPropertyName = stripQuotes(ctx.PROPERTY_NAME().getText());
-        currentPredicate = null;
-        currentValues = new ArrayList<>();
+        currentAssertBuilder = AssertExpr.builder();
+        currentStatements.push(new ArrayList<>());
     }
 
     @Override
     public void exitAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
-        currentRuleAssertExprs.add(new AssertExpr(currentAssertPropertyName, currentPredicate));
+        currentAssertBuilder.setStatement(currentStatements.pop().get(0));
+        currentRuleBuilder.setAssertExp(currentAssertBuilder.build());
     }
 
     @Override
-    public void exitWithEqualPredicate(CloudSpecParser.WithEqualPredicateContext ctx) {
-        currentPredicate = P.eq(currentValues.get(0));
+    public void enterPropertyStatement(CloudSpecParser.PropertyStatementContext ctx) {
+        currentMemberNames.push(stripQuotes(ctx.MEMBER_NAME().getText()));
     }
 
     @Override
-    public void exitWithNotEqualPredicate(CloudSpecParser.WithNotEqualPredicateContext ctx) {
-        currentPredicate = P.neq(currentValues.get(0));
+    public void enterAssociationStatement(CloudSpecParser.AssociationStatementContext ctx) {
+        currentMemberNames.push(stripQuotes(ctx.MEMBER_NAME().getText()));
+        currentStatements.push(new ArrayList<>());
     }
 
     @Override
-    public void exitWithWithinPredicate(CloudSpecParser.WithWithinPredicateContext ctx) {
-        currentPredicate = P.within(currentValues);
+    public void exitAssociationStatement(CloudSpecParser.AssociationStatementContext ctx) {
+        Statement statement = new AssociationStatement(
+                currentMemberNames.pop(), currentStatements.pop().get(0)
+        );
+        currentStatements.peek().add(statement);
     }
 
     @Override
-    public void exitWithNotWithinPredicate(CloudSpecParser.WithNotWithinPredicateContext ctx) {
-        currentPredicate = P.not(P.within(currentValues));
+    public void exitAndStatement(CloudSpecParser.AndStatementContext ctx) {
+        Statement statement = new CombinedStatement(
+                LogicalOperator.AND, new ArrayList<>(currentStatements.pop())
+        );
+        currentStatements.push(new ArrayList<>());
+        currentStatements.peek().add(statement);
     }
 
     @Override
-    public void exitAssertEqualPredicate(CloudSpecParser.AssertEqualPredicateContext ctx) {
-        currentPredicate = P.eq(currentValues.get(0));
+    public void exitOrStatement(CloudSpecParser.OrStatementContext ctx) {
+        Statement statement = new CombinedStatement(
+                LogicalOperator.OR, new ArrayList<>(currentStatements.pop())
+        );
+        currentStatements.push(new ArrayList<>());
+        currentStatements.peek().add(statement);
     }
 
     @Override
-    public void exitAssertNotEqualPredicate(CloudSpecParser.AssertNotEqualPredicateContext ctx) {
-        currentPredicate = P.neq(currentValues.get(0));
+    public void exitPropertyEqualPredicate(CloudSpecParser.PropertyEqualPredicateContext ctx) {
+        currentStatements.peek().add(
+                new PropertyStatement(
+                        currentMemberNames.pop(),
+                        P.eq(currentValues.pop())
+                )
+        );
     }
 
     @Override
-    public void exitAssertWithinPredicate(CloudSpecParser.AssertWithinPredicateContext ctx) {
-        currentPredicate = P.within(currentValues);
+    public void exitPropertyNotEqualPredicate(CloudSpecParser.PropertyNotEqualPredicateContext ctx) {
+        currentStatements.peek().add(
+                new PropertyStatement(
+                        currentMemberNames.pop(),
+                        P.neq(currentValues.pop())
+                )
+        );
     }
 
     @Override
-    public void exitAssertNotWithinPredicate(CloudSpecParser.AssertNotWithinPredicateContext ctx) {
-        currentPredicate = P.not(P.within(currentValues));
+    public void exitPropertyWithinPredicate(CloudSpecParser.PropertyWithinPredicateContext ctx) {
+        currentStatements.peek().add(
+                new PropertyStatement(
+                        currentMemberNames.pop(),
+                        P.within(currentValues)
+                )
+        );
+        currentValues.clear();
+    }
+
+    @Override
+    public void exitPropertyNotWithinPredicate(CloudSpecParser.PropertyNotWithinPredicateContext ctx) {
+        currentStatements.peek().add(
+                new PropertyStatement(
+                        currentMemberNames.pop(),
+                        P.not(P.within(currentValues))
+                )
+        );
+        currentValues.clear();
     }
 
     @Override

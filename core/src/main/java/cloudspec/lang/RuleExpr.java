@@ -25,8 +25,6 @@
  */
 package cloudspec.lang;
 
-import java.util.List;
-
 /**
  * Define a rule expression.
  * <p>
@@ -35,22 +33,22 @@ import java.util.List;
 public class RuleExpr {
     private final String name;
     private final String resourceDefRef;
-    private final List<WithExpr> withs;
-    private final List<AssertExpr> asserts;
+    private final WithExpr withExpr;
+    private final AssertExpr assertExpr;
 
     /**
      * Constructor.
      *
      * @param name           Rules' name.
      * @param resourceDefRef Fully-qualified name of the resource type the rule applies to.
-     * @param withs          List of 'with' expressions to filter the resources.
-     * @param asserts        List of 'assert' expressions to validate the resources.
+     * @param withExpr       'With' expression to filter the resources.
+     * @param assertExpr     'Assert' expression to validate the resources.
      */
-    public RuleExpr(String name, String resourceDefRef, List<WithExpr> withs, List<AssertExpr> asserts) {
+    public RuleExpr(String name, String resourceDefRef, WithExpr withExpr, AssertExpr assertExpr) {
         this.name = name;
         this.resourceDefRef = resourceDefRef;
-        this.withs = withs;
-        this.asserts = asserts;
+        this.withExpr = withExpr;
+        this.assertExpr = assertExpr;
     }
 
     /**
@@ -72,21 +70,21 @@ public class RuleExpr {
     }
 
     /**
-     * Get the rule's 'with' expressions.
+     * Get the rule 'With' expression.
      *
-     * @return List of with expressions.
+     * @return 'With' expression.
      */
-    public List<WithExpr> getWiths() {
-        return withs;
+    public WithExpr getWithExpr() {
+        return withExpr;
     }
 
     /**
-     * Get the rule's 'assert' expressions.
+     * Get the rule 'Assert' expression.
      *
-     * @return List of assert expressions.
+     * @return 'Assert' expression.
      */
-    public List<AssertExpr> getAsserts() {
-        return asserts;
+    public AssertExpr getAssertExpr() {
+        return assertExpr;
     }
 
     @Override
@@ -94,8 +92,43 @@ public class RuleExpr {
         return "SpecRule{" +
                 "name='" + name + '\'' +
                 ", resourceDefRef='" + resourceDefRef + '\'' +
-                ", withs=" + withs +
-                ", asserts=" + asserts +
+                ", with=" + withExpr +
+                ", assert=" + assertExpr +
                 '}';
+    }
+
+    public static RuleExprBuilder builder() {
+        return new RuleExprBuilder();
+    }
+
+    public static class RuleExprBuilder {
+        private String name;
+        private String resourceDefRef;
+        private WithExpr withExpr;
+        private AssertExpr assertExpr;
+
+        public RuleExprBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public RuleExprBuilder setResourceDefRef(String resourceDefRef) {
+            this.resourceDefRef = resourceDefRef;
+            return this;
+        }
+
+        public RuleExprBuilder setWithExpr(WithExpr withExpr) {
+            this.withExpr = withExpr;
+            return this;
+        }
+
+        public RuleExprBuilder setAssertExp(AssertExpr assertExpr) {
+            this.assertExpr = assertExpr;
+            return this;
+        }
+
+        public RuleExpr build() {
+            return new RuleExpr(name, resourceDefRef, withExpr, assertExpr);
+        }
     }
 }
