@@ -1,0 +1,4 @@
+ignore:
+  - "core/src/main/java/cloudspec/annotation"
+  - "core/src/main/java/cloudspec/lang"
+  - "core/src/main/java/cloudspec/model"
