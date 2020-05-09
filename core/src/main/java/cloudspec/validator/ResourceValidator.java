@@ -29,6 +29,7 @@ import cloudspec.lang.Statement;
 import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Define a resource validator.
@@ -38,7 +39,7 @@ public interface ResourceValidator {
      * Check whether a resource exists by its id.
      *
      * @param resourceDefRef Resource definition reference.
-     * @param resourceId Resource id.
+     * @param resourceId     Resource id.
      * @return True if resource exists. False otherwise.
      */
     Boolean existById(ResourceDefRef resourceDefRef, String resourceId);
@@ -46,35 +47,35 @@ public interface ResourceValidator {
     /**
      * Check whether any resource exist.
      *
-     * @param resourceDefRef Resource definition reference.
-     * @param filterStatement Filter statement.
+     * @param resourceDefRef   Resource definition reference.
+     * @param filterStatements List of statements for filtering.
      * @return True if at least one resource exists. False otherwise.
      */
-    Boolean existAny(ResourceDefRef resourceDefRef, Statement filterStatement);
+    Boolean existAny(ResourceDefRef resourceDefRef, List<Statement> filterStatements);
 
     /**
      * Validate an individual resource.
      *
-     * @param resourceDefRef  Resource definition reference.
-     * @param resourceId      Resource id.
-     * @param filterStatement Filter statement.
-     * @param assertStatement Assertion statement.
+     * @param resourceDefRef   Resource definition reference.
+     * @param resourceId       Resource id.
+     * @param filterStatements List of statements for filtering.
+     * @param assertStatements List of statements for asserting.
      * @return Resource validator result.
      */
-    ResourceValidatorResult validateById(ResourceDefRef resourceDefRef,
-                                         String resourceId,
-                                         Statement filterStatement,
-                                         Statement assertStatement);
+    Optional<ResourceValidationResult> validateById(ResourceDefRef resourceDefRef,
+                                                    String resourceId,
+                                                    List<Statement> filterStatements,
+                                                    List<Statement> assertStatements);
 
     /**
      * Validate all resources of a kind.
      *
-     * @param resourceDefRef  Resource definition reference.
-     * @param filterStatement Filter statement.
-     * @param assertStatement Assertion statement.
+     * @param resourceDefRef   Resource definition reference.
+     * @param filterStatements List of statements for filtering.
+     * @param assertStatements List of statements for asserting.
      * @return List of resource validator results.
      */
-    List<ResourceValidatorResult> validateAll(ResourceDefRef resourceDefRef,
-                                              Statement filterStatement,
-                                              Statement assertStatement);
+    List<ResourceValidationResult> validateAll(ResourceDefRef resourceDefRef,
+                                               List<Statement> filterStatements,
+                                               List<Statement> assertStatements);
 }

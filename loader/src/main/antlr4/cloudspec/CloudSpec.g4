@@ -6,13 +6,15 @@ specDecl: SPEC STRING;
 
 groupDecl: GROUP STRING ruleDecl+;
 
-ruleDecl: RULE STRING onDecl assertDecl*;
+ruleDecl: RULE STRING onDecl assertDecl;
 
-onDecl: ON RESOURCE_DEF_REF withDecl*;
+onDecl: ON RESOURCE_DEF_REF withDecl;
 
-withDecl: WITH statement;
+withDecl: WITH statement andDecl*;
 
-assertDecl: ASSERT statement;
+assertDecl: ASSERT statement andDecl*;
+
+andDecl: AND statement;
 
 predicate: IS? ('==' | EQUAL TO) value      # PropertyEqualPredicate
          | IS? ('!=' | NOT EQUAL TO) value  # PropertyNotEqualPredicate
@@ -22,8 +24,6 @@ predicate: IS? ('==' | EQUAL TO) value      # PropertyEqualPredicate
 
 statement: MEMBER_NAME predicate                           # PropertyStatement
          | MEMBER_NAME '(' statement (',' statement)* ')'  # AssociationStatement
-         | statement AND statement                         # AndStatement
-         | statement OR  statement                         # OrStatement
          ;
 
 value: STRING                    # StringValue

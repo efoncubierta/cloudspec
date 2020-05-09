@@ -23,32 +23,47 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.lang;
+package cloudspec.validator;
+
+import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
 
-public class CombinedStatement implements Statement {
-    private final LogicalOperator logicalOperator;
-    private final List<Statement> statements;
+public class ResourceValidationResult {
+    private final ResourceDefRef resourceDefRef;
+    private final String resourceId;
+    private final List<AssertValidationResult> assertResults;
 
-    public CombinedStatement(LogicalOperator logicalOperator, List<Statement> statements) {
-        this.logicalOperator = logicalOperator;
-        this.statements = statements;
+    public ResourceValidationResult(ResourceDefRef resourceDefRef,
+                                    String resourceId,
+                                    List<AssertValidationResult> assertResults) {
+        this.resourceDefRef = resourceDefRef;
+        this.resourceId = resourceId;
+        this.assertResults = assertResults;
     }
 
-    public LogicalOperator getLogicalOperator() {
-        return logicalOperator;
+    public ResourceDefRef getResourceDefRef() {
+        return resourceDefRef;
     }
 
-    public List<Statement> getStatements() {
-        return statements;
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public List<AssertValidationResult> getAssertResults() {
+        return assertResults;
+    }
+
+    public Boolean isSuccess() {
+        return assertResults.stream().allMatch(AssertValidationResult::isSuccess);
     }
 
     @Override
     public String toString() {
-        return "CombinedStatement{" +
-                "logicalOperator=" + logicalOperator +
-                ", statements=" + statements +
+        return "ResourceValidationResult{" +
+                "resourceDefRef=" + resourceDefRef +
+                ", resourceId='" + resourceId + '\'' +
+                ", assertResults=" + assertResults +
                 '}';
     }
 }

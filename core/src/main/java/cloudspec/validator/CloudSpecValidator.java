@@ -68,16 +68,18 @@ public class CloudSpecValidator {
         }
 
         // validate all resources
-        List<ResourceValidatorResult> errors = resourceValidator.validateAll(
+        List<ResourceValidationResult> results = resourceValidator.validateAll(
                 resourceDefRefOpt.get(),
-                rule.getWithExpr().getStatement(),
-                rule.getAssertExpr().getStatement()
+                rule.getWithExpr().getStatements(),
+                rule.getAssertExpr().getStatements()
         );
 
         // check for errors
-        if (errors.size() > 0) {
-            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, errors.get(0).getMessage());
-        }
+//        if (results.size() > 0) {
+//            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, results.get(0).getMessage());
+//        }
+
+        // TODO manage results
 
         // return success
         return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.TRUE);

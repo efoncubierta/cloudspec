@@ -47,6 +47,7 @@ public class GraphResourceStoreTest {
     public void shouldAddAndGetResource() {
         GraphResourceStore store = new GraphResourceStore(TinkerGraph.open());
 
+        store.addResource(ModelTestUtils.TARGET_RESOURCE);
         store.addResource(ModelTestUtils.RESOURCE);
 
         Optional<Resource> resourceOpt = store.getResource(ModelTestUtils.RESOURCE.getResourceDefRef(), ModelTestUtils.RESOURCE.getResourceId());

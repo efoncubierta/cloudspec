@@ -25,17 +25,25 @@
  */
 package cloudspec.validator;
 
-public class ResourceValidatorResult {
+import java.util.List;
+
+public class AssertValidationResult {
+    private final List<String> path;
     private final Boolean success;
     private final String message;
 
-    public ResourceValidatorResult(Boolean success) {
-        this(success, "");
+    public AssertValidationResult(List<String> path, Boolean success) {
+        this(path, success, "");
     }
 
-    public ResourceValidatorResult(Boolean success, String message) {
+    public AssertValidationResult(List<String> path, Boolean success, String message) {
+        this.path = path;
         this.success = success;
         this.message = message;
+    }
+
+    public List<String> getPath() {
+        return path;
     }
 
     public Boolean getSuccess() {
@@ -44,5 +52,18 @@ public class ResourceValidatorResult {
 
     public String getMessage() {
         return message;
+    }
+
+    public Boolean isSuccess() {
+        return success;
+    }
+
+    @Override
+    public String toString() {
+        return "AssertValidationResult{" +
+                "path='" + path + '\'' +
+                ", success=" + success +
+                ", message='" + message + '\'' +
+                '}';
     }
 }

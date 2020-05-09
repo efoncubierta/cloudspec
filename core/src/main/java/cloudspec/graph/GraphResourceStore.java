@@ -30,6 +30,7 @@ import cloudspec.model.Property;
 import cloudspec.model.Resource;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceStore;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -37,23 +38,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.valueMap;
 
 public class GraphResourceStore implements ResourceStore {
     private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceStore.class);
 
     public static final String LABEL_RESOURCE = "resource";
-    public static final String LABEL_PROPERTY = "property";
-    public static final String LABEL_ASSOCIATION = "association";
-    public static final String LABEL_HAS_PROPERTY = "hasProperty";
     public static final String LABEL_HAS_ASSOCIATION = "hasAssociation";
     public static final String PROPERTY_RESOURCE_ID = "resourceId";
     public static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
     public static final String PROPERTY_NAME = "name";
-    public static final String PROPERTY_VALUE = "value";
 
     private final Graph graph;
     private final GraphTraversalSource gTraversal;
@@ -64,57 +63,23 @@ public class GraphResourceStore implements ResourceStore {
     }
 
     @Override
-    public Optional<Resource> getResource(ResourceDefRef resourceDefRef, String id) {
-        LOGGER.debug("Getting resource '{}' with id '{}'", resourceDefRef, id);
+    public Optional<Resource> getResource(ResourceDefRef resourceDefRef, String reosurceId) {
+        LOGGER.debug("Getting resource '{}' with id '{}'", resourceDefRef, reosurceId);
 
         return gTraversal.V()
                 .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, id)
+                .has(PROPERTY_RESOURCE_ID, reosurceId)
                 .valueMap()
                 .by(unfold())
                 .toStream()
-                .peek(resourceMap -> LOGGER.debug("- Found resource '{}' with id '{}'",
-                        resourceMap.get(PROPERTY_RESOURCE_DEF_REF), resourceMap.get(PROPERTY_RESOURCE_ID)))
-                .map(resourceMap -> new Resource(
-                        (ResourceDefRef) resourceMap.get(PROPERTY_RESOURCE_DEF_REF),
-                        (String) resourceMap.get(PROPERTY_RESOURCE_ID),
-                        getProperties(resourceDefRef, id),
-                        getAssociations(resourceDefRef, id)
-                ))
+                .peek(resourceMap ->
+                        LOGGER.debug("- Found resource '{}' with id '{}'",
+                                resourceMap.get(PROPERTY_RESOURCE_DEF_REF),
+                                resourceMap.get(PROPERTY_RESOURCE_ID)
+                        )
+                )
+                .map(this::toResource)
                 .findFirst();
-    }
-
-    private List<Property> getProperties(ResourceDefRef resourceDefRef, String id) {
-        return gTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, id)
-                .out(LABEL_HAS_PROPERTY)
-                .valueMap()
-                .by(unfold())
-                .toStream()
-                .peek(propertyMap -> LOGGER.debug("- Found property '{}'", propertyMap.get(PROPERTY_NAME)))
-                .map(propertyMap -> new Property(
-                        (String) propertyMap.get(PROPERTY_NAME),
-                        (Object) propertyMap.get(PROPERTY_VALUE)
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private List<Association> getAssociations(ResourceDefRef resourceDefRef, String id) {
-        return gTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, id)
-                .out(LABEL_HAS_ASSOCIATION)
-                .valueMap()
-                .by(unfold())
-                .toStream()
-                .peek(associationMap -> LOGGER.debug("- Found association '{}'", associationMap.get(PROPERTY_NAME)))
-                .map(associationMap -> new Association(
-                        (String) associationMap.get(PROPERTY_NAME),
-                        (ResourceDefRef) associationMap.get(PROPERTY_RESOURCE_DEF_REF),
-                        (String) associationMap.get(PROPERTY_RESOURCE_ID)
-                ))
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -126,12 +91,17 @@ public class GraphResourceStore implements ResourceStore {
                 .valueMap()
                 .by(unfold())
                 .toStream()
-                .peek(resourceMap -> LOGGER.debug("- Found resource '{}' with id '{}'", resourceDefRef, resourceMap.get(PROPERTY_RESOURCE_ID)))
-                .map(resourceDefMap -> new Resource(
-                        (ResourceDefRef) resourceDefMap.get(PROPERTY_RESOURCE_DEF_REF),
-                        (String) resourceDefMap.get(PROPERTY_RESOURCE_ID),
-                        getProperties(resourceDefRef, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID)),
-                        getAssociations(resourceDefRef, (String) resourceDefMap.get(PROPERTY_RESOURCE_ID))
+                .peek(resourceMap ->
+                        LOGGER.debug("- Found resource '{}' with id '{}'",
+                                resourceDefRef,
+                                resourceMap.get(PROPERTY_RESOURCE_ID)
+                        )
+                )
+                .map(resourceMap -> new Resource(
+                        (ResourceDefRef) resourceMap.get(PROPERTY_RESOURCE_DEF_REF),
+                        (String) resourceMap.get(PROPERTY_RESOURCE_ID),
+                        toProperties(resourceMap),
+                        getAssociations(resourceDefRef, (String) resourceMap.get(PROPERTY_RESOURCE_ID))
                 ))
                 .collect(Collectors.toList());
     }
@@ -139,63 +109,97 @@ public class GraphResourceStore implements ResourceStore {
     public void addResource(Resource resource) {
         LOGGER.debug("Adding resource '{}' with id '{}'", resource.getResourceDefRef(), resource.getResourceId());
 
-        Vertex resourceVertex = gTraversal.addV(LABEL_RESOURCE)
+        GraphTraversal<Vertex, Vertex> traversal = gTraversal.addV(LABEL_RESOURCE)
                 .property(PROPERTY_RESOURCE_DEF_REF, resource.getResourceDefRef())
-                .property(PROPERTY_RESOURCE_ID, resource.getResourceId())
-                .next();
+                .property(PROPERTY_RESOURCE_ID, resource.getResourceId());
 
-        // add property definitions
-        addProperties(resource.getProperties())
-                .forEach(propertyVertex -> {
-                    gTraversal.addE(LABEL_HAS_PROPERTY)
-                            .from(resourceVertex)
-                            .to(propertyVertex)
-                            .iterate();
+        // add properties
+        LOGGER.debug("- Found {} properties", resource.getProperties().size());
+        resource.getProperties()
+                .forEach(property -> {
+                    LOGGER.debug("- Adding property '{}'", property);
+                    traversal.property(property.getName(), property.getValue());
                 });
 
-        // add association definitions
-        addAssociations(resource.getAssociations())
-                .forEach(associationVertex -> {
-                    gTraversal.addE(LABEL_HAS_ASSOCIATION)
-                            .from(resourceVertex)
-                            .to(associationVertex)
-                            .iterate();
-                });
+        // create resource vertex
+        Vertex resourceVertex = traversal.next();
+
+        // add associations
+        LOGGER.debug("- Found {} association(s)", resource.getAssociations().size());
+        resource.getAssociations().forEach(association -> {
+            Optional<Vertex> vertexOpt = getResourceVertexById(association.getResourceDefRef(), association.getResourceId());
+            if (!vertexOpt.isPresent()) {
+                LOGGER.warn(
+                        "Resource '{}' with id '{}' not found. Ignoring association with '{}' with id '{}'",
+                        association.getResourceDefRef(),
+                        association.getResourceId(),
+                        resource.getResourceDefRef(),
+                        resource.getResourceId()
+                );
+            } else {
+                LOGGER.debug("- Adding association '{}'", association);
+                gTraversal.addE(LABEL_HAS_ASSOCIATION)
+                        .property(PROPERTY_NAME, association.getName())
+                        .from(resourceVertex)
+                        .to(vertexOpt.get())
+                        .next();
+            }
+        });
     }
 
-    private List<Vertex> addProperties(List<Property> properties) {
-        LOGGER.debug("- Found {} properties", properties.size());
-        return properties
-                .stream()
-                .map(this::addProperty)
+    private Optional<Vertex> getResourceVertexById(ResourceDefRef resourceDefRef, String resourceId) {
+        List<Vertex> vertices = gTraversal.V().has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .has(PROPERTY_RESOURCE_ID, resourceId)
+                .toList();
+
+        return vertices.size() > 0 ? Optional.of(vertices.get(0)) : Optional.empty();
+    }
+
+    private Resource toResource(Map<Object, Object> resourceMap) {
+        ResourceDefRef resourceDefRef = (ResourceDefRef) resourceMap.get(PROPERTY_RESOURCE_DEF_REF);
+        String resourceId = (String) resourceMap.get(PROPERTY_RESOURCE_ID);
+
+        return new Resource(
+                resourceDefRef,
+                resourceId,
+                toProperties(resourceMap),
+                getAssociations(resourceDefRef, resourceId)
+        );
+    }
+
+    private List<Property> toProperties(Map<Object, Object> resourceMap) {
+        return resourceMap.keySet().stream()
+                .filter(key ->
+                        key instanceof String &&
+                                key != PROPERTY_RESOURCE_DEF_REF &&
+                                key != PROPERTY_RESOURCE_ID
+                )
+                .map(key -> {
+                    LOGGER.debug("- Found property '{}'", key);
+                    return new Property((String) key, resourceMap.get(key));
+                })
                 .collect(Collectors.toList());
     }
 
-    private Vertex addProperty(Property property) {
-        LOGGER.debug("- Adding property '{}'", property);
+    private List<Association> getAssociations(ResourceDefRef resourceDefRef, String id) {
+        return gTraversal.V()
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .has(PROPERTY_RESOURCE_ID, id)
+                .outE(LABEL_HAS_ASSOCIATION).as("association")
+                .inV().as("target")
+                .select("association", "target")
+                .by(valueMap())
+                .toStream()
+                .map(map -> {
+                    // TODO refactor this ugly code
+                    Map<String, Object> associationMap = (Map<String, Object>) map.get("association");
+                    Map<String, List<Object>> targetMap = (Map<String, List<Object>>) map.get("target");
 
-        return gTraversal.addV(LABEL_PROPERTY)
-                .property(PROPERTY_NAME, property.getName())
-                .property(PROPERTY_VALUE, property.getValue())
-                .next();
-    }
-
-    private List<Vertex> addAssociations(List<Association> associations) {
-        LOGGER.debug("- Found {} association(s)", associations.size());
-
-        return associations
-                .stream()
-                .map(this::addAssociation)
-                .collect(Collectors.toList());
-    }
-
-    private Vertex addAssociation(Association association) {
-        LOGGER.debug("- Adding association '{}'", association);
-
-        return gTraversal.addV(LABEL_ASSOCIATION)
-                .property(PROPERTY_NAME, association.getName())
-                .property(PROPERTY_RESOURCE_DEF_REF, association.getResourceDefRef())
-                .property(PROPERTY_RESOURCE_ID, association.getResourceId())
-                .next();
+                    return new Association(
+                            (String) associationMap.get(PROPERTY_NAME),
+                            (ResourceDefRef) targetMap.get(PROPERTY_RESOURCE_DEF_REF).get(0),
+                            (String) targetMap.get(PROPERTY_RESOURCE_ID).get(0)
+                    );
+                }).collect(Collectors.toList());
     }
 }

@@ -39,11 +39,11 @@ public class CloudSpecTestUtils {
     public static final String TEST_SPEC_RULE_NAME = "myrule";
 
     public static final List<WithExpr> TEST_WITH_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new WithExpr(new PropertyStatement(propertyDef.getName(), P.eq(1))))
+            .map(propertyDef -> new WithExpr(Collections.singletonList(new PropertyStatement(propertyDef.getName(), P.eq(1)))))
             .collect(Collectors.toList());
 
     public static final List<AssertExpr> TEST_ASSERT_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new AssertExpr(new PropertyStatement(propertyDef.getName(), P.eq(1))))
+            .map(propertyDef -> new AssertExpr(Collections.singletonList(new PropertyStatement(propertyDef.getName(), P.eq(1)))))
             .collect(Collectors.toList());
 
     public static final RuleExpr TEST_RULE_EXPR = new RuleExpr(

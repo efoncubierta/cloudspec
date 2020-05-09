@@ -25,36 +25,38 @@
  */
 package cloudspec.lang;
 
+import java.util.List;
+
 /**
  * Define an 'assert' expression.
  * <p>
  * Assert expressions ares used to validate resources.
  */
 public class AssertExpr {
-    private final Statement statement;
+    private final List<Statement> statements;
 
     /**
      * Constructor.
      *
-     * @param statement Statement.
+     * @param statements List of statements.
      */
-    public AssertExpr(Statement statement) {
-        this.statement = statement;
+    public AssertExpr(List<Statement> statements) {
+        this.statements = statements;
     }
 
     /**
-     * Get the statement.
+     * Get list of statements.
      *
-     * @return Statement.
+     * @return List of statements.
      */
-    public Statement getStatement() {
-        return statement;
+    public List<Statement> getStatements() {
+        return statements;
     }
 
     @Override
     public String toString() {
         return "AssertExpr{" +
-                "statement=" + statement +
+                "statements=" + statements +
                 '}';
     }
 
@@ -63,15 +65,15 @@ public class AssertExpr {
     }
 
     public static class AssertExprBuilder {
-        private Statement statement;
+        private List<Statement> statements;
 
-        public AssertExprBuilder setStatement(Statement statement) {
-            this.statement = statement;
+        public AssertExprBuilder setStatement(List<Statement> statements) {
+            this.statements = statements;
             return this;
         }
 
         public AssertExpr build() {
-            return new AssertExpr(statement);
+            return new AssertExpr(statements);
         }
     }
 }

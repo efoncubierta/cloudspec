@@ -99,7 +99,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
 
     @Override
     public void exitWithDecl(CloudSpecParser.WithDeclContext ctx) {
-        currentWithBuilder.setStatement(currentStatements.pop().get(0));
+        currentWithBuilder.setStatements(currentStatements.pop());
         currentRuleBuilder.setWithExpr(currentWithBuilder.build());
     }
 
@@ -111,7 +111,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
 
     @Override
     public void exitAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
-        currentAssertBuilder.setStatement(currentStatements.pop().get(0));
+        currentAssertBuilder.setStatement(currentStatements.pop());
         currentRuleBuilder.setAssertExp(currentAssertBuilder.build());
     }
 
@@ -129,26 +129,8 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
     @Override
     public void exitAssociationStatement(CloudSpecParser.AssociationStatementContext ctx) {
         Statement statement = new AssociationStatement(
-                currentMemberNames.pop(), currentStatements.pop().get(0)
+                currentMemberNames.pop(), currentStatements.pop()
         );
-        currentStatements.peek().add(statement);
-    }
-
-    @Override
-    public void exitAndStatement(CloudSpecParser.AndStatementContext ctx) {
-        Statement statement = new CombinedStatement(
-                LogicalOperator.AND, new ArrayList<>(currentStatements.pop())
-        );
-        currentStatements.push(new ArrayList<>());
-        currentStatements.peek().add(statement);
-    }
-
-    @Override
-    public void exitOrStatement(CloudSpecParser.OrStatementContext ctx) {
-        Statement statement = new CombinedStatement(
-                LogicalOperator.OR, new ArrayList<>(currentStatements.pop())
-        );
-        currentStatements.push(new ArrayList<>());
         currentStatements.peek().add(statement);
     }
 

@@ -25,36 +25,38 @@
  */
 package cloudspec.lang;
 
+import java.util.List;
+
 /**
  * Define a 'with' expression.
  * <p>
  * With expressions ares used to filter resources.
  */
 public class WithExpr {
-    private final Statement statement;
+    private final List<Statement> statements;
 
     /**
      * Constructor.
      *
-     * @param statement Predicate.
+     * @param statements List of statements.
      */
-    public WithExpr(Statement statement) {
-        this.statement = statement;
+    public WithExpr(List<Statement> statements) {
+        this.statements = statements;
     }
 
     /**
-     * Get the statement.
+     * Get list of statements.
      *
-     * @return Statement.
+     * @return List of statements.
      */
-    public Statement getStatement() {
-        return statement;
+    public List<Statement> getStatements() {
+        return statements;
     }
 
     @Override
     public String toString() {
         return "WithExpr{" +
-                "statement=" + statement +
+                "statements=" + statements +
                 '}';
     }
 
@@ -63,15 +65,15 @@ public class WithExpr {
     }
 
     public static class WithExprBuilder {
-        private Statement statement;
+        private List<Statement> statements;
 
-        public WithExprBuilder setStatement(Statement statement) {
-            this.statement = statement;
+        public WithExprBuilder setStatements(List<Statement> statements) {
+            this.statements = statements;
             return this;
         }
 
         public WithExpr build() {
-            return new WithExpr(statement);
+            return new WithExpr(statements);
         }
     }
 }

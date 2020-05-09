@@ -25,28 +25,30 @@
  */
 package cloudspec.lang;
 
+import java.util.List;
+
 public class AssociationStatement implements Statement {
     private final String associationName;
-    private final Statement statement;
+    private final List<Statement> statements;
 
-    public AssociationStatement(String associationName, Statement statement) {
+    public AssociationStatement(String associationName, List<Statement> statements) {
         this.associationName = associationName;
-        this.statement = statement;
+        this.statements = statements;
     }
 
     public String getAssociationName() {
         return associationName;
     }
 
-    public Statement getStatement() {
-        return statement;
+    public List<Statement> getStatements() {
+        return statements;
     }
 
     @Override
     public String toString() {
         return "AssociationStatement{" +
                 "associationName='" + associationName + '\'' +
-                ", statements" + statement +
+                ", statements=" + statements +
                 '}';
     }
 }
