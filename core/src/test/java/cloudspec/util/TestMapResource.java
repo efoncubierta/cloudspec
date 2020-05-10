@@ -25,24 +25,9 @@
  */
 package cloudspec.util;
 
-import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
-import cloudspec.annotation.ResourceDefinition;
 
-@ResourceDefinition(
-        provider = ProviderDataUtil.PROVIDER_NAME,
-        group = ModelTestUtils.RESOURCE_GROUP,
-        name = ModelTestUtils.TARGET_RESOURCE_NAME,
-        description = ModelTestUtils.TARGET_RESOURCE_DESCRIPTION
-)
-public class TestTargetResource {
-    @IdDefinition
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_ID_NAME,
-            description = ModelTestUtils.PROP_ID_DESCRIPTION
-    )
-    private final String id;
-
+public class TestMapResource {
     @PropertyDefinition(
             name = ModelTestUtils.PROP_INTEGER_NAME,
             description = ModelTestUtils.PROP_INTEGER_DESCRIPTION
@@ -61,15 +46,10 @@ public class TestTargetResource {
     )
     private final Boolean booleanProperty;
 
-    public TestTargetResource(String id, Integer integerProperty, String stringProperty, Boolean booleanProperty) {
-        this.id = id;
+    public TestMapResource(Integer integerProperty, String stringProperty, Boolean booleanProperty) {
         this.integerProperty = integerProperty;
         this.stringProperty = stringProperty;
         this.booleanProperty = booleanProperty;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public Integer getIntegerProperty() {

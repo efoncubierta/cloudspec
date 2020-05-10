@@ -51,6 +51,17 @@ public class ModelTestUtils {
     public static final String RESOURCE_ID = UUID.randomUUID().toString();
     public static final String TARGET_RESOURCE_ID = UUID.randomUUID().toString();
 
+    public static final String PROP_ID_NAME = "id_property";
+    public static final String PROP_ID_DESCRIPTION = "ID property";
+    public static final PropertyType PROP_ID_TYPE = PropertyType.STRING;
+    public static final PropertyDef PROP_ID_DEF = new PropertyDef(
+            PROP_ID_NAME,
+            PROP_ID_DESCRIPTION,
+            PROP_ID_TYPE,
+            Boolean.FALSE
+    );
+    public static final Property PROP_ID = new Property(PROP_ID_NAME, RESOURCE_ID);
+
     public static final String PROP_INTEGER_NAME = "integer_property";
     public static final String PROP_INTEGER_DESCRIPTION = "Integer property";
     public static final PropertyType PROP_INTEGER_TYPE = PropertyType.INTEGER;
@@ -87,9 +98,25 @@ public class ModelTestUtils {
     );
     public static final Property PROP_BOOLEAN = new Property(PROP_BOOLEAN_NAME, PROP_BOOLEAN_VALUE);
 
-    public static final List<Property> PROPERTIES = Arrays.asList(PROP_INTEGER, PROP_STRING, PROP_BOOLEAN);
-    public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF);
+    public static final String PROP_MAP_NAME = "map_property";
+    public static final String PROP_MAP_DESCRIPTION = "Map property";
+    public static final PropertyType PROP_MAP_TYPE = PropertyType.MAP;
+    public static final List<Property> PROP_MAP_VALUE = Arrays.asList(
+            PROP_INTEGER,
+            PROP_STRING,
+            PROP_BOOLEAN
+    );
+    public static final PropertyDef PROP_MAP_DEF = new PropertyDef(
+            PROP_MAP_NAME,
+            PROP_MAP_DESCRIPTION,
+            PROP_MAP_TYPE,
+            Boolean.FALSE,
+            Arrays.asList(PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF)
+    );
+    public static final Property PROP_MAP = new Property(PROP_MAP_NAME, PROP_MAP_VALUE);
 
+    public static final List<Property> PROPERTIES = Arrays.asList(PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN, PROP_MAP);
+    public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF, PROP_MAP_DEF);
 
     public static final String ASSOC_NAME = "myassociation";
     public static final String ASSOC_DESCRIPTION = "My association";
@@ -119,7 +146,18 @@ public class ModelTestUtils {
     );
 
     public static final Provider TEST_PROVIDER = new TestProvider();
-    public static final TestResource TEST_RESOURCE = new TestResource(RESOURCE_ID, PROP_INTEGER_VALUE, PROP_STRING_VALUE, PROP_BOOLEAN_VALUE, TARGET_RESOURCE_ID);
+    public static final TestResource TEST_RESOURCE = new TestResource(
+            RESOURCE_ID,
+            PROP_INTEGER_VALUE,
+            PROP_STRING_VALUE,
+            PROP_BOOLEAN_VALUE,
+            new TestMapResource(
+                    PROP_INTEGER_VALUE,
+                    PROP_STRING_VALUE,
+                    PROP_BOOLEAN_VALUE
+            ),
+            TARGET_RESOURCE_ID
+    );
 
     public static void compareProperties(List<Property> properties1, List<Property> properties2) {
         assertNotNull(properties1);

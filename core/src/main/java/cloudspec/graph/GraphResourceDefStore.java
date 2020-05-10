@@ -33,6 +33,8 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,6 +56,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_TYPE = "type";
     public static final String PROPERTY_IS_ARRAY = "isArray";
+    public static final String PROPERTY_PATH = "path";
 
     private final Graph graph;
     private final GraphTraversalSource gTraversal;
@@ -76,15 +79,37 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .map(resourceDefMap -> new ResourceDef(
                         (ResourceDefRef) resourceDefMap.get(PROPERTY_RESOURCE_DEF_REF),
                         (String) resourceDefMap.get(PROPERTY_DESCRIPTION),
-                        getPropertyDefs(resourceDefRef),
+                        getPropertyDefs(resourceDefRef, Collections.emptyList()),
                         getAssociationDefs(resourceDefRef)
                 ))
                 .findFirst();
     }
 
-    private List<PropertyDef> getPropertyDefs(ResourceDefRef resourceDefRef) {
+    private List<PropertyDef> getPropertyDefs(ResourceDefRef resourceDefRef, List<String> parentPath) {
         return gTraversal.V()
-                .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .has(LABEL_PROPERTY_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .has(PROPERTY_PATH, String.join(".", parentPath))
+                .valueMap()
+                .by(unfold())
+                .toStream()
+                .peek(propertyDefMap -> LOGGER.debug("- Found property definition '{}'", propertyDefMap.get(PROPERTY_NAME)))
+                .map(propertyDefMap -> {
+                    List<String> propertyPath = new ArrayList<>(parentPath);
+                    propertyPath.add((String) propertyDefMap.get(PROPERTY_NAME));
+                    return new PropertyDef(
+                            (String) propertyDefMap.get(PROPERTY_NAME),
+                            (String) propertyDefMap.get(PROPERTY_DESCRIPTION),
+                            (PropertyType) propertyDefMap.get(PROPERTY_TYPE),
+                            (Boolean) propertyDefMap.get(PROPERTY_IS_ARRAY),
+                            getPropertyDefs(resourceDefRef, propertyPath)
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<PropertyDef> getPropertyDefs(PropertyDef propertyDef) {
+        return gTraversal.V()
+                .has(LABEL_PROPERTY_DEF, PROPERTY_NAME, propertyDef.getName())
                 .out(LABEL_HAS_PROPERTY_DEF)
                 .valueMap()
                 .by(unfold())
@@ -135,7 +160,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .next();
 
         // add property definitions
-        addPropertyDefs(resourceDef.getProperties())
+        addPropertyDefs(resourceDef.getRef(), resourceDef.getProperties(), Collections.emptyList())
                 .forEach(propertyVertex -> {
                     gTraversal.addE(LABEL_HAS_PROPERTY_DEF)
                             .from(resourceVertex)
@@ -153,24 +178,40 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 });
     }
 
-    private List<Vertex> addPropertyDefs(List<PropertyDef> propertyDefs) {
+    private List<Vertex> addPropertyDefs(ResourceDefRef resourceDefRef, List<PropertyDef> propertyDefs, List<String> parentPath) {
         LOGGER.debug("- Found {} property definition(s)", propertyDefs.size());
 
         return propertyDefs
                 .stream()
-                .map(this::addPropertyDef)
+                .map(propertyDef -> addPropertyDef(resourceDefRef, propertyDef, parentPath))
                 .collect(Collectors.toList());
     }
 
-    private Vertex addPropertyDef(PropertyDef propertyDef) {
+    private Vertex addPropertyDef(ResourceDefRef resourceDefRef, PropertyDef propertyDef, List<String> parentPath) {
         LOGGER.debug("- Adding property definition '{}'", propertyDef);
 
-        return gTraversal.addV(LABEL_PROPERTY_DEF)
+        Vertex propertyFromVertex = gTraversal.addV(LABEL_PROPERTY_DEF)
+                .property(PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .property(PROPERTY_PATH, String.join(".", parentPath))
+                .property(PROPERTY_NAME, propertyDef.getName())
                 .property(PROPERTY_NAME, propertyDef.getName())
                 .property(PROPERTY_DESCRIPTION, propertyDef.getDescription())
                 .property(PROPERTY_TYPE, propertyDef.getPropertyType())
                 .property(PROPERTY_IS_ARRAY, propertyDef.isArray())
                 .next();
+
+        // add property definitions
+        List<String> propertyPath = new ArrayList<>(parentPath);
+        propertyPath.add(propertyDef.getName());
+        addPropertyDefs(resourceDefRef, propertyDef.getProperties(), propertyPath)
+                .forEach(propertyToVertex -> {
+                    gTraversal.addE(LABEL_HAS_PROPERTY_DEF)
+                            .from(propertyFromVertex)
+                            .to(propertyToVertex)
+                            .iterate();
+                });
+
+        return propertyFromVertex;
     }
 
     private List<Vertex> addAssociationDefs(List<AssociationDef> associationDefs) {

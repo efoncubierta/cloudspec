@@ -134,7 +134,12 @@ public class ResourceReflectionUtil {
                         } else {
                             List<Property> properties = toProperties(value);
                             if (properties.size() > 0) {
-                                return properties.stream();
+                                return Stream.of(
+                                        new Property(
+                                                propertyDefAnnotation.name(),
+                                                properties
+                                        )
+                                );
                             }
                         }
 

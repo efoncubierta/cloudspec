@@ -31,5 +31,6 @@ package cloudspec.model;
 public enum PropertyType {
     STRING,
     BOOLEAN,
-    INTEGER
+    INTEGER,
+    MAP
 }

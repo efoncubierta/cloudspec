@@ -25,6 +25,9 @@
  */
 package cloudspec.model;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Define a property definition.
  * <p>
@@ -33,6 +36,7 @@ package cloudspec.model;
 public class PropertyDef extends BaseMemberDef {
     private final PropertyType propertyType;
     private final Boolean isArray;
+    private final List<PropertyDef> properties;
 
     /**
      * Constructor.
@@ -43,9 +47,23 @@ public class PropertyDef extends BaseMemberDef {
      * @param isArray      Flag the property as multi-valued.
      */
     public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
+        this(name, description, propertyType, isArray, Collections.emptyList());
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name         Property name.
+     * @param description  Property description.
+     * @param propertyType Property type.
+     * @param isArray      Flag the property as multi-valued.
+     * @param properties   List of sub properties (when type is map).
+     */
+    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray, List<PropertyDef> properties) {
         super(name, description);
         this.propertyType = propertyType;
         this.isArray = isArray;
+        this.properties = properties;
     }
 
     /**
@@ -66,6 +84,10 @@ public class PropertyDef extends BaseMemberDef {
         return isArray;
     }
 
+    public List<PropertyDef> getProperties() {
+        return properties;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -76,10 +98,15 @@ public class PropertyDef extends BaseMemberDef {
             return false;
         }
 
-        return getName().equals(((PropertyDef) obj).getName()) &&
-                getDescription().equals(((PropertyDef) obj).getDescription()) &&
-                getPropertyType().equals(((PropertyDef) obj).getPropertyType()) &&
-                isArray().equals(((PropertyDef) obj).isArray());
+        PropertyDef propertyDef = (PropertyDef)obj;
+
+        return getName().equals(propertyDef.getName()) &&
+                getDescription().equals(propertyDef.getDescription()) &&
+                getPropertyType().equals(propertyDef.getPropertyType()) &&
+                isArray().equals(propertyDef.isArray()) &&
+                getProperties().size() == propertyDef.getProperties().size() &&
+                getProperties().stream().allMatch(propertyDef1 ->
+                        propertyDef.getProperties().stream().anyMatch(propertyDef1::equals));
     }
 
     @Override
@@ -89,6 +116,7 @@ public class PropertyDef extends BaseMemberDef {
                 ", description=" + getDescription() +
                 ", propertyType=" + propertyType +
                 ", isArray=" + isArray +
+                ", properties=" + properties +
                 '}';
     }
 }

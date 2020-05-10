@@ -164,6 +164,24 @@ public class ResourceDefReflectionUtil {
                             PropertyType.BOOLEAN,
                             Boolean.FALSE)
             );
+        } else {
+            List<PropertyDef> propertyDefs = Stream.of(type.getDeclaredFields())
+                    .map(subField -> toPropertyDef(type, subField))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+
+            if (propertyDefs.size() > 0) {
+                return Optional.of(
+                        new PropertyDef(
+                                propertyDefAnnotation.name(),
+                                propertyDefAnnotation.description(),
+                                PropertyType.MAP,
+                                Boolean.FALSE,
+                                propertyDefs
+                        )
+                );
+            }
         }
 
         LOGGER.warn("Type {} of property '{}' in class {} is not supported",
