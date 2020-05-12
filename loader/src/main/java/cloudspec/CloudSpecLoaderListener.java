@@ -30,7 +30,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.P;
 
 import java.util.*;
 
-public class CloudSpecRealListener extends CloudSpecBaseListener {
+public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     private static List<String> BOOLEAN_TRUE_VALUES = Arrays.asList("true", "enabled");
     // private static List<String> BOOLEAN_FALSE_VALUES = Arrays.asList("false", "disabled");
 
