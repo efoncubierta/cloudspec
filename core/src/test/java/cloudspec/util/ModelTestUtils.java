@@ -116,7 +116,9 @@ public class ModelTestUtils {
     public static final Property PROP_MAP = new Property(PROP_MAP_NAME, PROP_MAP_VALUE);
 
     public static final List<Property> PROPERTIES = Arrays.asList(PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN, PROP_MAP);
+    public static final List<Property> TARGET_PROPERTIES = Arrays.asList(PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN);
     public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF, PROP_MAP_DEF);
+    public static final List<PropertyDef> TARGET_PROPERTY_DEFS = Arrays.asList(PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF);
 
     public static final String ASSOC_NAME = "myassociation";
     public static final String ASSOC_DESCRIPTION = "My association";
@@ -124,6 +126,8 @@ public class ModelTestUtils {
     public static final Association ASSOCIATION = new Association(ASSOC_NAME, TARGET_RESOURCE_DEF_REF, TARGET_RESOURCE_ID);
     public static final List<Association> ASSOCIATIONS = Collections.singletonList(ASSOCIATION);
     public static final List<AssociationDef> ASSOCIATION_DEFS = Collections.singletonList(ASSOCIATION_DEF);
+    public static final List<Association> TARGET_ASSOCIATIONS = Collections.emptyList();
+    public static final List<AssociationDef> TARGET_ASSOCIATION_DEFS = Collections.emptyList();
 
     // test model objects
     public static final ResourceDef RESOURCE_DEF = new ResourceDef(
@@ -131,6 +135,12 @@ public class ModelTestUtils {
             RESOURCE_DESCRIPTION,
             PROPERTY_DEFS,
             ASSOCIATION_DEFS
+    );
+    public static final ResourceDef TARGET_RESOURCE_DEF = new ResourceDef(
+            TARGET_RESOURCE_DEF_REF,
+            TARGET_RESOURCE_DESCRIPTION,
+            TARGET_PROPERTY_DEFS,
+            TARGET_ASSOCIATION_DEFS
     );
     public static final Resource RESOURCE = new Resource(
             RESOURCE_DEF_REF,
@@ -141,8 +151,8 @@ public class ModelTestUtils {
     public static final Resource TARGET_RESOURCE = new Resource(
             TARGET_RESOURCE_DEF_REF,
             TARGET_RESOURCE_ID,
-            PROPERTIES,
-            Collections.emptyList()
+            TARGET_PROPERTIES,
+            TARGET_ASSOCIATIONS
     );
 
     public static final Provider TEST_PROVIDER = new TestProvider();

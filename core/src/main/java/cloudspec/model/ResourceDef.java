@@ -125,11 +125,9 @@ public class ResourceDef {
         return getRef().equals(resourceDef.getRef()) &&
                 getDescription().equals(resourceDef.getDescription()) &&
                 getProperties().size() == resourceDef.getProperties().size() &&
-                getProperties().stream().allMatch(propertyDef ->
-                        resourceDef.getProperties().stream().anyMatch(propertyDef::equals)) &&
+                getProperties().containsAll(resourceDef.getProperties()) &&
                 getAssociations().size() == resourceDef.getAssociations().size() &&
-                getAssociations().stream().allMatch(associationDef ->
-                        resourceDef.getAssociations().stream().anyMatch(associationDef::equals));
+                getAssociations().containsAll(resourceDef.getAssociations());
     }
 
     @Override

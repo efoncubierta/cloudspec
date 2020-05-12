@@ -131,11 +131,9 @@ public class Resource {
         return getResourceDefRef().equals(resource.getResourceDefRef()) &&
                 getResourceId().equals(resource.getResourceId()) &&
                 getProperties().size() == resource.getProperties().size() &&
-                getProperties().stream().allMatch(property ->
-                        resource.getProperties().stream().anyMatch(property::equals)) &&
+                getProperties().containsAll(resource.getProperties()) &&
                 getAssociations().size() == resource.getAssociations().size() &&
-                getAssociations().stream().allMatch(associationDef ->
-                        resource.getAssociations().stream().anyMatch(associationDef::equals));
+                getAssociations().containsAll(resource.getAssociations());
     }
 
     @Override

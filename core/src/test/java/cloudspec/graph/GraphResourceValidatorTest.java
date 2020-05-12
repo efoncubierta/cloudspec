@@ -43,12 +43,15 @@ import static org.junit.Assert.*;
 
 public class GraphResourceValidatorTest {
     private final Graph graph = TinkerGraph.open();
-    private final GraphResourceStore store = new GraphResourceStore(graph);
+    private final GraphResourceDefStore resourceDefStore = new GraphResourceDefStore(graph);
+    private final GraphResourceStore resourceStore = new GraphResourceStore(graph);
     private final GraphResourceValidator validator = new GraphResourceValidator(graph);
 
     {
-        store.addResource(ModelTestUtils.TARGET_RESOURCE);
-        store.addResource(ModelTestUtils.RESOURCE);
+        resourceDefStore.addResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
+        resourceDefStore.addResourceDef(ModelTestUtils.RESOURCE_DEF);
+        resourceStore.addResource(ModelTestUtils.TARGET_RESOURCE);
+        resourceStore.addResource(ModelTestUtils.RESOURCE);
     }
 
     @Test
@@ -88,13 +91,13 @@ public class GraphResourceValidatorTest {
 
     @Test
     public void shouldNotExistResourceByPropertyFiltering() {
-        assertTrue(
+        assertFalse(
                 validator.existAny(
                         ModelTestUtils.RESOURCE_DEF_REF,
                         Collections.singletonList(
                                 new PropertyStatement(
                                         ModelTestUtils.PROP_STRING_NAME,
-                                        P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                        P.eq("zzz")
                                 )
                         )
                 )

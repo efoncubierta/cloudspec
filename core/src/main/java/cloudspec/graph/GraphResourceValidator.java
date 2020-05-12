@@ -47,30 +47,36 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
-
+/**
+ * Graph-based implementation of resource validator.
+ * <p>
+ * This class implement {@link ResourceValidator} using Tinkerpop graphs created with
+ * {@link GraphResourceStore} and {@link GraphResourceDefStore}
+ */
 public class GraphResourceValidator implements ResourceValidator {
     private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceValidator.class);
 
+    private final GraphTraversalSource graphTraversal;
 
-    private final Graph graph;
-    private final GraphTraversalSource gTraversal;
-
+    /**
+     * Constructor.
+     *
+     * @param graph TinkerPop Graph.
+     */
     public GraphResourceValidator(Graph graph) {
-        this.graph = graph;
-        this.gTraversal = graph.traversal();
+        this.graphTraversal = graph.traversal();
     }
 
     @Override
     public Boolean existById(ResourceDefRef resourceDefRef,
                              String resourceId) {
-        return buildGetResourceByIdQuery(resourceDefRef, resourceId).hasNext();
+        return buildGetResourceByIdTraversal(resourceDefRef, resourceId).hasNext();
     }
 
     @Override
     public Boolean existAny(ResourceDefRef resourceDefRef,
                             List<Statement> filterStatements) {
-        return buildGetAllResourcesFilteredQuery(resourceDefRef, filterStatements).hasNext();
+        return buildGetAllResourcesFilteredTraversal(resourceDefRef, filterStatements).hasNext();
     }
 
     @Override
@@ -78,13 +84,11 @@ public class GraphResourceValidator implements ResourceValidator {
                                                            String resourceId,
                                                            List<Statement> filterStatements,
                                                            List<Statement> assertStatements) {
-        return buildGetResourceByIdFilteredQuery(resourceDefRef, resourceId, filterStatements)
-                .valueMap()
-                .by(unfold())
+        return buildGetResourceByIdFilteringTraversal(resourceDefRef, resourceId, filterStatements)
                 .tryNext()
-                .map(resourceMap -> this.validateResource(
-                        (ResourceDefRef) resourceMap.get(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
-                        (String) resourceMap.get(GraphResourceStore.PROPERTY_RESOURCE_ID),
+                .map(resourceV -> this.validateResource(
+                        resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
+                        resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_ID),
                         assertStatements
                 ));
     }
@@ -92,13 +96,11 @@ public class GraphResourceValidator implements ResourceValidator {
     public List<ResourceValidationResult> validateAll(ResourceDefRef resourceDefRef,
                                                       List<Statement> filterStatements,
                                                       List<Statement> assertStatements) {
-        return buildGetAllResourcesFilteredQuery(resourceDefRef, filterStatements)
-                .valueMap()
-                .by(unfold())
+        return buildGetAllResourcesFilteredTraversal(resourceDefRef, filterStatements)
                 .toStream()
-                .map(resourceMap -> this.validateResource(
-                        (ResourceDefRef) resourceMap.get(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
-                        (String) resourceMap.get(GraphResourceStore.PROPERTY_RESOURCE_ID),
+                .map(resourceV -> this.validateResource(
+                        resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
+                        resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_ID),
                         assertStatements
                 ))
                 .collect(Collectors.toList());
@@ -110,23 +112,22 @@ public class GraphResourceValidator implements ResourceValidator {
         return new ResourceValidationResult(
                 resourceDefRef,
                 resourceId,
-                assertStatements.stream()
+                assertStatements
+                        .stream()
                         .flatMap(assertStatement ->
-                                buildTraversalForAssertion(new ArrayList<>(), assertStatement).stream()
+                                buildAssertionTraversals(new ArrayList<>(), assertStatement).stream()
                         )
                         .map(traversal ->
-                                buildGetResourceByIdQuery(resourceDefRef, resourceId)
-                                        .flatMap(traversal)
-                                        .next()
+                                buildGetResourceByIdTraversal(resourceDefRef, resourceId).flatMap(traversal).next()
                         )
                         .collect(Collectors.toList())
         );
 
     }
 
-    private GraphTraversal<Vertex, ?> buildGetResourceByIdQuery(ResourceDefRef resourceDefRef,
-                                                                String resourceId) {
-        return gTraversal.V()
+    private GraphTraversal<Vertex, ?> buildGetResourceByIdTraversal(ResourceDefRef resourceDefRef,
+                                                                    String resourceId) {
+        return graphTraversal.V()
                 .has(
                         GraphResourceStore.LABEL_RESOURCE,
                         GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
@@ -138,50 +139,48 @@ public class GraphResourceValidator implements ResourceValidator {
                 );
     }
 
-    private GraphTraversal<Vertex, ?> buildGetResourceByIdFilteredQuery(ResourceDefRef resourceDefRef,
-                                                                        String resourceId,
-                                                                        List<Statement> statements) {
-        return gTraversal.V()
+    private GraphTraversal<Vertex, Vertex> buildGetResourceByIdFilteringTraversal(ResourceDefRef resourceDefRef,
+                                                                                  String resourceId,
+                                                                                  List<Statement> statements) {
+        return graphTraversal.V()
+                .has(
+                        GraphResourceStore.LABEL_RESOURCE,
+                        GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
+                        resourceDefRef
+                )
+                .has(
+                        GraphResourceStore.PROPERTY_RESOURCE_ID,
+                        resourceId
+                )
                 .and(
-                        Stream.concat(
-                                Stream.of(
-                                        __.has(
-                                                GraphResourceStore.LABEL_RESOURCE,
-                                                GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
-                                                resourceDefRef
-                                        ),
-                                        __.has(
-                                                GraphResourceStore.PROPERTY_RESOURCE_ID,
-                                                resourceId
-                                        )
-                                ),
-                                statements.stream().map(this::buildTraversalForFiltering)
-                        ).toArray(GraphTraversal<?, ?>[]::new)
+                        statements
+                                .stream()
+                                .map(this::buildFilteringTraversal)
+                                .toArray(GraphTraversal<?, ?>[]::new)
                 );
     }
 
-    private GraphTraversal<Vertex, ?> buildGetAllResourcesFilteredQuery(ResourceDefRef resourceDefRef,
-                                                                        List<Statement> statements) {
-        return gTraversal.V()
+    private GraphTraversal<Vertex, Vertex> buildGetAllResourcesFilteredTraversal(ResourceDefRef resourceDefRef,
+                                                                                 List<Statement> statements) {
+        return graphTraversal.V()
+                .has(
+                        GraphResourceStore.LABEL_RESOURCE,
+                        GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
+                        resourceDefRef
+                )
                 .and(
-                        Stream.concat(
-                                Stream.of(
-                                        __.has(
-                                                GraphResourceStore.LABEL_RESOURCE,
-                                                GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
-                                                resourceDefRef
-                                        )
-                                ),
-                                statements.stream().map(this::buildTraversalForFiltering)
-                        ).toArray(GraphTraversal<?, ?>[]::new)
+                        statements
+                                .stream()
+                                .map(this::buildFilteringTraversal)
+                                .toArray(GraphTraversal<?, ?>[]::new)
                 );
     }
 
-    private GraphTraversal<?, ?> buildTraversalForFiltering(Statement statement) {
+    private GraphTraversal<?, ?> buildFilteringTraversal(Statement statement) {
         if (statement instanceof PropertyStatement) {
-            return buildTraversalForPropertyFiltering((PropertyStatement) statement);
+            return buildPropertyFilteringTraversal((PropertyStatement) statement);
         } else if (statement instanceof AssociationStatement) {
-            return buildTraversalForAssociationFiltering((AssociationStatement) statement);
+            return buildAssociationFilteredTraversal((AssociationStatement) statement);
         }
 
         throw new RuntimeException(
@@ -189,12 +188,14 @@ public class GraphResourceValidator implements ResourceValidator {
         );
     }
 
-    private List<GraphTraversal<?, AssertValidationResult>> buildTraversalForAssertion(List<String> path,
-                                                                                       Statement statement) {
+    private List<GraphTraversal<?, AssertValidationResult>> buildAssertionTraversals(List<String> parentPath,
+                                                                                     Statement statement) {
         if (statement instanceof PropertyStatement) {
-            return buildTraversalForPropertyAssertion(path, (PropertyStatement) statement);
+            return Collections.singletonList(
+                    buildPropertyAssertionTraversal(parentPath, (PropertyStatement) statement)
+            );
         } else if (statement instanceof AssociationStatement) {
-            return buildTraversalForAssociationAssertion(path, (AssociationStatement) statement);
+            return buildAssociationAssertionTraversal(parentPath, (AssociationStatement) statement);
         }
 
         throw new RuntimeException(
@@ -202,44 +203,56 @@ public class GraphResourceValidator implements ResourceValidator {
         );
     }
 
-    private GraphTraversal<?, ?> buildTraversalForPropertyFiltering(PropertyStatement statement) {
-        return __.has(
-                statement.getPropertyName(),
-                statement.getPredicate()
-        );
+    private GraphTraversal<?, ?> buildPropertyFilteringTraversal(PropertyStatement statement) {
+        return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
+                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate());
     }
 
-    private List<GraphTraversal<?, AssertValidationResult>> buildTraversalForPropertyAssertion(List<String> path,
-                                                                                               PropertyStatement statement) {
-        List<String> propertyPath = new ArrayList<>(path);
+    @SuppressWarnings("unchecked")
+    private GraphTraversal<?, AssertValidationResult> buildPropertyAssertionTraversal(List<String> parentPath,
+                                                                                      PropertyStatement statement) {
+        List<String> propertyPath = new ArrayList<>(parentPath);
         propertyPath.add(statement.getPropertyName());
 
-        return Collections.singletonList(
-                __.has(statement.getPropertyName(), statement.getPredicate())
-                        .fold()
-                        .coalesce(
-                                __.constant(
-                                        new AssertValidationResult(
-                                                propertyPath,
-                                                Boolean.TRUE
+        return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
+                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                .coalesce(
+                        __.has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
+                                .coalesce(
+                                        __.constant(
+                                                new AssertValidationResult(
+                                                        propertyPath,
+                                                        Boolean.TRUE
+                                                )
+                                        ),
+                                        __.constant(
+                                                new AssertValidationResult(
+                                                        propertyPath,
+                                                        Boolean.FALSE,
+                                                        // TODO build message for each type of predicate
+                                                        String.format(
+                                                                "Property '%s' does not match predicate [%s]",
+                                                                statement.getPropertyName(),
+                                                                statement.getPredicate()
+                                                        )
+                                                )
                                         )
                                 ),
-                                __.constant(
-                                        new AssertValidationResult(
-                                                propertyPath,
-                                                Boolean.FALSE,
-                                                String.format(
-                                                        "Property '%s' does not exist or match the value '%s'",
-                                                        statement.getPropertyName(),
-                                                        statement.getPredicate().getOriginalValue()
-                                                )
+                        __.constant(
+                                new AssertValidationResult(
+                                        propertyPath,
+                                        Boolean.FALSE,
+                                        String.format(
+                                                "Property '%s' does not exist",
+                                                statement.getPropertyName()
                                         )
                                 )
                         )
-        );
+                );
     }
 
-    private GraphTraversal<?, ?> buildTraversalForAssociationFiltering(AssociationStatement statement) {
+    private GraphTraversal<?, ?> buildAssociationFilteredTraversal(AssociationStatement statement) {
         return __.outE(GraphResourceStore.LABEL_HAS_ASSOCIATION)
                 .has(GraphResourceStore.PROPERTY_NAME, statement.getAssociationName())
                 .inV()
@@ -250,20 +263,21 @@ public class GraphResourceValidator implements ResourceValidator {
                                 ),
                                 statement.getStatements()
                                         .stream()
-                                        .map(this::buildTraversalForFiltering)
+                                        .map(this::buildFilteringTraversal)
                         ).toArray(GraphTraversal<?, ?>[]::new)
                 );
     }
 
-    private List<GraphTraversal<?, AssertValidationResult>> buildTraversalForAssociationAssertion(List<String> path,
-                                                                                                  AssociationStatement statement) {
-        List<String> associationPath = new ArrayList<>(path);
+    private List<GraphTraversal<?, AssertValidationResult>> buildAssociationAssertionTraversal(List<String> parentPath,
+                                                                                               AssociationStatement statement) {
+        List<String> associationPath = new ArrayList<>(parentPath);
         associationPath.add(statement.getAssociationName());
 
-        return statement.getStatements()
+        return statement
+                .getStatements()
                 .stream()
                 .flatMap(stmt ->
-                        buildTraversalForAssertion(associationPath, stmt).stream()
+                        buildAssertionTraversals(associationPath, stmt).stream()
                 )
                 .map(traversal ->
                         __.outE(GraphResourceStore.LABEL_HAS_ASSOCIATION)

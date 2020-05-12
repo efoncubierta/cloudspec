@@ -27,6 +27,7 @@ package cloudspec.model;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Define a property definition.
@@ -84,6 +85,21 @@ public class PropertyDef extends BaseMemberDef {
         return isArray;
     }
 
+    /**
+     * Get a property definition by name.
+     *
+     * @param propertyName Property name.
+     * @return Optional property definition.
+     */
+    public Optional<PropertyDef> getProperty(String propertyName) {
+        return getProperties().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
+    }
+
+    /**
+     * Get list of property definitions.
+     *
+     * @return List of property definitions.
+     */
     public List<PropertyDef> getProperties() {
         return properties;
     }
@@ -98,15 +114,14 @@ public class PropertyDef extends BaseMemberDef {
             return false;
         }
 
-        PropertyDef propertyDef = (PropertyDef)obj;
+        PropertyDef propertyDef = (PropertyDef) obj;
 
         return getName().equals(propertyDef.getName()) &&
                 getDescription().equals(propertyDef.getDescription()) &&
                 getPropertyType().equals(propertyDef.getPropertyType()) &&
                 isArray().equals(propertyDef.isArray()) &&
                 getProperties().size() == propertyDef.getProperties().size() &&
-                getProperties().stream().allMatch(propertyDef1 ->
-                        propertyDef.getProperties().stream().anyMatch(propertyDef1::equals));
+                getProperties().containsAll(propertyDef.getProperties());
     }
 
     @Override

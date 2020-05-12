@@ -25,7 +25,10 @@
  */
 package cloudspec.graph;
 
-import cloudspec.model.*;
+import cloudspec.model.AssociationDef;
+import cloudspec.model.PropertyDef;
+import cloudspec.model.ResourceDef;
+import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -33,14 +36,56 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
-
+/**
+ * Graph-based implementation of resource definition store.
+ * <p>
+ * This class implement {@link ResourceDefStore} using Tinkerpop graphs.
+ * <p>
+ * Graph model:
+ * <ul>
+ * <li>
+ *     Resource definitions are <strong>resourceDef</strong> vertices, with the following properties:
+ *     <ul>
+ *         <li><strong>resourceDefRef</strong></li>
+ *         <li><strong>description</strong></li>
+ *     </ul>
+ * </li>
+ * <li>
+ *     Property definitions are <strong>propertyDef</strong> vertices, with the following properties:
+ *     <ul>
+ *         <li><strong>name</strong></li>
+ *         <li><strong>description</strong></li>
+ *         <li><strong>type</strong></li>
+ *         <li><strong>isArray</strong></li>
+ *     </ul>
+ * </li>
+ * <li>
+ *     Association definitions are <strong>associationDef</strong> vertices, with the following properties:
+ *     <ul>
+ *         <li><strong>name</strong></li>
+ *         <li><strong>description</strong></li>
+ *         <li><strong>resourceDefRef</strong></li>
+ *     </ul>
+ * </li>
+ * <li>
+ *     <strong>resourceDef</strong> vertices has the following out edges:
+ *     <ul>
+ *         <li>resourceDef --- [hasPropertyDef] ---> propertyDef</li>
+ *         <li>resourceDef --- [hasAssociationDef] ---> associationDef</li>
+ *     </ul>
+ * </li>
+ * <li>
+ *     <strong>propertyDef</strong> vertices has the following out edges:
+ *     <ul>
+ *         <li>propertyDef --- [hasPropertyDef] ---> propertyDef</li>
+ *     </ul>
+ * </li>
+ * </ul>
+ */
 public class GraphResourceDefStore implements ResourceDefStore {
     private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceDefStore.class);
 
@@ -56,93 +101,90 @@ public class GraphResourceDefStore implements ResourceDefStore {
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_TYPE = "type";
     public static final String PROPERTY_IS_ARRAY = "isArray";
-    public static final String PROPERTY_PATH = "path";
 
-    private final Graph graph;
-    private final GraphTraversalSource gTraversal;
+    private final GraphTraversalSource graphTraversal;
 
+    /**
+     * Constructor.
+     *
+     * @param graph TinkerPop Graph.
+     */
     public GraphResourceDefStore(Graph graph) {
-        this.graph = graph;
-        this.gTraversal = graph.traversal();
+        this.graphTraversal = graph.traversal();
     }
 
     @Override
     public Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef) {
         LOGGER.debug("Getting resource definition '{}'", resourceDefRef);
 
-        return gTraversal.V()
+        return graphTraversal
+                .V()
                 .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .valueMap()
-                .by(unfold())
                 .toStream()
-                .peek(resourceDefMap -> LOGGER.debug("- Found resource definition '{}'", resourceDefMap.get(PROPERTY_RESOURCE_DEF_REF)))
-                .map(resourceDefMap -> new ResourceDef(
-                        (ResourceDefRef) resourceDefMap.get(PROPERTY_RESOURCE_DEF_REF),
-                        (String) resourceDefMap.get(PROPERTY_DESCRIPTION),
-                        getPropertyDefs(resourceDefRef, Collections.emptyList()),
-                        getAssociationDefs(resourceDefRef)
+                .peek(resourceDefV -> LOGGER.debug("- Found resource definition '{}'",
+                        (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF))
+                )
+                .map(resourceDefV -> new ResourceDef(
+                        resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
+                        resourceDefV.value(PROPERTY_DESCRIPTION),
+                        getPropertyDefs(resourceDefV),
+                        getAssociationDefs(resourceDefV)
                 ))
                 .findFirst();
     }
 
-    private List<PropertyDef> getPropertyDefs(ResourceDefRef resourceDefRef, List<String> parentPath) {
-        return gTraversal.V()
-                .has(LABEL_PROPERTY_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_PATH, String.join(".", parentPath))
-                .valueMap()
-                .by(unfold())
-                .toStream()
-                .peek(propertyDefMap -> LOGGER.debug("- Found property definition '{}'", propertyDefMap.get(PROPERTY_NAME)))
-                .map(propertyDefMap -> {
-                    List<String> propertyPath = new ArrayList<>(parentPath);
-                    propertyPath.add((String) propertyDefMap.get(PROPERTY_NAME));
-                    return new PropertyDef(
-                            (String) propertyDefMap.get(PROPERTY_NAME),
-                            (String) propertyDefMap.get(PROPERTY_DESCRIPTION),
-                            (PropertyType) propertyDefMap.get(PROPERTY_TYPE),
-                            (Boolean) propertyDefMap.get(PROPERTY_IS_ARRAY),
-                            getPropertyDefs(resourceDefRef, propertyPath)
-                    );
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<PropertyDef> getPropertyDefs(PropertyDef propertyDef) {
-        return gTraversal.V()
-                .has(LABEL_PROPERTY_DEF, PROPERTY_NAME, propertyDef.getName())
+    private List<PropertyDef> getPropertyDefs(Vertex sourceV) {
+        return graphTraversal
+                .V(sourceV.id())
                 .out(LABEL_HAS_PROPERTY_DEF)
-                .valueMap()
-                .by(unfold())
                 .toStream()
-                .peek(propertyDefMap -> LOGGER.debug("- Found property definition '{}'", propertyDefMap.get(PROPERTY_NAME)))
-                .map(propertyDefMap -> new PropertyDef(
-                        (String) propertyDefMap.get(PROPERTY_NAME),
-                        (String) propertyDefMap.get(PROPERTY_DESCRIPTION),
-                        (PropertyType) propertyDefMap.get(PROPERTY_TYPE),
-                        (Boolean) propertyDefMap.get(PROPERTY_IS_ARRAY)
+                .peek(propertyDefV -> LOGGER.debug("- Found property definition '{}'",
+                        (Object) propertyDefV.value(PROPERTY_NAME))
+                )
+                .map(propertyDefV -> new PropertyDef(
+                        propertyDefV.value(PROPERTY_NAME),
+                        propertyDefV.value(PROPERTY_DESCRIPTION),
+                        propertyDefV.value(PROPERTY_TYPE),
+                        propertyDefV.value(PROPERTY_IS_ARRAY),
+                        getPropertyDefs(propertyDefV)
                 ))
                 .collect(Collectors.toList());
     }
 
-    private List<AssociationDef> getAssociationDefs(ResourceDefRef resourceDefRef) {
-        return gTraversal.V()
-                .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+    private List<AssociationDef> getAssociationDefs(Vertex sourceV) {
+        return graphTraversal
+                .V(sourceV.id())
                 .out(LABEL_HAS_ASSOCIATION_DEF)
-                .valueMap()
-                .by(unfold())
                 .toStream()
-                .peek(associationDefMap -> LOGGER.debug("- Found association definition '{}'", associationDefMap.get(PROPERTY_NAME)))
-                .map(associationDefMap -> new AssociationDef(
-                        (String) associationDefMap.get(PROPERTY_NAME),
-                        (String) associationDefMap.get(PROPERTY_DESCRIPTION),
-                        (ResourceDefRef) associationDefMap.get(PROPERTY_RESOURCE_DEF_REF)
+                .peek(associationDefV -> LOGGER.debug("- Found association definition '{}'",
+                        (Object) associationDefV.value(PROPERTY_NAME))
+                )
+                .map(associationDefV -> new AssociationDef(
+                        associationDefV.value(PROPERTY_NAME),
+                        associationDefV.value(PROPERTY_DESCRIPTION),
+                        associationDefV.value(PROPERTY_RESOURCE_DEF_REF)
                 ))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ResourceDef> getResourceDefs() {
-        return null;
+        LOGGER.debug("Getting all resource definitions");
+
+        return graphTraversal
+                .V()
+                .has(LABEL_RESOURCE_DEF)
+                .toStream()
+                .peek(resourceDefV -> LOGGER.debug("- Found resource definition '{}'",
+                        (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF))
+                )
+                .map(resourceDefV -> new ResourceDef(
+                        resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
+                        resourceDefV.value(PROPERTY_DESCRIPTION),
+                        getPropertyDefs(resourceDefV),
+                        getAssociationDefs(resourceDefV)
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -151,7 +193,9 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
         ResourceDefRef resourceDefRef = resourceDef.getRef();
 
-        Vertex resourceVertex = gTraversal.addV(LABEL_RESOURCE_DEF)
+        // create resource definition vertex
+        Vertex resourceV = graphTraversal
+                .addV(LABEL_RESOURCE_DEF)
                 .property(PROPERTY_PROVIDER_NAME, resourceDefRef.getProviderName())
                 .property(PROPERTY_GROUP_NAME, resourceDefRef.getGroupName())
                 .property(PROPERTY_NAME, resourceDefRef.getResourceName())
@@ -160,76 +204,61 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .next();
 
         // add property definitions
-        addPropertyDefs(resourceDef.getRef(), resourceDef.getProperties(), Collections.emptyList())
-                .forEach(propertyVertex -> {
-                    gTraversal.addE(LABEL_HAS_PROPERTY_DEF)
-                            .from(resourceVertex)
-                            .to(propertyVertex)
-                            .iterate();
-                });
+        addPropertyDefs(resourceV, resourceDef.getProperties());
 
         // add association definitions
-        addAssociationDefs(resourceDef.getAssociations())
-                .forEach(associationVertex -> {
-                    gTraversal.addE(LABEL_HAS_ASSOCIATION_DEF)
-                            .from(resourceVertex)
-                            .to(associationVertex)
-                            .iterate();
-                });
+        addAssociationDefs(resourceV, resourceDef.getAssociations());
     }
 
-    private List<Vertex> addPropertyDefs(ResourceDefRef resourceDefRef, List<PropertyDef> propertyDefs, List<String> parentPath) {
+    private void addPropertyDefs(Vertex sourceV, List<PropertyDef> propertyDefs) {
         LOGGER.debug("- Found {} property definition(s)", propertyDefs.size());
-
-        return propertyDefs
-                .stream()
-                .map(propertyDef -> addPropertyDef(resourceDefRef, propertyDef, parentPath))
-                .collect(Collectors.toList());
+        propertyDefs.forEach(propertyDef -> addPropertyDef(sourceV, propertyDef));
     }
 
-    private Vertex addPropertyDef(ResourceDefRef resourceDefRef, PropertyDef propertyDef, List<String> parentPath) {
+    private void addPropertyDef(Vertex sourceV, PropertyDef propertyDef) {
         LOGGER.debug("- Adding property definition '{}'", propertyDef);
 
-        Vertex propertyFromVertex = gTraversal.addV(LABEL_PROPERTY_DEF)
-                .property(PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .property(PROPERTY_PATH, String.join(".", parentPath))
-                .property(PROPERTY_NAME, propertyDef.getName())
+        // create property definition vertex
+        Vertex propertyFromV = graphTraversal
+                .addV(LABEL_PROPERTY_DEF)
                 .property(PROPERTY_NAME, propertyDef.getName())
                 .property(PROPERTY_DESCRIPTION, propertyDef.getDescription())
                 .property(PROPERTY_TYPE, propertyDef.getPropertyType())
                 .property(PROPERTY_IS_ARRAY, propertyDef.isArray())
                 .next();
 
-        // add property definitions
-        List<String> propertyPath = new ArrayList<>(parentPath);
-        propertyPath.add(propertyDef.getName());
-        addPropertyDefs(resourceDefRef, propertyDef.getProperties(), propertyPath)
-                .forEach(propertyToVertex -> {
-                    gTraversal.addE(LABEL_HAS_PROPERTY_DEF)
-                            .from(propertyFromVertex)
-                            .to(propertyToVertex)
-                            .iterate();
-                });
+        // link property definition to source vertex
+        graphTraversal
+                .addE(LABEL_HAS_PROPERTY_DEF)
+                .from(sourceV)
+                .to(propertyFromV)
+                .next();
 
-        return propertyFromVertex;
+        // add nested property definitions
+        addPropertyDefs(propertyFromV, propertyDef.getProperties());
     }
 
-    private List<Vertex> addAssociationDefs(List<AssociationDef> associationDefs) {
+    private void addAssociationDefs(Vertex sourceV, List<AssociationDef> associationDefs) {
         LOGGER.debug("- Found {} association definition(s)", associationDefs.size());
-
-        return associationDefs
-                .stream()
-                .map(this::addAssociationDef)
-                .collect(Collectors.toList());
+        associationDefs.forEach(associationDef -> addAssociationDef(sourceV, associationDef));
     }
 
-    private Vertex addAssociationDef(AssociationDef associationDef) {
+    private void addAssociationDef(Vertex sourceV, AssociationDef associationDef) {
         LOGGER.debug("- Adding association definition '{}'", associationDef);
 
-        return gTraversal.addV(LABEL_ASSOCIATION_DEF)
+        // create association definition vertex
+        Vertex associationDefV = graphTraversal
+                .addV(LABEL_ASSOCIATION_DEF)
                 .property(PROPERTY_NAME, associationDef.getName())
                 .property(PROPERTY_DESCRIPTION, associationDef.getDescription())
                 .property(PROPERTY_RESOURCE_DEF_REF, associationDef.getResourceDefRef())
+                .next();
+
+        // link association definition to source vertex
+        graphTraversal
+                .addE(LABEL_HAS_ASSOCIATION_DEF)
+                .from(sourceV)
+                .to(associationDefV)
                 .next();
     }
 }

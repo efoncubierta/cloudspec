@@ -25,6 +25,8 @@
  */
 package cloudspec.model;
 
+import java.util.List;
+
 /**
  * Define a resource property.
  */
@@ -65,6 +67,8 @@ public class Property extends BaseMember {
         Property property = (Property) obj;
 
         return getName().equals(property.getName()) &&
+                getValue() instanceof List ?
+                ((List<?>) getValue()).containsAll((List<?>) property.getValue()) :
                 getValue().equals(property.getValue());
     }
 

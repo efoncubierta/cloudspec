@@ -27,30 +27,37 @@ package cloudspec.graph;
 
 import cloudspec.model.Resource;
 import cloudspec.util.ModelTestUtils;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
 public class GraphResourceStoreTest {
+    private final Graph graph = TinkerGraph.open();
+    private final GraphResourceDefStore resourceDefStore = new GraphResourceDefStore(graph);
+    private final GraphResourceStore resourceStore = new GraphResourceStore(graph);
+
+    {
+        resourceDefStore.addResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
+        resourceDefStore.addResourceDef(ModelTestUtils.RESOURCE_DEF);
+        resourceStore.addResource(ModelTestUtils.TARGET_RESOURCE);
+        resourceStore.addResource(ModelTestUtils.RESOURCE);
+    }
+
     @Test
     public void shouldNotGetResourceThatDoesntExist() {
-        GraphResourceStore store = new GraphResourceStore(TinkerGraph.open());
-        Optional<Resource> resourceOpt = store.getResource(ModelTestUtils.RESOURCE_DEF_REF, ModelTestUtils.RESOURCE_ID);
+        Optional<Resource> resourceOpt = resourceStore.getResource(ModelTestUtils.RESOURCE_DEF_REF, UUID.randomUUID().toString());
         assertNotNull(resourceOpt);
         assertFalse(resourceOpt.isPresent());
     }
 
     @Test
     public void shouldAddAndGetResource() {
-        GraphResourceStore store = new GraphResourceStore(TinkerGraph.open());
-
-        store.addResource(ModelTestUtils.TARGET_RESOURCE);
-        store.addResource(ModelTestUtils.RESOURCE);
-
-        Optional<Resource> resourceOpt = store.getResource(ModelTestUtils.RESOURCE.getResourceDefRef(), ModelTestUtils.RESOURCE.getResourceId());
+        Optional<Resource> resourceOpt = resourceStore.getResource(ModelTestUtils.RESOURCE.getResourceDefRef(), ModelTestUtils.RESOURCE.getResourceId());
         assertNotNull(resourceOpt);
         assertTrue(resourceOpt.isPresent());
         assertEquals(ModelTestUtils.RESOURCE, resourceOpt.get());
