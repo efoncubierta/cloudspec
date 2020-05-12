@@ -180,6 +180,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
         Collections.reverse(memberNames);
 
         Statement statement = memberNames.stream()
+                .skip(1)
                 .reduce(
                         (Statement) new PropertyStatement(
                                 memberNames.get(0),
@@ -197,6 +198,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
         Collections.reverse(memberNames);
 
         Statement statement = memberNames.stream()
+                .skip(1)
                 .reduce(
                         (Statement) new AssociationStatement(
                                 memberNames.get(0),
