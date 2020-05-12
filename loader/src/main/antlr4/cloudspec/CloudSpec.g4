@@ -22,9 +22,11 @@ predicate: IS? ('==' | EQUAL TO) value      # PropertyEqualPredicate
          | IS? NOT WITHIN array             # PropertyNotWithinPredicate
          ;
 
-statement: MEMBER_NAME predicate                           # PropertyStatement
-         | MEMBER_NAME '(' statement (',' statement)* ')'  # AssociationStatement
+statement: memberPath predicate                           # PropertyStatement
+         | memberPath '(' statement (',' statement)* ')'  # AssociationStatement
          ;
+
+memberPath: MEMBER_NAME ('.' memberPath)*;
 
 value: STRING                    # StringValue
      | BOOLEAN                   # BooleanValue
@@ -79,7 +81,7 @@ RESOURCE_DEF_REF: PROVIDER_NAMESPACE (':' GROUP_NAMESPACE)? ':' RESOURCE_TYPE;
 fragment PROVIDER_NAMESPACE: LETTER ALPHANUM*;
 fragment GROUP_NAMESPACE: LETTER ALPHANUM*;
 fragment RESOURCE_TYPE: LETTER ALPHANUM*;
-MEMBER_NAME: [a-zA-Z0-9_]+ ('.' [a-zA-Z0-9_]+)*;
+MEMBER_NAME: [a-zA-Z0-9_]+;
 
 WS: [ \t\r\n]+ -> skip;
 SL_COMMENT: '//' .*? '\n' -> skip;

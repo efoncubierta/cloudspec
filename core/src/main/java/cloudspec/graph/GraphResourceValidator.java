@@ -26,6 +26,7 @@
 package cloudspec.graph;
 
 import cloudspec.lang.AssociationStatement;
+import cloudspec.lang.NestedStatement;
 import cloudspec.lang.PropertyStatement;
 import cloudspec.lang.Statement;
 import cloudspec.model.ResourceDefRef;
@@ -180,7 +181,9 @@ public class GraphResourceValidator implements ResourceValidator {
         if (statement instanceof PropertyStatement) {
             return buildPropertyFilteringTraversal((PropertyStatement) statement);
         } else if (statement instanceof AssociationStatement) {
-            return buildAssociationFilteredTraversal((AssociationStatement) statement);
+            return buildAssociationFilteringTraversal((AssociationStatement) statement);
+        } else if (statement instanceof NestedStatement) {
+            return buildNestedFilteringTraversal((NestedStatement) statement);
         }
 
         throw new RuntimeException(
@@ -196,6 +199,8 @@ public class GraphResourceValidator implements ResourceValidator {
             );
         } else if (statement instanceof AssociationStatement) {
             return buildAssociationAssertionTraversal(parentPath, (AssociationStatement) statement);
+        } else if (statement instanceof NestedStatement) {
+            return buildNestedAssertionTraversal(parentPath, (NestedStatement) statement);
         }
 
         throw new RuntimeException(
@@ -252,7 +257,44 @@ public class GraphResourceValidator implements ResourceValidator {
                 );
     }
 
-    private GraphTraversal<?, ?> buildAssociationFilteredTraversal(AssociationStatement statement) {
+    private GraphTraversal<?, ?> buildNestedFilteringTraversal(NestedStatement statement) {
+        return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
+                .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                .and(
+                        buildFilteringTraversal(statement.getStatement())
+                );
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<GraphTraversal<?, AssertValidationResult>> buildNestedAssertionTraversal(List<String> parentPath,
+                                                                                          NestedStatement statement) {
+        List<String> nestedPath = new ArrayList<>(parentPath);
+        nestedPath.add(statement.getMemberName());
+
+
+        return buildAssertionTraversals(nestedPath, statement.getStatement())
+                .stream()
+                .map(traversal ->
+                        __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
+                                .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                                .coalesce(
+                                        __.flatMap(traversal),
+                                        __.constant(
+                                                new AssertValidationResult(
+                                                        nestedPath,
+                                                        Boolean.FALSE,
+                                                        String.format(
+                                                                "Property '%s' does not exist",
+                                                                statement.getMemberName()
+                                                        )
+                                                )
+                                        )
+                                )
+                )
+                .collect(Collectors.toList());
+    }
+
+    private GraphTraversal<?, ?> buildAssociationFilteringTraversal(AssociationStatement statement) {
         return __.outE(GraphResourceStore.LABEL_HAS_ASSOCIATION)
                 .has(GraphResourceStore.PROPERTY_NAME, statement.getAssociationName())
                 .inV()
@@ -268,6 +310,7 @@ public class GraphResourceValidator implements ResourceValidator {
                 );
     }
 
+    @SuppressWarnings("unchecked")
     private List<GraphTraversal<?, AssertValidationResult>> buildAssociationAssertionTraversal(List<String> parentPath,
                                                                                                AssociationStatement statement) {
         List<String> associationPath = new ArrayList<>(parentPath);
@@ -282,9 +325,22 @@ public class GraphResourceValidator implements ResourceValidator {
                 .map(traversal ->
                         __.outE(GraphResourceStore.LABEL_HAS_ASSOCIATION)
                                 .has(GraphResourceStore.PROPERTY_NAME, statement.getAssociationName())
-                                .inV()
-                                .hasLabel(GraphResourceStore.LABEL_RESOURCE)
-                                .flatMap(traversal)
+                                .coalesce(
+                                        __.inV()
+                                                .hasLabel(GraphResourceStore.LABEL_RESOURCE)
+                                                .flatMap(traversal),
+                                        __.constant(
+                                                new AssertValidationResult(
+                                                        associationPath,
+                                                        Boolean.FALSE,
+                                                        String.format(
+                                                                "Association '%s' does not exist",
+                                                                statement.getAssociationName()
+                                                        )
+                                                )
+                                        )
+                                )
+
                 )
                 .collect(Collectors.toList());
     }

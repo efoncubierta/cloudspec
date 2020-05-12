@@ -28,10 +28,7 @@ package cloudspec;
 import cloudspec.lang.*;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class CloudSpecRealListener extends CloudSpecBaseListener {
     private static List<String> BOOLEAN_TRUE_VALUES = Arrays.asList("true", "enabled");
@@ -53,7 +50,7 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
     private AssertExpr.AssertExprBuilder currentAssertBuilder;
 
     // evaluator
-    private Stack<String> currentMemberNames = new Stack<>();
+    private Stack<List<String>> currentMemberNames = new Stack<>();
     private Stack<List<Statement>> currentStatements = new Stack<>();
     private Stack<Object> currentValues = new Stack<>();
 
@@ -117,63 +114,45 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
 
     @Override
     public void enterPropertyStatement(CloudSpecParser.PropertyStatementContext ctx) {
-        currentMemberNames.push(stripQuotes(ctx.MEMBER_NAME().getText()));
+        currentMemberNames.push(new ArrayList<>());
     }
 
     @Override
     public void enterAssociationStatement(CloudSpecParser.AssociationStatementContext ctx) {
-        currentMemberNames.push(stripQuotes(ctx.MEMBER_NAME().getText()));
+        currentMemberNames.push(new ArrayList<>());
         currentStatements.push(new ArrayList<>());
     }
 
     @Override
     public void exitAssociationStatement(CloudSpecParser.AssociationStatementContext ctx) {
-        Statement statement = new AssociationStatement(
-                currentMemberNames.pop(), currentStatements.pop()
-        );
-        currentStatements.peek().add(statement);
+        buildNestedAssociationStatement();
     }
 
     @Override
     public void exitPropertyEqualPredicate(CloudSpecParser.PropertyEqualPredicateContext ctx) {
-        currentStatements.peek().add(
-                new PropertyStatement(
-                        currentMemberNames.pop(),
-                        P.eq(currentValues.pop())
-                )
-        );
+        buildNestedPropertyStatement(P.eq(currentValues.pop()));
     }
 
     @Override
     public void exitPropertyNotEqualPredicate(CloudSpecParser.PropertyNotEqualPredicateContext ctx) {
-        currentStatements.peek().add(
-                new PropertyStatement(
-                        currentMemberNames.pop(),
-                        P.neq(currentValues.pop())
-                )
-        );
+        buildNestedPropertyStatement(P.neq(currentValues.pop()));
     }
 
     @Override
     public void exitPropertyWithinPredicate(CloudSpecParser.PropertyWithinPredicateContext ctx) {
-        currentStatements.peek().add(
-                new PropertyStatement(
-                        currentMemberNames.pop(),
-                        P.within(currentValues)
-                )
-        );
+        buildNestedPropertyStatement(P.within(currentValues));
         currentValues.clear();
     }
 
     @Override
     public void exitPropertyNotWithinPredicate(CloudSpecParser.PropertyNotWithinPredicateContext ctx) {
-        currentStatements.peek().add(
-                new PropertyStatement(
-                        currentMemberNames.pop(),
-                        P.not(P.within(currentValues))
-                )
-        );
+        buildNestedPropertyStatement(P.not(P.within(currentValues)));
         currentValues.clear();
+    }
+
+    @Override
+    public void enterMemberPath(CloudSpecParser.MemberPathContext ctx) {
+        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().getText()));
     }
 
     @Override
@@ -194,5 +173,39 @@ public class CloudSpecRealListener extends CloudSpecBaseListener {
     private String stripQuotes(String s) {
         if (s == null || s.charAt(0) != '"') return s;
         return s.substring(1, s.length() - 1);
+    }
+
+    private void buildNestedPropertyStatement(P<?> predicate) {
+        List<String> memberNames = currentMemberNames.pop();
+        Collections.reverse(memberNames);
+
+        Statement statement = memberNames.stream()
+                .reduce(
+                        (Statement) new PropertyStatement(
+                                memberNames.get(0),
+                                predicate
+                        ),
+                        (stm, memberName) -> new NestedStatement(memberName, stm),
+                        (stm1, stm2) -> stm2
+                );
+
+        currentStatements.peek().add(statement);
+    }
+
+    private void buildNestedAssociationStatement() {
+        List<String> memberNames = currentMemberNames.pop();
+        Collections.reverse(memberNames);
+
+        Statement statement = memberNames.stream()
+                .reduce(
+                        (Statement) new AssociationStatement(
+                                memberNames.get(0),
+                                currentStatements.pop()
+                        ),
+                        (stm, memberName) -> new NestedStatement(memberName, stm),
+                        (stm1, stm2) -> stm2
+                );
+
+        currentStatements.peek().add(statement);
     }
 }
