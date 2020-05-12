@@ -28,13 +28,15 @@ package cloudspec.aws.s3;
 import cloudspec.aws.IAWSClientsProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Bucket;
-import software.amazon.awssdk.services.s3.model.GetBucketLocationRequest;
-import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+import software.amazon.awssdk.services.s3.model.LoggingEnabled;
+import software.amazon.awssdk.services.s3.model.ServerSideEncryptionConfiguration;
 import software.amazon.awssdk.utils.IoUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
     private final IAWSClientsProvider clientsProvider;
@@ -45,38 +47,81 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
 
     @Override
     public Optional<S3BucketResource> getById(String id) {
-        // TODO implement method
-        return Optional.empty();
+        return getBuckets(Collections.singletonList(id)).findFirst();
     }
 
     @Override
     public List<S3BucketResource> getAll() {
+        return getBuckets(Collections.emptyList()).collect(Collectors.toList());
+    }
+
+    public Stream<S3BucketResource> getBuckets(List<String> bucketNames) {
         S3Client s3Client = clientsProvider.getS3Client();
 
         try {
-            ListBucketsResponse response = s3Client.listBuckets();
-            return response.buckets()
-                    .stream()
-                    .map(bucket -> toResource(s3Client, bucket))
-                    .collect(Collectors.toList());
+            Stream<String> bucketNamesStream;
+            if (bucketNames != null && bucketNames.size() > 0) {
+                bucketNamesStream = bucketNames.stream();
+            } else {
+                bucketNamesStream = s3Client.listBuckets()
+                        .buckets()
+                        .stream()
+                        .map(Bucket::name);
+            }
+
+            return bucketNamesStream
+                    .map(bucketName -> toResource(s3Client, bucketName));
         } finally {
             IoUtils.closeQuietly(s3Client, null);
         }
     }
 
-    private S3BucketResource toResource(S3Client s3Client, Bucket bucket) {
-        return new S3BucketResource("",
-                getRegion(s3Client, bucket.name()),
-                bucket.name()
-        );
-    }
+    private S3BucketResource toResource(S3Client s3Client, String bucketName) {
+        S3BucketResource.Builder resourceBuilder = S3BucketResource.builder();
+        resourceBuilder.setBucketName(bucketName);
 
-    private String getRegion(S3Client s3Client, String bucketName) {
-        return s3Client.getBucketLocation(
-                GetBucketLocationRequest
-                        .builder()
-                        .bucket(bucketName)
-                        .build()
-        ).locationConstraint().toString();
+        // load region
+        resourceBuilder.setRegion(
+                s3Client.getBucketLocation(
+                        builder -> builder.bucket(bucketName)
+                )
+                        .locationConstraint()
+                        .toString()
+        );
+
+        // load encryption
+        ServerSideEncryptionConfiguration encryptionConfiguration =
+                s3Client
+                        .getBucketEncryption(builder ->
+                                builder.bucket(bucketName)
+                        )
+                        .serverSideEncryptionConfiguration();
+        resourceBuilder.setEncryption(
+                new S3BucketResource.S3BucketEncryption(
+                        encryptionConfiguration.hasRules(),
+                        encryptionConfiguration
+                                .rules()
+                                .get(0)
+                                .applyServerSideEncryptionByDefault()
+                                .kmsMasterKeyID() != null ?
+                                "KMS" : "SSE"
+                )
+
+        );
+
+        // load logging
+        LoggingEnabled loggingEnabled = s3Client
+                .getBucketLogging(builder ->
+                        builder.bucket(bucketName)
+                )
+                .loggingEnabled();
+        resourceBuilder.setLogging(
+                new S3BucketResource.S3BucketLogging(
+                        loggingEnabled != null
+                )
+
+        );
+
+        return resourceBuilder.build();
     }
 }

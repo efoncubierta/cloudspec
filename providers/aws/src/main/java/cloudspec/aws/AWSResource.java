@@ -32,13 +32,5 @@ public class AWSResource {
             name = "account_id",
             description = "AWS Account ID"
     )
-    private final String accountId;
-
-    public AWSResource(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
+    protected String accountId;
 }

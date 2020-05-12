@@ -29,8 +29,4 @@ import cloudspec.aws.AWSResource;
 
 public abstract class EC2Resource extends AWSResource {
     public static final String GROUP_NAME = "ec2";
-
-    public EC2Resource(String accountId) {
-        super(accountId);
-    }
 }

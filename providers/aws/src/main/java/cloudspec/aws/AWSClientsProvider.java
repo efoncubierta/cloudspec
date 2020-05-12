@@ -29,6 +29,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 public class AWSClientsProvider implements IAWSClientsProvider {
@@ -58,7 +59,7 @@ public class AWSClientsProvider implements IAWSClientsProvider {
     }
 
     @Override
-    public SqsClient getSqsClientForRegion(String region) {
-        return SqsClient.builder().region(Region.of(region)).build();
+    public SnsClient getSnsClient() {
+        return SnsClient.create();
     }
 }

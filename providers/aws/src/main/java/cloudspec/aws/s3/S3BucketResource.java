@@ -48,19 +48,25 @@ public class S3BucketResource extends S3Resource {
             name = "region",
             description = "AWS Region"
     )
-    private final String region;
+    private String region;
 
     @PropertyDefinition(
             name = "bucket_name",
             description = "Bucket name"
     )
-    private final String bucketName;
+    private String bucketName;
 
-    public S3BucketResource(String accountId, String region, String bucketName) {
-        super(accountId);
-        this.region = region;
-        this.bucketName = bucketName;
-    }
+    @PropertyDefinition(
+            name = "encryption",
+            description = "Encryption"
+    )
+    private S3BucketEncryption encryption;
+
+    @PropertyDefinition(
+            name = "logging",
+            description = "Logging"
+    )
+    private S3BucketLogging logging;
 
     public String getRegion() {
         return region;
@@ -68,5 +74,92 @@ public class S3BucketResource extends S3Resource {
 
     public String getBucketName() {
         return bucketName;
+    }
+
+    public S3BucketEncryption getEncryption() {
+        return encryption;
+    }
+
+    public S3BucketLogging getLogging() {
+        return logging;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class S3BucketEncryption {
+        @PropertyDefinition(
+                name = "enabled",
+                description = "Encryption is enabled"
+        )
+        private Boolean enabled;
+
+        @PropertyDefinition(
+                name = "type",
+                description = "Encryption type"
+        )
+        private String type;
+
+        public S3BucketEncryption(Boolean enabled, String type) {
+            this.enabled = enabled;
+            this.type = type;
+        }
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
+
+        public String getType() {
+            return type;
+        }
+    }
+
+    public static class S3BucketLogging {
+        @PropertyDefinition(
+                name = "enabled",
+                description = "Logging is enabled"
+        )
+        private Boolean enabled;
+
+        public S3BucketLogging(Boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
+    }
+
+    public static class Builder {
+        private String region;
+        private String bucketName;
+        private S3BucketEncryption encryption;
+        private S3BucketLogging logging;
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
+
+        public void setBucketName(String bucketName) {
+            this.bucketName = bucketName;
+        }
+
+        public void setEncryption(S3BucketEncryption encryption) {
+            this.encryption = encryption;
+        }
+
+        public void setLogging(S3BucketLogging logging) {
+            this.logging = logging;
+        }
+
+        public S3BucketResource build() {
+            S3BucketResource resource = new S3BucketResource();
+            resource.region = region;
+            resource.bucketName = bucketName;
+            resource.encryption = encryption;
+            resource.logging = logging;
+            return resource;
+        }
     }
 }

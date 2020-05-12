@@ -29,12 +29,11 @@ import cloudspec.aws.IAWSClientsProvider;
 import org.junit.Test;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.Bucket;
-import software.amazon.awssdk.services.s3.model.GetBucketLocationRequest;
-import software.amazon.awssdk.services.s3.model.GetBucketLocationResponse;
-import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -66,12 +65,47 @@ public class S3BucketLoaderTest {
                     .locationConstraint(TEST_REGION.id())
                     .build();
 
+    public static final GetBucketEncryptionResponse TEST_GET_BUCKET_ENCRYPTION_RESPONSE =
+            GetBucketEncryptionResponse
+                    .builder()
+                    .serverSideEncryptionConfiguration(
+                            ServerSideEncryptionConfiguration
+                                    .builder()
+                                    .rules(
+                                            ServerSideEncryptionRule
+                                                    .builder()
+                                                    .applyServerSideEncryptionByDefault(
+                                                            ServerSideEncryptionByDefault
+                                                                    .builder()
+                                                                    .kmsMasterKeyID(UUID.randomUUID().toString())
+                                                                    .build()
+                                                    )
+                                                    .build()
+                                    )
+                                    .build()
+                    )
+                    .build();
+
+    public static final GetBucketLoggingResponse TEST_GET_BUCKET_LOGGING_RESPONSE =
+            GetBucketLoggingResponse
+                    .builder()
+                    .loggingEnabled(
+                            LoggingEnabled
+                                    .builder()
+                                    .build()
+                    )
+                    .build();
+
     static {
         when(TEST_CLIENTS_PROVIDER.getS3Client()).thenReturn(TEST_S3_CLIENT);
 
         when(TEST_S3_CLIENT.listBuckets()).thenReturn(TEST_LIST_BUCKETS_RESPONSE);
-        when(TEST_S3_CLIENT.getBucketLocation(any(GetBucketLocationRequest.class)))
+        when(TEST_S3_CLIENT.getBucketLocation(any(Consumer.class)))
                 .thenReturn(TEST_BUCKET_LOCATION_RESPONSE);
+        when(TEST_S3_CLIENT.getBucketEncryption(any(Consumer.class)))
+                .thenReturn(TEST_GET_BUCKET_ENCRYPTION_RESPONSE);
+        when(TEST_S3_CLIENT.getBucketLogging(any(Consumer.class)))
+                .thenReturn(TEST_GET_BUCKET_LOGGING_RESPONSE);
     }
 
     @Test

@@ -25,7 +25,6 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
@@ -36,66 +35,64 @@ import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 @ResourceDefinition(
         provider = PROVIDER_NAME,
         group = EC2Resource.GROUP_NAME,
-        name = EC2InstanceResource.RESOURCE_NAME,
-        description = "EC2 Instance"
+        name = EC2SubnetResource.RESOURCE_NAME,
+        description = "VPC Subnet"
 )
-public class EC2InstanceResource extends EC2Resource {
-    public static final String RESOURCE_NAME = "instance";
+public class EC2SubnetResource extends EC2Resource {
+    public static final String RESOURCE_NAME = "subnet";
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
 
     @PropertyDefinition(
-            name = "region",
-            description = "AWS Region"
-    )
-    private String region;
-
-    @IdDefinition
-    @PropertyDefinition(
-            name = "instance_id",
-            description = "EC2 Instance ID"
-    )
-    private String instanceId;
-
-    @PropertyDefinition(
-            name = "instance_type",
-            description = "EC2 Instance Type"
-    )
-    private String instanceType;
-
-    @AssociationDefinition(
-            name = "vpc",
-            description = "VPC",
-            targetClass = EC2VpcResource.class
+            name = "vpc_id",
+            description = "VPC ID"
     )
     private String vpcId;
 
-    @AssociationDefinition(
-            name = "subnet",
-            description = "Subnet",
-            targetClass = EC2SubnetResource.class
+    @IdDefinition
+    @PropertyDefinition(
+            name = "subnet_id",
+            description = "VPC Subnet ID"
     )
     private String subnetId;
 
-    public String getRegion() {
-        return region;
-    }
+    @PropertyDefinition(
+            name = "availability_zone",
+            description = "AWS Availability Zone"
+    )
+    private String availabilityZone;
 
-    public String getInstanceId() {
-        return instanceId;
-    }
+    @PropertyDefinition(
+            name = "cidr_block",
+            description = "CIDR Block"
+    )
+    private String cidrBlock;
 
-    public String getInstanceType() {
-        return instanceType;
+    @PropertyDefinition(
+            name = "state",
+            description = "State"
+    )
+    private String state;
+
+    public String getVpcId() {
+        return vpcId;
     }
 
     public String getSubnetId() {
         return subnetId;
     }
 
-    public String getVpcId() {
-        return vpcId;
+    public String getAvailabilityZone() {
+        return availabilityZone;
+    }
+
+    public String getCidrBlock() {
+        return cidrBlock;
+    }
+
+    public String getState() {
+        return state;
     }
 
     public static Builder builder() {
@@ -103,26 +100,11 @@ public class EC2InstanceResource extends EC2Resource {
     }
 
     public static class Builder {
-        private String region;
-        private String instanceId;
-        private String instanceType;
         private String vpcId;
         private String subnetId;
-
-        public Builder setRegion(String region) {
-            this.region = region;
-            return this;
-        }
-
-        public Builder setInstanceId(String instanceId) {
-            this.instanceId = instanceId;
-            return this;
-        }
-
-        public Builder setInstanceType(String instanceType) {
-            this.instanceType = instanceType;
-            return this;
-        }
+        private String availabilityZone;
+        private String cidrBlock;
+        private String state;
 
         public Builder setVpcId(String vpcId) {
             this.vpcId = vpcId;
@@ -134,13 +116,28 @@ public class EC2InstanceResource extends EC2Resource {
             return this;
         }
 
-        public EC2InstanceResource build() {
-            EC2InstanceResource resource = new EC2InstanceResource();
-            resource.region = region;
-            resource.instanceId = instanceId;
-            resource.instanceType = instanceType;
+        public Builder setAvailabilityZone(String availabilityZone) {
+            this.availabilityZone = availabilityZone;
+            return this;
+        }
+
+        public Builder setCidrBlock(String cidrBlock) {
+            this.cidrBlock = cidrBlock;
+            return this;
+        }
+
+        public Builder setState(String state) {
+            this.state = state;
+            return this;
+        }
+
+        public EC2SubnetResource build() {
+            EC2SubnetResource resource = new EC2SubnetResource();
             resource.vpcId = vpcId;
             resource.subnetId = subnetId;
+            resource.availabilityZone = availabilityZone;
+            resource.cidrBlock = cidrBlock;
+            resource.state = state;
             return resource;
         }
     }

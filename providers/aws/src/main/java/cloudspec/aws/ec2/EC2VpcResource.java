@@ -25,7 +25,6 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
@@ -36,66 +35,54 @@ import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 @ResourceDefinition(
         provider = PROVIDER_NAME,
         group = EC2Resource.GROUP_NAME,
-        name = EC2InstanceResource.RESOURCE_NAME,
-        description = "EC2 Instance"
+        name = EC2VpcResource.RESOURCE_NAME,
+        description = "Virtual Private Cloud"
 )
-public class EC2InstanceResource extends EC2Resource {
-    public static final String RESOURCE_NAME = "instance";
+public class EC2VpcResource extends EC2Resource {
+    public static final String RESOURCE_NAME = "vpc";
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
 
     @PropertyDefinition(
             name = "region",
-            description = "AWS Region"
+            description = "AWS region"
     )
     private String region;
 
     @IdDefinition
     @PropertyDefinition(
-            name = "instance_id",
-            description = "EC2 Instance ID"
-    )
-    private String instanceId;
-
-    @PropertyDefinition(
-            name = "instance_type",
-            description = "EC2 Instance Type"
-    )
-    private String instanceType;
-
-    @AssociationDefinition(
-            name = "vpc",
-            description = "VPC",
-            targetClass = EC2VpcResource.class
+            name = "vpc_id",
+            description = "VPC ID"
     )
     private String vpcId;
 
-    @AssociationDefinition(
-            name = "subnet",
-            description = "Subnet",
-            targetClass = EC2SubnetResource.class
+    @PropertyDefinition(
+            name = "cidr_block",
+            description = "CIDR Block"
     )
-    private String subnetId;
+    private String cidrBlock;
+
+    @PropertyDefinition(
+            name = "state",
+            description = "State"
+    )
+    private String state;
+
+    public String getVpcId() {
+        return vpcId;
+    }
 
     public String getRegion() {
         return region;
     }
 
-    public String getInstanceId() {
-        return instanceId;
+    public String getCidrBlock() {
+        return cidrBlock;
     }
 
-    public String getInstanceType() {
-        return instanceType;
-    }
-
-    public String getSubnetId() {
-        return subnetId;
-    }
-
-    public String getVpcId() {
-        return vpcId;
+    public String getState() {
+        return state;
     }
 
     public static Builder builder() {
@@ -104,23 +91,12 @@ public class EC2InstanceResource extends EC2Resource {
 
     public static class Builder {
         private String region;
-        private String instanceId;
-        private String instanceType;
         private String vpcId;
-        private String subnetId;
+        private String cidrBlock;
+        private String state;
 
         public Builder setRegion(String region) {
             this.region = region;
-            return this;
-        }
-
-        public Builder setInstanceId(String instanceId) {
-            this.instanceId = instanceId;
-            return this;
-        }
-
-        public Builder setInstanceType(String instanceType) {
-            this.instanceType = instanceType;
             return this;
         }
 
@@ -129,18 +105,22 @@ public class EC2InstanceResource extends EC2Resource {
             return this;
         }
 
-        public Builder setSubnetId(String subnetId) {
-            this.subnetId = subnetId;
+        public Builder setCidrBlock(String cidrBlock) {
+            this.cidrBlock = cidrBlock;
             return this;
         }
 
-        public EC2InstanceResource build() {
-            EC2InstanceResource resource = new EC2InstanceResource();
+        public Builder setState(String state) {
+            this.state = state;
+            return this;
+        }
+
+        public EC2VpcResource build() {
+            EC2VpcResource resource = new EC2VpcResource();
             resource.region = region;
-            resource.instanceId = instanceId;
-            resource.instanceType = instanceType;
             resource.vpcId = vpcId;
-            resource.subnetId = subnetId;
+            resource.cidrBlock = cidrBlock;
+            resource.state = state;
             return resource;
         }
     }

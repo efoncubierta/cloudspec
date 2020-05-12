@@ -23,24 +23,10 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws;
+package cloudspec.aws.sqs;
 
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.iam.IamClient;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.sns.SnsClient;
-import software.amazon.awssdk.services.sqs.SqsClient;
+import cloudspec.aws.AWSResource;
 
-public interface IAWSClientsProvider {
-    IamClient getIamClient();
-
-    Ec2Client getEc2Client();
-
-    Ec2Client getEc2ClientForRegion(String region);
-
-    S3Client getS3Client();
-
-    SqsClient getSqsClient();
-
-    SnsClient getSnsClient();
+public abstract class SQSResource extends AWSResource {
+    public static final String GROUP_NAME = "sqs";
 }
