@@ -25,6 +25,7 @@
  */
 package cloudspec.validator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,43 +66,38 @@ public class CloudSpecValidatorResult {
 
     public static class RuleResult {
         private final String ruleName;
-        private final Boolean success;
-        private final Optional<String> reason;
-        private final Optional<Throwable> throwable;
+        private final List<ResourceValidationResult> resourceValidationResults;
+        private final Optional<Throwable> throwableOpt;
 
-        public RuleResult(String ruleName, Boolean success) {
-            this(ruleName, success, null, null);
-        }
-
-        public RuleResult(String ruleName, Boolean success, String reason, Throwable throwable) {
+        public RuleResult(String ruleName, List<ResourceValidationResult> resourceValidationResults) {
             this.ruleName = ruleName;
-            this.success = success;
-            this.reason = reason != null ? Optional.of(reason) : Optional.empty();
-            this.throwable = throwable != null ? Optional.of(throwable) : Optional.empty();
+            this.resourceValidationResults = resourceValidationResults;
+            this.throwableOpt = Optional.empty();
         }
 
-        public RuleResult(String ruleName, Boolean success, String reason) {
-            this(ruleName, success, reason, null);
+        public RuleResult(String ruleName, Throwable throwableOpt) {
+            this.ruleName = ruleName;
+            this.resourceValidationResults = Collections.emptyList();
+            this.throwableOpt = Optional.of(throwableOpt);
         }
 
         public String getRuleName() {
             return ruleName;
         }
 
-        public Boolean isError() {
-            return !isSuccess();
-        }
-
-        public Boolean isSuccess() {
-            return success;
-        }
-
-        public Optional<String> getReason() {
-            return reason;
+        public List<ResourceValidationResult> getResourceValidationResults() {
+            return resourceValidationResults;
         }
 
         public Optional<Throwable> getThrowable() {
-            return throwable;
+            return throwableOpt;
+        }
+
+        public Boolean isSuccess() {
+            return !throwableOpt.isPresent() &&
+                    resourceValidationResults
+                            .stream()
+                            .allMatch(ResourceValidationResult::isSuccess);
         }
     }
 }

@@ -230,6 +230,7 @@ public class GraphResourceValidatorTest {
         assertTrue(results.size() > 0);
 
         results.forEach(result -> {
+            System.out.println(result);
             assertTrue(result.isSuccess());
             assertEquals(ModelTestUtils.RESOURCE_DEF_REF, result.getResourceDefRef());
             assertNotNull(result.getResourceId());

@@ -105,16 +105,41 @@ public class CloudSpecRunner {
                 Ansi.BColor.NONE
         );
 
-        if (ruleResult.isError()) {
+        if (!ruleResult.isSuccess()) {
             System.out.println("");
 
             if (ruleResult.getThrowable().isPresent()) {
                 cp.println(ruleResult.getThrowable().get().getMessage(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
-            } else if (ruleResult.getReason().isPresent()) {
-                cp.println(ruleResult.getReason().get(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
             } else {
-                cp.println("Unknown", Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+                ruleResult
+                        .getResourceValidationResults()
+                        .stream()
+                        .filter(resourceValidationResult -> !resourceValidationResult.isSuccess())
+                        .peek(resourceValidationResult ->
+                                cp.println(
+                                        String.format(
+                                                "Resource '%s' with id '%s'",
+                                                resourceValidationResult.getResourceDefRef(),
+                                                resourceValidationResult.getResourceId()
+                                        ),
+                                        Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE
+                                )
+                        )
+                        .flatMap(resourceValidationResult -> resourceValidationResult.getAssertResults().stream())
+                        .filter(assertValidationResult -> !assertValidationResult.isSuccess())
+                        .forEach(assertValidationResult ->
+                                cp.println(
+                                        String.format(
+                                                " - %s: %s",
+                                                String.join(".", assertValidationResult.getPath()),
+                                                assertValidationResult.getMessage()
+                                        ),
+                                        Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
+                        );
+
             }
+
+            System.out.println("");
         }
     }
 

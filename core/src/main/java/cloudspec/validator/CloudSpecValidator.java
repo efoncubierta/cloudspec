@@ -59,30 +59,23 @@ public class CloudSpecValidator {
 
     private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
         Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(rule.getResourceDefRef());
-        if(!resourceDefRefOpt.isPresent()) {
+        if (!resourceDefRefOpt.isPresent()) {
             return new CloudSpecValidatorResult.RuleResult(
                     rule.getName(),
-                    Boolean.FALSE,
-                    String.format("Malformed resource definition reference '%s'", rule.getResourceDefRef())
+                    new RuntimeException(String.format("Malformed resource definition reference '%s'", rule.getResourceDefRef()))
             );
         }
 
-        // validate all resources
-        List<ResourceValidationResult> results = resourceValidator.validateAll(
-                resourceDefRefOpt.get(),
-                rule.getWithExpr().getStatements(),
-                rule.getAssertExpr().getStatements()
-        );
-
-        // check for errors
-//        if (results.size() > 0) {
-//            return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.FALSE, results.get(0).getMessage());
-//        }
-
-        // TODO manage results
-
-        // return success
-        return new CloudSpecValidatorResult.RuleResult(rule.getName(), Boolean.TRUE);
+        try {
+            // validate all resources
+            return new CloudSpecValidatorResult.RuleResult(rule.getName(), resourceValidator.validateAll(
+                    resourceDefRefOpt.get(),
+                    rule.getWithExpr().getStatements(),
+                    rule.getAssertExpr().getStatements()
+            ));
+        } catch (RuntimeException e) {
+            return new CloudSpecValidatorResult.RuleResult(rule.getName(), e);
+        }
     }
 
 }

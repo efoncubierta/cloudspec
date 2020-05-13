@@ -221,16 +221,20 @@ public class GraphResourceValidator implements ResourceValidator {
         propertyPath.add(statement.getPropertyName());
 
         return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
-                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                .fold()
                 .coalesce(
-                        __.has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
+                        __.unfold()
+                                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                                .fold()
                                 .coalesce(
-                                        __.constant(
-                                                new AssertValidationResult(
-                                                        propertyPath,
-                                                        Boolean.TRUE
-                                                )
-                                        ),
+                                        __.unfold()
+                                                .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
+                                                .constant(
+                                                        new AssertValidationResult(
+                                                                propertyPath,
+                                                                Boolean.TRUE
+                                                        )
+                                                ),
                                         __.constant(
                                                 new AssertValidationResult(
                                                         propertyPath,
@@ -276,9 +280,11 @@ public class GraphResourceValidator implements ResourceValidator {
                 .stream()
                 .map(traversal ->
                         __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
-                                .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                                .fold()
                                 .coalesce(
-                                        __.flatMap(traversal),
+                                        __.unfold()
+                                                .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                                                .flatMap(traversal),
                                         __.constant(
                                                 new AssertValidationResult(
                                                         nestedPath,
@@ -324,9 +330,11 @@ public class GraphResourceValidator implements ResourceValidator {
                 )
                 .map(traversal ->
                         __.outE(GraphResourceStore.LABEL_HAS_ASSOCIATION)
-                                .has(GraphResourceStore.PROPERTY_NAME, statement.getAssociationName())
+                                .fold()
                                 .coalesce(
-                                        __.inV()
+                                        __.unfold()
+                                                .has(GraphResourceStore.PROPERTY_NAME, statement.getAssociationName())
+                                                .inV()
                                                 .hasLabel(GraphResourceStore.LABEL_RESOURCE)
                                                 .flatMap(traversal),
                                         __.constant(
