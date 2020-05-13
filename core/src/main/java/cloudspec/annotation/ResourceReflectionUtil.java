@@ -70,9 +70,10 @@ public class ResourceReflectionUtil {
         return Stream.of(obj.getClass().getDeclaredFields())
                 .peek(field -> {
                     if (!field.isAnnotationPresent(IdDefinition.class)) {
-                        LOGGER.warn(
-                                "Cannot produce a resource id from object of class '{}' " +
+                        LOGGER.debug(
+                                "Cannot produce a resource id from field '{}' of object of class '{}' " +
                                         "because it does not have a field annotated with @IdDefinition",
+                                field.getName(),
                                 obj.getClass().getCanonicalName()
                         );
                     }
@@ -81,8 +82,9 @@ public class ResourceReflectionUtil {
                 .filter(field -> field.getType().isAssignableFrom(String.class))
                 .map(field -> {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Found @IdDefinition annotation in class '{}'",
-                                field.getType().getCanonicalName()
+                        LOGGER.debug("Found @IdDefinition annotation in field '{}' of object of class '{}'",
+                                field.getName(),
+                                obj.getClass().getCanonicalName()
                         );
                     }
 

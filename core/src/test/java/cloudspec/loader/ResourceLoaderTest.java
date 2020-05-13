@@ -37,18 +37,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ResourceLoaderTest {
-    public static final ProvidersRegistry PROVIDERS_REGISTRY = mock(ProvidersRegistry.class);
-    public static final ResourceDefStore RESOURCE_DEF_STORE = mock(ResourceDefStore.class);
-    public static final ResourceStore RESOURCE_STORE = mock(ResourceStore.class);
-
-    static {
-        when(PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(new TestProvider()));
-    }
-
-    @Test
-    public void shouldLoadResources() {
-        ResourceLoader resourceLoader = new ResourceLoader(PROVIDERS_REGISTRY, RESOURCE_DEF_STORE, RESOURCE_STORE);
-
-        resourceLoader.load();;
-    }
+//    public static final ProvidersRegistry PROVIDERS_REGISTRY = mock(ProvidersRegistry.class);
+//    public static final ResourceDefStore RESOURCE_DEF_STORE = mock(ResourceDefStore.class);
+//    public static final ResourceStore RESOURCE_STORE = mock(ResourceStore.class);
+//
+//    static {
+//        when(PROVIDERS_REGISTRY.getProviders()).thenReturn(Collections.singletonList(new TestProvider()));
+//    }
+//
+//    @Test
+//    public void shouldLoadResources() {
+//        ResourceLoader resourceLoader = new ResourceLoader(PROVIDERS_REGISTRY, RESOURCE_DEF_STORE, RESOURCE_STORE);
+//
+//        resourceLoader.load();;
+//    }
 }

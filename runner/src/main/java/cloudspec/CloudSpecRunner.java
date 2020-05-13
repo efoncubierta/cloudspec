@@ -60,7 +60,7 @@ public class CloudSpecRunner {
             cloudSpecManager.preflight(spec);
 
             // load resources
-            cloudSpecManager.loadResources();
+            cloudSpecManager.loadResources(spec);
 
             // validate spec
             printResult(cloudSpecManager.validate(spec));

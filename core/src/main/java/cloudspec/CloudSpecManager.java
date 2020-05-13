@@ -26,6 +26,7 @@
 package cloudspec;
 
 import cloudspec.lang.CloudSpec;
+import cloudspec.loader.ResourceLoader;
 import cloudspec.preflight.CloudSpecPreflight;
 import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
@@ -43,6 +44,7 @@ public class CloudSpecManager {
     private final ResourceStore resourceStore;
     private final ResourceValidator resourceValidator;
 
+    private final ResourceLoader resourceLoader;
     private final CloudSpecPreflight cloudSpecPreflight;
     private final CloudSpecValidator cloudSpecValidator;
 
@@ -57,6 +59,7 @@ public class CloudSpecManager {
         this.resourceStore = resourceStore;
         this.resourceValidator = resourceValidator;
 
+        this.resourceLoader = new ResourceLoader(providersRegistry, resourceDefStore, resourceStore);
         this.cloudSpecPreflight = new CloudSpecPreflight(resourceDefStore);
         this.cloudSpecValidator = new CloudSpecValidator(resourceValidator);
     }
@@ -87,8 +90,10 @@ public class CloudSpecManager {
         cloudSpecPreflight.preflight(spec);
     }
 
-    public void loadResources() {
+    public void loadResources(CloudSpec spec) {
         mustBeInitiated();
+
+        resourceLoader.load(spec);
     }
 
     public CloudSpecValidatorResult validate(CloudSpec spec) {

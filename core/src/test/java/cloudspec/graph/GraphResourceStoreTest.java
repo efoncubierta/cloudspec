@@ -25,14 +25,15 @@
  */
 package cloudspec.graph;
 
-import cloudspec.model.Resource;
+import cloudspec.model.*;
+import cloudspec.util.ModelGenerator;
 import cloudspec.util.ModelTestUtils;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -44,22 +45,285 @@ public class GraphResourceStoreTest {
     {
         resourceDefStore.addResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
         resourceDefStore.addResourceDef(ModelTestUtils.RESOURCE_DEF);
-        resourceStore.addResource(ModelTestUtils.TARGET_RESOURCE);
-        resourceStore.addResource(ModelTestUtils.RESOURCE);
+        resourceStore.createResource(
+                ModelTestUtils.TARGET_RESOURCE_DEF_REF,
+                ModelTestUtils.TARGET_RESOURCE_ID,
+                ModelTestUtils.TARGET_PROPERTIES,
+                ModelTestUtils.TARGET_ASSOCIATIONS
+        );
+        resourceStore.createResource(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                ModelTestUtils.PROPERTIES,
+                ModelTestUtils.ASSOCIATIONS
+        );
     }
 
     @Test
-    public void shouldNotGetResourceThatDoesntExist() {
-        Optional<Resource> resourceOpt = resourceStore.getResource(ModelTestUtils.RESOURCE_DEF_REF, UUID.randomUUID().toString());
+    public void shouldNotExistRandomResourceId() {
+        assertFalse(
+                resourceStore.exists(
+                        ModelGenerator.randomResourceDefRef(),
+                        ModelGenerator.randomResourceId()
+                )
+        );
+    }
+
+    @Test
+    public void shouldExistResource() {
+        assertTrue(
+                resourceStore.exists(
+                        ModelTestUtils.RESOURCE_DEF_REF,
+                        ModelTestUtils.RESOURCE_ID
+                )
+        );
+    }
+
+    @Test
+    public void shouldNotGetRandomResource() {
+        Optional<Resource> resourceOpt = resourceStore.getResource(
+                ModelGenerator.randomResourceDefRef(),
+                ModelGenerator.randomResourceId()
+        );
         assertNotNull(resourceOpt);
         assertFalse(resourceOpt.isPresent());
     }
 
     @Test
-    public void shouldAddAndGetResource() {
-        Optional<Resource> resourceOpt = resourceStore.getResource(ModelTestUtils.RESOURCE.getResourceDefRef(), ModelTestUtils.RESOURCE.getResourceId());
+    public void shouldGetResource() {
+        Optional<Resource> resourceOpt = resourceStore.getResource(
+                ModelTestUtils.RESOURCE.getResourceDefRef(),
+                ModelTestUtils.RESOURCE.getResourceId()
+        );
         assertNotNull(resourceOpt);
         assertTrue(resourceOpt.isPresent());
         assertEquals(ModelTestUtils.RESOURCE, resourceOpt.get());
+    }
+
+    @Test
+    public void shouldNotGetPropertiesOfRandomResource() {
+        List<Property> properties = resourceStore.getProperties(
+                ModelGenerator.randomResourceDefRef(),
+                ModelGenerator.randomResourceId()
+        );
+        assertNotNull(properties);
+        assertTrue(properties.isEmpty());
+    }
+
+    @Test
+    public void shouldGetPropertiesOfResource() {
+        List<Property> properties = resourceStore.getProperties(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID
+        );
+        assertNotNull(properties);
+        assertFalse(properties.isEmpty());
+        assertEquals(ModelTestUtils.PROPERTIES.size(), properties.size());
+        assertTrue(ModelTestUtils.PROPERTIES.containsAll(properties));
+    }
+
+    @Test
+    public void shouldNotGetAssociationsOfRandomResource() {
+        List<Association> associations = resourceStore.getAssociations(
+                ModelGenerator.randomResourceDefRef(),
+                ModelGenerator.randomResourceId()
+        );
+        assertNotNull(associations);
+        assertTrue(associations.isEmpty());
+    }
+
+    @Test
+    public void shouldGetAssociationsOfResource() {
+        List<Association> associations = resourceStore.getAssociations(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID
+        );
+        assertNotNull(associations);
+        assertFalse(associations.isEmpty());
+        assertEquals(ModelTestUtils.ASSOCIATIONS.size(), associations.size());
+        assertTrue(ModelTestUtils.ASSOCIATIONS.containsAll(associations));
+    }
+
+    @Test
+    public void shouldNotGetResourcesByRandomDefinition() {
+        List<Resource> resources = resourceStore.getResourcesByDefinition(
+                ModelGenerator.randomResourceDefRef()
+        );
+        assertNotNull(resources);
+        assertTrue(resources.isEmpty());
+    }
+
+    @Test
+    public void shouldGetResourcesByDefinition() {
+        List<Resource> resources = resourceStore.getResourcesByDefinition(
+                ModelTestUtils.RESOURCE_DEF_REF
+        );
+        assertNotNull(resources);
+        assertFalse(resources.isEmpty());
+        assertEquals(1, resources.size());
+        assertEquals(ModelTestUtils.RESOURCE, resources.get(0));
+    }
+
+    @Test
+    public void shouldNotSetRandomPropertyToRandomResource() {
+        ResourceDefRef resourceDefRef = ModelGenerator.randomResourceDefRef();
+        String resourceId = ModelGenerator.randomResourceId();
+        Property property = ModelGenerator.randomProperty();
+
+        resourceStore.setProperty(
+                resourceDefRef,
+                resourceId,
+                property
+        );
+
+        List<Property> properties = resourceStore.getProperties(resourceDefRef, resourceId);
+        assertNotNull(properties);
+        assertTrue(properties.isEmpty());
+    }
+
+    @Test
+    public void shouldNotSetRandomPropertyToResource() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+        Resource resource = ModelGenerator.randomResource(resourceDef);
+        Property property = ModelGenerator.randomProperty();
+
+        resourceDefStore.addResourceDef(resourceDef);
+        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
+
+        List<Property> properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(properties);
+        assertTrue(properties.isEmpty());
+    }
+
+    @Test
+    public void shouldSetPropertyToResource() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+        Resource resource = ModelGenerator.randomResource(resourceDef);
+        Property property = resource.getProperties().get(0);
+
+        resourceDefStore.addResourceDef(resourceDef);
+        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
+
+        List<Property> properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(properties);
+        assertFalse(properties.isEmpty());
+        assertEquals(1, properties.size());
+        assertEquals(property, resource.getProperties().get(0));
+    }
+
+    @Test
+    public void shouldSetMultiplePropertiesToResource() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+        Resource resource = ModelGenerator.randomResource(resourceDef);
+
+        resourceDefStore.addResourceDef(resourceDef);
+        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.setProperties(resource.getResourceDefRef(), resource.getResourceId(), resource.getProperties());
+
+        List<Property> properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(properties);
+        assertFalse(properties.isEmpty());
+        assertEquals(resource.getProperties().size(), properties.size());
+        assertTrue(resource.getProperties().containsAll(properties));
+    }
+
+    @Test
+    public void shouldNotSetRandomAssociationToRandomResource() {
+        ResourceDefRef resourceDefRef = ModelGenerator.randomResourceDefRef();
+        String resourceId = ModelGenerator.randomResourceId();
+        Association association = ModelGenerator.randomAssociation();
+
+        resourceStore.setAssociation(
+                resourceDefRef,
+                resourceId,
+                association
+        );
+
+        List<Association> associations = resourceStore.getAssociations(resourceDefRef, resourceId);
+        assertNotNull(associations);
+        assertTrue(associations.isEmpty());
+    }
+
+    @Test
+    public void shouldNotSetRandomAssociationToResource() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+        Resource resource = ModelGenerator.randomResource(resourceDef);
+        Association association = ModelGenerator.randomAssociation();
+
+        resourceDefStore.addResourceDef(resourceDef);
+        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.setAssociation(
+                resource.getResourceDefRef(),
+                resource.getResourceId(),
+                association
+        );
+
+        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associations);
+        assertTrue(associations.isEmpty());
+    }
+
+    @Test
+    public void shouldNotSetAssociationToRandomTargetResource() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+        Resource resource = ModelGenerator.randomResource(resourceDef);
+        Association association = resource.getAssociations().get(0);
+
+        resourceDefStore.addResourceDef(resourceDef);
+
+        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.setAssociation(resource.getResourceDefRef(), resource.getResourceId(), association);
+
+        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associations);
+        assertTrue(associations.isEmpty());
+    }
+
+    @Test
+    public void shouldSetAssociationToResource() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+        Resource resource = ModelGenerator.randomResource(resourceDef);
+        Association association = resource.getAssociations().get(0);
+
+        resourceDefStore.addResourceDef(resourceDef);
+
+        // create associated resources
+        resourceDefStore.addResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
+        resourceStore.createResource(association.getResourceDefRef(), association.getResourceId());
+
+
+        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.setAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
+
+        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associations);
+        assertFalse(associations.isEmpty());
+        assertEquals(1, associations.size());
+        assertEquals(association, associations.get(0));
+    }
+
+    @Test
+    public void shouldSetMultipleAssociationsToResource() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+        Resource resource = ModelGenerator.randomResource(resourceDef);
+
+        resourceDefStore.addResourceDef(resourceDef);
+
+        // create associated resources
+        resource.getAssociations().forEach(association -> {
+            resourceDefStore.addResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
+            resourceStore.createResource(association.getResourceDefRef(), association.getResourceId());
+        });
+
+        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.setAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
+
+        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associations);
+        assertFalse(associations.isEmpty());
+        assertEquals(resource.getAssociations().size(), associations.size());
+        assertTrue(resource.getAssociations().containsAll(associations));
     }
 }

@@ -211,12 +211,12 @@ public class GraphResourceDefStore implements ResourceDefStore {
     }
 
     private void addPropertyDefs(Vertex sourceV, List<PropertyDef> propertyDefs) {
-        LOGGER.debug("- Found {} property definition(s)", propertyDefs.size());
         propertyDefs.forEach(propertyDef -> addPropertyDef(sourceV, propertyDef));
     }
 
     private void addPropertyDef(Vertex sourceV, PropertyDef propertyDef) {
-        LOGGER.debug("- Adding property definition '{}'", propertyDef);
+        LOGGER.debug("- Adding property definition '{}' with value {}",
+                getPropertyPath(sourceV, propertyDef.getName()), propertyDef);
 
         // create property definition vertex
         Vertex propertyFromV = graphTraversal
@@ -239,12 +239,12 @@ public class GraphResourceDefStore implements ResourceDefStore {
     }
 
     private void addAssociationDefs(Vertex sourceV, List<AssociationDef> associationDefs) {
-        LOGGER.debug("- Found {} association definition(s)", associationDefs.size());
         associationDefs.forEach(associationDef -> addAssociationDef(sourceV, associationDef));
     }
 
     private void addAssociationDef(Vertex sourceV, AssociationDef associationDef) {
-        LOGGER.debug("- Adding association definition '{}'", associationDef);
+        LOGGER.debug("- Adding association definition '{}' with value {}",
+                getPropertyPath(sourceV, associationDef.getName()), associationDef);
 
         // create association definition vertex
         Vertex associationDefV = graphTraversal
@@ -260,5 +260,21 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .from(sourceV)
                 .to(associationDefV)
                 .next();
+    }
+
+    private String getPropertyPath(Vertex sourceV, String memberName) {
+        if (sourceV.label().equals(LABEL_RESOURCE_DEF)) {
+            return memberName;
+        } else {
+            return String.format(
+                    "%s.%s",
+                    getPropertyPath(graphTraversal.V(sourceV.id())
+                                    .in(LABEL_HAS_PROPERTY_DEF)
+                                    .next(),
+                            sourceV.value(PROPERTY_NAME)
+                    ),
+                    memberName
+            );
+        }
     }
 }

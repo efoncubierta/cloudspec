@@ -34,10 +34,12 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.valueMap;
 
@@ -113,56 +115,26 @@ public class GraphResourceStore implements ResourceStore {
     }
 
     @Override
-    public Optional<Resource> getResource(ResourceDefRef resourceDefRef, String resourceId) {
-        LOGGER.debug("Getting resource '{}' with id '{}'", resourceDefRef, resourceId);
-
-        return graphTraversal
-                .V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, resourceId)
-                .toStream()
-                .peek(resourceV ->
-                        LOGGER.debug("- Found resource '{}' with id '{}'",
-                                resourceV.value(PROPERTY_RESOURCE_DEF_REF),
-                                resourceV.value(PROPERTY_RESOURCE_ID)
-                        )
-                )
-                .map(this::toResource)
-                .findFirst();
+    public void createResource(ResourceDefRef resourceDefRef, String resourceId) {
+        createResource(resourceDefRef, resourceId, Collections.emptyList(), Collections.emptyList());
     }
 
     @Override
-    public List<Resource> getResourcesByType(ResourceDefRef resourceDefRef) {
-        LOGGER.debug("Getting all resources of type '{}'", resourceDefRef);
+    public void createResource(ResourceDefRef resourceDefRef, String resourceId,
+                               List<Property> properties, List<Association> associations) {
+        LOGGER.debug("Creating resource '{}' with id '{}'", resourceDefRef, resourceId);
 
-        return graphTraversal
-                .V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .toStream()
-                .peek(resourceV ->
-                        LOGGER.debug("- Found resource '{}' with id '{}'",
-                                resourceDefRef,
-                                resourceV.value(PROPERTY_RESOURCE_ID)
-                        )
-                )
-                .map(resourceV -> new Resource(
-                        resourceV.value(PROPERTY_RESOURCE_DEF_REF),
-                        resourceV.value(PROPERTY_RESOURCE_ID),
-                        getProperties(resourceV),
-                        getAssociations(resourceV)
-                ))
-                .collect(Collectors.toList());
-    }
+        if (getResourceVertexById(resourceDefRef, resourceId).isPresent()) {
+            LOGGER.error("A resource '{}' with id '{}' already exists.",
+                    resourceDefRef, resourceId);
+            return;
+        }
 
-    public void addResource(Resource resource) {
-        LOGGER.debug("Adding resource '{}' with id '{}'",
-                resource.getResourceDefRef(), resource.getResourceId());
-
-        // create resource
+        // create resource vertex
         Vertex resourceV = graphTraversal
                 .addV(LABEL_RESOURCE)
-                .property(PROPERTY_RESOURCE_DEF_REF, resource.getResourceDefRef())
-                .property(PROPERTY_RESOURCE_ID, resource.getResourceId())
+                .property(PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .property(PROPERTY_RESOURCE_ID, resourceId)
                 .next();
 
         // link resource to resource definition vertex
@@ -171,7 +143,7 @@ public class GraphResourceStore implements ResourceStore {
                 .has(
                         GraphResourceDefStore.LABEL_RESOURCE_DEF,
                         GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
-                        resource.getResourceDefRef()
+                        resourceDefRef
                 )
                 .as("resourceDef")
                 .addE(LABEL_IS_RESOURCE_DEF)
@@ -183,34 +155,93 @@ public class GraphResourceStore implements ResourceStore {
             throw new RuntimeException(
                     String.format(
                             "Resource definition '%s' not found.",
-                            resource.getResourceDefRef()
+                            resourceDefRef
                     )
             );
         }
 
         // add properties
-        addProperties(resourceV, resource.getProperties());
+        createOrUpdatePropertiesFromVertex(resourceV, properties);
 
         // add associations
-        addAssociations(resourceV, resource.getAssociations());
+        createOrUpdateAssociationsFromVertex(resourceV, associations);
     }
 
-    private void addProperties(Vertex sourceV, List<Property> properties) {
-        LOGGER.debug("- Found {} properties", properties.size());
-        properties
-                .stream()
-                .map(property -> addProperty(sourceV, property))
-                .forEach(propertyVertex ->
-                        graphTraversal
-                                .addE(LABEL_HAS_PROPERTY)
-                                .from(sourceV)
-                                .to(propertyVertex)
-                                .next()
-                );
+    @Override
+    public Boolean exists(ResourceDefRef resourceDefRef, String resourceId) {
+        return getResourceVertexById(resourceDefRef, resourceId).isPresent();
     }
 
-    private Vertex addProperty(Vertex sourceV, Property property) {
-        LOGGER.debug("- Adding property '{}'", property);
+    @Override
+    public List<Property> getProperties(ResourceDefRef resourceDefRef, String resourceId) {
+        return getResourceVertexById(resourceDefRef, resourceId)
+                .map(this::getPropertiesFromVertex)
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
+    public void setProperty(ResourceDefRef resourceDefRef, String resourceId, Property property) {
+        // TODO handle missing resource
+        getResourceVertexById(resourceDefRef, resourceId)
+                .ifPresent(resourceV -> createOrUpdatePropertyFromVertex(resourceV, property));
+    }
+
+    @Override
+    public void setProperties(ResourceDefRef resourceDefRef, String resourceId, List<Property> properties) {
+        // TODO handle missing resource
+        getResourceVertexById(resourceDefRef, resourceId)
+                .ifPresent(resourceV -> createOrUpdatePropertiesFromVertex(resourceV, properties));
+    }
+
+    @Override
+    public List<Association> getAssociations(ResourceDefRef resourceDefRef, String resourceId) {
+        return getResourceVertexById(resourceDefRef, resourceId)
+                .map(this::getAssociationsFromVertex)
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
+    public void setAssociation(ResourceDefRef resourceDefRef, String resourceId, Association association) {
+        // TODO handle missing resource
+        getResourceVertexById(resourceDefRef, resourceId)
+                .ifPresent(resourceV -> createOrUpdateAssociationFromVertex(resourceV, association));
+    }
+
+    @Override
+    public void setAssociations(ResourceDefRef resourceDefRef, String resourceId, List<Association> associations) {
+        // TODO handle missing resource
+        getResourceVertexById(resourceDefRef, resourceId)
+                .ifPresent(resourceV -> createOrUpdateAssociationsFromVertex(resourceV, associations));
+    }
+
+    @Override
+    public Optional<Resource> getResource(ResourceDefRef resourceDefRef, String resourceId) {
+        LOGGER.debug("Getting resource '{}' with id '{}'", resourceDefRef, resourceId);
+
+        return getResourceVertexById(resourceDefRef, resourceId)
+                .flatMap(this::getResourceFromVertex);
+    }
+
+    @Override
+    public List<Resource> getResourcesByDefinition(ResourceDefRef resourceDefRef) {
+        LOGGER.debug("Getting all resources of type '{}'", resourceDefRef);
+
+        return getResourceVerticesByDefinition(resourceDefRef)
+                .map(this::getResourceFromVertex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    private void createOrUpdatePropertiesFromVertex(Vertex sourceV, List<Property> properties) {
+        properties.forEach(property -> createOrUpdatePropertyFromVertex(sourceV, property));
+    }
+
+    private void createOrUpdatePropertyFromVertex(Vertex sourceV, Property property) {
+        LOGGER.debug("- Setting property '{}' with value {}",
+                getPropertyPath(sourceV, property.getName()),
+                property
+        );
 
         // get property definition
         Optional<Vertex> propertyDefVOpt = graphTraversal
@@ -222,12 +253,8 @@ public class GraphResourceStore implements ResourceStore {
 
         // TODO validate property value with definition
         if (!propertyDefVOpt.isPresent()) {
-            throw new RuntimeException(
-                    String.format(
-                            "Property definition '%s' not found",
-                            property.getName()
-                    )
-            );
+            LOGGER.error("Property definition '{}' not found. Ignoring it.", property.getName());
+            return;
         }
 
         // create property vertex
@@ -254,63 +281,90 @@ public class GraphResourceStore implements ResourceStore {
                 .to(propertyDefVOpt.get())
                 .next();
 
-        // add nested properties
+        // link source (resource or property) vertex to property vertex
+        graphTraversal
+                .addE(LABEL_HAS_PROPERTY)
+                .from(sourceV)
+                .to(propertyFromV)
+                .next();
+
+        // if property type is map, then spread out properties to their own vertex
         if (propertyDefVOpt.get().value(GraphResourceDefStore.PROPERTY_TYPE).equals(PropertyType.MAP)) {
-            // if property type is map, then spread out properties to their own vertex
-            addProperties(propertyFromV, ((List<Property>) property.getValue()));
+            createOrUpdatePropertiesFromVertex(propertyFromV, ((List<Property>) property.getValue()));
         }
-
-        return propertyFromV;
     }
 
-    private void addAssociations(Vertex sourceV, List<Association> associations) {
-        LOGGER.debug("- Found {} association(s)", associations.size());
-
-        associations.forEach(association -> addAssociation(sourceV, association));
+    private void createOrUpdateAssociationsFromVertex(Vertex sourceV, List<Association> associations) {
+        associations.forEach(association -> createOrUpdateAssociationFromVertex(sourceV, association));
     }
 
-    private void addAssociation(Vertex sourceV, Association association) {
+    private void createOrUpdateAssociationFromVertex(Vertex sourceV, Association association) {
+        LOGGER.debug("- Setting association '{}'", association);
+
         // validate target resource exists
-        Optional<Vertex> vertexOpt = getResourceVertexById(association.getResourceDefRef(), association.getResourceId());
-        if (!vertexOpt.isPresent()) {
-            throw new RuntimeException(
-                    String.format("Resource '%s' with id '%s' not found.",
-                            association.getResourceDefRef(),
-                            association.getResourceId()
-                    )
+        Optional<Vertex> targetVOpt = getResourceVertexById(association.getResourceDefRef(), association.getResourceId());
+        if (!targetVOpt.isPresent()) {
+            LOGGER.error("Resource '{}' with id '{}' not found. Ignoring association '{}'.",
+                    association.getResourceDefRef(),
+                    association.getResourceId(),
+                    association.getName()
             );
+            return;
         }
 
-        LOGGER.debug("- Adding association '{}'", association);
+        // link source vertex to target vertex
         graphTraversal.addE(LABEL_HAS_ASSOCIATION)
                 .property(PROPERTY_NAME, association.getName())
                 .from(sourceV)
-                .to(vertexOpt.get())
+                .to(targetVOpt.get())
                 .next();
 
     }
 
-    private Optional<Vertex> getResourceVertexById(ResourceDefRef resourceDefRef, String resourceId) {
-        List<Vertex> vertices = graphTraversal.V().has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, resourceId)
-                .toList();
-
-        return vertices.size() > 0 ? Optional.of(vertices.get(0)) : Optional.empty();
+    private Stream<Vertex> getResourceVertices(ResourceDefRef resourceDefRef) {
+        return graphTraversal.V()
+                .has(LABEL_RESOURCE)
+                .toStream();
     }
 
-    private Resource toResource(Vertex resourceV) {
+    private Stream<Vertex> getResourceVerticesByDefinition(ResourceDefRef resourceDefRef) {
+        return graphTraversal.V()
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .toStream();
+    }
+
+    private Optional<Vertex> getResourceVertexById(ResourceDefRef resourceDefRef, String resourceId) {
+        return graphTraversal.V()
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .has(PROPERTY_RESOURCE_ID, resourceId)
+                .tryNext();
+    }
+
+    private Optional<Resource> getResourceFromVertex(Vertex resourceV) {
+        if (!resourceV.label().equals(LABEL_RESOURCE)) {
+            LOGGER.error("Vertex is not of type '{}'.", LABEL_RESOURCE);
+            return Optional.empty();
+        }
+
         ResourceDefRef resourceDefRef = resourceV.value(PROPERTY_RESOURCE_DEF_REF);
         String resourceId = resourceV.value(PROPERTY_RESOURCE_ID);
 
-        return new Resource(
+        LOGGER.debug("- Found resource '{}' with id '{}'",
                 resourceDefRef,
-                resourceId,
-                getProperties(resourceV),
-                getAssociations(resourceV)
+                resourceId
+        );
+
+        return Optional.of(
+                new Resource(
+                        resourceDefRef,
+                        resourceId,
+                        getPropertiesFromVertex(resourceV),
+                        getAssociationsFromVertex(resourceV)
+                )
         );
     }
 
-    private List<Property> getProperties(Vertex sourceV) {
+    private List<Property> getPropertiesFromVertex(Vertex sourceV) {
         return graphTraversal
                 .V(sourceV.id())
                 .out(LABEL_HAS_PROPERTY)
@@ -319,7 +373,7 @@ public class GraphResourceStore implements ResourceStore {
                     if (propertyV.value(PROPERTY_IS_MAP)) {
                         return new Property(
                                 propertyV.value(PROPERTY_NAME),
-                                getProperties(propertyV)
+                                getPropertiesFromVertex(propertyV)
                         );
                     } else {
                         return new Property(
@@ -331,7 +385,7 @@ public class GraphResourceStore implements ResourceStore {
                 .collect(Collectors.toList());
     }
 
-    private List<Association> getAssociations(Vertex resourceV) {
+    private List<Association> getAssociationsFromVertex(Vertex resourceV) {
         return graphTraversal
                 .V(resourceV.id())
                 .outE(LABEL_HAS_ASSOCIATION).as("association")
@@ -350,5 +404,21 @@ public class GraphResourceStore implements ResourceStore {
                             (String) targetMap.get(PROPERTY_RESOURCE_ID).get(0)
                     );
                 }).collect(Collectors.toList());
+    }
+
+    private String getPropertyPath(Vertex sourceV, String memberName) {
+        if (sourceV.label().equals(LABEL_RESOURCE)) {
+            return memberName;
+        } else {
+            return String.format(
+                    "%s.%s",
+                    getPropertyPath(graphTraversal.V(sourceV.id())
+                                    .in(LABEL_HAS_PROPERTY)
+                                    .next(),
+                            sourceV.value(PROPERTY_NAME)
+                    ),
+                    memberName
+            );
+        }
     }
 }

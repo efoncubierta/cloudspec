@@ -25,6 +25,8 @@
  */
 package cloudspec.store;
 
+import cloudspec.model.Association;
+import cloudspec.model.Property;
 import cloudspec.model.Resource;
 import cloudspec.model.ResourceDefRef;
 
@@ -32,9 +34,26 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResourceStore {
-    void addResource(Resource resource);
+    void createResource(ResourceDefRef resourceDefRef, String resourceId);
 
-    Optional<Resource> getResource(ResourceDefRef resourceDefRef, String id);
+    void createResource(ResourceDefRef resourceDefRef, String resourceId,
+                        List<Property> properties, List<Association> associations);
 
-    List<Resource> getResourcesByType(ResourceDefRef resourceDefRef);
+    Boolean exists(ResourceDefRef resourceDefRef, String resourceId);
+
+    Optional<Resource> getResource(ResourceDefRef resourceDefRef, String resourceId);
+
+    List<Resource> getResourcesByDefinition(ResourceDefRef resourceDefRef);
+
+    List<Property> getProperties(ResourceDefRef resourceDefRef, String resourceId);
+
+    void setProperty(ResourceDefRef resourceDefRef, String resourceId, Property property);
+
+    void setProperties(ResourceDefRef resourceDefRef, String resourceId, List<Property> properties);
+
+    List<Association> getAssociations(ResourceDefRef resourceDefRef, String resourceId);
+
+    void setAssociation(ResourceDefRef resourceDefRef, String resourceId, Association association);
+
+    void setAssociations(ResourceDefRef resourceDefRef, String resourceId, List<Association> associations);
 }

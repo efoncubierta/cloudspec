@@ -26,14 +26,20 @@
 package cloudspec.preflight;
 
 import cloudspec.lang.*;
+import cloudspec.loader.ResourceLoader;
+import cloudspec.model.AssociationDef;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
 public class CloudSpecPreflight {
+    private final Logger LOGGER = LoggerFactory.getLogger(ResourceLoader.class);
+
     private final ResourceDefStore resourceDefStore;
 
     public CloudSpecPreflight(ResourceDefStore resourceDefStore) {
@@ -41,7 +47,7 @@ public class CloudSpecPreflight {
     }
 
     public void preflight(CloudSpec spec) {
-        System.out.println("CloudSpec Preflight");
+        LOGGER.info("Validating cloud specification");
 
         preflightGroups(spec.getGroups());
     }
@@ -72,22 +78,71 @@ public class CloudSpecPreflight {
             throw new CloudSpecPreflightException(String.format("Resource of type '%s' is not supported.", rule.getResourceDefRef()));
         }
 
+        ResourceDef resourceDef = resourceDefOpt.get();
+
         // preflight withs and asserts
-        preflightWith(resourceDefOpt.get(), rule.getWithExpr());
-        preflightAssert(resourceDefOpt.get(), rule.getAssertExpr());
+        rule.getWithExpr().getStatements().forEach(statement -> preflightStatement(resourceDef, statement));
+        rule.getAssertExpr().getStatements().forEach(statement -> preflightStatement(resourceDef, statement));
     }
 
-    private void preflightWith(ResourceDef resourceDef, WithExpr withExpr) {
-//        withExprs.forEach(withExpr -> preflightProperty(resourceDef, withExpr.getPropertyName()));
+    private void preflightStatement(ResourceDef resourceDef, Statement statement) {
+        if (statement instanceof NestedStatement) {
+            preflightNestedStatement(resourceDef, ((NestedStatement) statement));
+        } else if (statement instanceof PropertyStatement) {
+            preflightPropertyStatement(resourceDef, (PropertyStatement) statement);
+        } else if (statement instanceof AssociationStatement) {
+            preflightAssociationStatement(resourceDef, (AssociationStatement) statement);
+        }
     }
 
-    private void preflightAssert(ResourceDef resourceDef, AssertExpr assertExpr) {
-//        assertExprs.forEach(assertExpr -> preflightProperty(resourceDef, assertExpr.getPropertyName()));
+    private void preflightNestedStatement(ResourceDef resourceDef, NestedStatement statement) {
+        if (!resourceDef.getProperty(statement.getMemberName()).isPresent()) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Resource type '%s' does not define property '%s'.",
+                            resourceDef.getRef(), statement.getMemberName()
+                    )
+            );
+        }
+        preflightStatement(resourceDef, statement.getStatement());
     }
 
-    private void preflightProperty(ResourceDef resourceDef, String propertyName) {
-        if (!resourceDef.getProperty(propertyName).isPresent()) {
-            throw new CloudSpecPreflightException(String.format("Resource type '%s' does not define property '%s'.", resourceDef.getRef(), propertyName));
+    private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement) {
+        Optional<AssociationDef> associationDefOpt = resourceDef.getAssociation(statement.getAssociationName());
+        if (!associationDefOpt.isPresent()) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Resource type '%s' does not define association '%s'.",
+                            resourceDef.getRef(), statement.getAssociationName()
+                    )
+            );
+        }
+
+        AssociationDef associationDef = associationDefOpt.get();
+
+        Optional<ResourceDef> associatedResourceDefOpt = resourceDefStore.getResourceDef(associationDef.getResourceDefRef());
+        if (!associatedResourceDefOpt.isPresent()) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Associated resource of type '%s' is not supported.",
+                            associationDef.getResourceDefRef()
+                    )
+            );
+        }
+
+        ResourceDef associatedResourceDef = associatedResourceDefOpt.get();
+        statement.getStatements().forEach(stmt -> preflightStatement(associatedResourceDef, stmt));
+    }
+
+    private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement) {
+        if (!resourceDef.getProperty(statement.getPropertyName()).isPresent()) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Resource type '%s' does not define property '%s'.",
+                            resourceDef.getRef(),
+                            statement.getPropertyName()
+                    )
+            );
         }
     }
 }

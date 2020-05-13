@@ -46,8 +46,6 @@ public class CloudSpecMain {
         // load spec
         CloudSpec spec = loader.load(is);
 
-        System.out.println(spec);
-
         // run spec
         CloudSpecRunner runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner();
         runner.validate(spec);
