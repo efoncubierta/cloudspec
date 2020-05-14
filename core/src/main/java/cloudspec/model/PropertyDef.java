@@ -27,14 +27,13 @@ package cloudspec.model;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Define a property definition.
  * <p>
  * Properties must be defined so resources integrity can be validated.
  */
-public class PropertyDef extends BaseMemberDef {
+public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer {
     private final PropertyType propertyType;
     private final Boolean isArray;
     private final List<PropertyDef> properties;
@@ -85,21 +84,7 @@ public class PropertyDef extends BaseMemberDef {
         return isArray;
     }
 
-    /**
-     * Get a property definition by name.
-     *
-     * @param propertyName Property name.
-     * @return Optional property definition.
-     */
-    public Optional<PropertyDef> getProperty(String propertyName) {
-        return getProperties().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
-    }
-
-    /**
-     * Get list of property definitions.
-     *
-     * @return List of property definitions.
-     */
+    @Override
     public List<PropertyDef> getProperties() {
         return properties;
     }

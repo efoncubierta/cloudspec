@@ -26,14 +26,13 @@
 package cloudspec.model;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Define a resource definition.
  * <p>
  * All resources to be validated must be defined beforehand.
  */
-public class ResourceDef {
+public class ResourceDef implements PropertyDefsContainer, AssociationDefsContainer {
     private final ResourceDefRef ref;
     private final String description;
     private final List<PropertyDef> properties;
@@ -72,40 +71,12 @@ public class ResourceDef {
         return description;
     }
 
-    /**
-     * Get a property definition by name.
-     *
-     * @param propertyName Property name.
-     * @return Optional property definition.
-     */
-    public Optional<PropertyDef> getProperty(String propertyName) {
-        return getProperties().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
-    }
-
-    /**
-     * Get list of property definitions.
-     *
-     * @return List of property definitions.
-     */
+    @Override
     public List<PropertyDef> getProperties() {
         return properties;
     }
 
-    /**
-     * Get an association definition by name.
-     *
-     * @param associationName Association name.
-     * @return Optional association definition.
-     */
-    public Optional<AssociationDef> getAssociation(String associationName) {
-        return getAssociations().stream().filter(def -> def.getName().equals(associationName)).findFirst();
-    }
-
-    /**
-     * Get list of association definitions.
-     *
-     * @return List of association definitions.
-     */
+    @Override
     public List<AssociationDef> getAssociations() {
         return associations;
     }

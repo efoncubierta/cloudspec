@@ -23,18 +23,26 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.store;
-
-import cloudspec.model.ResourceDef;
-import cloudspec.model.ResourceDefRef;
+package cloudspec.model;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ResourceDefStore {
-    void createResourceDef(ResourceDef resourceDef);
+public interface AssociationsContainer {
+    /**
+     * Get an association by name.
+     *
+     * @param associationName Association name.
+     * @return Optional association.
+     */
+    default Optional<Association> getAssociation(String associationName) {
+        return getAssociations().stream().filter(association -> association.getName().equals(associationName)).findFirst();
+    }
 
-    Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef);
-
-    List<ResourceDef> getResourceDefs();
+    /**
+     * Get all associations.
+     *
+     * @return List of associations.
+     */
+    List<Association> getAssociations();
 }

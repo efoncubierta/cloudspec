@@ -26,7 +26,6 @@
 package cloudspec.model;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Define a CloudSpec resource.
@@ -36,7 +35,7 @@ import java.util.Optional;
  * <p>
  * Resources are provided by the providers.
  */
-public class Resource {
+public class Resource implements PropertiesContainer, AssociationsContainer {
     private final ResourceDefRef resourceDefRef;
     private final String resourceId;
     private final List<Property> properties;
@@ -75,43 +74,12 @@ public class Resource {
         return resourceId;
     }
 
-    /**
-     * Get a resource property by name.
-     *
-     * @param propertyName Property name.
-     * @return Optional property.
-     */
-    public Optional<Property> getProperty(String propertyName) {
-        return getProperties()
-                .stream()
-                .filter(p -> p.getName().equals(propertyName))
-                .findFirst();
-    }
-
-    /**
-     * Get all resource properties.
-     *
-     * @return List of properties.
-     */
+    @Override
     public List<Property> getProperties() {
         return properties;
     }
 
-    /**
-     * Get a resource association by name.
-     *
-     * @param associationName Association name.
-     * @return Optional association.
-     */
-    public Optional<Association> getAssociation(String associationName) {
-        return getAssociations().stream().filter(association -> association.getName().equals(associationName)).findFirst();
-    }
-
-    /**
-     * Get all resource's associations.
-     *
-     * @return List of associations.
-     */
+    @Override
     public List<Association> getAssociations() {
         return associations;
     }

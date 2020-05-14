@@ -33,12 +33,10 @@ import cloudspec.validator.ResourceValidationResult;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -48,9 +46,12 @@ public class GraphResourceValidatorTest {
     private final GraphResourceStore resourceStore = new GraphResourceStore(graph);
     private final GraphResourceValidator validator = new GraphResourceValidator(graph);
 
-    {
-        resourceDefStore.addResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
-        resourceDefStore.addResourceDef(ModelTestUtils.RESOURCE_DEF);
+    @Before
+    public void before() {
+        graph.traversal().V().drop().iterate();
+
+        resourceDefStore.createResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
+        resourceDefStore.createResourceDef(ModelTestUtils.RESOURCE_DEF);
         resourceStore.createResource(
                 ModelTestUtils.TARGET_RESOURCE_DEF_REF,
                 ModelTestUtils.TARGET_RESOURCE_ID,
@@ -178,6 +179,38 @@ public class GraphResourceValidatorTest {
     }
 
     @Test
+    public void shouldSuccessAssertingPropertiesOfResourceById() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.singletonList(
+                        new PropertyStatement(ModelTestUtils.PROP_INTEGER_NAME, P.eq(ModelTestUtils.PROP_INTEGER_VALUE))
+                ),
+                Collections.singletonList(
+                        new NestedStatement(
+                                ModelTestUtils.PROP_MAP_NAME,
+                                new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE))
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertTrue(result.isSuccess());
+            assertEquals(ModelTestUtils.RESOURCE_DEF_REF, result.getResourceDefRef());
+            assertNotNull(result.getResourceId());
+            assertEquals(1, result.getAssertResults().size());
+            assertTrue(result.getAssertResults().get(0).isSuccess());
+            assertEquals(
+                    String.format("%s->%s", ModelTestUtils.PROP_MAP_NAME, ModelTestUtils.PROP_STRING_NAME),
+                    String.join("->", result.getAssertResults().get(0).getPath())
+            );
+        });
+    }
+
+    @Test
     public void shouldSuccessAssertingProperties() {
         List<ResourceValidationResult> results = validator.validateAll(
                 ModelTestUtils.RESOURCE_DEF_REF,
@@ -196,7 +229,6 @@ public class GraphResourceValidatorTest {
         assertTrue(results.size() > 0);
 
         results.forEach(result -> {
-            System.out.println(result);
             assertTrue(result.isSuccess());
             assertEquals(ModelTestUtils.RESOURCE_DEF_REF, result.getResourceDefRef());
             assertNotNull(result.getResourceId());
@@ -230,7 +262,6 @@ public class GraphResourceValidatorTest {
         assertTrue(results.size() > 0);
 
         results.forEach(result -> {
-            System.out.println(result);
             assertTrue(result.isSuccess());
             assertEquals(ModelTestUtils.RESOURCE_DEF_REF, result.getResourceDefRef());
             assertNotNull(result.getResourceId());

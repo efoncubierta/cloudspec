@@ -84,6 +84,10 @@ public class ResourceDefRef {
     public static Optional<ResourceDefRef> fromString(String refString) {
         // TODO manage null or malformed strings
         String[] parts = refString.split(":");
+        if(parts.length != 3) {
+            return Optional.empty();
+        }
+
         return Optional.of(new ResourceDefRef(parts[0], parts[1], parts[2]));
     }
 

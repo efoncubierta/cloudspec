@@ -25,7 +25,25 @@
  */
 package cloudspec.model;
 
+import cloudspec.util.ModelTestUtils;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
+
 public class ResourceTest {
+    @Test
+    public void shouldGetPropertyByPath() {
+        Optional<PropertyDef> propertyDefOpt = ModelTestUtils.RESOURCE_DEF.getPropertyByPath(
+                Arrays.asList(ModelTestUtils.PROP_MAP_NAME, ModelTestUtils.PROP_STRING_NAME)
+        );
+
+        assertNotNull(propertyDefOpt);
+        assertTrue(propertyDefOpt.isPresent());
+        assertEquals(ModelTestUtils.PROP_STRING_DEF, propertyDefOpt.get());
+    }
 //    @Test
 //    public void shouldBuildResourceFromAnnotation() {
 //        BaseResource resource = new MyResource(MyResource.PROP_INTEGER_VALUE, MyResource.PROP_STRING_VALUE, MyResource.PROP_BOOLEAN_VALUE);

@@ -173,10 +173,13 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
         return graphTraversal
                 .V()
-                .has(LABEL_RESOURCE_DEF)
+                .hasLabel(LABEL_RESOURCE_DEF)
                 .toStream()
-                .peek(resourceDefV -> LOGGER.debug("- Found resource definition '{}'",
-                        (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF))
+                .peek(resourceDefV ->
+                        LOGGER.debug(
+                                "- Found resource definition '{}'",
+                                (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF)
+                        )
                 )
                 .map(resourceDefV -> new ResourceDef(
                         resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
@@ -188,7 +191,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
     }
 
     @Override
-    public void addResourceDef(ResourceDef resourceDef) {
+    public void createResourceDef(ResourceDef resourceDef) {
         LOGGER.debug("Adding resource definition '{}'", resourceDef.getRef());
 
         ResourceDefRef resourceDefRef = resourceDef.getRef();

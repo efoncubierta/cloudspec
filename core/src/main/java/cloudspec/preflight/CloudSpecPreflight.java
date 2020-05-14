@@ -28,12 +28,15 @@ package cloudspec.preflight;
 import cloudspec.lang.*;
 import cloudspec.loader.ResourceLoader;
 import cloudspec.model.AssociationDef;
+import cloudspec.model.PropertyDef;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,7 +99,8 @@ public class CloudSpecPreflight {
     }
 
     private void preflightNestedStatement(ResourceDef resourceDef, NestedStatement statement) {
-        if (!resourceDef.getProperty(statement.getMemberName()).isPresent()) {
+        Optional<PropertyDef> propertyDefOpt = resourceDef.getPropertyByPath(toPath(statement));
+        if (!propertyDefOpt.isPresent()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Resource type '%s' does not define property '%s'.",
@@ -104,7 +108,6 @@ public class CloudSpecPreflight {
                     )
             );
         }
-        preflightStatement(resourceDef, statement.getStatement());
     }
 
     private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement) {
@@ -144,5 +147,19 @@ public class CloudSpecPreflight {
                     )
             );
         }
+    }
+
+    private List<String> toPath(Statement statement) {
+        if (statement instanceof NestedStatement) {
+            List<String> path = new ArrayList<>();
+            path.add(((NestedStatement) statement).getMemberName());
+            path.addAll(toPath(((NestedStatement) statement).getStatement()));
+            return path;
+        } else if (statement instanceof PropertyStatement) {
+            return Collections.singletonList(((PropertyStatement) statement).getPropertyName());
+        } else if (statement instanceof AssociationStatement) {
+            return Collections.singletonList(((AssociationStatement) statement).getAssociationName());
+        }
+        return Collections.emptyList();
     }
 }

@@ -23,18 +23,29 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.store;
-
-import cloudspec.model.ResourceDef;
-import cloudspec.model.ResourceDefRef;
+package cloudspec.model;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ResourceDefStore {
-    void createResourceDef(ResourceDef resourceDef);
+public interface PropertiesContainer {
+    /**
+     * Get a property by name.
+     *
+     * @param propertyName Property name.
+     * @return Optional property.
+     */
+    default Optional<Property> getProperty(String propertyName) {
+        return getProperties()
+                .stream()
+                .filter(p -> p.getName().equals(propertyName))
+                .findFirst();
+    }
 
-    Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef);
-
-    List<ResourceDef> getResourceDefs();
+    /**
+     * Get all properties.
+     *
+     * @return List of properties.
+     */
+    List<Property> getProperties();
 }

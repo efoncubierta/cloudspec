@@ -79,7 +79,7 @@ public class CloudSpecManager {
                     LOGGER.debug("- Found {} resource definitions", provider.getResourceDefs().size());
                 })
                 .flatMap(provider -> provider.getResourceDefs().stream())
-                .forEach(resourceDefStore::addResourceDef);
+                .forEach(resourceDefStore::createResourceDef);
 
         initiated = Boolean.TRUE;
     }

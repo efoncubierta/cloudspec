@@ -321,12 +321,6 @@ public class GraphResourceStore implements ResourceStore {
 
     }
 
-    private Stream<Vertex> getResourceVertices(ResourceDefRef resourceDefRef) {
-        return graphTraversal.V()
-                .has(LABEL_RESOURCE)
-                .toStream();
-    }
-
     private Stream<Vertex> getResourceVerticesByDefinition(ResourceDefRef resourceDefRef) {
         return graphTraversal.V()
                 .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)

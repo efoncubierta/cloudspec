@@ -26,32 +26,52 @@
 package cloudspec.graph;
 
 import cloudspec.model.ResourceDef;
+import cloudspec.util.ModelGenerator;
 import cloudspec.util.ModelTestUtils;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
 
 public class GraphResourceDefStoreTest {
+    private final Graph graph = TinkerGraph.open();
+    GraphResourceDefStore resourceDefStore = new GraphResourceDefStore(graph);
+
+    @Before
+    public void before() {
+        graph.traversal().V().drop().iterate();
+    }
+
     @Test
-    public void shouldNotGetResourceDefThatDoesntExist() {
-        GraphResourceDefStore store = new GraphResourceDefStore(TinkerGraph.open());
-        Optional<ResourceDef> resourceDefOpt = store.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF);
+    public void shouldNotGetRandomResourceDef() {
+        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF);
         assertNotNull(resourceDefOpt);
         assertFalse(resourceDefOpt.isPresent());
     }
 
     @Test
-    public void shouldAddAndGetResourceDef() {
-        GraphResourceDefStore store = new GraphResourceDefStore(TinkerGraph.open());
-
-        store.addResourceDef(ModelTestUtils.RESOURCE_DEF);
-
-        Optional<ResourceDef> resourceDefOpt = store.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF);
+    public void shouldCreateResourceDef() {
+        resourceDefStore.createResourceDef(ModelTestUtils.RESOURCE_DEF);
+        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF);
         assertNotNull(resourceDefOpt);
         assertTrue(resourceDefOpt.isPresent());
         assertEquals(ModelTestUtils.RESOURCE_DEF, resourceDefOpt.get());
+    }
+
+    @Test
+    public void shouldCreateMultipleResourceDefs() {
+        resourceDefStore.createResourceDef(ModelGenerator.randomResourceDef());
+        resourceDefStore.createResourceDef(ModelGenerator.randomResourceDef());
+        resourceDefStore.createResourceDef(ModelGenerator.randomResourceDef());
+
+        List<ResourceDef> resourceDefs = resourceDefStore.getResourceDefs();
+        assertNotNull(resourceDefs);
+        assertFalse(resourceDefs.isEmpty());
+        assertEquals(3, resourceDefs.size());
     }
 }

@@ -30,6 +30,7 @@ import cloudspec.util.ModelGenerator;
 import cloudspec.util.ModelTestUtils;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -42,9 +43,12 @@ public class GraphResourceStoreTest {
     private final GraphResourceDefStore resourceDefStore = new GraphResourceDefStore(graph);
     private final GraphResourceStore resourceStore = new GraphResourceStore(graph);
 
-    {
-        resourceDefStore.addResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
-        resourceDefStore.addResourceDef(ModelTestUtils.RESOURCE_DEF);
+    @Before
+    public void before() {
+        graph.traversal().V().drop().iterate();
+
+        resourceDefStore.createResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
+        resourceDefStore.createResourceDef(ModelTestUtils.RESOURCE_DEF);
         resourceStore.createResource(
                 ModelTestUtils.TARGET_RESOURCE_DEF_REF,
                 ModelTestUtils.TARGET_RESOURCE_ID,
@@ -187,7 +191,7 @@ public class GraphResourceStoreTest {
         Resource resource = ModelGenerator.randomResource(resourceDef);
         Property property = ModelGenerator.randomProperty();
 
-        resourceDefStore.addResourceDef(resourceDef);
+        resourceDefStore.createResourceDef(resourceDef);
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
 
@@ -202,7 +206,7 @@ public class GraphResourceStoreTest {
         Resource resource = ModelGenerator.randomResource(resourceDef);
         Property property = resource.getProperties().get(0);
 
-        resourceDefStore.addResourceDef(resourceDef);
+        resourceDefStore.createResourceDef(resourceDef);
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
 
@@ -218,7 +222,7 @@ public class GraphResourceStoreTest {
         ResourceDef resourceDef = ModelGenerator.randomResourceDef();
         Resource resource = ModelGenerator.randomResource(resourceDef);
 
-        resourceDefStore.addResourceDef(resourceDef);
+        resourceDefStore.createResourceDef(resourceDef);
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setProperties(resource.getResourceDefRef(), resource.getResourceId(), resource.getProperties());
 
@@ -252,7 +256,7 @@ public class GraphResourceStoreTest {
         Resource resource = ModelGenerator.randomResource(resourceDef);
         Association association = ModelGenerator.randomAssociation();
 
-        resourceDefStore.addResourceDef(resourceDef);
+        resourceDefStore.createResourceDef(resourceDef);
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setAssociation(
                 resource.getResourceDefRef(),
@@ -271,7 +275,7 @@ public class GraphResourceStoreTest {
         Resource resource = ModelGenerator.randomResource(resourceDef);
         Association association = resource.getAssociations().get(0);
 
-        resourceDefStore.addResourceDef(resourceDef);
+        resourceDefStore.createResourceDef(resourceDef);
 
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setAssociation(resource.getResourceDefRef(), resource.getResourceId(), association);
@@ -287,10 +291,10 @@ public class GraphResourceStoreTest {
         Resource resource = ModelGenerator.randomResource(resourceDef);
         Association association = resource.getAssociations().get(0);
 
-        resourceDefStore.addResourceDef(resourceDef);
+        resourceDefStore.createResourceDef(resourceDef);
 
         // create associated resources
-        resourceDefStore.addResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
+        resourceDefStore.createResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
         resourceStore.createResource(association.getResourceDefRef(), association.getResourceId());
 
 
@@ -309,11 +313,11 @@ public class GraphResourceStoreTest {
         ResourceDef resourceDef = ModelGenerator.randomResourceDef();
         Resource resource = ModelGenerator.randomResource(resourceDef);
 
-        resourceDefStore.addResourceDef(resourceDef);
+        resourceDefStore.createResourceDef(resourceDef);
 
         // create associated resources
         resource.getAssociations().forEach(association -> {
-            resourceDefStore.addResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
+            resourceDefStore.createResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
             resourceStore.createResource(association.getResourceDefRef(), association.getResourceId());
         });
 

@@ -25,12 +25,13 @@
  */
 package cloudspec.model;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Define a resource property.
  */
-public class Property extends BaseMember {
+public class Property extends BaseMember implements PropertiesContainer {
     private final Object value;
 
     /**
@@ -52,6 +53,18 @@ public class Property extends BaseMember {
      */
     public Object getValue() {
         return value;
+    }
+
+    @Override
+    public List<Property> getProperties() {
+        // TODO review this code
+        if (value instanceof List) {
+            List<?> values = ((List<?>) value);
+            if (values.size() > 0 && values.get(0) instanceof Property) {
+                return ((List<Property>) values);
+            }
+        }
+        return Collections.emptyList();
     }
 
     @Override
