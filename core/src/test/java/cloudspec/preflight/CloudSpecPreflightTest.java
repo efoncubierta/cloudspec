@@ -28,6 +28,7 @@ package cloudspec.preflight;
 import cloudspec.graph.GraphResourceDefStore;
 import cloudspec.lang.*;
 import cloudspec.model.ResourceDef;
+import cloudspec.util.CloudSpecTestUtils;
 import cloudspec.util.ModelGenerator;
 import cloudspec.util.ModelTestUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
@@ -36,7 +37,6 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.assertThrows;
@@ -217,51 +217,6 @@ public class CloudSpecPreflightTest {
         resourceDefStore.createResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
         resourceDefStore.createResourceDef(ModelTestUtils.RESOURCE_DEF);
 
-        CloudSpec spec = new CloudSpec(
-                ModelGenerator.randomName(),
-                Collections.singletonList(
-                        new GroupExpr(
-                                ModelGenerator.randomName(),
-                                Collections.singletonList(
-                                        new RuleExpr(
-                                                ModelGenerator.randomName(),
-                                                ModelTestUtils.RESOURCE_DEF_REF.toString(),
-                                                new WithExpr(
-                                                        Arrays.asList(
-                                                                new PropertyStatement(
-                                                                        ModelTestUtils.PROP_INTEGER_NAME,
-                                                                        P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
-                                                                ),
-                                                                new PropertyStatement(
-                                                                        ModelTestUtils.PROP_STRING_NAME,
-                                                                        P.eq(ModelTestUtils.PROP_STRING_VALUE)
-                                                                ),
-                                                                new PropertyStatement(
-                                                                        ModelTestUtils.PROP_BOOLEAN_NAME,
-                                                                        P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
-                                                                ),
-                                                                new NestedStatement(
-                                                                        ModelTestUtils.PROP_MAP_NAME,
-                                                                        new PropertyStatement(
-                                                                                ModelTestUtils.PROP_INTEGER_NAME,
-                                                                                P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
-                                                                        )
-                                                                ),
-                                                                new AssociationStatement(
-                                                                        ModelTestUtils.ASSOC_NAME,
-                                                                        Collections.emptyList()
-                                                                )
-                                                        )
-                                                ),
-                                                new AssertExpr(
-                                                        Collections.emptyList()
-                                                )
-                                        )
-                                )
-                        )
-                )
-        );
-
-        preflight.preflight(spec);
+        preflight.preflight(CloudSpecTestUtils.TEST_SPEC);
     }
 }

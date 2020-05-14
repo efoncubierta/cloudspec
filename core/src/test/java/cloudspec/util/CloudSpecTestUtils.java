@@ -26,31 +26,106 @@
 package cloudspec.util;
 
 import cloudspec.lang.*;
-import cloudspec.lang.PropertyStatement;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class CloudSpecTestUtils {
     public static final String TEST_SPEC_NAME = "myspec";
     public static final String TEST_SPEC_GROUP_NAME = "mygroup";
     public static final String TEST_SPEC_RULE_NAME = "myrule";
 
-    public static final List<WithExpr> TEST_WITH_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new WithExpr(Collections.singletonList(new PropertyStatement(propertyDef.getName(), P.eq(1)))))
-            .collect(Collectors.toList());
+    public static final WithExpr TEST_WITH_EXPR = new WithExpr(
+            Arrays.asList(
+                    new PropertyStatement(
+                            ModelTestUtils.PROP_INTEGER_NAME,
+                            P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                    ),
+                    new PropertyStatement(
+                            ModelTestUtils.PROP_STRING_NAME,
+                            P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                    ),
+                    new PropertyStatement(
+                            ModelTestUtils.PROP_BOOLEAN_NAME,
+                            P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
+                    ),
+                    new NestedStatement(
+                            ModelTestUtils.PROP_MAP_NAME,
+                            new PropertyStatement(
+                                    ModelTestUtils.PROP_INTEGER_NAME,
+                                    P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                            )
+                    ),
+                    new NestedStatement(
+                            ModelTestUtils.PROP_MAP_NAME,
+                            new PropertyStatement(
+                                    ModelTestUtils.PROP_STRING_NAME,
+                                    P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                            )
+                    ),
+                    new NestedStatement(
+                            ModelTestUtils.PROP_MAP_NAME,
+                            new PropertyStatement(
+                                    ModelTestUtils.PROP_BOOLEAN_NAME,
+                                    P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
+                            )
+                    ),
+                    new AssociationStatement(
+                            ModelTestUtils.ASSOC_NAME,
+                            Collections.emptyList()
+                    )
+            )
+    );
 
-    public static final List<AssertExpr> TEST_ASSERT_EXPRS = ModelTestUtils.RESOURCE_DEF.getProperties().stream()
-            .map(propertyDef -> new AssertExpr(Collections.singletonList(new PropertyStatement(propertyDef.getName(), P.eq(1)))))
-            .collect(Collectors.toList());
+    public static final AssertExpr TEST_ASSERT_EXPR = new AssertExpr(
+            Arrays.asList(
+                    new PropertyStatement(
+                            ModelTestUtils.PROP_INTEGER_NAME,
+                            P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                    ),
+                    new PropertyStatement(
+                            ModelTestUtils.PROP_STRING_NAME,
+                            P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                    ),
+                    new PropertyStatement(
+                            ModelTestUtils.PROP_BOOLEAN_NAME,
+                            P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
+                    ),
+                    new NestedStatement(
+                            ModelTestUtils.PROP_MAP_NAME,
+                            new PropertyStatement(
+                                    ModelTestUtils.PROP_INTEGER_NAME,
+                                    P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                            )
+                    ),
+                    new NestedStatement(
+                            ModelTestUtils.PROP_MAP_NAME,
+                            new PropertyStatement(
+                                    ModelTestUtils.PROP_STRING_NAME,
+                                    P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                            )
+                    ),
+                    new NestedStatement(
+                            ModelTestUtils.PROP_MAP_NAME,
+                            new PropertyStatement(
+                                    ModelTestUtils.PROP_BOOLEAN_NAME,
+                                    P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
+                            )
+                    ),
+                    new AssociationStatement(
+                            ModelTestUtils.ASSOC_NAME,
+                            Collections.emptyList()
+                    )
+            )
+    );
 
     public static final RuleExpr TEST_RULE_EXPR = new RuleExpr(
             TEST_SPEC_RULE_NAME,
             ModelTestUtils.RESOURCE_DEF_REF.toString(),
-            TEST_WITH_EXPRS.get(0),
-            TEST_ASSERT_EXPRS.get(0));
+            TEST_WITH_EXPR,
+            TEST_ASSERT_EXPR
+    );
 
     public static final GroupExpr TEST_GROUP_EXPR = new GroupExpr(
             TEST_SPEC_GROUP_NAME,

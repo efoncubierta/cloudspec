@@ -25,34 +25,50 @@
  */
 package cloudspec.validator;
 
+import cloudspec.model.ResourceDefRef;
+import cloudspec.util.CloudSpecTestUtils;
+import cloudspec.util.ModelTestUtils;
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class CloudSpecValidatorTest {
-//    public static final ResourceService TEST_RESOURCE_SERVICE = mock(ResourceService.class);
-//
-//    static {
-//        when(TEST_RESOURCE_SERVICE.getResourceDef(MyResource.RESOURCE_FQN))
-//                .thenReturn(Optional.of(MyResource.RESOURCE_DEF));
-//    }
-//
-//    @Test
-//    public void shouldValidateAWellDefinedCloudSpec() {
-//        CloudSpecValidator validator = new CloudSpecValidator(TEST_RESOURCE_SERVICE);
-//
-//        CloudSpecValidatorResult result = validator.validate(CloudSpecTestUtils.TEST_SPEC);
-//
-//        assertEquals(CloudSpecTestUtils.TEST_SPEC_NAME, result.getSpecName());
-//        assertEquals(1, result.getGroupResults().size());
-//
-//        result.getGroupResults().forEach(groupResult -> {
-//            assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupResult.getGroupName());
-//            assertEquals(1, groupResult.getRuleResults().size());
-//
-//            groupResult.getRuleResults().forEach(ruleResult -> {
-//                assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.getRuleName());
-//                assertTrue(ruleResult.isSuccess());
-//                assertFalse(ruleResult.isError());
-//                assertFalse(ruleResult.getReason().isPresent());
-//                assertFalse(ruleResult.getThrowable().isPresent());
-//            });
-//        });
-//    }
+    public static final ResourceValidator resourceValidator = mock(ResourceValidator.class);
+    public static final ResourceValidationResult resourceValidationResuls = new ResourceValidationResult(
+            ModelTestUtils.RESOURCE_DEF_REF,
+            ModelTestUtils.RESOURCE_ID,
+            Collections.emptyList()
+    );
+
+    static {
+        when(resourceValidator.validateAll(any(ResourceDefRef.class), any(List.class), any(List.class)))
+                .thenReturn(Collections.singletonList(resourceValidationResuls));
+    }
+
+    @Test
+    public void shouldValidateCloudSpec() {
+        CloudSpecValidator validator = new CloudSpecValidator(resourceValidator);
+
+        CloudSpecValidatorResult result = validator.validate(CloudSpecTestUtils.TEST_SPEC);
+
+        assertEquals(CloudSpecTestUtils.TEST_SPEC_NAME, result.getSpecName());
+        assertEquals(1, result.getGroupResults().size());
+
+        result.getGroupResults().forEach(groupResult -> {
+            assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupResult.getGroupName());
+            assertEquals(1, groupResult.getRuleResults().size());
+
+            groupResult.getRuleResults().forEach(ruleResult -> {
+                assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.getRuleName());
+                assertTrue(ruleResult.isSuccess());
+                assertFalse(ruleResult.getThrowable().isPresent());
+            });
+        });
+    }
 }
