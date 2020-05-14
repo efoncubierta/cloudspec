@@ -100,8 +100,9 @@ public class GraphResourceStore implements ResourceStore {
     public static final String PROPERTY_RESOURCE_ID = "resourceId";
     public static final String PROPERTY_RESOURCE_DEF_REF = "resourceDefRef";
     public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_KEY = "key";
     public static final String PROPERTY_VALUE = "value";
-    public static final String PROPERTY_IS_MAP = "isMap";
+    public static final String PROPERTY_TYPE = "propertyType";
 
     private final GraphTraversalSource graphTraversal;
 
@@ -257,21 +258,36 @@ public class GraphResourceStore implements ResourceStore {
             return;
         }
 
+        // get property type
+        PropertyType propertyType = propertyDefVOpt.get().value(GraphResourceDefStore.PROPERTY_TYPE);
+
         // create property vertex
         Vertex propertyFromV;
-        if (propertyDefVOpt.get().value(GraphResourceDefStore.PROPERTY_TYPE).equals(PropertyType.MAP)) {
-            propertyFromV = graphTraversal
-                    .addV(LABEL_PROPERTY)
-                    .property(PROPERTY_IS_MAP, Boolean.TRUE)
-                    .property(PROPERTY_NAME, property.getName())
-                    .next();
-        } else {
-            propertyFromV = graphTraversal
-                    .addV(LABEL_PROPERTY)
-                    .property(PROPERTY_IS_MAP, Boolean.FALSE)
-                    .property(PROPERTY_NAME, property.getName())
-                    .property(PROPERTY_VALUE, property.getValue())
-                    .next();
+        switch (propertyType) {
+            case MAP:
+                propertyFromV = graphTraversal
+                        .addV(LABEL_PROPERTY)
+                        .property(PROPERTY_TYPE, propertyType)
+                        .property(PROPERTY_NAME, property.getName())
+                        .next();
+                break;
+            case KEY_VALUE:
+                KeyValue kv = (KeyValue) property.getValue();
+                propertyFromV = graphTraversal
+                        .addV(LABEL_PROPERTY)
+                        .property(PROPERTY_TYPE, propertyType)
+                        .property(PROPERTY_NAME, property.getName())
+                        .property(PROPERTY_KEY, kv.getKey())
+                        .property(PROPERTY_VALUE, kv.getValue())
+                        .next();
+                break;
+            default:
+                propertyFromV = graphTraversal
+                        .addV(LABEL_PROPERTY)
+                        .property(PROPERTY_TYPE, propertyType)
+                        .property(PROPERTY_NAME, property.getName())
+                        .property(PROPERTY_VALUE, property.getValue())
+                        .next();
         }
 
         // link property to property definition vertex
@@ -364,16 +380,22 @@ public class GraphResourceStore implements ResourceStore {
                 .out(LABEL_HAS_PROPERTY)
                 .toStream()
                 .map(propertyV -> {
-                    if (propertyV.value(PROPERTY_IS_MAP)) {
-                        return new Property(
-                                propertyV.value(PROPERTY_NAME),
-                                getPropertiesFromVertex(propertyV)
-                        );
-                    } else {
-                        return new Property(
-                                propertyV.value(PROPERTY_NAME),
-                                propertyV.value(PROPERTY_VALUE)
-                        );
+                    switch ((PropertyType) propertyV.value(PROPERTY_TYPE)) {
+                        case MAP:
+                            return new Property(
+                                    propertyV.value(PROPERTY_NAME),
+                                    getPropertiesFromVertex(propertyV)
+                            );
+                        case KEY_VALUE:
+                            return new Property(
+                                    propertyV.value(PROPERTY_NAME),
+                                    new KeyValue(propertyV.value(PROPERTY_KEY), propertyV.value(PROPERTY_VALUE))
+                            );
+                        default:
+                            return new Property(
+                                    propertyV.value(PROPERTY_NAME),
+                                    propertyV.value(PROPERTY_VALUE)
+                            );
                     }
                 })
                 .collect(Collectors.toList());

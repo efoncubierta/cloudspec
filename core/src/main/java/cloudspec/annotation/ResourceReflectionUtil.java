@@ -25,10 +25,7 @@
  */
 package cloudspec.annotation;
 
-import cloudspec.model.Association;
-import cloudspec.model.Property;
-import cloudspec.model.Resource;
-import cloudspec.model.ResourceDefRef;
+import cloudspec.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +128,8 @@ public class ResourceReflectionUtil {
                         Object value = field.get(obj);
                         field.setAccessible(true);
 
-                        if (value instanceof String || value instanceof Integer || value instanceof Boolean) {
+                        if (value instanceof String || value instanceof Integer ||
+                                value instanceof Boolean || value instanceof KeyValue) {
                             return Stream.of(new Property(propertyDefAnnotation.name(), value));
                         } else {
                             List<Property> properties = toProperties(value);

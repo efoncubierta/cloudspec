@@ -25,10 +25,7 @@
  */
 package cloudspec.graph;
 
-import cloudspec.lang.AssociationStatement;
-import cloudspec.lang.NestedStatement;
-import cloudspec.lang.PropertyStatement;
-import cloudspec.lang.Statement;
+import cloudspec.lang.*;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.validator.AssertValidationResult;
 import cloudspec.validator.ResourceValidationResult;
@@ -180,6 +177,8 @@ public class GraphResourceValidator implements ResourceValidator {
     private GraphTraversal<?, ?> buildFilteringTraversal(Statement statement) {
         if (statement instanceof PropertyStatement) {
             return buildPropertyFilteringTraversal((PropertyStatement) statement);
+        } else if (statement instanceof KeyValueStatement) {
+            return buildKeyValueFilteringTraversal((KeyValueStatement) statement);
         } else if (statement instanceof AssociationStatement) {
             return buildAssociationFilteringTraversal((AssociationStatement) statement);
         } else if (statement instanceof NestedStatement) {
@@ -196,6 +195,10 @@ public class GraphResourceValidator implements ResourceValidator {
         if (statement instanceof PropertyStatement) {
             return Collections.singletonList(
                     buildPropertyAssertionTraversal(parentPath, (PropertyStatement) statement)
+            );
+        } else if (statement instanceof KeyValueStatement) {
+            return Collections.singletonList(
+                    buildKeyValueAssertionTraversal(parentPath, (KeyValueStatement) statement)
             );
         } else if (statement instanceof AssociationStatement) {
             return buildAssociationAssertionTraversal(parentPath, (AssociationStatement) statement);
@@ -214,6 +217,13 @@ public class GraphResourceValidator implements ResourceValidator {
                 .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate());
     }
 
+    private GraphTraversal<?, ?> buildKeyValueFilteringTraversal(KeyValueStatement statement) {
+        return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
+                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                .has(GraphResourceStore.PROPERTY_KEY, statement.getKey())
+                .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate());
+    }
+
     @SuppressWarnings("unchecked")
     private GraphTraversal<?, AssertValidationResult> buildPropertyAssertionTraversal(List<String> parentPath,
                                                                                       PropertyStatement statement) {
@@ -228,6 +238,53 @@ public class GraphResourceValidator implements ResourceValidator {
                                 .fold()
                                 .coalesce(
                                         __.unfold()
+                                                .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
+                                                .constant(
+                                                        new AssertValidationResult(
+                                                                propertyPath,
+                                                                Boolean.TRUE
+                                                        )
+                                                ),
+                                        __.constant(
+                                                new AssertValidationResult(
+                                                        propertyPath,
+                                                        Boolean.FALSE,
+                                                        // TODO build message for each type of predicate
+                                                        String.format(
+                                                                "Property '%s' does not match predicate [%s]",
+                                                                statement.getPropertyName(),
+                                                                statement.getPredicate()
+                                                        )
+                                                )
+                                        )
+                                ),
+                        __.constant(
+                                new AssertValidationResult(
+                                        propertyPath,
+                                        Boolean.FALSE,
+                                        String.format(
+                                                "Property '%s' does not exist",
+                                                statement.getPropertyName()
+                                        )
+                                )
+                        )
+                );
+    }
+
+    private GraphTraversal<?, AssertValidationResult> buildKeyValueAssertionTraversal(List<String> parentPath,
+                                                                                      KeyValueStatement statement) {
+        List<String> propertyPath = new ArrayList<>(parentPath);
+        propertyPath.add(statement.getPropertyName());
+
+        return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
+                .fold()
+                .coalesce(
+                        __.unfold()
+                                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                                .fold()
+                                .coalesce(
+                                        __.unfold()
+                                                .has(GraphResourceStore.PROPERTY_KEY, statement.getKey())
                                                 .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
                                                 .constant(
                                                         new AssertValidationResult(

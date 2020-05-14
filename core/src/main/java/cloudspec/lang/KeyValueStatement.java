@@ -23,15 +23,39 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.lang;
 
-/**
- * Property type.
- */
-public enum PropertyType {
-    STRING,
-    BOOLEAN,
-    INTEGER,
-    KEY_VALUE,
-    MAP
+import org.apache.tinkerpop.gremlin.process.traversal.P;
+
+public class KeyValueStatement implements Statement {
+    private final String propertyName;
+    private final String key;
+    private final P<?> predicate;
+
+    public KeyValueStatement(String propertyName, String key, P<?> predicate) {
+        this.propertyName = propertyName;
+        this.key = key;
+        this.predicate = predicate;
+    }
+
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public P<?> getPredicate() {
+        return predicate;
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyStatement{" +
+                "propertyName='" + propertyName + '\'' +
+                ", key='" + key + '\'' +
+                ", predicate=" + predicate +
+                '}';
+    }
 }

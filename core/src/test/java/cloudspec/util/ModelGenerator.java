@@ -65,8 +65,9 @@ public class ModelGenerator {
                 PropertyType.INTEGER,
                 PropertyType.STRING,
                 PropertyType.BOOLEAN,
+                PropertyType.KEY_VALUE,
                 PropertyType.MAP
-        ).get(faker.random().nextInt(0, excludeMap ? 2 : 3));
+        ).get(faker.random().nextInt(0, excludeMap ? 3 : 4));
     }
 
     public static List<PropertyDef> randomPropertyDefs(Integer n) {
@@ -85,21 +86,23 @@ public class ModelGenerator {
 
     public static PropertyDef randomPropertyDef(Boolean excludeMap) {
         PropertyType propertyType = randomPropertyType(excludeMap);
-        if (propertyType.equals(PropertyType.MAP)) {
-            return new PropertyDef(
-                    randomName(),
-                    randomDescription(),
-                    PropertyType.MAP,
-                    Boolean.FALSE,
-                    randomPropertyDefs(3, Boolean.TRUE)
-            );
-        } else {
-            return new PropertyDef(
-                    randomName(),
-                    randomDescription(),
-                    propertyType,
-                    Boolean.FALSE
-            );
+        switch (propertyType) {
+            case MAP:
+                return new PropertyDef(
+                        randomName(),
+                        randomDescription(),
+                        PropertyType.MAP,
+                        Boolean.FALSE,
+                        randomPropertyDefs(3, Boolean.TRUE)
+                );
+            case KEY_VALUE:
+            default:
+                return new PropertyDef(
+                        randomName(),
+                        randomDescription(),
+                        propertyType,
+                        Boolean.FALSE
+                );
         }
     }
 
@@ -135,18 +138,22 @@ public class ModelGenerator {
     }
 
     public static Object randomPropertyValue(PropertyDef propertyDef) {
-        if (propertyDef.getPropertyType().equals(PropertyType.INTEGER)) {
-            return faker.random().nextInt(Integer.MAX_VALUE);
-        } else if (propertyDef.getPropertyType().equals(PropertyType.STRING)) {
-            return faker.lorem().sentence();
-        } else if (propertyDef.getPropertyType().equals(PropertyType.BOOLEAN)) {
-            return faker.random().nextBoolean();
+        switch (propertyDef.getPropertyType()) {
+            case MAP:
+                return propertyDef.getProperties()
+                        .stream()
+                        .map(ModelGenerator::randomProperty)
+                        .collect(Collectors.toList());
+            case KEY_VALUE:
+                return new KeyValue(faker.lorem().word(), faker.lorem().word());
+            case INTEGER:
+                return faker.random().nextInt(Integer.MAX_VALUE);
+            case BOOLEAN:
+                return faker.random().nextBoolean();
+            case STRING:
+            default:
+                return faker.lorem().sentence();
         }
-
-        return propertyDef.getProperties()
-                .stream()
-                .map(ModelGenerator::randomProperty)
-                .collect(Collectors.toList());
     }
 
     public static List<Property> randomProperties(Integer n) {

@@ -93,6 +93,8 @@ public class CloudSpecPreflight {
             preflightNestedStatement(resourceDef, ((NestedStatement) statement));
         } else if (statement instanceof PropertyStatement) {
             preflightPropertyStatement(resourceDef, (PropertyStatement) statement);
+        } else if (statement instanceof KeyValueStatement) {
+            preflightKeyValueStatement(resourceDef, (KeyValueStatement) statement);
         } else if (statement instanceof AssociationStatement) {
             preflightAssociationStatement(resourceDef, (AssociationStatement) statement);
         }
@@ -138,6 +140,18 @@ public class CloudSpecPreflight {
     }
 
     private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement) {
+        if (!resourceDef.getProperty(statement.getPropertyName()).isPresent()) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Resource type '%s' does not define property '%s'.",
+                            resourceDef.getRef(),
+                            statement.getPropertyName()
+                    )
+            );
+        }
+    }
+
+    private void preflightKeyValueStatement(ResourceDef resourceDef, KeyValueStatement statement) {
         if (!resourceDef.getProperty(statement.getPropertyName()).isPresent()) {
             throw new CloudSpecPreflightException(
                     String.format(

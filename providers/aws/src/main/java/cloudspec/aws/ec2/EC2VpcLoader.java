@@ -27,6 +27,7 @@ package cloudspec.aws.ec2;
 
 import cloudspec.aws.IAWSClientsProvider;
 import software.amazon.awssdk.services.ec2.Ec2Client;
+import software.amazon.awssdk.services.ec2.model.DescribeVpcAttributeResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcsResponse;
 import software.amazon.awssdk.services.ec2.model.Vpc;
 import software.amazon.awssdk.utils.IoUtils;
@@ -78,18 +79,24 @@ public class EC2VpcLoader implements EC2ResourceLoader<EC2VpcResource> {
 
             return response.vpcs()
                     .stream()
-                    .map(vpc -> toVpc(region.regionName(), vpc));
+                    .map(vpc -> toVpc(client, region.regionName(), vpc));
         } finally {
             IoUtils.closeQuietly(client, null);
         }
     }
 
-    private EC2VpcResource toVpc(String regionName, Vpc vpc) {
-        return EC2VpcResource.builder()
+    private EC2VpcResource toVpc(Ec2Client client, String regionName, Vpc vpc) {
+        EC2VpcResource.Builder vpcBuilder = EC2VpcResource.builder()
                 .setRegion(regionName)
                 .setVpcId(vpc.vpcId())
                 .setCidrBlock(vpc.cidrBlock())
-                .setState(vpc.stateAsString())
-                .build();
+                .setState(vpc.stateAsString());
+
+        DescribeVpcAttributeResponse describeVpcAttributeResponse =
+                client.describeVpcAttribute(builder -> builder.vpcId(vpc.vpcId()));
+
+        vpc.tags().forEach(tag -> tag.);
+
+        return vpcBuilder.build();
     }
 }

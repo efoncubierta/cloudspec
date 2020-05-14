@@ -28,6 +28,7 @@ package cloudspec.util;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
+import cloudspec.model.KeyValue;
 
 @ResourceDefinition(
         provider = ProviderDataUtil.PROVIDER_NAME,
@@ -61,11 +62,19 @@ public class TestTargetResource {
     )
     private final Boolean booleanProperty;
 
-    public TestTargetResource(String id, Integer integerProperty, String stringProperty, Boolean booleanProperty) {
+    @PropertyDefinition(
+            name = ModelTestUtils.PROP_KEY_VALUE_NAME,
+            description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION
+    )
+    private final KeyValue keyValueProperty;
+
+    public TestTargetResource(String id, Integer integerProperty, String stringProperty,
+                              Boolean booleanProperty, KeyValue keyValueProperty) {
         this.id = id;
         this.integerProperty = integerProperty;
         this.stringProperty = stringProperty;
         this.booleanProperty = booleanProperty;
+        this.keyValueProperty = keyValueProperty;
     }
 
     public String getId() {
@@ -82,5 +91,9 @@ public class TestTargetResource {
 
     public Boolean getBooleanProperty() {
         return booleanProperty;
+    }
+
+    public KeyValue getKeyValueProperty() {
+        return keyValueProperty;
     }
 }

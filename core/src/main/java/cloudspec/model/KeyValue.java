@@ -25,13 +25,44 @@
  */
 package cloudspec.model;
 
-/**
- * Property type.
- */
-public enum PropertyType {
-    STRING,
-    BOOLEAN,
-    INTEGER,
-    KEY_VALUE,
-    MAP
+public class KeyValue {
+    private final String key;
+    private final String value;
+
+    public KeyValue(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof KeyValue)) {
+            return false;
+        }
+
+        KeyValue keyValue = (KeyValue) obj;
+
+        return getKey().equals(keyValue.getKey()) &&
+                getValue().equals(keyValue.getValue());
+    }
+
+    @Override
+    public String toString() {
+        return "KeyValue{" +
+                "key='" + key + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

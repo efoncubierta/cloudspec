@@ -164,6 +164,14 @@ public class ResourceDefReflectionUtil {
                             PropertyType.BOOLEAN,
                             Boolean.FALSE)
             );
+        } else if(type.isAssignableFrom(KeyValue.class)) {
+            return Optional.of(
+                    new PropertyDef(
+                            propertyDefAnnotation.name(),
+                            propertyDefAnnotation.description(),
+                            PropertyType.KEY_VALUE,
+                            Boolean.FALSE)
+            );
         } else {
             List<PropertyDef> propertyDefs = Stream.of(type.getDeclaredFields())
                     .map(subField -> toPropertyDef(type, subField))

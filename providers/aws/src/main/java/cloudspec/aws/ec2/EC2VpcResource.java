@@ -69,6 +69,11 @@ public class EC2VpcResource extends EC2Resource {
     )
     private String state;
 
+    // describeVpcAttribute
+    private Boolean isDefault;
+    private Boolean dnsHostnamesEnabled;
+    private Boolean dnsSupportEnabled;
+
     public String getVpcId() {
         return vpcId;
     }

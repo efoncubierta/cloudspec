@@ -29,6 +29,7 @@ import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
+import cloudspec.model.KeyValue;
 
 @ResourceDefinition(
         provider = ProviderDataUtil.PROVIDER_NAME,
@@ -63,6 +64,12 @@ public class TestResource {
     private final Boolean booleanProperty;
 
     @PropertyDefinition(
+            name = ModelTestUtils.PROP_KEY_VALUE_NAME,
+            description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION
+    )
+    private final KeyValue keyValueProperty;
+
+    @PropertyDefinition(
             name = ModelTestUtils.PROP_MAP_NAME,
             description = ModelTestUtils.PROP_MAP_DESCRIPTION
     )
@@ -76,11 +83,13 @@ public class TestResource {
     private final String associationId;
 
     public TestResource(String id, Integer integerProperty, String stringProperty,
-                        Boolean booleanProperty, TestMapResource mapProperty, String associationId) {
+                        Boolean booleanProperty, KeyValue keyValueProperty,
+                        TestMapResource mapProperty, String associationId) {
         this.id = id;
         this.integerProperty = integerProperty;
         this.stringProperty = stringProperty;
         this.booleanProperty = booleanProperty;
+        this.keyValueProperty = keyValueProperty;
         this.mapProperty = mapProperty;
         this.associationId = associationId;
     }
@@ -99,6 +108,10 @@ public class TestResource {
 
     public Boolean getBooleanProperty() {
         return booleanProperty;
+    }
+
+    public KeyValue getKeyValueProperty() {
+        return keyValueProperty;
     }
 
     public TestMapResource getMapProperty() {

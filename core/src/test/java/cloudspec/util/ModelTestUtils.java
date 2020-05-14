@@ -98,6 +98,18 @@ public class ModelTestUtils {
     );
     public static final Property PROP_BOOLEAN = new Property(PROP_BOOLEAN_NAME, PROP_BOOLEAN_VALUE);
 
+    public static final String PROP_KEY_VALUE_NAME = "key_value_property";
+    public static final String PROP_KEY_VALUE_DESCRIPTION = "KeyValue property";
+    public static final PropertyType PROP_KEY_VALUE_TYPE = PropertyType.KEY_VALUE;
+    public static final KeyValue PROP_KEY_VALUE_VALUE = new KeyValue(PROP_STRING_NAME, PROP_STRING_VALUE);
+    public static final PropertyDef PROP_KEY_VALUE_DEF = new PropertyDef(
+            PROP_KEY_VALUE_NAME,
+            PROP_KEY_VALUE_DESCRIPTION,
+            PROP_KEY_VALUE_TYPE,
+            Boolean.FALSE
+    );
+    public static final Property PROP_KEY_VALUE = new Property(PROP_KEY_VALUE_NAME, PROP_KEY_VALUE_VALUE);
+
     public static final String PROP_MAP_NAME = "map_property";
     public static final String PROP_MAP_DESCRIPTION = "Map property";
     public static final PropertyType PROP_MAP_TYPE = PropertyType.MAP;
@@ -115,10 +127,18 @@ public class ModelTestUtils {
     );
     public static final Property PROP_MAP = new Property(PROP_MAP_NAME, PROP_MAP_VALUE);
 
-    public static final List<Property> PROPERTIES = Arrays.asList(PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN, PROP_MAP);
-    public static final List<Property> TARGET_PROPERTIES = Arrays.asList(PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN);
-    public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF, PROP_MAP_DEF);
-    public static final List<PropertyDef> TARGET_PROPERTY_DEFS = Arrays.asList(PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF);
+    public static final List<Property> PROPERTIES = Arrays.asList(
+            PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN, PROP_KEY_VALUE, PROP_MAP
+    );
+    public static final List<Property> TARGET_PROPERTIES = Arrays.asList(
+            PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN, PROP_KEY_VALUE
+    );
+    public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(
+            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF, PROP_KEY_VALUE_DEF, PROP_MAP_DEF
+    );
+    public static final List<PropertyDef> TARGET_PROPERTY_DEFS = Arrays.asList(
+            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF, PROP_KEY_VALUE_DEF
+    );
 
     public static final String ASSOC_NAME = "myassociation";
     public static final String ASSOC_DESCRIPTION = "My association";
@@ -161,6 +181,7 @@ public class ModelTestUtils {
             PROP_INTEGER_VALUE,
             PROP_STRING_VALUE,
             PROP_BOOLEAN_VALUE,
+            PROP_KEY_VALUE_VALUE,
             new TestMapResource(
                     PROP_INTEGER_VALUE,
                     PROP_STRING_VALUE,
