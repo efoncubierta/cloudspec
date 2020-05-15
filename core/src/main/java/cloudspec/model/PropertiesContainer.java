@@ -25,7 +25,6 @@
  */
 package cloudspec.model;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface PropertiesContainer {
@@ -47,5 +46,5 @@ public interface PropertiesContainer {
      *
      * @return List of properties.
      */
-    List<Property> getProperties();
+    Properties getProperties();
 }

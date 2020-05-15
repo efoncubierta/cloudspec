@@ -23,34 +23,39 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.store;
+package cloudspec.model;
 
-import cloudspec.model.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public interface ResourceStore {
-    void createResource(ResourceDefRef resourceDefRef, String resourceId);
+public class Associations extends ArrayList<Association> {
+    public Associations(Association... associations) {
+        super(Arrays.asList(associations));
+    }
 
-    void createResource(ResourceDefRef resourceDefRef, String resourceId,
-                        Properties properties, Associations associations);
+    public Associations(Stream<Association> associations) {
+        super(associations.collect(Collectors.toList()));
+    }
 
-    Boolean exists(ResourceDefRef resourceDefRef, String resourceId);
+    public Associations(List<Association> associations) {
+        super(associations);
+    }
 
-    Optional<Resource> getResource(ResourceDefRef resourceDefRef, String resourceId);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
 
-    List<Resource> getResourcesByDefinition(ResourceDefRef resourceDefRef);
+        if (!(obj instanceof Associations)) {
+            return false;
+        }
 
-    Properties getProperties(ResourceDefRef resourceDefRef, String resourceId);
+        Associations associations = (Associations) obj;
 
-    void setProperty(ResourceDefRef resourceDefRef, String resourceId, Property property);
-
-    void setProperties(ResourceDefRef resourceDefRef, String resourceId, Properties properties);
-
-    Associations getAssociations(ResourceDefRef resourceDefRef, String resourceId);
-
-    void setAssociation(ResourceDefRef resourceDefRef, String resourceId, Association association);
-
-    void setAssociations(ResourceDefRef resourceDefRef, String resourceId, Associations associations);
+        return size() == associations.size() && containsAll(associations);
+    }
 }

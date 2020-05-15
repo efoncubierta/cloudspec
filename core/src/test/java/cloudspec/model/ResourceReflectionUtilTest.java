@@ -51,30 +51,30 @@ public class ResourceReflectionUtilTest {
     }
 
     public void shouldProduceProperties() {
-        List<Property> properties = ResourceReflectionUtil.toProperties(ModelTestUtils.TEST_RESOURCE);
+        Properties properties = ResourceReflectionUtil.toProperties(ModelTestUtils.TEST_RESOURCE);
         assertNotNull(properties);
         assertFalse(properties.isEmpty());
-        ModelTestUtils.compareProperties(ModelTestUtils.PROPERTIES, properties);
+        assertEquals(ModelTestUtils.PROPERTIES, properties);
     }
 
     @Test
     public void shouldNotProduceProperties() {
-        List<Property> properties = ResourceReflectionUtil.toProperties(new MyResource("test"));
+        Properties properties = ResourceReflectionUtil.toProperties(new MyResource("test"));
         assertNotNull(properties);
         assertTrue(properties.isEmpty());
     }
 
     @Test
     public void shouldProduceAssociations() {
-        List<Association> associations = ResourceReflectionUtil.toAssociations(ModelTestUtils.TEST_RESOURCE);
+        Associations associations = ResourceReflectionUtil.toAssociations(ModelTestUtils.TEST_RESOURCE);
         assertNotNull(associations);
         assertFalse(associations.isEmpty());
-        ModelTestUtils.compareAssociations(ModelTestUtils.ASSOCIATIONS, associations);
+        assertEquals(ModelTestUtils.ASSOCIATIONS, associations);
     }
 
     @Test
     public void shouldNotProduceAssociations() {
-        List<Association> associations = ResourceReflectionUtil.toAssociations(new MyResource("test"));
+        Associations associations = ResourceReflectionUtil.toAssociations(new MyResource("test"));
         assertNotNull(associations);
         assertTrue(associations.isEmpty());
     }

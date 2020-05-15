@@ -51,21 +51,21 @@ public class CloudSpecTestUtils {
                             P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
                     ),
                     new NestedStatement(
-                            ModelTestUtils.PROP_MAP_NAME,
+                            ModelTestUtils.PROP_NESTED_NAME,
                             new PropertyStatement(
                                     ModelTestUtils.PROP_INTEGER_NAME,
                                     P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
                             )
                     ),
                     new NestedStatement(
-                            ModelTestUtils.PROP_MAP_NAME,
+                            ModelTestUtils.PROP_NESTED_NAME,
                             new PropertyStatement(
                                     ModelTestUtils.PROP_STRING_NAME,
                                     P.eq(ModelTestUtils.PROP_STRING_VALUE)
                             )
                     ),
                     new NestedStatement(
-                            ModelTestUtils.PROP_MAP_NAME,
+                            ModelTestUtils.PROP_NESTED_NAME,
                             new PropertyStatement(
                                     ModelTestUtils.PROP_BOOLEAN_NAME,
                                     P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
@@ -93,21 +93,21 @@ public class CloudSpecTestUtils {
                             P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
                     ),
                     new NestedStatement(
-                            ModelTestUtils.PROP_MAP_NAME,
+                            ModelTestUtils.PROP_NESTED_NAME,
                             new PropertyStatement(
                                     ModelTestUtils.PROP_INTEGER_NAME,
                                     P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
                             )
                     ),
                     new NestedStatement(
-                            ModelTestUtils.PROP_MAP_NAME,
+                            ModelTestUtils.PROP_NESTED_NAME,
                             new PropertyStatement(
                                     ModelTestUtils.PROP_STRING_NAME,
                                     P.eq(ModelTestUtils.PROP_STRING_VALUE)
                             )
                     ),
                     new NestedStatement(
-                            ModelTestUtils.PROP_MAP_NAME,
+                            ModelTestUtils.PROP_NESTED_NAME,
                             new PropertyStatement(
                                     ModelTestUtils.PROP_BOOLEAN_NAME,
                                     P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)

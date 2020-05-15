@@ -33,5 +33,5 @@ public enum PropertyType {
     BOOLEAN,
     INTEGER,
     KEY_VALUE,
-    MAP
+    NESTED
 }

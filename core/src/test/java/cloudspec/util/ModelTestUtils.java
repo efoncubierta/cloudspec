@@ -26,11 +26,9 @@
 package cloudspec.util;
 
 import cloudspec.model.*;
+import cloudspec.model.Properties;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -74,6 +72,18 @@ public class ModelTestUtils {
     );
     public static final Property PROP_INTEGER = new Property(PROP_INTEGER_NAME, PROP_INTEGER_VALUE);
 
+    public static final String PROP_INTEGER_LIST_NAME = "integer_list_property";
+    public static final String PROP_INTEGER_LIST_DESCRIPTION = "Integer list property";
+    public static final PropertyType PROP_INTEGER_LIST_TYPE = PropertyType.INTEGER;
+    public static final List<Integer> PROP_INTEGER_LIST_VALUE = Arrays.asList(PROP_INTEGER_VALUE, PROP_INTEGER_VALUE);
+    public static final PropertyDef PROP_INTEGER_LIST_DEF = new PropertyDef(
+            PROP_INTEGER_LIST_NAME,
+            PROP_INTEGER_LIST_DESCRIPTION,
+            PROP_INTEGER_LIST_TYPE,
+            Boolean.TRUE
+    );
+    public static final Property PROP_INTEGER_LIST = new Property(PROP_INTEGER_LIST_NAME, PROP_INTEGER_LIST_VALUE);
+
     public static final String PROP_STRING_NAME = "string_property";
     public static final String PROP_STRING_DESCRIPTION = "String property";
     public static final PropertyType PROP_STRING_TYPE = PropertyType.STRING;
@@ -85,6 +95,18 @@ public class ModelTestUtils {
             Boolean.FALSE
     );
     public static final Property PROP_STRING = new Property(PROP_STRING_NAME, PROP_STRING_VALUE);
+
+    public static final String PROP_STRING_LIST_NAME = "string_list_property";
+    public static final String PROP_STRING_LIST_DESCRIPTION = "String list property";
+    public static final PropertyType PROP_STRING_LIST_TYPE = PropertyType.STRING;
+    public static final List<String> PROP_STRING_LIST_VALUE = Arrays.asList(PROP_STRING_VALUE, PROP_STRING_VALUE);
+    public static final PropertyDef PROP_STRING_LIST_DEF = new PropertyDef(
+            PROP_STRING_LIST_NAME,
+            PROP_STRING_LIST_DESCRIPTION,
+            PROP_STRING_LIST_TYPE,
+            Boolean.TRUE
+    );
+    public static final Property PROP_STRING_LIST = new Property(PROP_STRING_LIST_NAME, PROP_STRING_LIST_VALUE);
 
     public static final String PROP_BOOLEAN_NAME = "boolean_property";
     public static final String PROP_BOOLEAN_DESCRIPTION = "Boolean property";
@@ -98,6 +120,18 @@ public class ModelTestUtils {
     );
     public static final Property PROP_BOOLEAN = new Property(PROP_BOOLEAN_NAME, PROP_BOOLEAN_VALUE);
 
+    public static final String PROP_BOOLEAN_LIST_NAME = "boolean_list_property";
+    public static final String PROP_BOOLEAN_LIST_DESCRIPTION = "Boolean list property";
+    public static final PropertyType PROP_BOOLEAN_LIST_TYPE = PropertyType.BOOLEAN;
+    public static final List<Boolean> PROP_BOOLEAN_LIST_VALUE = Arrays.asList(PROP_BOOLEAN_VALUE, PROP_BOOLEAN_VALUE);
+    public static final PropertyDef PROP_BOOLEAN_LIST_DEF = new PropertyDef(
+            PROP_BOOLEAN_LIST_NAME,
+            PROP_BOOLEAN_LIST_DESCRIPTION,
+            PROP_BOOLEAN_LIST_TYPE,
+            Boolean.TRUE
+    );
+    public static final Property PROP_BOOLEAN_LIST = new Property(PROP_BOOLEAN_LIST_NAME, PROP_BOOLEAN_LIST_VALUE);
+
     public static final String PROP_KEY_VALUE_NAME = "key_value_property";
     public static final String PROP_KEY_VALUE_DESCRIPTION = "KeyValue property";
     public static final PropertyType PROP_KEY_VALUE_TYPE = PropertyType.KEY_VALUE;
@@ -110,43 +144,86 @@ public class ModelTestUtils {
     );
     public static final Property PROP_KEY_VALUE = new Property(PROP_KEY_VALUE_NAME, PROP_KEY_VALUE_VALUE);
 
-    public static final String PROP_MAP_NAME = "map_property";
-    public static final String PROP_MAP_DESCRIPTION = "Map property";
-    public static final PropertyType PROP_MAP_TYPE = PropertyType.MAP;
-    public static final List<Property> PROP_MAP_VALUE = Arrays.asList(
+    public static final String PROP_KEY_VALUE_LIST_NAME = "key_value_list_property";
+    public static final String PROP_KEY_VALUE_LIST_DESCRIPTION = "KeyValue list property";
+    public static final PropertyType PROP_KEY_VALUE_LIST_TYPE = PropertyType.KEY_VALUE;
+    public static final List<KeyValue> PROP_KEY_VALUE_LIST_VALUE = Arrays.asList(PROP_KEY_VALUE_VALUE, PROP_KEY_VALUE_VALUE);
+    public static final PropertyDef PROP_KEY_VALUE_LIST_DEF = new PropertyDef(
+            PROP_KEY_VALUE_LIST_NAME,
+            PROP_KEY_VALUE_LIST_DESCRIPTION,
+            PROP_KEY_VALUE_LIST_TYPE,
+            Boolean.TRUE
+    );
+    public static final Property PROP_KEY_VALUE_LIST = new Property(PROP_KEY_VALUE_LIST_NAME, PROP_KEY_VALUE_LIST_VALUE);
+
+    public static final String PROP_NESTED_NAME = "nested_property";
+    public static final String PROP_NESTED_DESCRIPTION = "Nested property";
+    public static final PropertyType PROP_NESTED_TYPE = PropertyType.NESTED;
+    public static final Properties PROP_NESTED_VALUE = new Properties(
             PROP_INTEGER,
             PROP_STRING,
-            PROP_BOOLEAN
+            PROP_BOOLEAN,
+            PROP_KEY_VALUE
     );
-    public static final PropertyDef PROP_MAP_DEF = new PropertyDef(
-            PROP_MAP_NAME,
-            PROP_MAP_DESCRIPTION,
-            PROP_MAP_TYPE,
+    public static final PropertyDef PROP_NESTED_DEF = new PropertyDef(
+            PROP_NESTED_NAME,
+            PROP_NESTED_DESCRIPTION,
+            PROP_NESTED_TYPE,
             Boolean.FALSE,
-            Arrays.asList(PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF)
+            Arrays.asList(
+                    PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+                    PROP_STRING_DEF, PROP_STRING_LIST_DEF,
+                    PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+                    PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
+            )
     );
-    public static final Property PROP_MAP = new Property(PROP_MAP_NAME, PROP_MAP_VALUE);
+    public static final Property PROP_NESTED = new Property(PROP_NESTED_NAME, PROP_NESTED_VALUE);
 
-    public static final List<Property> PROPERTIES = Arrays.asList(
-            PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN, PROP_KEY_VALUE, PROP_MAP
+    public static final String PROP_NESTED_LIST_NAME = "nested_list_property";
+    public static final String PROP_NESTED_LIST_DESCRIPTION = "Nested list property";
+    public static final PropertyType PROP_NESTED_LIST_TYPE = PropertyType.NESTED;
+    public static final List<Properties> PROP_NESTED_LIST_VALUE = Arrays.asList(PROP_NESTED_VALUE, PROP_NESTED_VALUE);
+    public static final PropertyDef PROP_NESTED_LIST_DEF = new PropertyDef(
+            PROP_NESTED_LIST_NAME,
+            PROP_NESTED_LIST_DESCRIPTION,
+            PROP_NESTED_LIST_TYPE,
+            Boolean.TRUE,
+            Arrays.asList(
+                    PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+                    PROP_STRING_DEF, PROP_STRING_LIST_DEF,
+                    PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+                    PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
+            )
     );
-    public static final List<Property> TARGET_PROPERTIES = Arrays.asList(
-            PROP_ID, PROP_INTEGER, PROP_STRING, PROP_BOOLEAN, PROP_KEY_VALUE
+    public static final Property PROP_NESTED_LIST = new Property(PROP_NESTED_LIST_NAME, PROP_NESTED_LIST_VALUE);
+
+    public static final Properties PROPERTIES = new Properties(
+            PROP_ID, PROP_INTEGER, PROP_INTEGER_LIST, PROP_STRING, PROP_STRING_LIST,
+            PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_KEY_VALUE, PROP_KEY_VALUE_LIST,
+            PROP_NESTED, PROP_NESTED_LIST
+    );
+    public static final Properties TARGET_PROPERTIES = new Properties(
+            PROP_ID, PROP_INTEGER, PROP_INTEGER_LIST, PROP_STRING, PROP_STRING_LIST,
+            PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_KEY_VALUE, PROP_KEY_VALUE_LIST
     );
     public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(
-            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF, PROP_KEY_VALUE_DEF, PROP_MAP_DEF
+            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+            PROP_STRING_DEF, PROP_STRING_LIST_DEF, PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+            PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF, PROP_NESTED_DEF, PROP_NESTED_LIST_DEF
     );
     public static final List<PropertyDef> TARGET_PROPERTY_DEFS = Arrays.asList(
-            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_STRING_DEF, PROP_BOOLEAN_DEF, PROP_KEY_VALUE_DEF
+            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+            PROP_STRING_DEF, PROP_STRING_LIST_DEF, PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+            PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
     );
 
     public static final String ASSOC_NAME = "myassociation";
     public static final String ASSOC_DESCRIPTION = "My association";
     public static final AssociationDef ASSOCIATION_DEF = new AssociationDef(ASSOC_NAME, ASSOC_DESCRIPTION, TARGET_RESOURCE_DEF_REF);
     public static final Association ASSOCIATION = new Association(ASSOC_NAME, TARGET_RESOURCE_DEF_REF, TARGET_RESOURCE_ID);
-    public static final List<Association> ASSOCIATIONS = Collections.singletonList(ASSOCIATION);
+    public static final Associations ASSOCIATIONS = new Associations(ASSOCIATION);
     public static final List<AssociationDef> ASSOCIATION_DEFS = Collections.singletonList(ASSOCIATION_DEF);
-    public static final List<Association> TARGET_ASSOCIATIONS = Collections.emptyList();
+    public static final Associations TARGET_ASSOCIATIONS = new Associations();
     public static final List<AssociationDef> TARGET_ASSOCIATION_DEFS = Collections.emptyList();
 
     // test model objects
@@ -179,38 +256,37 @@ public class ModelTestUtils {
     public static final TestResource TEST_RESOURCE = new TestResource(
             RESOURCE_ID,
             PROP_INTEGER_VALUE,
+            PROP_INTEGER_LIST_VALUE,
             PROP_STRING_VALUE,
+            PROP_STRING_LIST_VALUE,
             PROP_BOOLEAN_VALUE,
+            PROP_BOOLEAN_LIST_VALUE,
             PROP_KEY_VALUE_VALUE,
-            new TestMapResource(
+            PROP_KEY_VALUE_LIST_VALUE,
+            new TestNestedProperty(
                     PROP_INTEGER_VALUE,
+                    PROP_INTEGER_LIST_VALUE,
                     PROP_STRING_VALUE,
-                    PROP_BOOLEAN_VALUE
+                    PROP_STRING_LIST_VALUE,
+                    PROP_BOOLEAN_VALUE,
+                    PROP_BOOLEAN_LIST_VALUE,
+                    PROP_KEY_VALUE_VALUE,
+                    PROP_KEY_VALUE_LIST_VALUE
+            ),
+            Collections.singletonList(
+                    new TestNestedProperty(
+                            PROP_INTEGER_VALUE,
+                            PROP_INTEGER_LIST_VALUE,
+                            PROP_STRING_VALUE,
+                            PROP_STRING_LIST_VALUE,
+                            PROP_BOOLEAN_VALUE,
+                            PROP_BOOLEAN_LIST_VALUE,
+                            PROP_KEY_VALUE_VALUE,
+                            PROP_KEY_VALUE_LIST_VALUE
+                    )
             ),
             TARGET_RESOURCE_ID
     );
-
-    public static void compareProperties(List<Property> properties1, List<Property> properties2) {
-        assertNotNull(properties1);
-        assertNotNull(properties2);
-        assertEquals(properties1.size(), properties2.size());
-
-        assertTrue(
-                properties1.stream().allMatch(property1 ->
-                        properties2.stream().anyMatch(property1::equals))
-        );
-    }
-
-    public static void compareAssociations(List<Association> associations1, List<Association> associations2) {
-        assertNotNull(associations1);
-        assertNotNull(associations2);
-        assertEquals(associations1.size(), associations2.size());
-
-        assertTrue(
-                associations1.stream().allMatch(association1 ->
-                        associations2.stream().anyMatch(association1::equals))
-        );
-    }
 
     public static void comparePropertyDefs(List<PropertyDef> propertyDefs1, List<PropertyDef> propertyDefs2) {
         assertNotNull(propertyDefs1);

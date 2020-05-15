@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -138,58 +139,45 @@ public class ResourceDefReflectionUtil {
 
         PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
 
-        Class<?> type = field.getType();
+        PropertyType propertyType = guessPropertyType(field);
+        Boolean multiValued = guessMultiValued(field);
 
-        if (type.isAssignableFrom(String.class)) {
-            return Optional.of(
-                    new PropertyDef(
-                            propertyDefAnnotation.name(),
-                            propertyDefAnnotation.description(),
-                            PropertyType.STRING,
-                            Boolean.FALSE)
-            );
-        } else if (type.isAssignableFrom(Integer.class)) {
-            return Optional.of(
-                    new PropertyDef(
-                            propertyDefAnnotation.name(),
-                            propertyDefAnnotation.description(),
-                            PropertyType.INTEGER,
-                            Boolean.FALSE)
-            );
-        } else if (type.isAssignableFrom(Boolean.class)) {
-            return Optional.of(
-                    new PropertyDef(
-                            propertyDefAnnotation.name(),
-                            propertyDefAnnotation.description(),
-                            PropertyType.BOOLEAN,
-                            Boolean.FALSE)
-            );
-        } else if(type.isAssignableFrom(KeyValue.class)) {
-            return Optional.of(
-                    new PropertyDef(
-                            propertyDefAnnotation.name(),
-                            propertyDefAnnotation.description(),
-                            PropertyType.KEY_VALUE,
-                            Boolean.FALSE)
-            );
-        } else {
-            List<PropertyDef> propertyDefs = Stream.of(type.getDeclaredFields())
-                    .map(subField -> toPropertyDef(type, subField))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-
-            if (propertyDefs.size() > 0) {
+        switch (propertyType) {
+            case KEY_VALUE:
+            case INTEGER:
+            case STRING:
+            case BOOLEAN:
                 return Optional.of(
                         new PropertyDef(
                                 propertyDefAnnotation.name(),
                                 propertyDefAnnotation.description(),
-                                PropertyType.MAP,
-                                Boolean.FALSE,
-                                propertyDefs
+                                propertyType,
+                                multiValued
                         )
                 );
-            }
+            case NESTED:
+            default:
+                Class<?> type = multiValued ?
+                        (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0] :
+                        field.getType();
+
+                List<PropertyDef> propertyDefs = Stream.of(type.getDeclaredFields())
+                        .map(subField -> toPropertyDef(type, subField))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList());
+
+                if (propertyDefs.size() > 0) {
+                    return Optional.of(
+                            new PropertyDef(
+                                    propertyDefAnnotation.name(),
+                                    propertyDefAnnotation.description(),
+                                    PropertyType.NESTED,
+                                    multiValued,
+                                    propertyDefs
+                            )
+                    );
+                }
         }
 
         LOGGER.warn("Type {} of property '{}' in class {} is not supported",
@@ -239,5 +227,42 @@ public class ResourceDefReflectionUtil {
                         associationDefAnnotation.description(),
                         resourceDefRef
                 ));
+    }
+
+    /**
+     * Guess whether a field of a class is multivalued.
+     *
+     * @param field Field.
+     * @return True if field is multi-valued. False otherwise.
+     */
+    public static Boolean guessMultiValued(Field field) {
+        return field.getType().isAssignableFrom(List.class);
+    }
+
+    /**
+     * Guess the property type of field of a class.
+     *
+     * @param field Field.
+     * @return Property type.
+     */
+    public static PropertyType guessPropertyType(Field field) {
+        Class<?> clazz = field.getType();
+
+        if (field.getType().isAssignableFrom(List.class)) {
+            clazz = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+        }
+
+        if (clazz.isAssignableFrom(Integer.class)) {
+            return PropertyType.INTEGER;
+        } else if (clazz.isAssignableFrom(String.class)) {
+            return PropertyType.STRING;
+        } else if (clazz.isAssignableFrom(Boolean.class)) {
+            return PropertyType.BOOLEAN;
+        } else if (clazz.isAssignableFrom(KeyValue.class)) {
+            return PropertyType.KEY_VALUE;
+        }
+
+        // otherwise it must be nested
+        return PropertyType.NESTED;
     }
 }

@@ -25,7 +25,6 @@
  */
 package cloudspec.model;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -56,15 +55,15 @@ public class Property extends BaseMember implements PropertiesContainer {
     }
 
     @Override
-    public List<Property> getProperties() {
+    public Properties getProperties() {
         // TODO review this code
         if (value instanceof List) {
             List<?> values = ((List<?>) value);
             if (values.size() > 0 && values.get(0) instanceof Property) {
-                return ((List<Property>) values);
+                return (Properties) values;
             }
         }
-        return Collections.emptyList();
+        return new Properties();
     }
 
     @Override
@@ -80,8 +79,9 @@ public class Property extends BaseMember implements PropertiesContainer {
         Property property = (Property) obj;
 
         return getName().equals(property.getName()) &&
-                getValue() instanceof List ?
-                ((List<?>) getValue()).containsAll((List<?>) property.getValue()) :
+                getValue() instanceof List && property.getValue() instanceof List ?
+                ((List<?>) getValue()).size() == ((List<?>) getValue()).size() &&
+                        ((List<?>) getValue()).containsAll((List<?>) getValue()) :
                 getValue().equals(property.getValue());
     }
 

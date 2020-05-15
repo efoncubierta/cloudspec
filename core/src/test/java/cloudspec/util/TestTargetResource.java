@@ -30,6 +30,8 @@ import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.model.KeyValue;
 
+import java.util.List;
+
 @ResourceDefinition(
         provider = ProviderDataUtil.PROVIDER_NAME,
         group = ModelTestUtils.RESOURCE_GROUP,
@@ -51,10 +53,22 @@ public class TestTargetResource {
     private final Integer integerProperty;
 
     @PropertyDefinition(
+            name = ModelTestUtils.PROP_INTEGER_LIST_NAME,
+            description = ModelTestUtils.PROP_INTEGER_LIST_DESCRIPTION
+    )
+    private final List<Integer> integerListProperty;
+
+    @PropertyDefinition(
             name = ModelTestUtils.PROP_STRING_NAME,
             description = ModelTestUtils.PROP_STRING_DESCRIPTION
     )
     private final String stringProperty;
+
+    @PropertyDefinition(
+            name = ModelTestUtils.PROP_STRING_LIST_NAME,
+            description = ModelTestUtils.PROP_STRING_LIST_DESCRIPTION
+    )
+    private final List<String> stringListProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_BOOLEAN_NAME,
@@ -63,18 +77,37 @@ public class TestTargetResource {
     private final Boolean booleanProperty;
 
     @PropertyDefinition(
+            name = ModelTestUtils.PROP_BOOLEAN_LIST_NAME,
+            description = ModelTestUtils.PROP_BOOLEAN_LIST_DESCRIPTION
+    )
+    private final List<Boolean> booleanListProperty;
+
+    @PropertyDefinition(
             name = ModelTestUtils.PROP_KEY_VALUE_NAME,
             description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION
     )
     private final KeyValue keyValueProperty;
 
-    public TestTargetResource(String id, Integer integerProperty, String stringProperty,
-                              Boolean booleanProperty, KeyValue keyValueProperty) {
+    @PropertyDefinition(
+            name = ModelTestUtils.PROP_KEY_VALUE_LIST_NAME,
+            description = ModelTestUtils.PROP_KEY_VALUE_LIST_DESCRIPTION
+    )
+    private final List<KeyValue> keyValueListProperty;
+
+    public TestTargetResource(String id,
+                              Integer integerProperty, List<Integer> integerListProperty,
+                              String stringProperty, List<String> stringListProperty,
+                              Boolean booleanProperty, List<Boolean> booleanListProperty,
+                              KeyValue keyValueProperty, List<KeyValue> keyValueListProperty) {
         this.id = id;
         this.integerProperty = integerProperty;
+        this.integerListProperty = integerListProperty;
         this.stringProperty = stringProperty;
+        this.stringListProperty = stringListProperty;
         this.booleanProperty = booleanProperty;
+        this.booleanListProperty = booleanListProperty;
         this.keyValueProperty = keyValueProperty;
+        this.keyValueListProperty = keyValueListProperty;
     }
 
     public String getId() {
@@ -85,15 +118,31 @@ public class TestTargetResource {
         return integerProperty;
     }
 
+    public List<Integer> getIntegerListProperty() {
+        return integerListProperty;
+    }
+
     public String getStringProperty() {
         return stringProperty;
+    }
+
+    public List<String> getStringListProperty() {
+        return stringListProperty;
     }
 
     public Boolean getBooleanProperty() {
         return booleanProperty;
     }
 
+    public List<Boolean> getBooleanListProperty() {
+        return booleanListProperty;
+    }
+
     public KeyValue getKeyValueProperty() {
         return keyValueProperty;
+    }
+
+    public List<KeyValue> getKeyValueListProperty() {
+        return keyValueListProperty;
     }
 }

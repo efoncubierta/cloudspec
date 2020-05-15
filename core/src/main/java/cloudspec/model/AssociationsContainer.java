@@ -44,5 +44,5 @@ public interface AssociationsContainer {
      *
      * @return List of associations.
      */
-    List<Association> getAssociations();
+    Associations getAssociations();
 }

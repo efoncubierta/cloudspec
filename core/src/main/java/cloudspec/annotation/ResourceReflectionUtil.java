@@ -110,55 +110,74 @@ public class ResourceReflectionUtil {
      * @param obj Object.
      * @return List of properties.
      */
-    public static List<Property> toProperties(Object obj) {
-        return Stream.of(obj.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
-                .flatMap(field -> {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Found @PropertyDefinition annotation in field '{}' of class '{}'",
-                                field.getName(),
-                                field.getType().getCanonicalName()
-                        );
-                    }
+    public static Properties toProperties(Object obj) {
+        return new Properties(
+                Stream.of(obj.getClass().getDeclaredFields())
+                        .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
+                        .flatMap(field -> {
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("Found @PropertyDefinition annotation in field '{}' of class '{}'",
+                                        field.getName(),
+                                        field.getType().getCanonicalName()
+                                );
+                            }
 
-                    PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
+                            PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
 
-                    try {
-                        field.setAccessible(true);
-                        Object value = field.get(obj);
-                        field.setAccessible(true);
+                            try {
+                                field.setAccessible(true);
+                                Object value = field.get(obj);
+                                Boolean multiValued = ResourceDefReflectionUtil.guessMultiValued(field);
+                                field.setAccessible(true);
 
-                        if (value instanceof String || value instanceof Integer ||
-                                value instanceof Boolean || value instanceof KeyValue) {
-                            return Stream.of(new Property(propertyDefAnnotation.name(), value));
-                        } else {
-                            List<Property> properties = toProperties(value);
-                            if (properties.size() > 0) {
-                                return Stream.of(
-                                        new Property(
-                                                propertyDefAnnotation.name(),
-                                                properties
+                                switch (ResourceDefReflectionUtil.guessPropertyType(field)) {
+                                    case INTEGER:
+                                    case STRING:
+                                    case BOOLEAN:
+                                    case KEY_VALUE:
+                                        return Stream.of(new Property(propertyDefAnnotation.name(), value));
+                                    case NESTED:
+                                    default:
+                                        if (multiValued) {
+                                            return Stream.of(
+                                                    new Property(
+                                                            propertyDefAnnotation.name(),
+                                                            ((List<?>) value)
+                                                                    .stream()
+                                                                    .map(ResourceReflectionUtil::toProperties)
+                                                                    .collect(Collectors.toList())
+                                                    )
+                                            );
+                                        }
+
+                                        Properties properties = toProperties(value);
+                                        if (properties.size() > 0) {
+                                            return Stream.of(
+                                                    new Property(
+                                                            propertyDefAnnotation.name(),
+                                                            properties
+                                                    )
+                                            );
+                                        }
+                                }
+
+                                LOGGER.warn("Type {} of property '{}' in class {} is not supported",
+                                        field.getType().getCanonicalName(),
+                                        field.getName(),
+                                        obj.getClass().getCanonicalName()
+                                );
+                                return Stream.empty();
+                            } catch (IllegalAccessException exception) {
+                                throw new RuntimeException(
+                                        String.format(
+                                                "Could not obtain value from property %s in class %s",
+                                                field.getName(),
+                                                obj.getClass().getCanonicalName()
                                         )
                                 );
                             }
-                        }
-
-                        LOGGER.warn("Type {} of property '{}' in class {} is not supported",
-                                field.getType().getCanonicalName(),
-                                field.getName(),
-                                obj.getClass().getCanonicalName()
-                        );
-                        return Stream.empty();
-                    } catch (IllegalAccessException exception) {
-                        throw new RuntimeException(
-                                String.format(
-                                        "Could not obtain value from property %s in class %s",
-                                        field.getName(),
-                                        obj.getClass().getCanonicalName()
-                                )
-                        );
-                    }
-                }).collect(Collectors.toList());
+                        })
+        );
     }
 
     /**
@@ -167,49 +186,51 @@ public class ResourceReflectionUtil {
      * @param obj Object.
      * @return List of associations.
      */
-    public static List<Association> toAssociations(Object obj) {
-        return Stream.of(obj.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(AssociationDefinition.class))
-                .flatMap(field -> {
-                    // validate field is a string
-                    if (!field.getType().isAssignableFrom(String.class)) {
-                        LOGGER.warn("Type {} of association '{}' in class {} is not supported",
-                                field.getType().getCanonicalName(),
-                                field.getName(),
-                                obj.getClass().getCanonicalName()
-                        );
-                        return Stream.empty();
-                    }
-
-                    AssociationDefinition associationDefinitionAnnotation = field.getAnnotation(AssociationDefinition.class);
-
-                    String associationName = associationDefinitionAnnotation.name();
-                    Optional<ResourceDefRef> resourceDefRefOptional = ResourceDefReflectionUtil.toResourceDefRef(associationDefinitionAnnotation.targetClass());
-
-                    // TODO add validation for association name and resourceDefRef
-                    if (!resourceDefRefOptional.isPresent()) {
-                        return Stream.empty();
-                    }
-
-                    try {
-                        field.setAccessible(true);
-                        String id = (String) field.get(obj);
-                        field.setAccessible(true);
-
-                        return Stream.of(new Association(
-                                associationName,
-                                resourceDefRefOptional.get(),
-                                id)
-                        );
-                    } catch (IllegalAccessException exception) {
-                        throw new RuntimeException(
-                                String.format(
-                                        "Could not obtain value from property %s in class %s",
+    public static Associations toAssociations(Object obj) {
+        return new Associations(
+                Stream.of(obj.getClass().getDeclaredFields())
+                        .filter(field -> field.isAnnotationPresent(AssociationDefinition.class))
+                        .flatMap(field -> {
+                            // validate field is a string
+                            if (!field.getType().isAssignableFrom(String.class)) {
+                                LOGGER.warn("Type {} of association '{}' in class {} is not supported",
+                                        field.getType().getCanonicalName(),
                                         field.getName(),
                                         obj.getClass().getCanonicalName()
-                                )
-                        );
-                    }
-                }).collect(Collectors.toList());
+                                );
+                                return Stream.empty();
+                            }
+
+                            AssociationDefinition associationDefinitionAnnotation = field.getAnnotation(AssociationDefinition.class);
+
+                            String associationName = associationDefinitionAnnotation.name();
+                            Optional<ResourceDefRef> resourceDefRefOptional = ResourceDefReflectionUtil.toResourceDefRef(associationDefinitionAnnotation.targetClass());
+
+                            // TODO add validation for association name and resourceDefRef
+                            if (!resourceDefRefOptional.isPresent()) {
+                                return Stream.empty();
+                            }
+
+                            try {
+                                field.setAccessible(true);
+                                String id = (String) field.get(obj);
+                                field.setAccessible(true);
+
+                                return Stream.of(new Association(
+                                        associationName,
+                                        resourceDefRefOptional.get(),
+                                        id)
+                                );
+                            } catch (IllegalAccessException exception) {
+                                throw new RuntimeException(
+                                        String.format(
+                                                "Could not obtain value from property %s in class %s",
+                                                field.getName(),
+                                                obj.getClass().getCanonicalName()
+                                        )
+                                );
+                            }
+                        })
+        );
     }
 }

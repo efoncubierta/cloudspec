@@ -214,12 +214,14 @@ public class GraphResourceValidator implements ResourceValidator {
     private GraphTraversal<?, ?> buildPropertyFilteringTraversal(PropertyStatement statement) {
         return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
                 .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                 .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate());
     }
 
     private GraphTraversal<?, ?> buildKeyValueFilteringTraversal(KeyValueStatement statement) {
         return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
                 .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
+                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                 .has(GraphResourceStore.PROPERTY_KEY, statement.getKey())
                 .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate());
     }
@@ -238,6 +240,7 @@ public class GraphResourceValidator implements ResourceValidator {
                                 .fold()
                                 .coalesce(
                                         __.unfold()
+                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                                                 .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
                                                 .constant(
                                                         new AssertValidationResult(
@@ -284,6 +287,7 @@ public class GraphResourceValidator implements ResourceValidator {
                                 .fold()
                                 .coalesce(
                                         __.unfold()
+                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                                                 .has(GraphResourceStore.PROPERTY_KEY, statement.getKey())
                                                 .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
                                                 .constant(
@@ -321,6 +325,7 @@ public class GraphResourceValidator implements ResourceValidator {
     private GraphTraversal<?, ?> buildNestedFilteringTraversal(NestedStatement statement) {
         return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
                 .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                 .and(
                         buildFilteringTraversal(statement.getStatement())
                 );
@@ -341,6 +346,7 @@ public class GraphResourceValidator implements ResourceValidator {
                                 .coalesce(
                                         __.unfold()
                                                 .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                                                 .flatMap(traversal),
                                         __.constant(
                                                 new AssertValidationResult(

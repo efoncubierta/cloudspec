@@ -25,28 +25,12 @@
  */
 package cloudspec.util;
 
-import cloudspec.annotation.AssociationDefinition;
-import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
-import cloudspec.annotation.ResourceDefinition;
 import cloudspec.model.KeyValue;
 
 import java.util.List;
 
-@ResourceDefinition(
-        provider = ProviderDataUtil.PROVIDER_NAME,
-        group = ModelTestUtils.RESOURCE_GROUP,
-        name = ModelTestUtils.RESOURCE_NAME,
-        description = ModelTestUtils.RESOURCE_DESCRIPTION
-)
-public class TestResource {
-    @IdDefinition
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_ID_NAME,
-            description = ModelTestUtils.PROP_ID_DESCRIPTION
-    )
-    private final String id;
-
+public class TestNestedProperty {
     @PropertyDefinition(
             name = ModelTestUtils.PROP_INTEGER_NAME,
             description = ModelTestUtils.PROP_INTEGER_DESCRIPTION
@@ -95,33 +79,10 @@ public class TestResource {
     )
     private final List<KeyValue> keyValueListProperty;
 
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_NESTED_NAME,
-            description = ModelTestUtils.PROP_NESTED_DESCRIPTION
-    )
-    private final TestNestedProperty nestedProperty;
-
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_NESTED_LIST_NAME,
-            description = ModelTestUtils.PROP_NESTED_LIST_DESCRIPTION
-    )
-    private final List<TestNestedProperty> nestedListProperty;
-
-    @AssociationDefinition(
-            name = ModelTestUtils.ASSOC_NAME,
-            description = ModelTestUtils.ASSOC_DESCRIPTION,
-            targetClass = TestTargetResource.class
-    )
-    private final String associationId;
-
-    public TestResource(String id,
-                        Integer integerProperty, List<Integer> integerListProperty,
-                        String stringProperty, List<String> stringListProperty,
-                        Boolean booleanProperty, List<Boolean> booleanListProperty,
-                        KeyValue keyValueProperty, List<KeyValue> keyValueListProperty,
-                        TestNestedProperty nestedProperty, List<TestNestedProperty> nestedListProperty,
-                        String associationId) {
-        this.id = id;
+    public TestNestedProperty(Integer integerProperty, List<Integer> integerListProperty,
+                              String stringProperty, List<String> stringListProperty,
+                              Boolean booleanProperty, List<Boolean> booleanListProperty,
+                              KeyValue keyValueProperty, List<KeyValue> keyValueListProperty) {
         this.integerProperty = integerProperty;
         this.integerListProperty = integerListProperty;
         this.stringProperty = stringProperty;
@@ -130,13 +91,6 @@ public class TestResource {
         this.booleanListProperty = booleanListProperty;
         this.keyValueProperty = keyValueProperty;
         this.keyValueListProperty = keyValueListProperty;
-        this.nestedProperty = nestedProperty;
-        this.nestedListProperty = nestedListProperty;
-        this.associationId = associationId;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public Integer getIntegerProperty() {
@@ -169,17 +123,5 @@ public class TestResource {
 
     public List<KeyValue> getKeyValueListProperty() {
         return keyValueListProperty;
-    }
-
-    public TestNestedProperty getNestedProperty() {
-        return nestedProperty;
-    }
-
-    public List<TestNestedProperty> getNestedListProperty() {
-        return nestedListProperty;
-    }
-
-    public String getAssociationId() {
-        return associationId;
     }
 }

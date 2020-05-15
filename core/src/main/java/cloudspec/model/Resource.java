@@ -25,8 +25,6 @@
  */
 package cloudspec.model;
 
-import java.util.List;
-
 /**
  * Define a CloudSpec resource.
  * <p>
@@ -38,8 +36,8 @@ import java.util.List;
 public class Resource implements PropertiesContainer, AssociationsContainer {
     private final ResourceDefRef resourceDefRef;
     private final String resourceId;
-    private final List<Property> properties;
-    private final List<Association> associations;
+    private final Properties properties;
+    private final Associations associations;
 
     /**
      * Constructor.
@@ -49,7 +47,7 @@ public class Resource implements PropertiesContainer, AssociationsContainer {
      * @param properties     List of properties.
      * @param associations   List of associations.
      */
-    public Resource(ResourceDefRef resourceDefRef, String resourceId, List<Property> properties, List<Association> associations) {
+    public Resource(ResourceDefRef resourceDefRef, String resourceId, Properties properties, Associations associations) {
         this.resourceDefRef = resourceDefRef;
         this.resourceId = resourceId;
         this.properties = properties;
@@ -75,12 +73,12 @@ public class Resource implements PropertiesContainer, AssociationsContainer {
     }
 
     @Override
-    public List<Property> getProperties() {
+    public Properties getProperties() {
         return properties;
     }
 
     @Override
-    public List<Association> getAssociations() {
+    public Associations getAssociations() {
         return associations;
     }
 
@@ -98,10 +96,8 @@ public class Resource implements PropertiesContainer, AssociationsContainer {
 
         return getResourceDefRef().equals(resource.getResourceDefRef()) &&
                 getResourceId().equals(resource.getResourceId()) &&
-                getProperties().size() == resource.getProperties().size() &&
-                getProperties().containsAll(resource.getProperties()) &&
-                getAssociations().size() == resource.getAssociations().size() &&
-                getAssociations().containsAll(resource.getAssociations());
+                getProperties().equals(resource.getProperties()) &&
+                getAssociations().equals(resource.getAssociations());
     }
 
     @Override

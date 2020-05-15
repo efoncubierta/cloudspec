@@ -100,7 +100,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
     public static final String PROPERTY_NAME = "name";
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_TYPE = "type";
-    public static final String PROPERTY_IS_ARRAY = "isArray";
+    public static final String PROPERTY_IS_MULTIVALUED = "isArray";
 
     private final GraphTraversalSource graphTraversal;
 
@@ -145,7 +145,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                         propertyDefV.value(PROPERTY_NAME),
                         propertyDefV.value(PROPERTY_DESCRIPTION),
                         propertyDefV.value(PROPERTY_TYPE),
-                        propertyDefV.value(PROPERTY_IS_ARRAY),
+                        propertyDefV.value(PROPERTY_IS_MULTIVALUED),
                         getPropertyDefs(propertyDefV)
                 ))
                 .collect(Collectors.toList());
@@ -227,7 +227,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .property(PROPERTY_NAME, propertyDef.getName())
                 .property(PROPERTY_DESCRIPTION, propertyDef.getDescription())
                 .property(PROPERTY_TYPE, propertyDef.getPropertyType())
-                .property(PROPERTY_IS_ARRAY, propertyDef.isArray())
+                .property(PROPERTY_IS_MULTIVALUED, propertyDef.isMultiValued())
                 .next();
 
         // link property definition to source vertex

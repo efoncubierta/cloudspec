@@ -37,7 +37,7 @@ public class ResourceTest {
     @Test
     public void shouldGetPropertyByPath() {
         Optional<PropertyDef> propertyDefOpt = ModelTestUtils.RESOURCE_DEF.getPropertyByPath(
-                Arrays.asList(ModelTestUtils.PROP_MAP_NAME, ModelTestUtils.PROP_STRING_NAME)
+                Arrays.asList(ModelTestUtils.PROP_NESTED_NAME, ModelTestUtils.PROP_STRING_NAME)
         );
 
         assertNotNull(propertyDefOpt);

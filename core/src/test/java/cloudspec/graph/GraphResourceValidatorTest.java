@@ -123,7 +123,7 @@ public class GraphResourceValidatorTest {
                         ModelTestUtils.RESOURCE_DEF_REF,
                         Collections.singletonList(
                                 new NestedStatement(
-                                        ModelTestUtils.PROP_MAP_NAME,
+                                        ModelTestUtils.PROP_NESTED_NAME,
                                         new PropertyStatement(
                                                 ModelTestUtils.PROP_STRING_NAME,
                                                 P.eq("zzz")
@@ -188,7 +188,7 @@ public class GraphResourceValidatorTest {
                 ),
                 Collections.singletonList(
                         new NestedStatement(
-                                ModelTestUtils.PROP_MAP_NAME,
+                                ModelTestUtils.PROP_NESTED_NAME,
                                 new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE))
                         )
                 )
@@ -204,7 +204,7 @@ public class GraphResourceValidatorTest {
             assertEquals(1, result.getAssertResults().size());
             assertTrue(result.getAssertResults().get(0).isSuccess());
             assertEquals(
-                    String.format("%s->%s", ModelTestUtils.PROP_MAP_NAME, ModelTestUtils.PROP_STRING_NAME),
+                    String.format("%s->%s", ModelTestUtils.PROP_NESTED_NAME, ModelTestUtils.PROP_STRING_NAME),
                     String.join("->", result.getAssertResults().get(0).getPath())
             );
         });
@@ -219,7 +219,7 @@ public class GraphResourceValidatorTest {
                 ),
                 Collections.singletonList(
                         new NestedStatement(
-                                ModelTestUtils.PROP_MAP_NAME,
+                                ModelTestUtils.PROP_NESTED_NAME,
                                 new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE))
                         )
                 )
@@ -235,7 +235,7 @@ public class GraphResourceValidatorTest {
             assertEquals(1, result.getAssertResults().size());
             assertTrue(result.getAssertResults().get(0).isSuccess());
             assertEquals(
-                    String.format("%s->%s", ModelTestUtils.PROP_MAP_NAME, ModelTestUtils.PROP_STRING_NAME),
+                    String.format("%s->%s", ModelTestUtils.PROP_NESTED_NAME, ModelTestUtils.PROP_STRING_NAME),
                     String.join("->", result.getAssertResults().get(0).getPath())
             );
         });

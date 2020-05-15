@@ -28,13 +28,13 @@ package cloudspec.graph;
 import cloudspec.model.*;
 import cloudspec.store.ResourceStore;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +62,25 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.valueM
  *     <ul>
  *         <li><strong>name (String)</strong></li>
  *         <li><strong>value (Object)</strong></li>
- *         <li><strong>isMap (Boolean)</strong></li>
+ *         <li><strong>type (PropertyType)</strong></li>
+ *     </ul>
+ * </li>
+ * <li>
+ *     Property values are <strong>propertyValue</strong> vertices, with the following properties:
+ *     <ul>
+ *         <li>
+ *             If property is of an atomic type (integer, string or boolean):
+ *             <ul>
+ *                 <li><strong>value (Object)</strong></li>
+ *             </ul>
+ *         </li>
+ *         <li>
+ *             If property is a key value type:
+ *             <ul>
+ *                 <li><strong>key (String)</strong></li>
+ *                 <li><strong>value (String)</strong></li>
+ *             </ul>
+ *         </li>
  *     </ul>
  * </li>
  * <li>
@@ -82,8 +100,9 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.valueM
  * <li>
  *     <strong>property</strong> vertices has the following out edges:
  *     <ul>
- *         <li>property --- [isPropertyDef] ---> propertyDef</li>
- *         <li>property --- [hasProperty]   ---> property</li>
+ *         <li>property --- [isPropertyDef]    ---> propertyDef</li>
+ *         <li>property --- [hasPropertyValue] ---> propertyValue</li>
+ *         <li>property --- [hasProperty]      ---> property</li>
  *     </ul>
  * </li>
  * </ul>
@@ -93,8 +112,10 @@ public class GraphResourceStore implements ResourceStore {
 
     public static final String LABEL_RESOURCE = "resource";
     public static final String LABEL_PROPERTY = "property";
+    public static final String LABEL_PROPERTY_VALUE = "propertyValue";
     public static final String LABEL_IS_RESOURCE_DEF = "isResourceDef";
     public static final String LABEL_HAS_PROPERTY = "hasProperty";
+    public static final String LABEL_HAS_PROPERTY_VALUE = "hasPropertyValue";
     public static final String LABEL_IS_PROPERTY_DEF = "isPropertyDef";
     public static final String LABEL_HAS_ASSOCIATION = "hasAssociation";
     public static final String PROPERTY_RESOURCE_ID = "resourceId";
@@ -103,6 +124,7 @@ public class GraphResourceStore implements ResourceStore {
     public static final String PROPERTY_KEY = "key";
     public static final String PROPERTY_VALUE = "value";
     public static final String PROPERTY_TYPE = "propertyType";
+    public static final String PROPERTY_IS_MULTIVALUED = "isMultiValued";
 
     private final GraphTraversalSource graphTraversal;
 
@@ -117,12 +139,12 @@ public class GraphResourceStore implements ResourceStore {
 
     @Override
     public void createResource(ResourceDefRef resourceDefRef, String resourceId) {
-        createResource(resourceDefRef, resourceId, Collections.emptyList(), Collections.emptyList());
+        createResource(resourceDefRef, resourceId, new Properties(), new Associations());
     }
 
     @Override
     public void createResource(ResourceDefRef resourceDefRef, String resourceId,
-                               List<Property> properties, List<Association> associations) {
+                               Properties properties, Associations associations) {
         LOGGER.debug("Creating resource '{}' with id '{}'", resourceDefRef, resourceId);
 
         if (getResourceVertexById(resourceDefRef, resourceId).isPresent()) {
@@ -162,10 +184,10 @@ public class GraphResourceStore implements ResourceStore {
         }
 
         // add properties
-        createOrUpdatePropertiesFromVertex(resourceV, properties);
+        createPropertiesFromVertex(resourceV, properties);
 
         // add associations
-        createOrUpdateAssociationsFromVertex(resourceV, associations);
+        createAssociationsFromVertex(resourceV, associations);
     }
 
     @Override
@@ -174,45 +196,45 @@ public class GraphResourceStore implements ResourceStore {
     }
 
     @Override
-    public List<Property> getProperties(ResourceDefRef resourceDefRef, String resourceId) {
+    public Properties getProperties(ResourceDefRef resourceDefRef, String resourceId) {
         return getResourceVertexById(resourceDefRef, resourceId)
                 .map(this::getPropertiesFromVertex)
-                .orElse(Collections.emptyList());
+                .orElse(new Properties());
     }
 
     @Override
     public void setProperty(ResourceDefRef resourceDefRef, String resourceId, Property property) {
         // TODO handle missing resource
         getResourceVertexById(resourceDefRef, resourceId)
-                .ifPresent(resourceV -> createOrUpdatePropertyFromVertex(resourceV, property));
+                .ifPresent(resourceV -> createPropertyFromVertex(resourceV, property));
     }
 
     @Override
-    public void setProperties(ResourceDefRef resourceDefRef, String resourceId, List<Property> properties) {
+    public void setProperties(ResourceDefRef resourceDefRef, String resourceId, Properties properties) {
         // TODO handle missing resource
         getResourceVertexById(resourceDefRef, resourceId)
-                .ifPresent(resourceV -> createOrUpdatePropertiesFromVertex(resourceV, properties));
+                .ifPresent(resourceV -> createPropertiesFromVertex(resourceV, properties));
     }
 
     @Override
-    public List<Association> getAssociations(ResourceDefRef resourceDefRef, String resourceId) {
+    public Associations getAssociations(ResourceDefRef resourceDefRef, String resourceId) {
         return getResourceVertexById(resourceDefRef, resourceId)
                 .map(this::getAssociationsFromVertex)
-                .orElse(Collections.emptyList());
+                .orElse(new Associations());
     }
 
     @Override
     public void setAssociation(ResourceDefRef resourceDefRef, String resourceId, Association association) {
         // TODO handle missing resource
         getResourceVertexById(resourceDefRef, resourceId)
-                .ifPresent(resourceV -> createOrUpdateAssociationFromVertex(resourceV, association));
+                .ifPresent(resourceV -> createAssociationFromVertex(resourceV, association));
     }
 
     @Override
-    public void setAssociations(ResourceDefRef resourceDefRef, String resourceId, List<Association> associations) {
+    public void setAssociations(ResourceDefRef resourceDefRef, String resourceId, Associations associations) {
         // TODO handle missing resource
         getResourceVertexById(resourceDefRef, resourceId)
-                .ifPresent(resourceV -> createOrUpdateAssociationsFromVertex(resourceV, associations));
+                .ifPresent(resourceV -> createAssociationsFromVertex(resourceV, associations));
     }
 
     @Override
@@ -234,11 +256,13 @@ public class GraphResourceStore implements ResourceStore {
                 .collect(Collectors.toList());
     }
 
-    private void createOrUpdatePropertiesFromVertex(Vertex sourceV, List<Property> properties) {
-        properties.forEach(property -> createOrUpdatePropertyFromVertex(sourceV, property));
+    private void createPropertiesFromVertex(Vertex sourceV, Properties properties) {
+        properties.forEach(property -> createPropertyFromVertex(sourceV, property));
     }
 
-    private void createOrUpdatePropertyFromVertex(Vertex sourceV, Property property) {
+    @SuppressWarnings("unchecked")
+    private void createPropertyFromVertex(Vertex sourceV, Property property) {
+        // sourceV can be a resource or a property value
         LOGGER.debug("- Setting property '{}' with value {}",
                 getPropertyPath(sourceV, property.getName()),
                 property
@@ -247,7 +271,10 @@ public class GraphResourceStore implements ResourceStore {
         // get property definition
         Optional<Vertex> propertyDefVOpt = graphTraversal
                 .V(sourceV.id())
-                .out(LABEL_IS_RESOURCE_DEF, LABEL_IS_PROPERTY_DEF)
+                .coalesce(
+                        __.out(LABEL_IS_RESOURCE_DEF),
+                        __.in(LABEL_HAS_PROPERTY_VALUE).out(LABEL_IS_PROPERTY_DEF)
+                )
                 .out(GraphResourceDefStore.LABEL_HAS_PROPERTY_DEF)
                 .has(GraphResourceDefStore.PROPERTY_NAME, property.getName())
                 .tryNext();
@@ -260,40 +287,20 @@ public class GraphResourceStore implements ResourceStore {
 
         // get property type
         PropertyType propertyType = propertyDefVOpt.get().value(GraphResourceDefStore.PROPERTY_TYPE);
+        Boolean multiValued = propertyDefVOpt.get().value(GraphResourceDefStore.PROPERTY_IS_MULTIVALUED);
 
         // create property vertex
-        Vertex propertyFromV;
-        switch (propertyType) {
-            case MAP:
-                propertyFromV = graphTraversal
-                        .addV(LABEL_PROPERTY)
-                        .property(PROPERTY_TYPE, propertyType)
-                        .property(PROPERTY_NAME, property.getName())
-                        .next();
-                break;
-            case KEY_VALUE:
-                KeyValue kv = (KeyValue) property.getValue();
-                propertyFromV = graphTraversal
-                        .addV(LABEL_PROPERTY)
-                        .property(PROPERTY_TYPE, propertyType)
-                        .property(PROPERTY_NAME, property.getName())
-                        .property(PROPERTY_KEY, kv.getKey())
-                        .property(PROPERTY_VALUE, kv.getValue())
-                        .next();
-                break;
-            default:
-                propertyFromV = graphTraversal
-                        .addV(LABEL_PROPERTY)
-                        .property(PROPERTY_TYPE, propertyType)
-                        .property(PROPERTY_NAME, property.getName())
-                        .property(PROPERTY_VALUE, property.getValue())
-                        .next();
-        }
+        Vertex propertyV = graphTraversal
+                .addV(LABEL_PROPERTY)
+                .property(PROPERTY_NAME, property.getName())
+                .property(PROPERTY_TYPE, propertyType)
+                .property(PROPERTY_IS_MULTIVALUED, multiValued)
+                .next();
 
         // link property to property definition vertex
         graphTraversal
                 .addE(LABEL_IS_PROPERTY_DEF)
-                .from(propertyFromV)
+                .from(propertyV)
                 .to(propertyDefVOpt.get())
                 .next();
 
@@ -301,20 +308,94 @@ public class GraphResourceStore implements ResourceStore {
         graphTraversal
                 .addE(LABEL_HAS_PROPERTY)
                 .from(sourceV)
-                .to(propertyFromV)
+                .to(propertyV)
                 .next();
 
-        // if property type is map, then spread out properties to their own vertex
-        if (propertyDefVOpt.get().value(GraphResourceDefStore.PROPERTY_TYPE).equals(PropertyType.MAP)) {
-            createOrUpdatePropertiesFromVertex(propertyFromV, ((List<Property>) property.getValue()));
+        switch (propertyType) {
+            case NESTED:
+                if (multiValued) {
+                    createNestedPropertyValuesFromVertex(propertyV, (List<Properties>) property.getValue());
+                } else {
+                    createNestedPropertyValueFromVertex(propertyV, (Properties) property.getValue());
+                }
+                break;
+            case KEY_VALUE:
+                if (multiValued) {
+                    createKeyValuePropertyValuesFromVertex(propertyV, (List<KeyValue>) property.getValue());
+                } else {
+                    createKeyValuePropertyValueFromVertex(propertyV, (KeyValue) property.getValue());
+                }
+                break;
+            default:
+                if (multiValued) {
+                    createAtomicPropertyValuesFromVertex(propertyV, (List<Object>) property.getValue());
+                } else {
+                    createAtomicPropertyValueFromVertex(propertyV, property.getValue());
+                }
         }
     }
 
-    private void createOrUpdateAssociationsFromVertex(Vertex sourceV, List<Association> associations) {
-        associations.forEach(association -> createOrUpdateAssociationFromVertex(sourceV, association));
+    private void createNestedPropertyValuesFromVertex(Vertex propertyV, List<Properties> properties) {
+        properties.forEach(nestedProperties -> createNestedPropertyValueFromVertex(propertyV, nestedProperties));
     }
 
-    private void createOrUpdateAssociationFromVertex(Vertex sourceV, Association association) {
+    private void createNestedPropertyValueFromVertex(Vertex propertyV, Properties properties) {
+        Vertex propertyValueV = graphTraversal.V(propertyV.id())
+                .addV(LABEL_PROPERTY_VALUE)
+                .next();
+
+        // link source (property) vertex to property value vertex
+        graphTraversal
+                .addE(LABEL_HAS_PROPERTY_VALUE)
+                .from(propertyV)
+                .to(propertyValueV)
+                .next();
+
+        createPropertiesFromVertex(propertyValueV, properties);
+    }
+
+    private void createAtomicPropertyValuesFromVertex(Vertex propertyV, List<Object> objs) {
+        objs.forEach(obj -> createAtomicPropertyValueFromVertex(propertyV, obj));
+    }
+
+    private void createAtomicPropertyValueFromVertex(Vertex propertyV, Object obj) {
+        Vertex propertyValueV = graphTraversal.V(propertyV.id())
+                .addV(LABEL_PROPERTY_VALUE)
+                .property(PROPERTY_VALUE, obj)
+                .next();
+
+        // link source (property) vertex to property value vertex
+        graphTraversal
+                .addE(LABEL_HAS_PROPERTY_VALUE)
+                .from(propertyV)
+                .to(propertyValueV)
+                .next();
+    }
+
+    private void createKeyValuePropertyValuesFromVertex(Vertex propertyV, List<KeyValue> keyValues) {
+        keyValues.forEach(keyValue -> createKeyValuePropertyValueFromVertex(propertyV, keyValue));
+    }
+
+    private void createKeyValuePropertyValueFromVertex(Vertex propertyV, KeyValue keyValue) {
+        Vertex propertyValueV = graphTraversal.V(propertyV.id())
+                .addV(LABEL_PROPERTY_VALUE)
+                .property(PROPERTY_KEY, keyValue.getKey())
+                .property(PROPERTY_VALUE, keyValue.getValue())
+                .next();
+
+        // link source (property) vertex to property value vertex
+        graphTraversal
+                .addE(LABEL_HAS_PROPERTY_VALUE)
+                .from(propertyV)
+                .to(propertyValueV)
+                .next();
+    }
+
+    private void createAssociationsFromVertex(Vertex sourceV, Associations associations) {
+        associations.forEach(association -> createAssociationFromVertex(sourceV, association));
+    }
+
+    private void createAssociationFromVertex(Vertex sourceV, Association association) {
         LOGGER.debug("- Setting association '{}'", association);
 
         // validate target resource exists
@@ -374,57 +455,129 @@ public class GraphResourceStore implements ResourceStore {
         );
     }
 
-    private List<Property> getPropertiesFromVertex(Vertex sourceV) {
-        return graphTraversal
-                .V(sourceV.id())
-                .out(LABEL_HAS_PROPERTY)
-                .toStream()
-                .map(propertyV -> {
-                    switch ((PropertyType) propertyV.value(PROPERTY_TYPE)) {
-                        case MAP:
-                            return new Property(
-                                    propertyV.value(PROPERTY_NAME),
-                                    getPropertiesFromVertex(propertyV)
-                            );
-                        case KEY_VALUE:
-                            return new Property(
-                                    propertyV.value(PROPERTY_NAME),
-                                    new KeyValue(propertyV.value(PROPERTY_KEY), propertyV.value(PROPERTY_VALUE))
-                            );
-                        default:
-                            return new Property(
-                                    propertyV.value(PROPERTY_NAME),
-                                    propertyV.value(PROPERTY_VALUE)
-                            );
-                    }
-                })
-                .collect(Collectors.toList());
+    private Properties getPropertiesFromVertex(Vertex sourceV) {
+        // source can be a resource or a property value
+        return new Properties(
+                graphTraversal
+                        .V(sourceV.id())
+                        .out(LABEL_HAS_PROPERTY)
+                        .toStream()
+                        .map(this::getPropertyFromVertex)
+        );
     }
 
-    private List<Association> getAssociationsFromVertex(Vertex resourceV) {
-        return graphTraversal
-                .V(resourceV.id())
-                .outE(LABEL_HAS_ASSOCIATION).as("association")
-                .inV().as("target")
-                .select("association", "target")
-                .by(valueMap())
-                .toStream()
-                .map(map -> {
-                    // TODO refactor this ugly code
-                    Map<String, Object> associationMap = (Map<String, Object>) map.get("association");
-                    Map<String, List<Object>> targetMap = (Map<String, List<Object>>) map.get("target");
+    private Property getPropertyFromVertex(Vertex propertyV) {
+        switch ((PropertyType) propertyV.value(PROPERTY_TYPE)) {
+            case NESTED:
+                return getNestedPropertyValuesFromVertex(propertyV);
+            case KEY_VALUE:
+                return getKeyValuePropertyValuesFromVertex(propertyV);
+            default:
+                return getAtomicPropertyValueFromVertex(propertyV);
+        }
+    }
 
-                    return new Association(
-                            (String) associationMap.get(PROPERTY_NAME),
-                            (ResourceDefRef) targetMap.get(PROPERTY_RESOURCE_DEF_REF).get(0),
-                            (String) targetMap.get(PROPERTY_RESOURCE_ID).get(0)
-                    );
-                }).collect(Collectors.toList());
+    private Property getAtomicPropertyValueFromVertex(Vertex propertyV) {
+        List<Object> propertyValues = graphTraversal
+                .V(propertyV.id())
+                .out(LABEL_HAS_PROPERTY_VALUE)
+                .toStream()
+                .map(propertyValueV -> propertyValueV.value(PROPERTY_VALUE))
+                .collect(Collectors.toList());
+
+        if (propertyV.value(PROPERTY_IS_MULTIVALUED).equals(Boolean.TRUE)) {
+            return new Property(
+                    propertyV.value(PROPERTY_NAME),
+                    propertyValues
+            );
+        } else {
+            return new Property(
+                    propertyV.value(PROPERTY_NAME),
+                    propertyValues.isEmpty() ? null : propertyValues.get(0)
+            );
+        }
+    }
+
+    private Property getKeyValuePropertyValuesFromVertex(Vertex propertyV) {
+        List<KeyValue> keyValues = graphTraversal
+                .V(propertyV.id())
+                .out(LABEL_HAS_PROPERTY_VALUE)
+                .toStream()
+                .map(
+                        propertyValueV -> new KeyValue(
+                                propertyValueV.value(PROPERTY_KEY),
+                                propertyValueV.value(PROPERTY_VALUE)
+                        )
+                )
+                .collect(Collectors.toList());
+
+        if (propertyV.value(PROPERTY_IS_MULTIVALUED).equals(Boolean.TRUE)) {
+            return new Property(
+                    propertyV.value(PROPERTY_NAME),
+                    keyValues
+            );
+        } else {
+            return new Property(
+                    propertyV.value(PROPERTY_NAME),
+                    keyValues.isEmpty() ? null : keyValues.get(0)
+            );
+        }
+    }
+
+    private Property getNestedPropertyValuesFromVertex(Vertex propertyV) {
+        List<Properties> nestedValues = graphTraversal
+                .V(propertyV.id())
+                .out(LABEL_HAS_PROPERTY_VALUE)
+                .toStream()
+                .map(this::getPropertiesFromVertex)
+                .collect(Collectors.toList());
+
+        if (propertyV.value(PROPERTY_IS_MULTIVALUED).equals(Boolean.TRUE)) {
+            return new Property(
+                    propertyV.value(PROPERTY_NAME),
+                    nestedValues
+            );
+        } else {
+            return new Property(
+                    propertyV.value(PROPERTY_NAME),
+                    nestedValues.isEmpty() ? null : nestedValues.get(0)
+            );
+        }
+    }
+
+    private Associations getAssociationsFromVertex(Vertex resourceV) {
+        return new Associations(
+                graphTraversal
+                        .V(resourceV.id())
+                        .outE(LABEL_HAS_ASSOCIATION).as("association")
+                        .inV().as("target")
+                        .select("association", "target")
+                        .by(valueMap())
+                        .toStream()
+                        .map(map -> {
+                            // TODO refactor this ugly code
+                            Map<String, Object> associationMap = (Map<String, Object>) map.get("association");
+                            Map<String, List<Object>> targetMap = (Map<String, List<Object>>) map.get("target");
+
+                            return new Association(
+                                    (String) associationMap.get(PROPERTY_NAME),
+                                    (ResourceDefRef) targetMap.get(PROPERTY_RESOURCE_DEF_REF).get(0),
+                                    (String) targetMap.get(PROPERTY_RESOURCE_ID).get(0)
+                            );
+                        })
+        );
     }
 
     private String getPropertyPath(Vertex sourceV, String memberName) {
         if (sourceV.label().equals(LABEL_RESOURCE)) {
             return memberName;
+        } else if (sourceV.label().equals(LABEL_PROPERTY_VALUE)) {
+            return getPropertyPath(
+                    graphTraversal
+                            .V(sourceV.id())
+                            .in(LABEL_HAS_PROPERTY_VALUE)
+                            .next(),
+                    memberName);
         } else {
             return String.format(
                     "%s.%s",

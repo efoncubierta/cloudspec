@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer {
     private final PropertyType propertyType;
-    private final Boolean isArray;
+    private final Boolean multiValued;
     private final List<PropertyDef> properties;
 
     /**
@@ -44,10 +44,10 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
      * @param name         Property name.
      * @param description  Property description.
      * @param propertyType Property type.
-     * @param isArray      Flag the property as multi-valued.
+     * @param multiValued  Flag the property as multi-valued.
      */
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray) {
-        this(name, description, propertyType, isArray, Collections.emptyList());
+    public PropertyDef(String name, String description, PropertyType propertyType, Boolean multiValued) {
+        this(name, description, propertyType, multiValued, Collections.emptyList());
     }
 
     /**
@@ -56,13 +56,13 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
      * @param name         Property name.
      * @param description  Property description.
      * @param propertyType Property type.
-     * @param isArray      Flag the property as multi-valued.
-     * @param properties   List of sub properties (when type is map).
+     * @param multiValued  Flag the property as multi-valued.
+     * @param properties   List of sub properties (when type is nested).
      */
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean isArray, List<PropertyDef> properties) {
+    public PropertyDef(String name, String description, PropertyType propertyType, Boolean multiValued, List<PropertyDef> properties) {
         super(name, description);
         this.propertyType = propertyType;
-        this.isArray = isArray;
+        this.multiValued = multiValued;
         this.properties = properties;
     }
 
@@ -80,8 +80,8 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
      *
      * @return True if the property is multi-valued. False otherwise.
      */
-    public Boolean isArray() {
-        return isArray;
+    public Boolean isMultiValued() {
+        return multiValued;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
         return getName().equals(propertyDef.getName()) &&
                 getDescription().equals(propertyDef.getDescription()) &&
                 getPropertyType().equals(propertyDef.getPropertyType()) &&
-                isArray().equals(propertyDef.isArray()) &&
+                isMultiValued().equals(propertyDef.isMultiValued()) &&
                 getProperties().size() == propertyDef.getProperties().size() &&
                 getProperties().containsAll(propertyDef.getProperties());
     }
@@ -115,7 +115,7 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
                 "name=" + getName() +
                 ", description=" + getDescription() +
                 ", propertyType=" + propertyType +
-                ", isArray=" + isArray +
+                ", multiValued=" + multiValued +
                 ", properties=" + properties +
                 '}';
     }

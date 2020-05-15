@@ -29,6 +29,7 @@ import cloudspec.ProvidersRegistry;
 import cloudspec.annotation.ResourceReflectionUtil;
 import cloudspec.lang.*;
 import cloudspec.model.Association;
+import cloudspec.model.Associations;
 import cloudspec.model.Resource;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
@@ -154,7 +155,7 @@ public class ResourceLoader {
                             resource.getResourceDefRef(),
                             resource.getResourceId(),
                             resource.getProperties(),
-                            Collections.emptyList()
+                            new Associations()
                     ));
         } else {
             return resourceStore.getResourcesByDefinition(resourceDefRef).stream();
@@ -174,7 +175,7 @@ public class ResourceLoader {
                     resource.getResourceDefRef(),
                     resource.getResourceId(),
                     resource.getProperties(),
-                    Collections.emptyList()
+                    new Associations()
             ));
 
             return resourceOpt;

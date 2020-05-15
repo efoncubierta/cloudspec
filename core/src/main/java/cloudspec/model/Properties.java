@@ -23,44 +23,40 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.util;
+package cloudspec.model;
 
-import cloudspec.annotation.PropertyDefinition;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class TestMapResource {
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_INTEGER_NAME,
-            description = ModelTestUtils.PROP_INTEGER_DESCRIPTION
-    )
-    private final Integer integerProperty;
-
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_STRING_NAME,
-            description = ModelTestUtils.PROP_STRING_DESCRIPTION
-    )
-    private final String stringProperty;
-
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_BOOLEAN_NAME,
-            description = ModelTestUtils.PROP_BOOLEAN_DESCRIPTION
-    )
-    private final Boolean booleanProperty;
-
-    public TestMapResource(Integer integerProperty, String stringProperty, Boolean booleanProperty) {
-        this.integerProperty = integerProperty;
-        this.stringProperty = stringProperty;
-        this.booleanProperty = booleanProperty;
+public class Properties extends ArrayList<Property> {
+    public Properties(Property... properties) {
+        super(Arrays.asList(properties));
     }
 
-    public Integer getIntegerProperty() {
-        return integerProperty;
+    public Properties(Stream<Property> properties) {
+        super(properties.collect(Collectors.toList()));
     }
 
-    public String getStringProperty() {
-        return stringProperty;
+    public Properties(List<Property> properties) {
+        super(properties);
     }
 
-    public Boolean getBooleanProperty() {
-        return booleanProperty;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Properties)) {
+            return false;
+        }
+
+        Properties properties = (Properties) obj;
+
+        return size() == properties.size() && containsAll(properties);
     }
 }

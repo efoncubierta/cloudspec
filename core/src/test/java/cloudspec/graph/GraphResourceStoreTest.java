@@ -106,7 +106,7 @@ public class GraphResourceStoreTest {
 
     @Test
     public void shouldNotGetPropertiesOfRandomResource() {
-        List<Property> properties = resourceStore.getProperties(
+        Properties properties = resourceStore.getProperties(
                 ModelGenerator.randomResourceDefRef(),
                 ModelGenerator.randomResourceId()
         );
@@ -116,19 +116,21 @@ public class GraphResourceStoreTest {
 
     @Test
     public void shouldGetPropertiesOfResource() {
-        List<Property> properties = resourceStore.getProperties(
+        Properties properties = resourceStore.getProperties(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID
         );
         assertNotNull(properties);
         assertFalse(properties.isEmpty());
         assertEquals(ModelTestUtils.PROPERTIES.size(), properties.size());
+        System.out.println(ModelTestUtils.PROPERTIES);
+        System.out.println(properties);
         assertTrue(ModelTestUtils.PROPERTIES.containsAll(properties));
     }
 
     @Test
     public void shouldNotGetAssociationsOfRandomResource() {
-        List<Association> associations = resourceStore.getAssociations(
+        Associations associations = resourceStore.getAssociations(
                 ModelGenerator.randomResourceDefRef(),
                 ModelGenerator.randomResourceId()
         );
@@ -138,14 +140,13 @@ public class GraphResourceStoreTest {
 
     @Test
     public void shouldGetAssociationsOfResource() {
-        List<Association> associations = resourceStore.getAssociations(
+        Associations associations = resourceStore.getAssociations(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID
         );
         assertNotNull(associations);
         assertFalse(associations.isEmpty());
-        assertEquals(ModelTestUtils.ASSOCIATIONS.size(), associations.size());
-        assertTrue(ModelTestUtils.ASSOCIATIONS.containsAll(associations));
+        assertEquals(ModelTestUtils.ASSOCIATIONS, associations);
     }
 
     @Test
@@ -180,7 +181,7 @@ public class GraphResourceStoreTest {
                 property
         );
 
-        List<Property> properties = resourceStore.getProperties(resourceDefRef, resourceId);
+        Properties properties = resourceStore.getProperties(resourceDefRef, resourceId);
         assertNotNull(properties);
         assertTrue(properties.isEmpty());
     }
@@ -195,7 +196,7 @@ public class GraphResourceStoreTest {
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
 
-        List<Property> properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(properties);
         assertTrue(properties.isEmpty());
     }
@@ -210,7 +211,7 @@ public class GraphResourceStoreTest {
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
 
-        List<Property> properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(properties);
         assertFalse(properties.isEmpty());
         assertEquals(1, properties.size());
@@ -226,11 +227,10 @@ public class GraphResourceStoreTest {
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setProperties(resource.getResourceDefRef(), resource.getResourceId(), resource.getProperties());
 
-        List<Property> properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(properties);
         assertFalse(properties.isEmpty());
-        assertEquals(resource.getProperties().size(), properties.size());
-        assertTrue(resource.getProperties().containsAll(properties));
+        assertEquals(resource.getProperties(), properties);
     }
 
     @Test
@@ -245,7 +245,7 @@ public class GraphResourceStoreTest {
                 association
         );
 
-        List<Association> associations = resourceStore.getAssociations(resourceDefRef, resourceId);
+        Associations associations = resourceStore.getAssociations(resourceDefRef, resourceId);
         assertNotNull(associations);
         assertTrue(associations.isEmpty());
     }
@@ -264,7 +264,7 @@ public class GraphResourceStoreTest {
                 association
         );
 
-        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);
         assertTrue(associations.isEmpty());
     }
@@ -280,7 +280,7 @@ public class GraphResourceStoreTest {
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setAssociation(resource.getResourceDefRef(), resource.getResourceId(), association);
 
-        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);
         assertTrue(associations.isEmpty());
     }
@@ -301,7 +301,7 @@ public class GraphResourceStoreTest {
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
 
-        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);
         assertFalse(associations.isEmpty());
         assertEquals(1, associations.size());
@@ -324,10 +324,9 @@ public class GraphResourceStoreTest {
         resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.setAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
 
-        List<Association> associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);
         assertFalse(associations.isEmpty());
-        assertEquals(resource.getAssociations().size(), associations.size());
-        assertTrue(resource.getAssociations().containsAll(associations));
+        assertEquals(resource.getAssociations(), associations);
     }
 }
