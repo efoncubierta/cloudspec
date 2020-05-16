@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,6 +26,7 @@
 package cloudspec.aws.ec2;
 
 import cloudspec.aws.IAWSClientsProvider;
+import cloudspec.model.KeyValue;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcAttributeResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcsResponse;
@@ -86,17 +87,24 @@ public class EC2VpcLoader implements EC2ResourceLoader<EC2VpcResource> {
     }
 
     private EC2VpcResource toVpc(Ec2Client client, String regionName, Vpc vpc) {
-        EC2VpcResource.Builder vpcBuilder = EC2VpcResource.builder()
-                .setRegion(regionName)
-                .setVpcId(vpc.vpcId())
-                .setCidrBlock(vpc.cidrBlock())
-                .setState(vpc.stateAsString());
+        EC2VpcResource resource = new EC2VpcResource();
 
         DescribeVpcAttributeResponse describeVpcAttributeResponse =
                 client.describeVpcAttribute(builder -> builder.vpcId(vpc.vpcId()));
 
-        vpc.tags().forEach(tag -> tag.);
+        resource.region = regionName;
+        resource.vpcId = vpc.vpcId();
+        resource.cidrBlock = vpc.cidrBlock();
+        resource.state = vpc.stateAsString();
+        resource.isDefault = vpc.isDefault();
+        resource.dnsHostnamesEnabled = describeVpcAttributeResponse.enableDnsHostnames().value();
+        resource.dnsSupportEnabled = describeVpcAttributeResponse.enableDnsSupport().value();
+        resource.tags =
+                vpc.tags()
+                        .stream()
+                        .map(tag -> new KeyValue(tag.key(), tag.value()))
+                        .collect(Collectors.toList());
 
-        return vpcBuilder.build();
+        return resource;
     }
 }

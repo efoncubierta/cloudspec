@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,10 @@ package cloudspec.aws.ec2;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
+import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
+
+import java.util.List;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -48,85 +51,54 @@ public class EC2VpcResource extends EC2Resource {
             name = "region",
             description = "AWS region"
     )
-    private String region;
+    public String region;
 
     @IdDefinition
     @PropertyDefinition(
             name = "vpc_id",
             description = "VPC ID"
     )
-    private String vpcId;
+    public String vpcId;
+
+    @PropertyDefinition(
+            name = "vpc_name",
+            description = "VPC Name"
+    )
+    public String vpcName;
 
     @PropertyDefinition(
             name = "cidr_block",
             description = "CIDR Block"
     )
-    private String cidrBlock;
+    public String cidrBlock;
 
     @PropertyDefinition(
             name = "state",
             description = "State"
     )
-    private String state;
+    public String state;
 
-    // describeVpcAttribute
-    private Boolean isDefault;
-    private Boolean dnsHostnamesEnabled;
-    private Boolean dnsSupportEnabled;
+    @PropertyDefinition(
+            name = "default",
+            description = "Indicate if the VPC is the default"
+    )
+    public Boolean isDefault;
 
-    public String getVpcId() {
-        return vpcId;
-    }
+    @PropertyDefinition(
+            name = "dns_hostnames",
+            description = "Indicate if the the DNS Hostnames flag is enabled"
+    )
+    public Boolean dnsHostnamesEnabled;
 
-    public String getRegion() {
-        return region;
-    }
+    @PropertyDefinition(
+            name = "dns_support",
+            description = "Indicate if the the DNS Support flag is enabled"
+    )
+    public Boolean dnsSupportEnabled;
 
-    public String getCidrBlock() {
-        return cidrBlock;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String region;
-        private String vpcId;
-        private String cidrBlock;
-        private String state;
-
-        public Builder setRegion(String region) {
-            this.region = region;
-            return this;
-        }
-
-        public Builder setVpcId(String vpcId) {
-            this.vpcId = vpcId;
-            return this;
-        }
-
-        public Builder setCidrBlock(String cidrBlock) {
-            this.cidrBlock = cidrBlock;
-            return this;
-        }
-
-        public Builder setState(String state) {
-            this.state = state;
-            return this;
-        }
-
-        public EC2VpcResource build() {
-            EC2VpcResource resource = new EC2VpcResource();
-            resource.region = region;
-            resource.vpcId = vpcId;
-            resource.cidrBlock = cidrBlock;
-            resource.state = state;
-            return resource;
-        }
-    }
+    @PropertyDefinition(
+            name = "tags",
+            description = "List of tags"
+    )
+    public List<KeyValue> tags;
 }

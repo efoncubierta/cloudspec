@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -81,11 +81,11 @@ public class SQSQueueLoader implements SQSResourceLoader<SQSQueueResource> {
     }
 
     private SQSQueueResource toResource(Map<QueueAttributeName, String> queueAttributes) {
-        return SQSQueueResource.builder()
-                .setQueueArn(queueAttributes.get(QueueAttributeName.QUEUE_ARN))
-                .setVisibilityTimeout(Integer.valueOf(queueAttributes.get(QueueAttributeName.VISIBILITY_TIMEOUT)))
-                .setDelaySeconds(Integer.valueOf(queueAttributes.get(QueueAttributeName.DELAY_SECONDS)))
-                .setMessageRetentionPeriod(Integer.valueOf(queueAttributes.get(QueueAttributeName.MESSAGE_RETENTION_PERIOD)))
-                .build();
+        SQSQueueResource resource = new SQSQueueResource();
+        resource.queueArn = queueAttributes.get(QueueAttributeName.QUEUE_ARN);
+        resource.visibilityTimeout = Integer.valueOf(queueAttributes.get(QueueAttributeName.VISIBILITY_TIMEOUT));
+        resource.delaySeconds = Integer.valueOf(queueAttributes.get(QueueAttributeName.DELAY_SECONDS));
+        resource.messageRetentionPeriod = Integer.valueOf(queueAttributes.get(QueueAttributeName.MESSAGE_RETENTION_PERIOD));
+        return resource;
     }
 }

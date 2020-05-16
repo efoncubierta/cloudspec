@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -85,12 +85,12 @@ public class EC2SubnetLoader implements EC2ResourceLoader<EC2SubnetResource> {
     }
 
     private EC2SubnetResource toSubnet(String regionName, Subnet subnet) {
-        return EC2SubnetResource.builder()
-                .setVpcId(subnet.vpcId())
-                .setSubnetId(subnet.subnetId())
-                .setAvailabilityZone(subnet.availabilityZone())
-                .setCidrBlock(subnet.cidrBlock())
-                .setState(subnet.stateAsString())
-                .build();
+        EC2SubnetResource resource = new EC2SubnetResource();
+        resource.vpcId = subnet.vpcId();
+        resource.subnetId = subnet.subnetId();
+        resource.availabilityZone = subnet.availabilityZone();
+        resource.cidrBlock = subnet.cidrBlock();
+        resource.state = subnet.stateAsString();
+        return resource;
     }
 }

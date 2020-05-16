@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -69,7 +69,7 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
     }
 
     private Stream<EC2InstanceResource> getAllInstancesInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                              List<String> instanceIds) {
+                                                                List<String> instanceIds) {
         Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
 
         try {
@@ -89,12 +89,12 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
     private EC2InstanceResource toResource(String regionName, Instance instance) {
 //        List<String> volumeIds = instance.blockDeviceMappings().stream()
 //                .map(instanceBlockDeviceMapping -> instanceBlockDeviceMapping.ebs().volumeId());
-        return EC2InstanceResource.builder()
-                .setRegion(regionName)
-                .setInstanceId(instance.instanceId())
-                .setInstanceType(instance.instanceType().toString())
-                .setVpcId(instance.vpcId())
-                .setSubnetId(instance.subnetId())
-                .build();
+        EC2InstanceResource resource = new EC2InstanceResource();
+        resource.region = regionName;
+        resource.instanceId = instance.instanceId();
+        resource.instanceType = instance.instanceType().toString();
+        resource.vpcId = instance.vpcId();
+        resource.subnetId = instance.subnetId();
+        return resource;
     }
 }

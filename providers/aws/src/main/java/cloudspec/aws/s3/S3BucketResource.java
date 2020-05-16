@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -48,71 +48,38 @@ public class S3BucketResource extends S3Resource {
             name = "region",
             description = "AWS Region"
     )
-    private String region;
+    public String region;
 
     @PropertyDefinition(
             name = "bucket_name",
             description = "Bucket name"
     )
-    private String bucketName;
+    public String bucketName;
 
     @PropertyDefinition(
             name = "encryption",
             description = "Encryption"
     )
-    private S3BucketEncryption encryption;
+    public S3BucketEncryption encryption = new S3BucketEncryption();
 
     @PropertyDefinition(
             name = "logging",
             description = "Logging"
     )
-    private S3BucketLogging logging;
-
-    public String getRegion() {
-        return region;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public S3BucketEncryption getEncryption() {
-        return encryption;
-    }
-
-    public S3BucketLogging getLogging() {
-        return logging;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
+    public S3BucketLogging logging = new S3BucketLogging();
 
     public static class S3BucketEncryption {
         @PropertyDefinition(
                 name = "enabled",
                 description = "Encryption is enabled"
         )
-        private Boolean enabled;
+        public Boolean enabled;
 
         @PropertyDefinition(
                 name = "type",
                 description = "Encryption type"
         )
-        private String type;
-
-        public S3BucketEncryption(Boolean enabled, String type) {
-            this.enabled = enabled;
-            this.type = type;
-        }
-
-        public Boolean getEnabled() {
-            return enabled;
-        }
-
-        public String getType() {
-            return type;
-        }
+        public String type;
     }
 
     public static class S3BucketLogging {
@@ -120,46 +87,6 @@ public class S3BucketResource extends S3Resource {
                 name = "enabled",
                 description = "Logging is enabled"
         )
-        private Boolean enabled;
-
-        public S3BucketLogging(Boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public Boolean getEnabled() {
-            return enabled;
-        }
-    }
-
-    public static class Builder {
-        private String region;
-        private String bucketName;
-        private S3BucketEncryption encryption;
-        private S3BucketLogging logging;
-
-        public void setRegion(String region) {
-            this.region = region;
-        }
-
-        public void setBucketName(String bucketName) {
-            this.bucketName = bucketName;
-        }
-
-        public void setEncryption(S3BucketEncryption encryption) {
-            this.encryption = encryption;
-        }
-
-        public void setLogging(S3BucketLogging logging) {
-            this.logging = logging;
-        }
-
-        public S3BucketResource build() {
-            S3BucketResource resource = new S3BucketResource();
-            resource.region = region;
-            resource.bucketName = bucketName;
-            resource.encryption = encryption;
-            resource.logging = logging;
-            return resource;
-        }
+        public Boolean enabled;
     }
 }

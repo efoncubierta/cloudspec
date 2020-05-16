@@ -32,5 +32,5 @@ public class AWSResource {
             name = "account_id",
             description = "AWS Account ID"
     )
-    protected String accountId;
+    public String accountId;
 }

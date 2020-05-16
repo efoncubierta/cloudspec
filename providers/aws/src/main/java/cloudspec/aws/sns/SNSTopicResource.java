@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,45 +49,11 @@ public class SNSTopicResource extends SNSResource {
             name = "topic_arn",
             description = "Topic Arn"
     )
-    private String topicArn;
+    public String topicArn;
 
     @PropertyDefinition(
             name = "enabled",
             description = "Enabled"
     )
-    private Boolean enabled;
-
-    public String getTopicArn() {
-        return topicArn;
-    }
-
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String topicArn;
-        private Boolean enabled;
-
-        public Builder setTopicArn(String topicArn) {
-            this.topicArn = topicArn;
-            return this;
-        }
-
-        public Builder setEnabled(Boolean enabled) {
-            this.enabled = enabled;
-            return this;
-        }
-
-        public SNSTopicResource build() {
-            SNSTopicResource resource = new SNSTopicResource();
-            resource.topicArn = topicArn;
-            resource.enabled = enabled;
-            return resource;
-        }
-    }
+    public Boolean enabled;
 }

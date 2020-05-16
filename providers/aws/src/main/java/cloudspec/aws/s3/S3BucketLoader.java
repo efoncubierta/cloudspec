@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -77,17 +77,16 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
     }
 
     private S3BucketResource toResource(S3Client s3Client, String bucketName) {
-        S3BucketResource.Builder resourceBuilder = S3BucketResource.builder();
-        resourceBuilder.setBucketName(bucketName);
+        S3BucketResource resource = new S3BucketResource();
+        resource.bucketName = bucketName;
 
         // load region
-        resourceBuilder.setRegion(
+        resource.region =
                 s3Client.getBucketLocation(
                         builder -> builder.bucket(bucketName)
                 )
                         .locationConstraint()
-                        .toString()
-        );
+                        .toString();
 
         // load encryption
         ServerSideEncryptionConfiguration encryptionConfiguration =
@@ -96,18 +95,13 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
                                 builder.bucket(bucketName)
                         )
                         .serverSideEncryptionConfiguration();
-        resourceBuilder.setEncryption(
-                new S3BucketResource.S3BucketEncryption(
-                        encryptionConfiguration.hasRules(),
-                        encryptionConfiguration
-                                .rules()
-                                .get(0)
-                                .applyServerSideEncryptionByDefault()
-                                .kmsMasterKeyID() != null ?
-                                "KMS" : "SSE"
-                )
-
-        );
+        resource.encryption.enabled = encryptionConfiguration.hasRules();
+        resource.encryption.type = encryptionConfiguration
+                .rules()
+                .get(0)
+                .applyServerSideEncryptionByDefault()
+                .kmsMasterKeyID() != null ?
+                "KMS" : "SSE";
 
         // load logging
         LoggingEnabled loggingEnabled = s3Client
@@ -115,13 +109,8 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
                         builder.bucket(bucketName)
                 )
                 .loggingEnabled();
-        resourceBuilder.setLogging(
-                new S3BucketResource.S3BucketLogging(
-                        loggingEnabled != null
-                )
+        resource.logging.enabled = loggingEnabled != null;
 
-        );
-
-        return resourceBuilder.build();
+        return resource;
     }
 }

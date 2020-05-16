@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,79 +49,23 @@ public class SQSQueueResource extends SQSResource {
             name = "queue_arn",
             description = "Queue Arn"
     )
-    private String queueArn;
+    public String queueArn;
 
     @PropertyDefinition(
             name = "visibility_timeout",
             description = "Visibility timeout"
     )
-    private Integer visibilityTimeout;
+    public Integer visibilityTimeout;
 
     @PropertyDefinition(
             name = "delay_seconds",
             description = "Delay in seconds"
     )
-    private Integer delaySeconds;
+    public Integer delaySeconds;
 
     @PropertyDefinition(
             name = "message_retention_period",
             description = "Message retention period"
     )
-    private Integer messageRetentionPeriod;
-
-    public String getQueueArn() {
-        return queueArn;
-    }
-
-    public Integer getVisibilityTimeout() {
-        return visibilityTimeout;
-    }
-
-    public Integer getDelaySeconds() {
-        return delaySeconds;
-    }
-
-    public Integer getMessageRetentionPeriod() {
-        return messageRetentionPeriod;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String queueArn;
-        private Integer visibilityTimeout;
-        private Integer delaySeconds;
-        private Integer messageRetentionPeriod;
-
-        public Builder setQueueArn(String queueArn) {
-            this.queueArn = queueArn;
-            return this;
-        }
-
-        public Builder setVisibilityTimeout(Integer visibilityTimeout) {
-            this.visibilityTimeout = visibilityTimeout;
-            return this;
-        }
-
-        public Builder setDelaySeconds(Integer delaySeconds) {
-            this.delaySeconds = delaySeconds;
-            return this;
-        }
-
-        public Builder setMessageRetentionPeriod(Integer messageRetentionPeriod) {
-            this.messageRetentionPeriod = messageRetentionPeriod;
-            return this;
-        }
-
-        public SQSQueueResource build() {
-            SQSQueueResource resource = new SQSQueueResource();
-            resource.queueArn = queueArn;
-            resource.visibilityTimeout = visibilityTimeout;
-            resource.delaySeconds = delaySeconds;
-            resource.messageRetentionPeriod = messageRetentionPeriod;
-            return resource;
-        }
-    }
+    public Integer messageRetentionPeriod;
 }

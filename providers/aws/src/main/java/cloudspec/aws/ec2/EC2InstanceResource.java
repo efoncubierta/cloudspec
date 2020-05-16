@@ -49,99 +49,32 @@ public class EC2InstanceResource extends EC2Resource {
             name = "region",
             description = "AWS Region"
     )
-    private String region;
+    public String region;
 
     @IdDefinition
     @PropertyDefinition(
             name = "instance_id",
             description = "EC2 Instance ID"
     )
-    private String instanceId;
+    public String instanceId;
 
     @PropertyDefinition(
             name = "instance_type",
             description = "EC2 Instance Type"
     )
-    private String instanceType;
+    public String instanceType;
 
     @AssociationDefinition(
             name = "vpc",
             description = "VPC",
             targetClass = EC2VpcResource.class
     )
-    private String vpcId;
+    public String vpcId;
 
     @AssociationDefinition(
             name = "subnet",
             description = "Subnet",
             targetClass = EC2SubnetResource.class
     )
-    private String subnetId;
-
-    public String getRegion() {
-        return region;
-    }
-
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public String getInstanceType() {
-        return instanceType;
-    }
-
-    public String getSubnetId() {
-        return subnetId;
-    }
-
-    public String getVpcId() {
-        return vpcId;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String region;
-        private String instanceId;
-        private String instanceType;
-        private String vpcId;
-        private String subnetId;
-
-        public Builder setRegion(String region) {
-            this.region = region;
-            return this;
-        }
-
-        public Builder setInstanceId(String instanceId) {
-            this.instanceId = instanceId;
-            return this;
-        }
-
-        public Builder setInstanceType(String instanceType) {
-            this.instanceType = instanceType;
-            return this;
-        }
-
-        public Builder setVpcId(String vpcId) {
-            this.vpcId = vpcId;
-            return this;
-        }
-
-        public Builder setSubnetId(String subnetId) {
-            this.subnetId = subnetId;
-            return this;
-        }
-
-        public EC2InstanceResource build() {
-            EC2InstanceResource resource = new EC2InstanceResource();
-            resource.region = region;
-            resource.instanceId = instanceId;
-            resource.instanceType = instanceType;
-            resource.vpcId = vpcId;
-            resource.subnetId = subnetId;
-            return resource;
-        }
-    }
+    public String subnetId;
 }
