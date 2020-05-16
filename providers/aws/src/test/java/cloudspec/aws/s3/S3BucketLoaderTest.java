@@ -116,7 +116,7 @@ public class S3BucketLoaderTest {
 
         assertNotNull(resources);
         assertEquals(1, resources.size());
-        assertEquals(TEST_REGION.id(), resources.get(0).getRegion());
-        assertEquals(TEST_BUCKET_NAME, resources.get(0).getBucketName());
+        assertEquals(TEST_REGION.id(), resources.get(0).region);
+        assertEquals(TEST_BUCKET_NAME, resources.get(0).bucketName);
     }
 }

@@ -93,8 +93,8 @@ public class EC2InstanceLoaderTest {
 
         assertNotNull(resources);
         assertEquals(1, resources.size());
-        assertEquals(TEST_REGION.id(), resources.get(0).getRegion());
-        assertEquals(TEST_INSTANCE_ID, resources.get(0).getInstanceId());
-        assertEquals(TEST_INSTANCE_TYPE.toString(), resources.get(0).getInstanceType());
+        assertEquals(TEST_REGION.id(), resources.get(0).region);
+        assertEquals(TEST_INSTANCE_ID, resources.get(0).instanceId);
+        assertEquals(TEST_INSTANCE_TYPE.toString(), resources.get(0).instanceId);
     }
 }
