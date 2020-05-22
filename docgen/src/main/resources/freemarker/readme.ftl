@@ -184,19 +184,19 @@ my (
 ```
 my (
     nested (
-        my_property :predicate,
-        my_other_property :predicate,
-        > my_association (
-            one_property :predicate,
-            another (
+        my_property :predicate
+        and my_other_property :predicate
+        and > my_association (
+            one_property :predicate
+            and another (
                 nested (
                     property :predicate
                 )
             )
-        ),
-        > my_other_association (
-            one_property :predicate,
-            > another_association (
+        )
+        and > my_other_association (
+            one_property :predicate
+            and > another_association (
                 property :predicate
             )
         )
@@ -244,4 +244,6 @@ Group "S3 validations"
 
 CloudSpec supports the following providers:
 
-* [aws](aws): Amazon Web Services
+<#list providers as provider>
+* [${provider.name}](${provider.name}): ${provider.description}
+</#list>

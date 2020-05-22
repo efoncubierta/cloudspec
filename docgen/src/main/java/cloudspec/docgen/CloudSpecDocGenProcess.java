@@ -91,14 +91,14 @@ public class CloudSpecDocGenProcess {
 
     private void writeIndexInMarkdown(File outputDir) throws IOException, TemplateException {
         // create index file
-        File indexFile = new File(outputDir, "index.md");
+        File indexFile = new File(outputDir, "readme.md");
         try (Writer out = new OutputStreamWriter(new FileOutputStream(indexFile))) {
             // create data dictionary
             Map<String, Object> data = new HashMap<>();
             data.put("providers", providersRegistry.getProviders());
 
             // get index template
-            Template indexTpl = freemarkerCfg.getTemplate("index.ftl");
+            Template indexTpl = freemarkerCfg.getTemplate("readme.ftl");
 
             // write file
             indexTpl.process(data, out);
