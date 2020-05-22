@@ -24,10 +24,13 @@
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <dagger.version>2.27</dagger.version>
+    <picocli.version>4.3.2</picocli.version>
+    <jcdp.version>4.0.1</jcdp.version>
     <antlr4.version>4.8-1</antlr4.version>
     <log4j.version>2.13.2</log4j.version>
     <junit.version>4.13</junit.version>
     <mockito.version>1.10.19</mockito.version>
+    <javafaker.version>1.0.2</javafaker.version>
     <license.plugin.version>2.0.0</license.plugin.version>
     <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
   </properties>
@@ -67,6 +70,20 @@
       </dependency>
 
       <dependency>
+        <groupId>info.picocli</groupId>
+        <artifactId>picocli</artifactId>
+        <version>${picocli.version}</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.diogonunes</groupId>
+        <artifactId>JCDP</artifactId>
+        <version>${jcdp.version}</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
@@ -77,6 +94,13 @@
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
         <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.javafaker</groupId>
+        <artifactId>javafaker</artifactId>
+        <version>${javafaker.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
