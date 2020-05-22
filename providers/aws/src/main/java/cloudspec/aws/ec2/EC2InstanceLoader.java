@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource> {
+public class EC2InstanceLoader extends EC2ResourceLoader<EC2InstanceResource> {
     private final IAWSClientsProvider clientsProvider;
 
     public EC2InstanceLoader(IAWSClientsProvider clientsProvider) {
@@ -45,13 +45,17 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
     }
 
     @Override
-    public Optional<EC2InstanceResource> getById(String id) {
-        return getInstances(Collections.singletonList(id)).findFirst();
+    public Optional<EC2InstanceResource> getById(String instanceId) {
+        return getInstances(Collections.singletonList(instanceId)).findFirst();
     }
 
     @Override
     public List<EC2InstanceResource> getAll() {
-        return getInstances(Collections.emptyList()).collect(Collectors.toList());
+        return getInstances().collect(Collectors.toList());
+    }
+
+    private Stream<EC2InstanceResource> getInstances() {
+        return getInstances(Collections.emptyList());
     }
 
     private Stream<EC2InstanceResource> getInstances(List<String> instanceIds) {
@@ -87,14 +91,57 @@ public class EC2InstanceLoader implements EC2ResourceLoader<EC2InstanceResource>
     }
 
     private EC2InstanceResource toResource(String regionName, Instance instance) {
-//        List<String> volumeIds = instance.blockDeviceMappings().stream()
-//                .map(instanceBlockDeviceMapping -> instanceBlockDeviceMapping.ebs().volumeId());
         EC2InstanceResource resource = new EC2InstanceResource();
+
+        // instance properties
         resource.region = regionName;
-        resource.instanceId = instance.instanceId();
-        resource.instanceType = instance.instanceType().toString();
+        resource.id = instance.instanceId();
+        resource.type = instance.instanceType().toString();
+        resource.architecture = instance.architectureAsString();
+        resource.kernelId = instance.kernelId();
+        resource.ebsOptimized = instance.ebsOptimized();
+        resource.privateDns = instance.privateDnsName();
+        resource.publicDns = instance.publicDnsName();
+        resource.privateIp = instance.privateIpAddress();
+        resource.publicIp = instance.publicIpAddress();
+        resource.keyName = instance.keyName();
+        resource.hibernationConfigured = instance.hibernationOptions().configured();
+        resource.tags = toTags(instance.tags());
+
+        // get volumes details
+        resource.rootDevice.name = instance.rootDeviceName();
+        resource.rootDevice.type = instance.rootDeviceTypeAsString();
+        resource.devices = instance.blockDeviceMappings()
+                .stream()
+                .map(instanceBlockDeviceMapping -> {
+                    EC2InstanceResource.Device device = new EC2InstanceResource.Device();
+                    device.name = instanceBlockDeviceMapping.deviceName();
+                    device.volumeId = instanceBlockDeviceMapping.ebs().volumeId();
+                    device.deleteOnTermination = instanceBlockDeviceMapping.ebs().deleteOnTermination();
+                    return device;
+                })
+                .collect(Collectors.toList());
+
+        // get network interfaces details
+        resource.networkInterfaces = instance.networkInterfaces()
+                .stream()
+                .map(instanceNetworkInterface -> {
+                    EC2InstanceResource.NetworkInterface iface = new EC2InstanceResource.NetworkInterface();
+                    iface.privateIp = instanceNetworkInterface.privateIpAddress();
+                    iface.privateDns = instanceNetworkInterface.privateDnsName();
+                    iface.networkInterfaceId = instanceNetworkInterface.networkInterfaceId();
+                    iface.vpcId = instanceNetworkInterface.vpcId();
+                    iface.subnetId = instanceNetworkInterface.subnetId();
+                    return iface;
+                })
+                .collect(Collectors.toList());
+
+        // associations
+        resource.iamInstanceProfileId = instance.iamInstanceProfile().id();
+        resource.imageId = instance.imageId();
         resource.vpcId = instance.vpcId();
         resource.subnetId = instance.subnetId();
+
         return resource;
     }
 }

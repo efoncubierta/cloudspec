@@ -27,6 +27,7 @@ package cloudspec.aws;
 
 import cloudspec.annotation.ProviderDefinition;
 import cloudspec.aws.ec2.*;
+import cloudspec.aws.iam.IAMInstanceProfileResource;
 import cloudspec.aws.s3.S3BucketLoader;
 import cloudspec.aws.s3.S3BucketResource;
 import cloudspec.aws.sns.SNSTopicLoader;
@@ -42,9 +43,13 @@ import java.util.*;
         name = "aws",
         description = "Amazon Web Services",
         resources = {
+                EC2AmiResource.class,
+                EC2EbsVolumeResource.class,
                 EC2InstanceResource.class,
+                EC2NetworkInterfaceResource.class,
                 EC2VpcResource.class,
                 EC2SubnetResource.class,
+                IAMInstanceProfileResource.class,
                 S3BucketResource.class,
                 SQSQueueResource.class,
                 SNSTopicResource.class
@@ -56,7 +61,10 @@ public class AWSProvider extends BaseProvider {
     private final Map<String, AWSResourceLoader<?>> loaders = new HashMap<>();
 
     public AWSProvider(IAWSClientsProvider clientsProvider) {
+        loaders.put(EC2AmiResource.RESOURCE_DEF_REF.toString(), new EC2AmiLoader(clientsProvider));
+        loaders.put(EC2EbsVolumeResource.RESOURCE_DEF_REF.toString(), new EC2EbsVolumeLoader(clientsProvider));
         loaders.put(EC2InstanceResource.RESOURCE_DEF_REF.toString(), new EC2InstanceLoader(clientsProvider));
+        loaders.put(EC2NetworkInterfaceResource.RESOURCE_DEF_REF.toString(), new EC2NetworkInterfaceLoader(clientsProvider));
         loaders.put(EC2VpcResource.RESOURCE_DEF_REF.toString(), new EC2VpcLoader(clientsProvider));
         loaders.put(EC2SubnetResource.RESOURCE_DEF_REF.toString(), new EC2SubnetLoader(clientsProvider));
         loaders.put(S3BucketResource.RESOURCE_DEF_REF.toString(), new S3BucketLoader(clientsProvider));

@@ -39,11 +39,11 @@ import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 @ResourceDefinition(
         provider = PROVIDER_NAME,
         group = EC2Resource.GROUP_NAME,
-        name = EC2SubnetResource.RESOURCE_NAME,
-        description = "VPC Subnet"
+        name = EC2NetworkInterfaceResource.RESOURCE_NAME,
+        description = "Network Interface"
 )
-public class EC2SubnetResource extends EC2Resource {
-    public static final String RESOURCE_NAME = "subnet";
+public class EC2NetworkInterfaceResource extends EC2Resource {
+    public static final String RESOURCE_NAME = "network_interface";
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
@@ -51,7 +51,7 @@ public class EC2SubnetResource extends EC2Resource {
     @IdDefinition
     @PropertyDefinition(
             name = "id",
-            description = "VPC Subnet ID"
+            description = "Interface ID"
     )
     public String id;
 
@@ -63,21 +63,39 @@ public class EC2SubnetResource extends EC2Resource {
 
     @PropertyDefinition(
             name = "availability_zone",
-            description = "AWS Availability Zone"
+            description = "Availability zone"
     )
     public String availabilityZone;
 
     @PropertyDefinition(
-            name = "cidr_block",
-            description = "CIDR Block"
+            name = "type",
+            description = "Interface type"
     )
-    public String cidrBlock;
+    public String type;
 
     @PropertyDefinition(
-            name = "state",
-            description = "State"
+            name = "mac_address",
+            description = "MAC Address"
     )
-    public String state;
+    public String macAddress;
+
+    @PropertyDefinition(
+            name = "private_dns",
+            description = "Private DNS"
+    )
+    public String privateDns;
+
+    @PropertyDefinition(
+            name = "private_ip",
+            description = "Private IP address"
+    )
+    public String privateIp;
+
+    @PropertyDefinition(
+            name = "status",
+            description = "Status"
+    )
+    public String status;
 
     @PropertyDefinition(
             name = "tags",
@@ -91,4 +109,11 @@ public class EC2SubnetResource extends EC2Resource {
             targetClass = EC2VpcResource.class
     )
     public String vpcId;
+
+    @AssociationDefinition(
+            name = "subnet",
+            description = "Subnet",
+            targetClass = EC2SubnetResource.class
+    )
+    public String subnetId;
 }

@@ -27,8 +27,8 @@ package cloudspec.aws.ec2;
 
 import cloudspec.aws.IAWSClientsProvider;
 import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeSubnetsResponse;
-import software.amazon.awssdk.services.ec2.model.Subnet;
+import software.amazon.awssdk.services.ec2.model.DescribeVolumesResponse;
+import software.amazon.awssdk.services.ec2.model.Volume;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.util.Collections;
@@ -37,70 +37,72 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EC2SubnetLoader extends EC2ResourceLoader<EC2SubnetResource> {
+public class EC2EbsVolumeLoader extends EC2ResourceLoader<EC2EbsVolumeResource> {
     private final IAWSClientsProvider clientsProvider;
 
-    public EC2SubnetLoader(IAWSClientsProvider clientsProvider) {
+    public EC2EbsVolumeLoader(IAWSClientsProvider clientsProvider) {
         this.clientsProvider = clientsProvider;
     }
 
     @Override
-    public Optional<EC2SubnetResource> getById(String subnetId) {
-        return getSubnets(Collections.singletonList(subnetId)).findFirst();
+    public Optional<EC2EbsVolumeResource> getById(String volumeId) {
+        return getVolumes(Collections.singletonList(volumeId)).findFirst();
     }
 
     @Override
-    public List<EC2SubnetResource> getAll() {
-        return getSubnets().collect(Collectors.toList());
+    public List<EC2EbsVolumeResource> getAll() {
+        return getVolumes().collect(Collectors.toList());
     }
 
-    private Stream<EC2SubnetResource> getSubnets() {
-        return getSubnets(Collections.emptyList());
+    private Stream<EC2EbsVolumeResource> getVolumes() {
+        return getVolumes(Collections.emptyList());
     }
 
-    private Stream<EC2SubnetResource> getSubnets(List<String> subnetIds) {
+    private Stream<EC2EbsVolumeResource> getVolumes(List<String> volumeIds) {
         Ec2Client ec2Client = clientsProvider.getEc2Client();
 
         try {
             return ec2Client.describeRegions()
                     .regions()
                     .stream()
-                    .flatMap(region -> getSubnetsInRegion(region, subnetIds));
+                    .flatMap(region -> getAllInstancesInRegion(region, volumeIds));
         } finally {
             IoUtils.closeQuietly(ec2Client, null);
         }
+
     }
 
-    private Stream<EC2SubnetResource> getSubnetsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                         List<String> subnetIds) {
+    private Stream<EC2EbsVolumeResource> getAllInstancesInRegion(software.amazon.awssdk.services.ec2.model.Region region,
+                                                                 List<String> volumeIds) {
         Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
 
         try {
-            DescribeSubnetsResponse response = subnetIds != null && !subnetIds.isEmpty() ?
-                    client.describeSubnets(builder -> builder.subnetIds(subnetIds.toArray(new String[0]))) :
-                    client.describeSubnets();
+            DescribeVolumesResponse response = volumeIds != null && !volumeIds.isEmpty() ?
+                    client.describeVolumes(builder -> builder.volumeIds(volumeIds.toArray(new String[0]))) :
+                    client.describeVolumes();
 
-            return response.subnets()
+            return response.volumes()
                     .stream()
-                    .map(subnet -> toSubnet(region.regionName(), subnet));
+                    .map(volume -> toResource(region.regionName(), volume));
         } finally {
             IoUtils.closeQuietly(client, null);
         }
     }
 
-    private EC2SubnetResource toSubnet(String regionName, Subnet subnet) {
-        EC2SubnetResource resource = new EC2SubnetResource();
+    private EC2EbsVolumeResource toResource(String regionName, Volume volume) {
+        EC2EbsVolumeResource resource = new EC2EbsVolumeResource();
 
-        // subnet properties
-        resource.id = subnet.subnetId();
+        // volume properties
+        resource.id = volume.volumeId();
         resource.region = regionName;
-        resource.availabilityZone = subnet.availabilityZone();
-        resource.cidrBlock = subnet.cidrBlock();
-        resource.state = subnet.stateAsString();
-        resource.tags = toTags(subnet.tags());
-
-        // subnet associations
-        resource.vpcId = subnet.vpcId();
+        resource.type = volume.volumeTypeAsString();
+        resource.availabilityZone = volume.availabilityZone();
+        resource.size = volume.size();
+        resource.iops = volume.iops();
+        resource.encrypted = volume.encrypted();
+        resource.multiAttachEnabled = volume.multiAttachEnabled();
+        resource.state = volume.stateAsString();
+        resource.tags = toTags(volume.tags());
 
         return resource;
     }

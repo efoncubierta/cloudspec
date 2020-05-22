@@ -26,10 +26,12 @@
 package cloudspec.aws.ec2;
 
 import cloudspec.aws.IAWSClientsProvider;
+import cloudspec.aws.util.EC2ResourcesUtil;
 import org.junit.Test;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.*;
+import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
+import software.amazon.awssdk.services.ec2.model.DescribeRegionsResponse;
+import software.amazon.awssdk.services.ec2.model.Reservation;
 
 import java.util.List;
 
@@ -40,61 +42,49 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class EC2InstanceLoaderTest {
-
     private static final IAWSClientsProvider TEST_CLIENTS_PROVIDER = mock(IAWSClientsProvider.class);
     private static final Ec2Client TEST_EC2_CLIENT = mock(Ec2Client.class);
 
-    private static final Region TEST_REGION = Region.EU_WEST_1;
-    private static final String TEST_AVAILABILITY_ZONE = "";
-    private static final String TEST_INSTANCE_ID = "instanceId";
-    private static final InstanceType TEST_INSTANCE_TYPE = InstanceType.M5_LARGE;
-
-    private static final DescribeRegionsResponse TEST_DESCRIBE_REGIONS_RESPONSE =
-            DescribeRegionsResponse
-                    .builder()
-                    .regions(
-                            software.amazon.awssdk.services.ec2.model.Region
-                                    .builder()
-                                    .regionName(TEST_REGION.id())
-                                    .build()
-                    )
-                    .build();
-
-    public static final DescribeInstancesResponse TEST_DESCRIBE_INSTANCES_RESPONSE =
-            DescribeInstancesResponse
-                    .builder()
-                    .reservations(
-                            Reservation
-                                    .builder()
-                                    .instances(
-                                            Instance
-                                                    .builder()
-                                                    .instanceId(TEST_INSTANCE_ID)
-                                                    .instanceType(InstanceType.M5_LARGE)
-                                                    .build()
-                                    )
-                                    .build()
-                    )
-                    .build();
+    private static final EC2InstanceResource TEST_EC2_INSTANCE = EC2ResourcesUtil.randomEc2InstanceResource();
 
     static {
         when(TEST_CLIENTS_PROVIDER.getEc2Client()).thenReturn(TEST_EC2_CLIENT);
         when(TEST_CLIENTS_PROVIDER.getEc2ClientForRegion(anyString())).thenReturn(TEST_EC2_CLIENT);
 
-        when(TEST_EC2_CLIENT.describeRegions()).thenReturn(TEST_DESCRIBE_REGIONS_RESPONSE);
-        when(TEST_EC2_CLIENT.describeInstances()).thenReturn(TEST_DESCRIBE_INSTANCES_RESPONSE);
+        when(TEST_EC2_CLIENT.describeRegions()).thenReturn(DescribeRegionsResponse
+                .builder()
+                .regions(
+                        software.amazon.awssdk.services.ec2.model.Region
+                                .builder()
+                                .regionName(TEST_EC2_INSTANCE.region)
+                                .build()
+                )
+                .build()
+        );
+
+        when(TEST_EC2_CLIENT.describeInstances()).thenReturn(
+                DescribeInstancesResponse
+                        .builder()
+                        .reservations(
+                                Reservation
+                                        .builder()
+                                        .instances(
+                                                EC2ResourcesUtil.asInstance(TEST_EC2_INSTANCE)
+                                        )
+                                        .build()
+                        )
+                        .build()
+        );
     }
 
     @Test
-    public void shouldLoadResources() {
+    public void shouldLoadAllEc2Instances() {
         EC2InstanceLoader loader = new EC2InstanceLoader(TEST_CLIENTS_PROVIDER);
 
         List<EC2InstanceResource> resources = loader.getAll();
 
         assertNotNull(resources);
         assertEquals(1, resources.size());
-        assertEquals(TEST_REGION.id(), resources.get(0).region);
-        assertEquals(TEST_INSTANCE_ID, resources.get(0).instanceId);
-        assertEquals(TEST_INSTANCE_TYPE.toString(), resources.get(0).instanceType);
+        assertEquals(TEST_EC2_INSTANCE, resources.get(0));
     }
 }

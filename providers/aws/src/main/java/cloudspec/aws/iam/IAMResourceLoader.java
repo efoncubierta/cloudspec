@@ -23,16 +23,16 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws.ec2;
+package cloudspec.aws.iam;
 
 import cloudspec.aws.AWSResourceLoader;
 import cloudspec.model.KeyValue;
-import software.amazon.awssdk.services.ec2.model.Tag;
+import software.amazon.awssdk.services.iam.model.Tag;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class EC2ResourceLoader<T extends EC2Resource> implements AWSResourceLoader<T> {
+public abstract class IAMResourceLoader<T extends IAMResource> implements AWSResourceLoader<T> {
     protected List<KeyValue> toTags(List<Tag> tags) {
         return tags.stream()
                 .map(tag -> new KeyValue(

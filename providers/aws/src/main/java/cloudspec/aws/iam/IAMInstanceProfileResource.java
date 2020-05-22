@@ -23,13 +23,12 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws.ec2;
+package cloudspec.aws.iam;
 
 import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 
 import java.util.List;
@@ -38,12 +37,12 @@ import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
 @ResourceDefinition(
         provider = PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
-        name = EC2SubnetResource.RESOURCE_NAME,
-        description = "VPC Subnet"
+        group = IAMResource.GROUP_NAME,
+        name = IAMInstanceProfileResource.RESOURCE_NAME,
+        description = "Amazon Machine Image"
 )
-public class EC2SubnetResource extends EC2Resource {
-    public static final String RESOURCE_NAME = "subnet";
+public class IAMInstanceProfileResource extends IAMResource {
+    public static final String RESOURCE_NAME = "iam_instance_profile";
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
@@ -51,44 +50,26 @@ public class EC2SubnetResource extends EC2Resource {
     @IdDefinition
     @PropertyDefinition(
             name = "id",
-            description = "VPC Subnet ID"
+            description = "Instance profile ID"
     )
     public String id;
 
     @PropertyDefinition(
-            name = "region",
-            description = "AWS Region"
+            name = "name",
+            description = "Instance profile name"
     )
-    public String region;
+    public String name;
 
     @PropertyDefinition(
-            name = "availability_zone",
-            description = "AWS Availability Zone"
+            name = "path",
+            description = "Path"
     )
-    public String availabilityZone;
-
-    @PropertyDefinition(
-            name = "cidr_block",
-            description = "CIDR Block"
-    )
-    public String cidrBlock;
-
-    @PropertyDefinition(
-            name = "state",
-            description = "State"
-    )
-    public String state;
-
-    @PropertyDefinition(
-            name = "tags",
-            description = "List of tags"
-    )
-    public List<KeyValue> tags;
+    public String path;
 
     @AssociationDefinition(
-            name = "vpc",
-            description = "VPC",
-            targetClass = EC2VpcResource.class
+            name = "roles",
+            description = "IAM Roles",
+            targetClass = IAMRoleResource.class
     )
-    public String vpcId;
+    public List<String> roleIds;
 }

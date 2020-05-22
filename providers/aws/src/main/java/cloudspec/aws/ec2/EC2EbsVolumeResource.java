@@ -25,7 +25,6 @@
  */
 package cloudspec.aws.ec2;
 
-import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
@@ -39,11 +38,11 @@ import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 @ResourceDefinition(
         provider = PROVIDER_NAME,
         group = EC2Resource.GROUP_NAME,
-        name = EC2SubnetResource.RESOURCE_NAME,
-        description = "VPC Subnet"
+        name = EC2EbsVolumeResource.RESOURCE_NAME,
+        description = "EBS Volume"
 )
-public class EC2SubnetResource extends EC2Resource {
-    public static final String RESOURCE_NAME = "subnet";
+public class EC2EbsVolumeResource extends EC2Resource {
+    public static final String RESOURCE_NAME = "ebs_volume";
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
@@ -51,7 +50,7 @@ public class EC2SubnetResource extends EC2Resource {
     @IdDefinition
     @PropertyDefinition(
             name = "id",
-            description = "VPC Subnet ID"
+            description = "Volume ID"
     )
     public String id;
 
@@ -62,16 +61,40 @@ public class EC2SubnetResource extends EC2Resource {
     public String region;
 
     @PropertyDefinition(
+            name = "type",
+            description = "Volume type"
+    )
+    public String type;
+
+    @PropertyDefinition(
             name = "availability_zone",
-            description = "AWS Availability Zone"
+            description = "Availability zone"
     )
     public String availabilityZone;
 
     @PropertyDefinition(
-            name = "cidr_block",
-            description = "CIDR Block"
+            name = "size",
+            description = "Volume size in GB"
     )
-    public String cidrBlock;
+    public Integer size;
+
+    @PropertyDefinition(
+            name = "iops",
+            description = "Volume IOPs"
+    )
+    public Integer iops;
+
+    @PropertyDefinition(
+            name = "encrypted",
+            description = "Flag indicating whether the volume is encrypted"
+    )
+    public Boolean encrypted;
+
+    @PropertyDefinition(
+            name = "multi_attach_enabled",
+            description = "Flag indicated whether the volume has multi-attach enabled"
+    )
+    public Boolean multiAttachEnabled;
 
     @PropertyDefinition(
             name = "state",
@@ -84,11 +107,4 @@ public class EC2SubnetResource extends EC2Resource {
             description = "List of tags"
     )
     public List<KeyValue> tags;
-
-    @AssociationDefinition(
-            name = "vpc",
-            description = "VPC",
-            targetClass = EC2VpcResource.class
-    )
-    public String vpcId;
 }

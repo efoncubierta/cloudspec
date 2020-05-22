@@ -23,21 +23,14 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws.ec2;
+package cloudspec.aws.util;
 
-import cloudspec.aws.AWSResourceLoader;
-import cloudspec.model.KeyValue;
-import software.amazon.awssdk.services.ec2.model.Tag;
+import com.github.javafaker.Faker;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class IAMResourcesUtil {
+    private final static Faker faker = new Faker();
 
-public abstract class EC2ResourceLoader<T extends EC2Resource> implements AWSResourceLoader<T> {
-    protected List<KeyValue> toTags(List<Tag> tags) {
-        return tags.stream()
-                .map(tag -> new KeyValue(
-                        tag.key(), tag.value())
-                )
-                .collect(Collectors.toList());
+    public static String randomInstanceProfileId() {
+        return faker.lorem().characters(10);
     }
 }

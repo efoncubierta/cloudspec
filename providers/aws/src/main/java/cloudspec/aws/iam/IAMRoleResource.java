@@ -23,21 +23,37 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws.ec2;
+package cloudspec.aws.iam;
 
-import cloudspec.aws.AWSResourceLoader;
-import cloudspec.model.KeyValue;
-import software.amazon.awssdk.services.ec2.model.Tag;
+import cloudspec.annotation.IdDefinition;
+import cloudspec.annotation.PropertyDefinition;
+import cloudspec.annotation.ResourceDefinition;
+import cloudspec.model.ResourceDefRef;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
-public abstract class EC2ResourceLoader<T extends EC2Resource> implements AWSResourceLoader<T> {
-    protected List<KeyValue> toTags(List<Tag> tags) {
-        return tags.stream()
-                .map(tag -> new KeyValue(
-                        tag.key(), tag.value())
-                )
-                .collect(Collectors.toList());
-    }
+@ResourceDefinition(
+        provider = PROVIDER_NAME,
+        group = IAMResource.GROUP_NAME,
+        name = IAMRoleResource.RESOURCE_NAME,
+        description = "IAM Role"
+)
+public class IAMRoleResource extends IAMResource {
+    public static final String RESOURCE_NAME = "role";
+    public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
+            PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
+    );
+
+    @IdDefinition
+    @PropertyDefinition(
+            name = "id",
+            description = "Role ID"
+    )
+    public String id;
+
+    @PropertyDefinition(
+            name = "arn",
+            description = "Arn"
+    )
+    public String arn;
 }

@@ -35,6 +35,6 @@ Properties:
 | region     | String | No           | The AWS region | eu-west-1  |
 | vpc_id     | String | No           | The vpc ID     | vpc-1234   |
 | cidr_block | String | No           | CIDR Block     | 10.0.0.0/8 |
-| status     | String | No           | The vpc ID     | eu-west-1  |
+| state      | String | No           | The vpc ID     | eu-west-1  |
 
 #### VPC Subnet

@@ -47,24 +47,24 @@ public class EC2VpcResource extends EC2Resource {
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
 
+    @IdDefinition
+    @PropertyDefinition(
+            name = "id",
+            description = "VPC ID"
+    )
+    public String vpcId;
+
     @PropertyDefinition(
             name = "region",
             description = "AWS region"
     )
     public String region;
 
-    @IdDefinition
     @PropertyDefinition(
-            name = "vpc_id",
-            description = "VPC ID"
-    )
-    public String vpcId;
-
-    @PropertyDefinition(
-            name = "vpc_name",
+            name = "name",
             description = "VPC Name"
     )
-    public String vpcName;
+    public String name;
 
     @PropertyDefinition(
             name = "cidr_block",

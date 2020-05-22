@@ -26,7 +26,6 @@
 package cloudspec.aws.ec2;
 
 import cloudspec.aws.IAWSClientsProvider;
-import cloudspec.model.KeyValue;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcAttributeResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcsResponse;
@@ -39,7 +38,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EC2VpcLoader implements EC2ResourceLoader<EC2VpcResource> {
+public class EC2VpcLoader extends EC2ResourceLoader<EC2VpcResource> {
     private final IAWSClientsProvider clientsProvider;
 
     public EC2VpcLoader(IAWSClientsProvider clientsProvider) {
@@ -47,30 +46,34 @@ public class EC2VpcLoader implements EC2ResourceLoader<EC2VpcResource> {
     }
 
     @Override
-    public Optional<EC2VpcResource> getById(String id) {
-        return getAllVpcs(Collections.singletonList(id)).findFirst();
+    public Optional<EC2VpcResource> getById(String vpcId) {
+        return getVpcs(Collections.singletonList(vpcId)).findFirst();
     }
 
     @Override
     public List<EC2VpcResource> getAll() {
-        return getAllVpcs(Collections.emptyList()).collect(Collectors.toList());
+        return getVpcs().collect(Collectors.toList());
     }
 
-    private Stream<EC2VpcResource> getAllVpcs(List<String> vpcIds) {
+    private Stream<EC2VpcResource> getVpcs() {
+        return getVpcs(Collections.emptyList());
+    }
+
+    private Stream<EC2VpcResource> getVpcs(List<String> vpcIds) {
         Ec2Client ec2Client = clientsProvider.getEc2Client();
 
         try {
             return ec2Client.describeRegions()
                     .regions()
                     .stream()
-                    .flatMap(region -> getAllVpcsInRegion(region, vpcIds));
+                    .flatMap(region -> getVpcsInRegion(region, vpcIds));
         } finally {
             IoUtils.closeQuietly(ec2Client, null);
         }
     }
 
-    private Stream<EC2VpcResource> getAllVpcsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                      List<String> vpcIds) {
+    private Stream<EC2VpcResource> getVpcsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
+                                                   List<String> vpcIds) {
         Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
 
         try {
@@ -92,6 +95,7 @@ public class EC2VpcLoader implements EC2ResourceLoader<EC2VpcResource> {
         DescribeVpcAttributeResponse describeVpcAttributeResponse =
                 client.describeVpcAttribute(builder -> builder.vpcId(vpc.vpcId()));
 
+        // vpc properties
         resource.region = regionName;
         resource.vpcId = vpc.vpcId();
         resource.cidrBlock = vpc.cidrBlock();
@@ -99,11 +103,7 @@ public class EC2VpcLoader implements EC2ResourceLoader<EC2VpcResource> {
         resource.isDefault = vpc.isDefault();
         resource.dnsHostnamesEnabled = describeVpcAttributeResponse.enableDnsHostnames().value();
         resource.dnsSupportEnabled = describeVpcAttributeResponse.enableDnsSupport().value();
-        resource.tags =
-                vpc.tags()
-                        .stream()
-                        .map(tag -> new KeyValue(tag.key(), tag.value()))
-                        .collect(Collectors.toList());
+        resource.tags = toTags(vpc.tags());
 
         return resource;
     }
