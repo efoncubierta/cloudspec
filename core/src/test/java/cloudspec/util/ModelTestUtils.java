@@ -26,9 +26,11 @@
 package cloudspec.util;
 
 import cloudspec.model.*;
-import cloudspec.model.Properties;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -83,6 +85,30 @@ public class ModelTestUtils {
             Boolean.TRUE
     );
     public static final Property PROP_INTEGER_LIST = new Property(PROP_INTEGER_LIST_NAME, PROP_INTEGER_LIST_VALUE);
+
+    public static final String PROP_DOUBLE_NAME = "double_property";
+    public static final String PROP_DOUBLE_DESCRIPTION = "Double property";
+    public static final PropertyType PROP_DOUBLE_TYPE = PropertyType.DOUBLE;
+    public static final Double PROP_DOUBLE_VALUE = 1.2;
+    public static final PropertyDef PROP_DOUBLE_DEF = new PropertyDef(
+            PROP_DOUBLE_NAME,
+            PROP_DOUBLE_DESCRIPTION,
+            PROP_DOUBLE_TYPE,
+            Boolean.FALSE
+    );
+    public static final Property PROP_DOUBLE = new Property(PROP_DOUBLE_NAME, PROP_DOUBLE_VALUE);
+
+    public static final String PROP_DOUBLE_LIST_NAME = "double_list_property";
+    public static final String PROP_DOUBLE_LIST_DESCRIPTION = "Double list property";
+    public static final PropertyType PROP_DOUBLE_LIST_TYPE = PropertyType.DOUBLE;
+    public static final List<Double> PROP_DOUBLE_LIST_VALUE = Arrays.asList(PROP_DOUBLE_VALUE, PROP_DOUBLE_VALUE);
+    public static final PropertyDef PROP_DOUBLE_LIST_DEF = new PropertyDef(
+            PROP_DOUBLE_LIST_NAME,
+            PROP_DOUBLE_LIST_DESCRIPTION,
+            PROP_DOUBLE_LIST_TYPE,
+            Boolean.TRUE
+    );
+    public static final Property PROP_DOUBLE_LIST = new Property(PROP_DOUBLE_LIST_NAME, PROP_DOUBLE_LIST_VALUE);
 
     public static final String PROP_STRING_NAME = "string_property";
     public static final String PROP_STRING_DESCRIPTION = "String property";
@@ -161,6 +187,7 @@ public class ModelTestUtils {
     public static final PropertyType PROP_NESTED_TYPE = PropertyType.NESTED;
     public static final Properties PROP_NESTED_VALUE = new Properties(
             PROP_INTEGER,
+            PROP_DOUBLE,
             PROP_STRING,
             PROP_BOOLEAN,
             PROP_KEY_VALUE
@@ -172,10 +199,12 @@ public class ModelTestUtils {
             Boolean.FALSE,
             Arrays.asList(
                     PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+                    PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
                     PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
-            )
+            ),
+            Collections.emptyList()
     );
     public static final Property PROP_NESTED = new Property(PROP_NESTED_NAME, PROP_NESTED_VALUE);
 
@@ -190,29 +219,32 @@ public class ModelTestUtils {
             Boolean.TRUE,
             Arrays.asList(
                     PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+                    PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
                     PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
-            )
+            ),
+            Collections.emptyList()
     );
     public static final Property PROP_NESTED_LIST = new Property(PROP_NESTED_LIST_NAME, PROP_NESTED_LIST_VALUE);
 
     public static final Properties PROPERTIES = new Properties(
-            PROP_ID, PROP_INTEGER, PROP_INTEGER_LIST, PROP_STRING, PROP_STRING_LIST,
-            PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_KEY_VALUE, PROP_KEY_VALUE_LIST,
-            PROP_NESTED, PROP_NESTED_LIST
+            PROP_ID, PROP_INTEGER, PROP_INTEGER_LIST, PROP_DOUBLE, PROP_DOUBLE_LIST,
+            PROP_STRING, PROP_STRING_LIST, PROP_BOOLEAN, PROP_BOOLEAN_LIST,
+            PROP_KEY_VALUE, PROP_KEY_VALUE_LIST, PROP_NESTED, PROP_NESTED_LIST
     );
     public static final Properties TARGET_PROPERTIES = new Properties(
-            PROP_ID, PROP_INTEGER, PROP_INTEGER_LIST, PROP_STRING, PROP_STRING_LIST,
-            PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_KEY_VALUE, PROP_KEY_VALUE_LIST
+            PROP_ID, PROP_INTEGER, PROP_INTEGER_LIST, PROP_DOUBLE, PROP_DOUBLE_LIST,
+            PROP_STRING, PROP_STRING_LIST, PROP_BOOLEAN, PROP_BOOLEAN_LIST,
+            PROP_KEY_VALUE, PROP_KEY_VALUE_LIST
     );
     public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(
-            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF, PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF, PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
             PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF, PROP_NESTED_DEF, PROP_NESTED_LIST_DEF
     );
     public static final List<PropertyDef> TARGET_PROPERTY_DEFS = Arrays.asList(
-            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
+            PROP_ID_DEF, PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF, PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF, PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
             PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
     );
@@ -257,6 +289,8 @@ public class ModelTestUtils {
             RESOURCE_ID,
             PROP_INTEGER_VALUE,
             PROP_INTEGER_LIST_VALUE,
+            PROP_DOUBLE_VALUE,
+            PROP_DOUBLE_LIST_VALUE,
             PROP_STRING_VALUE,
             PROP_STRING_LIST_VALUE,
             PROP_BOOLEAN_VALUE,
@@ -266,6 +300,8 @@ public class ModelTestUtils {
             new TestNestedProperty(
                     PROP_INTEGER_VALUE,
                     PROP_INTEGER_LIST_VALUE,
+                    PROP_DOUBLE_VALUE,
+                    PROP_DOUBLE_LIST_VALUE,
                     PROP_STRING_VALUE,
                     PROP_STRING_LIST_VALUE,
                     PROP_BOOLEAN_VALUE,
@@ -277,6 +313,8 @@ public class ModelTestUtils {
                     new TestNestedProperty(
                             PROP_INTEGER_VALUE,
                             PROP_INTEGER_LIST_VALUE,
+                            PROP_DOUBLE_VALUE,
+                            PROP_DOUBLE_LIST_VALUE,
                             PROP_STRING_VALUE,
                             PROP_STRING_LIST_VALUE,
                             PROP_BOOLEAN_VALUE,

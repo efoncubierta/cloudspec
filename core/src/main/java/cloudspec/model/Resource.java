@@ -33,7 +33,7 @@ package cloudspec.model;
  * <p>
  * Resources are provided by the providers.
  */
-public class Resource implements PropertiesContainer, AssociationsContainer {
+public class Resource implements MembersContainer {
     private final ResourceDefRef resourceDefRef;
     private final String resourceId;
     private final Properties properties;
@@ -52,6 +52,24 @@ public class Resource implements PropertiesContainer, AssociationsContainer {
         this.resourceId = resourceId;
         this.properties = properties;
         this.associations = associations;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Resource)) {
+            return false;
+        }
+
+        Resource resource = (Resource) obj;
+
+        return getResourceDefRef().equals(resource.getResourceDefRef()) &&
+                getResourceId().equals(resource.getResourceId()) &&
+                getProperties().equals(resource.getProperties()) &&
+                getAssociations().equals(resource.getAssociations());
     }
 
     /**
@@ -80,24 +98,6 @@ public class Resource implements PropertiesContainer, AssociationsContainer {
     @Override
     public Associations getAssociations() {
         return associations;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof Resource)) {
-            return false;
-        }
-
-        Resource resource = (Resource) obj;
-
-        return getResourceDefRef().equals(resource.getResourceDefRef()) &&
-                getResourceId().equals(resource.getResourceId()) &&
-                getProperties().equals(resource.getProperties()) &&
-                getAssociations().equals(resource.getAssociations());
     }
 
     @Override

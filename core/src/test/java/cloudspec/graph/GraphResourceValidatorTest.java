@@ -124,9 +124,11 @@ public class GraphResourceValidatorTest {
                         Collections.singletonList(
                                 new NestedStatement(
                                         ModelTestUtils.PROP_NESTED_NAME,
-                                        new PropertyStatement(
-                                                ModelTestUtils.PROP_STRING_NAME,
-                                                P.eq("zzz")
+                                        Collections.singletonList(
+                                                new PropertyStatement(
+                                                        ModelTestUtils.PROP_STRING_NAME,
+                                                        P.eq("zzz")
+                                                )
                                         )
                                 )
                         )
@@ -189,7 +191,12 @@ public class GraphResourceValidatorTest {
                 Collections.singletonList(
                         new NestedStatement(
                                 ModelTestUtils.PROP_NESTED_NAME,
-                                new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE))
+                                Collections.singletonList(
+                                        new PropertyStatement(
+                                                ModelTestUtils.PROP_STRING_NAME,
+                                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                        )
+                                )
                         )
                 )
         );
@@ -220,7 +227,12 @@ public class GraphResourceValidatorTest {
                 Collections.singletonList(
                         new NestedStatement(
                                 ModelTestUtils.PROP_NESTED_NAME,
-                                new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE))
+                                Collections.singletonList(
+                                        new PropertyStatement(
+                                                ModelTestUtils.PROP_STRING_NAME,
+                                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                        )
+                                )
                         )
                 )
         );

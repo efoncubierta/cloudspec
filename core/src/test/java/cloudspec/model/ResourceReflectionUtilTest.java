@@ -29,7 +29,6 @@ import cloudspec.annotation.ResourceReflectionUtil;
 import cloudspec.util.ModelTestUtils;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -50,6 +49,7 @@ public class ResourceReflectionUtilTest {
         assertFalse(resourceIdOpt.isPresent());
     }
 
+    @Test
     public void shouldProduceProperties() {
         Properties properties = ResourceReflectionUtil.toProperties(ModelTestUtils.TEST_RESOURCE);
         assertNotNull(properties);

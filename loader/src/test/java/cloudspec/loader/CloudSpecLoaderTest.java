@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec Core Library
+ * CloudSpec Loader Library
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
@@ -23,29 +23,25 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.loader;
 
-import java.util.List;
-import java.util.Optional;
+import cloudspec.lang.CloudSpec;
+import org.junit.Test;
 
-/**
- * Interface for classes that manage associations definitions.
- */
-public interface AssociationDefsContainer {
-    /**
-     * Get an association definition by name.
-     *
-     * @param associationName Association name.
-     * @return Optional association definition.
-     */
-    default Optional<AssociationDef> getAssociation(String associationName) {
-        return getAssociations().stream().filter(def -> def.getName().equals(associationName)).findFirst();
+import java.io.ByteArrayInputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class CloudSpecLoaderTest {
+    private final CloudSpecLoader cloudSpecLoader = new CloudSpecLoader();
+
+    @Test
+    public void shouldLoadFullSpec() throws Exception {
+        CloudSpec cloudSpecOriginal = CloudSpecGenerator.fullSpec();
+        CloudSpec cloudSpecLoaded = cloudSpecLoader.load(new ByteArrayInputStream(cloudSpecOriginal.toCloudSpecSyntax().getBytes()));
+
+        assertNotNull(cloudSpecLoaded);
+        assertEquals(cloudSpecOriginal, cloudSpecLoaded);
     }
-
-    /**
-     * Get list of association definitions.
-     *
-     * @return List of association definitions.
-     */
-    List<AssociationDef> getAssociations();
 }

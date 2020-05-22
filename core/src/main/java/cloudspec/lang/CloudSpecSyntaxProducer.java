@@ -25,7 +25,25 @@
  */
 package cloudspec.lang;
 
-public enum LogicalOperator {
-    AND,
-    OR
+/**
+ * Interface that each class of CloudSpec should implement to
+ * write themselves in CloudSpec syntax.
+ */
+public interface CloudSpecSyntaxProducer {
+    /**
+     * Write object in CloudSpec syntax.
+     *
+     * @return CloudSpec syntax.
+     */
+    default String toCloudSpecSyntax() {
+        return toCloudSpecSyntax(0);
+    }
+
+    /**
+     * Write object in CloudSpec syntax tabulated.
+     *
+     * @param spaces Number of spaces.
+     * @return CloudSpec syntax.
+     */
+    String toCloudSpecSyntax(Integer spaces);
 }

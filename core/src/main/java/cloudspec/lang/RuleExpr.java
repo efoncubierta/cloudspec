@@ -25,12 +25,17 @@
  */
 package cloudspec.lang;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
+
+import java.util.Objects;
+
 /**
  * Define a rule expression.
  * <p>
  * A rule filters and validates resources.
  */
-public class RuleExpr {
+public class RuleExpr implements CloudSpecSyntaxProducer {
     private final String name;
     private final String resourceDefRef;
     private final WithExpr withExpr;
@@ -49,6 +54,10 @@ public class RuleExpr {
         this.resourceDefRef = resourceDefRef;
         this.withExpr = withExpr;
         this.assertExpr = assertExpr;
+    }
+
+    public static RuleExprBuilder builder() {
+        return new RuleExprBuilder();
     }
 
     /**
@@ -88,6 +97,41 @@ public class RuleExpr {
     }
 
     @Override
+    public String toCloudSpecSyntax(Integer spaces) {
+        StrBuilder sb = new StrBuilder();
+        sb.appendln(
+                String.format("%sRule \"%s\"", StringUtils.repeat(" ", spaces), name)
+        );
+        sb.appendln(
+                String.format("%sOn %s", StringUtils.repeat(" ", spaces), resourceDefRef)
+        );
+
+        // add with statements
+        sb.append(withExpr.toCloudSpecSyntax(spaces));
+
+        // add assert statements
+        sb.append(assertExpr.toCloudSpecSyntax(spaces));
+
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, resourceDefRef, withExpr, assertExpr);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RuleExpr ruleExpr = (RuleExpr) o;
+        return name.equals(ruleExpr.name) &&
+                resourceDefRef.equals(ruleExpr.resourceDefRef) &&
+                withExpr.equals(ruleExpr.withExpr) &&
+                assertExpr.equals(ruleExpr.assertExpr);
+    }
+
+    @Override
     public String toString() {
         return "SpecRule{" +
                 "name='" + name + '\'' +
@@ -95,10 +139,6 @@ public class RuleExpr {
                 ", with=" + withExpr +
                 ", assert=" + assertExpr +
                 '}';
-    }
-
-    public static RuleExprBuilder builder() {
-        return new RuleExprBuilder();
     }
 
     public static class RuleExprBuilder {

@@ -49,6 +49,22 @@ public class ResourceDefRef {
     }
 
     /**
+     * Build a resource definition reference object from string.
+     *
+     * @param refString Resource definition reference as string.
+     * @return Optional resource definition reference.
+     */
+    public static Optional<ResourceDefRef> fromString(String refString) {
+        // TODO manage null or malformed strings
+        String[] parts = refString.split(":");
+        if (parts.length != 3) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ResourceDefRef(parts[0], parts[1], parts[2]));
+    }
+
+    /**
      * Get provider name.
      *
      * @return Provider name.
@@ -73,22 +89,6 @@ public class ResourceDefRef {
      */
     public String getResourceName() {
         return resourceName;
-    }
-
-    /**
-     * Build a resource definition reference object from string.
-     *
-     * @param refString Resource definition reference as string.
-     * @return Optional resource definition reference.
-     */
-    public static Optional<ResourceDefRef> fromString(String refString) {
-        // TODO manage null or malformed strings
-        String[] parts = refString.split(":");
-        if(parts.length != 3) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new ResourceDefRef(parts[0], parts[1], parts[2]));
     }
 
     @Override

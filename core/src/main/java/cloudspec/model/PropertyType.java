@@ -29,9 +29,21 @@ package cloudspec.model;
  * Property type.
  */
 public enum PropertyType {
-    STRING,
-    BOOLEAN,
-    INTEGER,
-    KEY_VALUE,
-    NESTED
+    STRING("string"),
+    BOOLEAN("boolean"),
+    INTEGER("integer"),
+    DOUBLE("double"),
+    KEY_VALUE("key_value"),
+    NESTED("nested");
+
+    private final String text;
+
+    PropertyType(final String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

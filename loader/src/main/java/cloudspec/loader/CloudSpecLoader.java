@@ -23,8 +23,10 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec;
+package cloudspec.loader;
 
+import cloudspec.CloudSpecLexer;
+import cloudspec.CloudSpecParser;
 import cloudspec.lang.CloudSpec;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;

@@ -31,15 +31,33 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Class that manage associations based on {@link ArrayList}.
+ */
 public class Associations extends ArrayList<Association> {
+    /**
+     * Constructor.
+     *
+     * @param associations Associations array
+     */
     public Associations(Association... associations) {
         super(Arrays.asList(associations));
     }
 
+    /**
+     * Constructor.
+     *
+     * @param associations Associations stream
+     */
     public Associations(Stream<Association> associations) {
         super(associations.collect(Collectors.toList()));
     }
 
+    /**
+     * Constructor.
+     *
+     * @param associations Associations list
+     */
     public Associations(List<Association> associations) {
         super(associations);
     }

@@ -27,6 +27,9 @@ package cloudspec.model;
 
 import java.util.Optional;
 
+/**
+ * Interface for classes that manage properties.
+ */
 public interface PropertiesContainer {
     /**
      * Get a property by name.

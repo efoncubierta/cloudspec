@@ -27,22 +27,81 @@ package cloudspec.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Properties extends ArrayList<Property> {
+/**
+ * Class that manage properties based on {@link ArrayList}.
+ */
+public class Properties extends ArrayList<Property> implements MembersContainer {
+    private final Associations associations;
+
+    /**
+     * Constructor.
+     *
+     * @param properties Properties array
+     */
     public Properties(Property... properties) {
         super(Arrays.asList(properties));
+
+        associations = new Associations();
     }
 
-    public Properties(Stream<Property> properties) {
-        super(properties.collect(Collectors.toList()));
+    /**
+     * Constructor.
+     *
+     * @param propertiesStream Properties stream
+     */
+    public Properties(Stream<Property> propertiesStream) {
+        super(propertiesStream.collect(Collectors.toList()));
+
+        associations = new Associations();
     }
 
-    public Properties(List<Property> properties) {
-        super(properties);
+    /**
+     * Constructor.
+     *
+     * @param propertiesStream   Properties stream
+     * @param associationsStream Associations stream
+     */
+    public Properties(Stream<Property> propertiesStream, Stream<Association> associationsStream) {
+        super(propertiesStream.collect(Collectors.toList()));
+
+        associations = new Associations(associationsStream);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param propertiesList Properties list
+     */
+    public Properties(List<Property> propertiesList) {
+        super(propertiesList);
+
+        associations = new Associations();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param propertiesList   Properties list
+     * @param associationsList Associations list
+     */
+    public Properties(List<Property> propertiesList, List<Association> associationsList) {
+        super(propertiesList);
+
+        associations = new Associations(associationsList);
+    }
+
+    @Override
+    public Properties getProperties() {
+        return this;
+    }
+
+    @Override
+    public Associations getAssociations() {
+        return associations;
     }
 
     @Override
@@ -57,6 +116,9 @@ public class Properties extends ArrayList<Property> {
 
         Properties properties = (Properties) obj;
 
-        return size() == properties.size() && containsAll(properties);
+        return size() == properties.size() &&
+                containsAll(properties) &&
+                associations.size() == properties.associations.size() &&
+                associations.containsAll(properties.associations);
     }
 }

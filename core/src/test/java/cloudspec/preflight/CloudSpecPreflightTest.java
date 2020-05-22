@@ -157,9 +157,11 @@ public class CloudSpecPreflightTest {
                                                         Collections.singletonList(
                                                                 new NestedStatement(
                                                                         resourceDef.getProperties().get(0).getName(),
-                                                                        new PropertyStatement(
-                                                                                ModelGenerator.randomName(),
-                                                                                P.eq(0)
+                                                                        Collections.singletonList(
+                                                                                new PropertyStatement(
+                                                                                        ModelGenerator.randomName(),
+                                                                                        P.eq(0)
+                                                                                )
                                                                         )
                                                                 )
 

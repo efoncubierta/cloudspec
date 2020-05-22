@@ -46,6 +46,23 @@ public class Association extends BaseMember {
         this.resourceId = resourceId;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Association)) {
+            return false;
+        }
+
+        Association association = (Association) obj;
+
+        return getName().equals(association.getName()) &&
+                getResourceDefRef().equals(association.getResourceDefRef()) &&
+                getResourceId().equals(association.getResourceId());
+    }
+
     /**
      * Get the resource definition reference of the target resource.
      *
@@ -62,23 +79,6 @@ public class Association extends BaseMember {
      */
     public String getResourceId() {
         return resourceId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof Association)) {
-            return false;
-        }
-
-        Association association = (Association) obj;
-
-        return getName().equals(association.getName()) &&
-                getResourceDefRef().equals(association.getResourceDefRef()) &&
-                getResourceId().equals(association.getResourceId());
     }
 
     @Override

@@ -90,6 +90,12 @@ public class CloudSpecManager {
         cloudSpecPreflight.preflight(spec);
     }
 
+    private void mustBeInitiated() {
+        if (!initiated) {
+            throw new RuntimeException("CloudSpec is not initiated");
+        }
+    }
+
     public void loadResources(CloudSpec spec) {
         mustBeInitiated();
 
@@ -100,11 +106,5 @@ public class CloudSpecManager {
         mustBeInitiated();
 
         return cloudSpecValidator.validate(spec);
-    }
-
-    private void mustBeInitiated() {
-        if (!initiated) {
-            throw new RuntimeException("CloudSpec is not initiated");
-        }
     }
 }

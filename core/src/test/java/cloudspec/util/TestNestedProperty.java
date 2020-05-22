@@ -44,6 +44,18 @@ public class TestNestedProperty {
     private final List<Integer> integerListProperty;
 
     @PropertyDefinition(
+            name = ModelTestUtils.PROP_DOUBLE_NAME,
+            description = ModelTestUtils.PROP_DOUBLE_DESCRIPTION
+    )
+    private final Double doubleProperty;
+
+    @PropertyDefinition(
+            name = ModelTestUtils.PROP_DOUBLE_LIST_NAME,
+            description = ModelTestUtils.PROP_DOUBLE_LIST_DESCRIPTION
+    )
+    private final List<Double> doubleListProperty;
+
+    @PropertyDefinition(
             name = ModelTestUtils.PROP_STRING_NAME,
             description = ModelTestUtils.PROP_STRING_DESCRIPTION
     )
@@ -80,11 +92,14 @@ public class TestNestedProperty {
     private final List<KeyValue> keyValueListProperty;
 
     public TestNestedProperty(Integer integerProperty, List<Integer> integerListProperty,
+                              Double doubleProperty, List<Double> doubleListProperty,
                               String stringProperty, List<String> stringListProperty,
                               Boolean booleanProperty, List<Boolean> booleanListProperty,
                               KeyValue keyValueProperty, List<KeyValue> keyValueListProperty) {
         this.integerProperty = integerProperty;
         this.integerListProperty = integerListProperty;
+        this.doubleProperty = doubleProperty;
+        this.doubleListProperty = doubleListProperty;
         this.stringProperty = stringProperty;
         this.stringListProperty = stringListProperty;
         this.booleanProperty = booleanProperty;
@@ -99,6 +114,14 @@ public class TestNestedProperty {
 
     public List<Integer> getIntegerListProperty() {
         return integerListProperty;
+    }
+
+    public Double getDoubleProperty() {
+        return doubleProperty;
+    }
+
+    public List<Double> getDoubleListProperty() {
+        return doubleListProperty;
     }
 
     public String getStringProperty() {

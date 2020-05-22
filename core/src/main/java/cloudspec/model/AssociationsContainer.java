@@ -25,9 +25,11 @@
  */
 package cloudspec.model;
 
-import java.util.List;
 import java.util.Optional;
 
+/**
+ * Interface for classes that manage associations.
+ */
 public interface AssociationsContainer {
     /**
      * Get an association by name.

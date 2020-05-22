@@ -45,15 +45,6 @@ public class Property extends BaseMember implements PropertiesContainer {
         this.value = value;
     }
 
-    /**
-     * Get property value.
-     *
-     * @return Property value.
-     */
-    public Object getValue() {
-        return value;
-    }
-
     @Override
     public Properties getProperties() {
         // TODO review this code
@@ -83,6 +74,15 @@ public class Property extends BaseMember implements PropertiesContainer {
                 ((List<?>) getValue()).size() == ((List<?>) getValue()).size() &&
                         ((List<?>) getValue()).containsAll((List<?>) getValue()) :
                 getValue().equals(property.getValue());
+    }
+
+    /**
+     * Get property value.
+     *
+     * @return Property value.
+     */
+    public Object getValue() {
+        return value;
     }
 
     @Override

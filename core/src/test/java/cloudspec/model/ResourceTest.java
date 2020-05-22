@@ -28,17 +28,18 @@ package cloudspec.model;
 import cloudspec.util.ModelTestUtils;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Optional;
+import java.util.Stack;
 
 import static org.junit.Assert.*;
 
 public class ResourceTest {
     @Test
     public void shouldGetPropertyByPath() {
-        Optional<PropertyDef> propertyDefOpt = ModelTestUtils.RESOURCE_DEF.getPropertyByPath(
-                Arrays.asList(ModelTestUtils.PROP_NESTED_NAME, ModelTestUtils.PROP_STRING_NAME)
-        );
+        Stack<String> path = new Stack<String>();
+        path.add(ModelTestUtils.PROP_NESTED_NAME);
+        path.add(ModelTestUtils.PROP_STRING_NAME);
+        Optional<PropertyDef> propertyDefOpt = ModelTestUtils.RESOURCE_DEF.getPropertyByPath(path);
 
         assertNotNull(propertyDefOpt);
         assertTrue(propertyDefOpt.isPresent());

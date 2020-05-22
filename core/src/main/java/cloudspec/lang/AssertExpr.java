@@ -25,14 +25,19 @@
  */
 package cloudspec.lang;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
+
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * Define an 'assert' expression.
  * <p>
  * Assert expressions ares used to validate resources.
  */
-public class AssertExpr {
+public class AssertExpr implements CloudSpecSyntaxProducer {
     private final List<Statement> statements;
 
     /**
@@ -42,6 +47,10 @@ public class AssertExpr {
      */
     public AssertExpr(List<Statement> statements) {
         this.statements = statements;
+    }
+
+    public static AssertExprBuilder builder() {
+        return new AssertExprBuilder();
     }
 
     /**
@@ -54,14 +63,49 @@ public class AssertExpr {
     }
 
     @Override
+    public String toCloudSpecSyntax(Integer spaces) {
+        StrBuilder sb = new StrBuilder();
+
+        IntStream.range(0, statements.size())
+                .forEach(i -> {
+                    if (i == 0) {
+                        sb.appendln(
+                                String.format(
+                                        "%sAssert", StringUtils.repeat(" ", spaces)
+                                )
+                        );
+                    } else {
+                        sb.appendln(
+                                String.format(
+                                        "%sAnd", StringUtils.repeat(" ", spaces)
+                                )
+                        );
+                    }
+                    sb.appendln(statements.get(i).toCloudSpecSyntax(spaces + 4));
+                });
+
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(statements);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssertExpr assertExpr = (AssertExpr) o;
+        return statements.size() == assertExpr.statements.size() &&
+                statements.containsAll(assertExpr.statements);
+    }
+
+    @Override
     public String toString() {
         return "AssertExpr{" +
                 "statements=" + statements +
                 '}';
-    }
-
-    public static AssertExprBuilder builder() {
-        return new AssertExprBuilder();
     }
 
     public static class AssertExprBuilder {

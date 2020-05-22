@@ -25,17 +25,6 @@
  */
 package cloudspec.loader;
 
-import cloudspec.ProvidersRegistry;
-import cloudspec.store.ResourceDefStore;
-import cloudspec.store.ResourceStore;
-import cloudspec.util.TestProvider;
-import org.junit.Test;
-
-import java.util.Collections;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class ResourceLoaderTest {
 //    public static final ProvidersRegistry PROVIDERS_REGISTRY = mock(ProvidersRegistry.class);
 //    public static final ResourceDefStore RESOURCE_DEF_STORE = mock(ResourceDefStore.class);

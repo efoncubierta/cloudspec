@@ -25,5 +25,6 @@
  */
 package cloudspec.lang;
 
-public interface Statement {
+public interface Statement extends CloudSpecSyntaxProducer {
+
 }

@@ -108,8 +108,6 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.valueM
  * </ul>
  */
 public class GraphResourceStore implements ResourceStore {
-    private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceStore.class);
-
     public static final String LABEL_RESOURCE = "resource";
     public static final String LABEL_PROPERTY = "property";
     public static final String LABEL_PROPERTY_VALUE = "propertyValue";
@@ -125,7 +123,7 @@ public class GraphResourceStore implements ResourceStore {
     public static final String PROPERTY_VALUE = "value";
     public static final String PROPERTY_TYPE = "propertyType";
     public static final String PROPERTY_IS_MULTIVALUED = "isMultiValued";
-
+    private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceStore.class);
     private final GraphTraversalSource graphTraversal;
 
     /**
@@ -196,6 +194,25 @@ public class GraphResourceStore implements ResourceStore {
     }
 
     @Override
+    public Optional<Resource> getResource(ResourceDefRef resourceDefRef, String resourceId) {
+        LOGGER.debug("Getting resource '{}' with id '{}'", resourceDefRef, resourceId);
+
+        return getResourceVertexById(resourceDefRef, resourceId)
+                .flatMap(this::getResourceFromVertex);
+    }
+
+    @Override
+    public List<Resource> getResourcesByDefinition(ResourceDefRef resourceDefRef) {
+        LOGGER.debug("Getting all resources of type '{}'", resourceDefRef);
+
+        return getResourceVerticesByDefinition(resourceDefRef)
+                .map(this::getResourceFromVertex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Properties getProperties(ResourceDefRef resourceDefRef, String resourceId) {
         return getResourceVertexById(resourceDefRef, resourceId)
                 .map(this::getPropertiesFromVertex)
@@ -237,23 +254,61 @@ public class GraphResourceStore implements ResourceStore {
                 .ifPresent(resourceV -> createAssociationsFromVertex(resourceV, associations));
     }
 
-    @Override
-    public Optional<Resource> getResource(ResourceDefRef resourceDefRef, String resourceId) {
-        LOGGER.debug("Getting resource '{}' with id '{}'", resourceDefRef, resourceId);
-
-        return getResourceVertexById(resourceDefRef, resourceId)
-                .flatMap(this::getResourceFromVertex);
+    private void createAssociationsFromVertex(Vertex sourceV, Associations associations) {
+        associations.forEach(association -> createAssociationFromVertex(sourceV, association));
     }
 
-    @Override
-    public List<Resource> getResourcesByDefinition(ResourceDefRef resourceDefRef) {
-        LOGGER.debug("Getting all resources of type '{}'", resourceDefRef);
+    private void createAssociationFromVertex(Vertex sourceV, Association association) {
+        LOGGER.debug("- Setting association '{}'", association);
 
-        return getResourceVerticesByDefinition(resourceDefRef)
-                .map(this::getResourceFromVertex)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+        // validate target resource exists
+        Optional<Vertex> targetVOpt = getResourceVertexById(association.getResourceDefRef(), association.getResourceId());
+        if (!targetVOpt.isPresent()) {
+            LOGGER.error("Resource '{}' with id '{}' not found. Ignoring association '{}'.",
+                    association.getResourceDefRef(),
+                    association.getResourceId(),
+                    association.getName()
+            );
+            return;
+        }
+
+        // link source vertex to target vertex
+        graphTraversal.addE(LABEL_HAS_ASSOCIATION)
+                .property(PROPERTY_NAME, association.getName())
+                .from(sourceV)
+                .to(targetVOpt.get())
+                .next();
+
+    }
+
+    private Associations getAssociationsFromVertex(Vertex resourceV) {
+        return new Associations(
+                graphTraversal
+                        .V(resourceV.id())
+                        .outE(LABEL_HAS_ASSOCIATION).as("association")
+                        .inV().as("target")
+                        .select("association", "target")
+                        .by(valueMap())
+                        .toStream()
+                        .map(map -> {
+                            // TODO refactor this ugly code
+                            Map<String, Object> associationMap = (Map<String, Object>) map.get("association");
+                            Map<String, List<Object>> targetMap = (Map<String, List<Object>>) map.get("target");
+
+                            return new Association(
+                                    (String) associationMap.get(PROPERTY_NAME),
+                                    (ResourceDefRef) targetMap.get(PROPERTY_RESOURCE_DEF_REF).get(0),
+                                    (String) targetMap.get(PROPERTY_RESOURCE_ID).get(0)
+                            );
+                        })
+        );
+    }
+
+    private Optional<Vertex> getResourceVertexById(ResourceDefRef resourceDefRef, String resourceId) {
+        return graphTraversal.V()
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .has(PROPERTY_RESOURCE_ID, resourceId)
+                .tryNext();
     }
 
     private void createPropertiesFromVertex(Vertex sourceV, Properties properties) {
@@ -391,44 +446,10 @@ public class GraphResourceStore implements ResourceStore {
                 .next();
     }
 
-    private void createAssociationsFromVertex(Vertex sourceV, Associations associations) {
-        associations.forEach(association -> createAssociationFromVertex(sourceV, association));
-    }
-
-    private void createAssociationFromVertex(Vertex sourceV, Association association) {
-        LOGGER.debug("- Setting association '{}'", association);
-
-        // validate target resource exists
-        Optional<Vertex> targetVOpt = getResourceVertexById(association.getResourceDefRef(), association.getResourceId());
-        if (!targetVOpt.isPresent()) {
-            LOGGER.error("Resource '{}' with id '{}' not found. Ignoring association '{}'.",
-                    association.getResourceDefRef(),
-                    association.getResourceId(),
-                    association.getName()
-            );
-            return;
-        }
-
-        // link source vertex to target vertex
-        graphTraversal.addE(LABEL_HAS_ASSOCIATION)
-                .property(PROPERTY_NAME, association.getName())
-                .from(sourceV)
-                .to(targetVOpt.get())
-                .next();
-
-    }
-
     private Stream<Vertex> getResourceVerticesByDefinition(ResourceDefRef resourceDefRef) {
         return graphTraversal.V()
                 .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .toStream();
-    }
-
-    private Optional<Vertex> getResourceVertexById(ResourceDefRef resourceDefRef, String resourceId) {
-        return graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, resourceId)
-                .tryNext();
     }
 
     private Optional<Resource> getResourceFromVertex(Vertex resourceV) {
@@ -543,29 +564,6 @@ public class GraphResourceStore implements ResourceStore {
                     nestedValues.isEmpty() ? null : nestedValues.get(0)
             );
         }
-    }
-
-    private Associations getAssociationsFromVertex(Vertex resourceV) {
-        return new Associations(
-                graphTraversal
-                        .V(resourceV.id())
-                        .outE(LABEL_HAS_ASSOCIATION).as("association")
-                        .inV().as("target")
-                        .select("association", "target")
-                        .by(valueMap())
-                        .toStream()
-                        .map(map -> {
-                            // TODO refactor this ugly code
-                            Map<String, Object> associationMap = (Map<String, Object>) map.get("association");
-                            Map<String, List<Object>> targetMap = (Map<String, List<Object>>) map.get("target");
-
-                            return new Association(
-                                    (String) associationMap.get(PROPERTY_NAME),
-                                    (ResourceDefRef) targetMap.get(PROPERTY_RESOURCE_DEF_REF).get(0),
-                                    (String) targetMap.get(PROPERTY_RESOURCE_ID).get(0)
-                            );
-                        })
-        );
     }
 
     private String getPropertyPath(Vertex sourceV, String memberName) {

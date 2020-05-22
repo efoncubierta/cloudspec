@@ -6,9 +6,9 @@ specDecl: SPEC STRING;
 
 groupDecl: GROUP STRING ruleDecl+;
 
-ruleDecl: RULE STRING onDecl assertDecl;
+ruleDecl: RULE STRING onDecl withDecl? assertDecl;
 
-onDecl: ON RESOURCE_DEF_REF withDecl;
+onDecl: ON RESOURCE_DEF_REF;
 
 withDecl: WITH statement andDecl*;
 
@@ -22,18 +22,28 @@ predicate: IS? ('==' | EQUAL TO) value      # PropertyEqualPredicate
          | IS? NOT WITHIN array             # PropertyNotWithinPredicate
          ;
 
-statement: memberPath predicate                           # PropertyStatement
-         | memberPath '(' statement (',' statement)* ')'  # AssociationStatement
+statement: MEMBER_NAME predicate                              # PropertyStatement
+         | MEMBER_NAME '[' STRING ']' predicate               # KeyValuePropertyStatement
+         | MEMBER_NAME '('  statement (',' statement)* ')'    # NestedPropertyStatement
+         | '>' MEMBER_NAME '(' statement (',' statement)* ')' # AssociationStatement
          ;
-
-memberPath: MEMBER_NAME ('.' memberPath)*;
 
 value: STRING                    # StringValue
      | BOOLEAN                   # BooleanValue
      | INTEGER                   # IntegerValue
+     | DOUBLE                    # DoubleValue
      ;
 
 array: '[' value (',' value)* ']';
+
+// Values
+STRING: '"' ('\\"'|.)*? '"';
+BOOLEAN: (ENABLED | DISABLED | TRUE | FALSE);
+DOUBLE: NEGATIVE? DIGIT+ DOT DIGIT+;
+INTEGER: NEGATIVE? DIGIT+;
+fragment DIGIT: [0-9];
+fragment DOT: '.';
+fragment NEGATIVE: '-';
 
 // Vocabulary
 SPEC: [Ss][Pp][Ee][Cc];
@@ -64,13 +74,6 @@ GREATER: [Gg][Rr][Ee][Aa][Tt][Ee][Rr];
 THAN: [Tt][Hh][Aa][Nn];
 
 // Values
-// ARRAY: '[' VALUE_LIST ']';
-// fragment VALUE_LIST: (STRING | BOOLEAN | INTEGER) (',' (STRING | BOOLEAN | INTEGER))*;
-STRING: '"' ('\\"'|.)*? '"';
-BOOLEAN: (ENABLED | DISABLED | TRUE | FALSE);
-INTEGER: [0-9]+;
-
-// Values
 fragment LETTER: [a-zA-Z];
 fragment LETTERS: [a-zA-Z]+;
 fragment ALPHANUM: [a-zA-Z0-9];
@@ -81,7 +84,7 @@ RESOURCE_DEF_REF: PROVIDER_NAMESPACE (':' GROUP_NAMESPACE)? ':' RESOURCE_TYPE;
 fragment PROVIDER_NAMESPACE: LETTER ALPHANUM*;
 fragment GROUP_NAMESPACE: LETTER ALPHANUM*;
 fragment RESOURCE_TYPE: LETTER ALPHANUM*;
-MEMBER_NAME: [a-zA-Z0-9_]+;
+MEMBER_NAME: LETTER ALPHANUM*;
 
 WS: [ \t\r\n]+ -> skip;
 SL_COMMENT: '//' .*? '\n' -> skip;

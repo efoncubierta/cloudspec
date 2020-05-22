@@ -36,26 +36,6 @@ import java.util.stream.IntStream;
 public class ModelGenerator {
     private static final Faker faker = new Faker();
 
-    public static String randomResourceId() {
-        return faker.idNumber().valid();
-    }
-
-    public static String randomName() {
-        return faker.lorem().characters(5, 10).toLowerCase();
-    }
-
-    public static String randomDescription() {
-        return faker.lorem().sentence();
-    }
-
-    public static ResourceDefRef randomResourceDefRef() {
-        return new ResourceDefRef(
-                randomName(),
-                randomName(),
-                randomName()
-        );
-    }
-
     public static PropertyType randomPropertyType() {
         return randomPropertyType(Boolean.FALSE);
     }
@@ -63,11 +43,12 @@ public class ModelGenerator {
     public static PropertyType randomPropertyType(Boolean excludeNested) {
         return Arrays.asList(
                 PropertyType.INTEGER,
+                PropertyType.DOUBLE,
                 PropertyType.STRING,
                 PropertyType.BOOLEAN,
                 PropertyType.KEY_VALUE,
                 PropertyType.NESTED
-        ).get(faker.random().nextInt(0, excludeNested ? 3 : 4));
+        ).get(faker.random().nextInt(0, excludeNested ? 4 : 5));
     }
 
     public static List<PropertyDef> randomPropertyDefs(Integer n) {
@@ -93,7 +74,8 @@ public class ModelGenerator {
                         randomDescription(),
                         PropertyType.NESTED,
                         faker.random().nextBoolean(),
-                        randomPropertyDefs(3, Boolean.TRUE)
+                        randomPropertyDefs(3, Boolean.TRUE),
+                        randomAssociationDefs(3)
                 );
             case KEY_VALUE:
             default:
@@ -104,20 +86,6 @@ public class ModelGenerator {
                         faker.random().nextBoolean()
                 );
         }
-    }
-
-    public static List<AssociationDef> randomAssociationDefs(Integer n) {
-        return IntStream.range(0, n)
-                .mapToObj(i -> randomAssociationDef())
-                .collect(Collectors.toList());
-    }
-
-    public static AssociationDef randomAssociationDef() {
-        return new AssociationDef(
-                randomName(),
-                randomDescription(),
-                randomResourceDefRef()
-        );
     }
 
     public static ResourceDef randomResourceDef() {
@@ -161,6 +129,8 @@ public class ModelGenerator {
                 return new KeyValue(faker.lorem().word(), faker.lorem().word());
             case INTEGER:
                 return faker.random().nextInt(Integer.MAX_VALUE);
+            case DOUBLE:
+                return faker.random().nextDouble();
             case BOOLEAN:
                 return faker.random().nextBoolean();
             case STRING:
@@ -208,8 +178,10 @@ public class ModelGenerator {
         );
     }
 
-    public static Association randomAssociation() {
-        return randomAssociation(randomAssociationDef());
+    public static List<AssociationDef> randomAssociationDefs(Integer n) {
+        return IntStream.range(0, n)
+                .mapToObj(i -> randomAssociationDef())
+                .collect(Collectors.toList());
     }
 
     public static Association randomAssociation(AssociationDef associationDef) {
@@ -218,6 +190,38 @@ public class ModelGenerator {
                 associationDef.getResourceDefRef(),
                 randomResourceId()
         );
+    }
+
+    public static AssociationDef randomAssociationDef() {
+        return new AssociationDef(
+                randomName(),
+                randomDescription(),
+                randomResourceDefRef()
+        );
+    }
+
+    public static String randomResourceId() {
+        return faker.idNumber().valid();
+    }
+
+    public static String randomName() {
+        return faker.lorem().characters(5, 10).toLowerCase();
+    }
+
+    public static String randomDescription() {
+        return faker.lorem().sentence();
+    }
+
+    public static ResourceDefRef randomResourceDefRef() {
+        return new ResourceDefRef(
+                randomName(),
+                randomName(),
+                randomName()
+        );
+    }
+
+    public static Association randomAssociation() {
+        return randomAssociation(randomAssociationDef());
     }
 
     public static Resource randomResource() {

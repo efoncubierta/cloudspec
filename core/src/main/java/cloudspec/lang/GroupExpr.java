@@ -25,16 +25,20 @@
  */
 package cloudspec.lang;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Define a group expression.
  * <p>
  * Rules in a spec are grouped in groups.
  */
-public class GroupExpr {
+public class GroupExpr implements CloudSpecSyntaxProducer {
     private final String name;
     private final List<RuleExpr> rules;
 
@@ -47,6 +51,10 @@ public class GroupExpr {
     public GroupExpr(String name, List<RuleExpr> rules) {
         this.name = name;
         this.rules = rules;
+    }
+
+    public static GroupExprBuilder builder() {
+        return new GroupExprBuilder();
     }
 
     /**
@@ -68,15 +76,43 @@ public class GroupExpr {
     }
 
     @Override
+    public String toCloudSpecSyntax(Integer spaces) {
+        StrBuilder sb = new StrBuilder();
+        sb.appendln(
+                String.format("%sGroup \"%s\"", StringUtils.repeat(" ", spaces), name)
+        );
+
+        // add rules
+        rules.stream()
+                .map(rule -> rule.toCloudSpecSyntax(4))
+                .forEach(sb::append);
+
+        sb.appendNewLine();
+
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, rules);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GroupExpr groupExpr = (GroupExpr) o;
+        return name.equals(groupExpr.name) &&
+                rules.size() == groupExpr.rules.size() &&
+                rules.containsAll(groupExpr.rules);
+    }
+
+    @Override
     public String toString() {
         return "SpecGroup{" +
                 "name='" + name + '\'' +
                 ", rules=" + rules +
                 '}';
-    }
-
-    public static GroupExprBuilder builder() {
-        return new GroupExprBuilder();
     }
 
     public static class GroupExprBuilder {

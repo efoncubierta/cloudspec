@@ -25,6 +25,9 @@
  */
 package cloudspec.lang;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +35,7 @@ import java.util.List;
 /**
  * Define the structure of a Cloud Spec.
  */
-public class CloudSpec {
+public class CloudSpec implements CloudSpecSyntaxProducer {
     private final String name;
     private final List<GroupExpr> groups;
 
@@ -45,6 +48,10 @@ public class CloudSpec {
     public CloudSpec(String name, List<GroupExpr> groups) {
         this.name = name;
         this.groups = groups;
+    }
+
+    public static CloudSpecBuilder builder() {
+        return new CloudSpecBuilder();
     }
 
     /**
@@ -66,15 +73,38 @@ public class CloudSpec {
     }
 
     @Override
+    public String toCloudSpecSyntax(Integer spaces) {
+        StrBuilder sb = new StrBuilder();
+        sb.appendln(
+                String.format("%sSpec \"%s\"", StringUtils.repeat(" ", spaces), name)
+        );
+
+        // add groups
+        groups.stream()
+                .map(group -> group.toCloudSpecSyntax(spaces))
+                .forEach(sb::append);
+
+        sb.appendNewLine();
+
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CloudSpec cloudSpec = (CloudSpec) o;
+        return name.equals(cloudSpec.name) &&
+                groups.size() == cloudSpec.groups.size() &&
+                groups.containsAll(cloudSpec.groups);
+    }
+
+    @Override
     public String toString() {
         return "CloudSpec{" +
                 "name='" + name + '\'' +
                 ", groups=" + groups +
                 '}';
-    }
-
-    public static CloudSpecBuilder builder() {
-        return new CloudSpecBuilder();
     }
 
     public static class CloudSpecBuilder {

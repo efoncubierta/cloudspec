@@ -132,6 +132,7 @@ public class ResourceReflectionUtil {
 
                                 switch (ResourceDefReflectionUtil.guessPropertyType(field)) {
                                     case INTEGER:
+                                    case DOUBLE:
                                     case STRING:
                                     case BOOLEAN:
                                     case KEY_VALUE:
@@ -151,11 +152,12 @@ public class ResourceReflectionUtil {
                                         }
 
                                         Properties properties = toProperties(value);
-                                        if (properties.size() > 0) {
+                                        Associations associations = toAssociations(value);
+                                        if (properties.size() > 0 || associations.size() > 0) {
                                             return Stream.of(
                                                     new Property(
                                                             propertyDefAnnotation.name(),
-                                                            properties
+                                                            new Properties(properties, associations)
                                                     )
                                             );
                                         }

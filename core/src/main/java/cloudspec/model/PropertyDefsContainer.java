@@ -28,6 +28,9 @@ package cloudspec.model;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Interface for classes that manage property definitions.
+ */
 public interface PropertyDefsContainer {
     /**
      * Get a property definition by name.
@@ -37,18 +40,6 @@ public interface PropertyDefsContainer {
      */
     default Optional<PropertyDef> getProperty(String propertyName) {
         return getProperties().stream().filter(def -> def.getName().equals(propertyName)).findFirst();
-    }
-
-    default Optional<PropertyDef> getPropertyByPath(List<String> path) {
-        if (path.size() > 0) {
-            Optional<PropertyDef> initialPropertyDefOpt = getProperty(path.get(0));
-            return path.stream().skip(1).reduce(
-                    initialPropertyDefOpt,
-                    (propertyDefOpt, s) -> propertyDefOpt.isPresent() ? getProperty(s) : propertyDefOpt,
-                    (propertyDefOpt, propertyDef2Opt) -> propertyDefOpt.flatMap(propertyDef -> propertyDef2Opt)
-            );
-        }
-        return Optional.empty();
     }
 
     /**

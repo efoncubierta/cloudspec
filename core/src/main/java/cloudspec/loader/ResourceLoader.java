@@ -37,7 +37,6 @@ import cloudspec.store.ResourceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -92,7 +91,8 @@ public class ResourceLoader {
 
     private void loadFromStatement(Resource resource, Statement statement) {
         if (statement instanceof NestedStatement) {
-            loadFromStatement(resource, ((NestedStatement) statement).getStatement());
+            ((NestedStatement) statement).getStatements()
+                    .forEach(stmt -> loadFromStatement(resource, stmt));
         } else if (statement instanceof AssociationStatement) {
             loadFromAssociationStatement(resource, (AssociationStatement) statement);
         }

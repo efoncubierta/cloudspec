@@ -25,23 +25,109 @@
  */
 package cloudspec.lang;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
+import org.apache.tinkerpop.gremlin.process.traversal.Compare;
+import org.apache.tinkerpop.gremlin.process.traversal.Contains;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 
-public class PropertyStatement implements Statement {
-    private final String propertyName;
-    private final P<?> predicate;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+/**
+ * Statement for property values.
+ */
+public class PropertyStatement implements Statement {
+    protected final String propertyName;
+    protected final P<?> predicate;
+
+    /**
+     * Constructor.
+     *
+     * @param propertyName Property name.
+     * @param predicate    Predicate for the value.
+     */
     public PropertyStatement(String propertyName, P<?> predicate) {
         this.propertyName = propertyName;
         this.predicate = predicate;
     }
 
+    /**
+     * Get the property name.
+     *
+     * @return Property name.
+     */
     public String getPropertyName() {
         return propertyName;
     }
 
+    /**
+     * Get the predicate for the value.
+     *
+     * @return Predicate.
+     */
     public P<?> getPredicate() {
         return predicate;
+    }
+
+    @Override
+    public String toCloudSpecSyntax(Integer spaces) {
+        StrBuilder sb = new StrBuilder();
+
+        sb.append(
+                String.format("%s%s ", StringUtils.repeat(" ", spaces), propertyName)
+        );
+
+        sb.append(predicateToCloudSpecSyntax(predicate));
+        sb.append(valueToCloudSpecSyntax(predicate.getOriginalValue()));
+
+        return sb.toString();
+    }
+
+    protected String predicateToCloudSpecSyntax(P<?> predicate) {
+        if (predicate.getBiPredicate().equals(Compare.eq)) {
+            return "EQUAL TO ";
+        } else if (predicate.getBiPredicate().equals(Compare.neq)) {
+            return "NOT EQUAL TO ";
+        } else if (predicate.getBiPredicate().equals(Contains.within)) {
+            return "WITHIN ";
+        } else if (predicate.getBiPredicate().equals(Contains.without)) {
+            return "NOT WITHIN ";
+        }
+
+        return "UNKNOWN";
+    }
+
+    protected String valueToCloudSpecSyntax(Object value) {
+        if (value instanceof List) {
+            return String.format(
+                    "[%s]",
+                    ((List<?>) value).stream()
+                            .map(this::valueToCloudSpecSyntax)
+                            .collect(Collectors.joining(", "))
+            );
+
+        } else if (value instanceof String) {
+            return String.format("\"%s\"", value);
+        } else {
+            return value.toString();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(propertyName, predicate);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PropertyStatement that = (PropertyStatement) o;
+        return propertyName.equals(that.propertyName) &&
+                predicate.getBiPredicate().equals(that.predicate.getBiPredicate()) &&
+                predicate.getOriginalValue().equals(that.predicate.getOriginalValue());
     }
 
     @Override

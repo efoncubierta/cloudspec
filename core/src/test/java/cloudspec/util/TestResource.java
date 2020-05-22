@@ -60,6 +60,18 @@ public class TestResource {
     private final List<Integer> integerListProperty;
 
     @PropertyDefinition(
+            name = ModelTestUtils.PROP_DOUBLE_NAME,
+            description = ModelTestUtils.PROP_DOUBLE_DESCRIPTION
+    )
+    private final Double doubleProperty;
+
+    @PropertyDefinition(
+            name = ModelTestUtils.PROP_DOUBLE_LIST_NAME,
+            description = ModelTestUtils.PROP_DOUBLE_LIST_DESCRIPTION
+    )
+    private final List<Double> doubleListProperty;
+
+    @PropertyDefinition(
             name = ModelTestUtils.PROP_STRING_NAME,
             description = ModelTestUtils.PROP_STRING_DESCRIPTION
     )
@@ -116,6 +128,7 @@ public class TestResource {
 
     public TestResource(String id,
                         Integer integerProperty, List<Integer> integerListProperty,
+                        Double doubleProperty, List<Double> doubleListProperty,
                         String stringProperty, List<String> stringListProperty,
                         Boolean booleanProperty, List<Boolean> booleanListProperty,
                         KeyValue keyValueProperty, List<KeyValue> keyValueListProperty,
@@ -124,6 +137,8 @@ public class TestResource {
         this.id = id;
         this.integerProperty = integerProperty;
         this.integerListProperty = integerListProperty;
+        this.doubleProperty = doubleProperty;
+        this.doubleListProperty = doubleListProperty;
         this.stringProperty = stringProperty;
         this.stringListProperty = stringListProperty;
         this.booleanProperty = booleanProperty;
@@ -145,6 +160,14 @@ public class TestResource {
 
     public List<Integer> getIntegerListProperty() {
         return integerListProperty;
+    }
+
+    public Double getDoubleProperty() {
+        return doubleProperty;
+    }
+
+    public List<Double> getDoubleListProperty() {
+        return doubleListProperty;
     }
 
     public String getStringProperty() {

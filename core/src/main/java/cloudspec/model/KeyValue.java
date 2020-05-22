@@ -25,20 +25,39 @@
  */
 package cloudspec.model;
 
+/**
+ * Class for key-value properties.
+ */
 public class KeyValue {
     private final String key;
-    private final String value;
+    private final Object value;
 
-    public KeyValue(String key, String value) {
+    /**
+     * Constructor.
+     *
+     * @param key   Key
+     * @param value Value
+     */
+    public KeyValue(String key, Object value) {
         this.key = key;
         this.value = value;
     }
 
+    /**
+     * Get the key.
+     *
+     * @return Key.
+     */
     public String getKey() {
         return key;
     }
 
-    public String getValue() {
+    /**
+     * Get the value.
+     *
+     * @return Value.
+     */
+    public Object getValue() {
         return value;
     }
 

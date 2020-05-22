@@ -23,12 +23,16 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec;
+package cloudspec.loader;
 
+import cloudspec.CloudSpecBaseListener;
+import cloudspec.CloudSpecParser;
 import cloudspec.lang.*;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Stack;
 
 public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     private static List<String> BOOLEAN_TRUE_VALUES = Arrays.asList("true", "enabled");
@@ -50,9 +54,10 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     private AssertExpr.AssertExprBuilder currentAssertBuilder;
 
     // evaluator
-    private Stack<List<String>> currentMemberNames = new Stack<>();
-    private Stack<List<Statement>> currentStatements = new Stack<>();
+    private Stack<Stack<String>> currentMemberNames = new Stack<>();
+    private Stack<Stack<Statement>> currentStatements = new Stack<>();
     private Stack<Object> currentValues = new Stack<>();
+    private P<?> currentPredicate;
 
     public CloudSpec getCloudSpec() {
         return currentCloudSpecBuilder.build();
@@ -91,68 +96,130 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     @Override
     public void enterWithDecl(CloudSpecParser.WithDeclContext ctx) {
         currentWithBuilder = WithExpr.builder();
-        currentStatements.push(new ArrayList<>());
+        currentStatements.push(new Stack<>());
+        currentMemberNames.push(new Stack<>());
     }
 
     @Override
     public void exitWithDecl(CloudSpecParser.WithDeclContext ctx) {
         currentWithBuilder.setStatements(currentStatements.pop());
         currentRuleBuilder.setWithExpr(currentWithBuilder.build());
+        currentMemberNames.pop();
     }
 
     @Override
     public void enterAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
         currentAssertBuilder = AssertExpr.builder();
-        currentStatements.push(new ArrayList<>());
+        currentStatements.push(new Stack<>());
+        currentMemberNames.push(new Stack<>());
     }
 
     @Override
     public void exitAssertDecl(CloudSpecParser.AssertDeclContext ctx) {
         currentAssertBuilder.setStatement(currentStatements.pop());
         currentRuleBuilder.setAssertExp(currentAssertBuilder.build());
+        currentMemberNames.pop();
+    }
+
+    @Override
+    public void enterAndDecl(CloudSpecParser.AndDeclContext ctx) {
+        currentMemberNames.push(new Stack<>());
+    }
+
+    @Override
+    public void exitAndDecl(CloudSpecParser.AndDeclContext ctx) {
+        currentMemberNames.pop();
     }
 
     @Override
     public void enterPropertyStatement(CloudSpecParser.PropertyStatementContext ctx) {
-        currentMemberNames.push(new ArrayList<>());
+        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().getText()));
+    }
+
+    @Override
+    public void exitPropertyStatement(CloudSpecParser.PropertyStatementContext ctx) {
+        currentStatements.peek().add(
+                new PropertyStatement(
+                        currentMemberNames.peek().pop(),
+                        currentPredicate
+                )
+        );
+    }
+
+    @Override
+    public void enterKeyValuePropertyStatement(CloudSpecParser.KeyValuePropertyStatementContext ctx) {
+        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().getText()));
+    }
+
+    @Override
+    public void exitKeyValuePropertyStatement(CloudSpecParser.KeyValuePropertyStatementContext ctx) {
+        currentStatements.peek().add(
+                new KeyValueStatement(
+                        currentMemberNames.peek().pop(),
+                        stripQuotes(ctx.STRING().getText()),
+                        currentPredicate
+                )
+        );
+    }
+
+    @Override
+    public void enterNestedPropertyStatement(CloudSpecParser.NestedPropertyStatementContext ctx) {
+        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().getText()));
+        currentMemberNames.push(new Stack<>());
+        currentStatements.push(new Stack<>());
+    }
+
+    @Override
+    public void exitNestedPropertyStatement(CloudSpecParser.NestedPropertyStatementContext ctx) {
+        currentMemberNames.pop();
+
+        NestedStatement statement = new NestedStatement(
+                currentMemberNames.peek().pop(),
+                currentStatements.pop()
+        );
+
+        currentStatements.peek().add(statement);
     }
 
     @Override
     public void enterAssociationStatement(CloudSpecParser.AssociationStatementContext ctx) {
-        currentMemberNames.push(new ArrayList<>());
-        currentStatements.push(new ArrayList<>());
+        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().getText()));
+        currentMemberNames.push(new Stack<>());
+        currentStatements.push(new Stack<>());
     }
 
     @Override
     public void exitAssociationStatement(CloudSpecParser.AssociationStatementContext ctx) {
-        buildNestedAssociationStatement();
+        currentMemberNames.pop();
+
+        AssociationStatement statement = new AssociationStatement(
+                currentMemberNames.peek().pop(),
+                currentStatements.pop()
+        );
+
+        currentStatements.peek().add(statement);
     }
 
     @Override
     public void exitPropertyEqualPredicate(CloudSpecParser.PropertyEqualPredicateContext ctx) {
-        buildNestedPropertyStatement(P.eq(currentValues.pop()));
+        currentPredicate = P.eq(currentValues.pop());
     }
 
     @Override
     public void exitPropertyNotEqualPredicate(CloudSpecParser.PropertyNotEqualPredicateContext ctx) {
-        buildNestedPropertyStatement(P.neq(currentValues.pop()));
+        currentPredicate = P.neq(currentValues.pop());
     }
 
     @Override
     public void exitPropertyWithinPredicate(CloudSpecParser.PropertyWithinPredicateContext ctx) {
-        buildNestedPropertyStatement(P.within(currentValues));
+        currentPredicate = P.within(currentValues.toArray());
         currentValues.clear();
     }
 
     @Override
     public void exitPropertyNotWithinPredicate(CloudSpecParser.PropertyNotWithinPredicateContext ctx) {
-        buildNestedPropertyStatement(P.not(P.within(currentValues)));
+        currentPredicate = P.without(currentValues.toArray());
         currentValues.clear();
-    }
-
-    @Override
-    public void enterMemberPath(CloudSpecParser.MemberPathContext ctx) {
-        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().getText()));
     }
 
     @Override
@@ -170,44 +237,13 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
         currentValues.add(Integer.parseInt(ctx.INTEGER().getText()));
     }
 
+    @Override
+    public void exitDoubleValue(CloudSpecParser.DoubleValueContext ctx) {
+        currentValues.add(Double.parseDouble(ctx.DOUBLE().getText()));
+    }
+
     private String stripQuotes(String s) {
         if (s == null || s.charAt(0) != '"') return s;
         return s.substring(1, s.length() - 1);
-    }
-
-    private void buildNestedPropertyStatement(P<?> predicate) {
-        List<String> memberNames = currentMemberNames.pop();
-        Collections.reverse(memberNames);
-
-        Statement statement = memberNames.stream()
-                .skip(1)
-                .reduce(
-                        (Statement) new PropertyStatement(
-                                memberNames.get(0),
-                                predicate
-                        ),
-                        (stm, memberName) -> new NestedStatement(memberName, stm),
-                        (stm1, stm2) -> stm2
-                );
-
-        currentStatements.peek().add(statement);
-    }
-
-    private void buildNestedAssociationStatement() {
-        List<String> memberNames = currentMemberNames.pop();
-        Collections.reverse(memberNames);
-
-        Statement statement = memberNames.stream()
-                .skip(1)
-                .reduce(
-                        (Statement) new AssociationStatement(
-                                memberNames.get(0),
-                                currentStatements.pop()
-                        ),
-                        (stm, memberName) -> new NestedStatement(memberName, stm),
-                        (stm1, stm2) -> stm2
-                );
-
-        currentStatements.peek().add(statement);
     }
 }

@@ -25,27 +25,8 @@
  */
 package cloudspec.model;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
- * Interface for classes that manage associations definitions.
+ * Interface for classes that manage properties and associations.
  */
-public interface AssociationDefsContainer {
-    /**
-     * Get an association definition by name.
-     *
-     * @param associationName Association name.
-     * @return Optional association definition.
-     */
-    default Optional<AssociationDef> getAssociation(String associationName) {
-        return getAssociations().stream().filter(def -> def.getName().equals(associationName)).findFirst();
-    }
-
-    /**
-     * Get list of association definitions.
-     *
-     * @return List of association definitions.
-     */
-    List<AssociationDef> getAssociations();
+public interface MembersContainer extends PropertiesContainer, AssociationsContainer {
 }

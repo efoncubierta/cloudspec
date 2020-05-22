@@ -25,14 +25,19 @@
  */
 package cloudspec.lang;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
+
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * Define a 'with' expression.
  * <p>
  * With expressions ares used to filter resources.
  */
-public class WithExpr {
+public class WithExpr implements CloudSpecSyntaxProducer {
     private final List<Statement> statements;
 
     /**
@@ -42,6 +47,10 @@ public class WithExpr {
      */
     public WithExpr(List<Statement> statements) {
         this.statements = statements;
+    }
+
+    public static WithExprBuilder builder() {
+        return new WithExprBuilder();
     }
 
     /**
@@ -54,14 +63,49 @@ public class WithExpr {
     }
 
     @Override
+    public String toCloudSpecSyntax(Integer spaces) {
+        StrBuilder sb = new StrBuilder();
+
+        IntStream.range(0, statements.size())
+                .forEach(i -> {
+                    if (i == 0) {
+                        sb.appendln(
+                                String.format(
+                                        "%sWith", StringUtils.repeat(" ", spaces)
+                                )
+                        );
+                    } else {
+                        sb.appendln(
+                                String.format(
+                                        "%sAnd", StringUtils.repeat(" ", spaces)
+                                )
+                        );
+                    }
+                    sb.appendln(statements.get(i).toCloudSpecSyntax(spaces + 4));
+                });
+
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(statements);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WithExpr withExpr = (WithExpr) o;
+        return statements.size() == withExpr.statements.size() &&
+                statements.containsAll(withExpr.statements);
+    }
+
+    @Override
     public String toString() {
         return "WithExpr{" +
                 "statements=" + statements +
                 '}';
-    }
-
-    public static WithExprBuilder builder() {
-        return new WithExprBuilder();
     }
 
     public static class WithExprBuilder {

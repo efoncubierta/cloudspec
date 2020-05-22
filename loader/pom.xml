@@ -29,6 +29,16 @@
       <artifactId>antlr4-runtime</artifactId>
       <scope>compile</scope>
     </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.javafaker</groupId>
+      <artifactId>javafaker</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

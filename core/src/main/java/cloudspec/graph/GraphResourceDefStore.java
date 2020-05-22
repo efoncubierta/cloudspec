@@ -87,8 +87,6 @@ import java.util.stream.Collectors;
  * </ul>
  */
 public class GraphResourceDefStore implements ResourceDefStore {
-    private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceDefStore.class);
-
     public static final String LABEL_RESOURCE_DEF = "resourceDef";
     public static final String LABEL_PROPERTY_DEF = "propertyDef";
     public static final String LABEL_ASSOCIATION_DEF = "associationDef";
@@ -101,7 +99,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_TYPE = "type";
     public static final String PROPERTY_IS_MULTIVALUED = "isArray";
-
+    private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceDefStore.class);
     private final GraphTraversalSource graphTraversal;
 
     /**
@@ -111,26 +109,6 @@ public class GraphResourceDefStore implements ResourceDefStore {
      */
     public GraphResourceDefStore(Graph graph) {
         this.graphTraversal = graph.traversal();
-    }
-
-    @Override
-    public Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef) {
-        LOGGER.debug("Getting resource definition '{}'", resourceDefRef);
-
-        return graphTraversal
-                .V()
-                .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .toStream()
-                .peek(resourceDefV -> LOGGER.debug("- Found resource definition '{}'",
-                        (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF))
-                )
-                .map(resourceDefV -> new ResourceDef(
-                        resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
-                        resourceDefV.value(PROPERTY_DESCRIPTION),
-                        getPropertyDefs(resourceDefV),
-                        getAssociationDefs(resourceDefV)
-                ))
-                .findFirst();
     }
 
     private List<PropertyDef> getPropertyDefs(Vertex sourceV) {
@@ -146,7 +124,8 @@ public class GraphResourceDefStore implements ResourceDefStore {
                         propertyDefV.value(PROPERTY_DESCRIPTION),
                         propertyDefV.value(PROPERTY_TYPE),
                         propertyDefV.value(PROPERTY_IS_MULTIVALUED),
-                        getPropertyDefs(propertyDefV)
+                        getPropertyDefs(propertyDefV),
+                        getAssociationDefs(propertyDefV)
                 ))
                 .collect(Collectors.toList());
     }
@@ -163,29 +142,6 @@ public class GraphResourceDefStore implements ResourceDefStore {
                         associationDefV.value(PROPERTY_NAME),
                         associationDefV.value(PROPERTY_DESCRIPTION),
                         associationDefV.value(PROPERTY_RESOURCE_DEF_REF)
-                ))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ResourceDef> getResourceDefs() {
-        LOGGER.debug("Getting all resource definitions");
-
-        return graphTraversal
-                .V()
-                .hasLabel(LABEL_RESOURCE_DEF)
-                .toStream()
-                .peek(resourceDefV ->
-                        LOGGER.debug(
-                                "- Found resource definition '{}'",
-                                (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF)
-                        )
-                )
-                .map(resourceDefV -> new ResourceDef(
-                        resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
-                        resourceDefV.value(PROPERTY_DESCRIPTION),
-                        getPropertyDefs(resourceDefV),
-                        getAssociationDefs(resourceDefV)
                 ))
                 .collect(Collectors.toList());
     }
@@ -211,6 +167,49 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
         // add association definitions
         addAssociationDefs(resourceV, resourceDef.getAssociations());
+    }
+
+    @Override
+    public Optional<ResourceDef> getResourceDef(ResourceDefRef resourceDefRef) {
+        LOGGER.debug("Getting resource definition '{}'", resourceDefRef);
+
+        return graphTraversal
+                .V()
+                .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                .toStream()
+                .peek(resourceDefV -> LOGGER.debug("- Found resource definition '{}'",
+                        (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF))
+                )
+                .map(resourceDefV -> new ResourceDef(
+                        resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
+                        resourceDefV.value(PROPERTY_DESCRIPTION),
+                        getPropertyDefs(resourceDefV),
+                        getAssociationDefs(resourceDefV)
+                ))
+                .findFirst();
+    }
+
+    @Override
+    public List<ResourceDef> getResourceDefs() {
+        LOGGER.debug("Getting all resource definitions");
+
+        return graphTraversal
+                .V()
+                .hasLabel(LABEL_RESOURCE_DEF)
+                .toStream()
+                .peek(resourceDefV ->
+                        LOGGER.debug(
+                                "- Found resource definition '{}'",
+                                (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF)
+                        )
+                )
+                .map(resourceDefV -> new ResourceDef(
+                        resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
+                        resourceDefV.value(PROPERTY_DESCRIPTION),
+                        getPropertyDefs(resourceDefV),
+                        getAssociationDefs(resourceDefV)
+                ))
+                .collect(Collectors.toList());
     }
 
     private void addPropertyDefs(Vertex sourceV, List<PropertyDef> propertyDefs) {
@@ -239,6 +238,9 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
         // add nested property definitions
         addPropertyDefs(propertyFromV, propertyDef.getProperties());
+
+        // add nested association definitions
+        addAssociationDefs(propertyFromV, propertyDef.getAssociations());
     }
 
     private void addAssociationDefs(Vertex sourceV, List<AssociationDef> associationDefs) {

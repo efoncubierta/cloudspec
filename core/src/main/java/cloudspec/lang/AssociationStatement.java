@@ -25,23 +25,83 @@
  */
 package cloudspec.lang;
 
-import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * Statement for association.
+ */
 public class AssociationStatement implements Statement {
     private final String associationName;
     private final List<Statement> statements;
 
+    /**
+     * Constructor.
+     *
+     * @param associationName Association name.
+     * @param statements      List of statements within the association.
+     */
     public AssociationStatement(String associationName, List<Statement> statements) {
         this.associationName = associationName;
         this.statements = statements;
     }
 
+    /**
+     * Get the association name.
+     *
+     * @return Association name.
+     */
     public String getAssociationName() {
         return associationName;
     }
 
+    /**
+     * Get list of statements within the association.
+     *
+     * @return List of statements.
+     */
     public List<Statement> getStatements() {
         return statements;
+    }
+
+    @Override
+    public String toCloudSpecSyntax(Integer spaces) {
+        StrBuilder sb = new StrBuilder();
+
+        sb.appendln(
+                String.format("%s> %s ( ", StringUtils.repeat(" ", spaces), associationName)
+        );
+
+        sb.appendln(
+                statements.stream()
+                        .map(statement -> statement.toCloudSpecSyntax(spaces + 4))
+                        .collect(Collectors.joining(",\n"))
+        );
+
+        sb.appendln(
+                String.format("%s)", StringUtils.repeat(" ", spaces))
+        );
+
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(associationName, statements);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssociationStatement statement = (AssociationStatement) o;
+        return associationName.equals(statement.associationName) &&
+                statements.size() == statement.statements.size() &&
+                statements.containsAll(statement.statements);
     }
 
     @Override

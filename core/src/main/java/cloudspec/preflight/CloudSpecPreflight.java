@@ -28,17 +28,15 @@ package cloudspec.preflight;
 import cloudspec.lang.*;
 import cloudspec.loader.ResourceLoader;
 import cloudspec.model.AssociationDef;
-import cloudspec.model.PropertyDef;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 
 public class CloudSpecPreflight {
     private final Logger LOGGER = LoggerFactory.getLogger(ResourceLoader.class);
@@ -84,36 +82,54 @@ public class CloudSpecPreflight {
         ResourceDef resourceDef = resourceDefOpt.get();
 
         // preflight withs and asserts
-        rule.getWithExpr().getStatements().forEach(statement -> preflightStatement(resourceDef, statement));
-        rule.getAssertExpr().getStatements().forEach(statement -> preflightStatement(resourceDef, statement));
+        rule.getWithExpr()
+                .getStatements()
+                .forEach(statement ->
+                        preflightStatement(resourceDef, statement, new Stack<>())
+                );
+        rule.getAssertExpr()
+                .getStatements()
+                .forEach(statement ->
+                        preflightStatement(resourceDef, statement, new Stack<>())
+                );
     }
 
-    private void preflightStatement(ResourceDef resourceDef, Statement statement) {
+    private void preflightStatement(ResourceDef resourceDef, Statement statement, Stack<String> path) {
         if (statement instanceof NestedStatement) {
-            preflightNestedStatement(resourceDef, ((NestedStatement) statement));
+            preflightNestedStatement(resourceDef, ((NestedStatement) statement), path);
         } else if (statement instanceof PropertyStatement) {
-            preflightPropertyStatement(resourceDef, (PropertyStatement) statement);
+            preflightPropertyStatement(resourceDef, (PropertyStatement) statement, path);
         } else if (statement instanceof KeyValueStatement) {
-            preflightKeyValueStatement(resourceDef, (KeyValueStatement) statement);
+            preflightKeyValueStatement(resourceDef, (KeyValueStatement) statement, path);
         } else if (statement instanceof AssociationStatement) {
-            preflightAssociationStatement(resourceDef, (AssociationStatement) statement);
+            preflightAssociationStatement(resourceDef, (AssociationStatement) statement, path);
         }
     }
 
-    private void preflightNestedStatement(ResourceDef resourceDef, NestedStatement statement) {
-        Optional<PropertyDef> propertyDefOpt = resourceDef.getPropertyByPath(toPath(statement));
-        if (!propertyDefOpt.isPresent()) {
+    private void preflightNestedStatement(ResourceDef resourceDef, NestedStatement statement, Stack<String> path) {
+        Stack<String> nestedPath = new Stack<>();
+        nestedPath.addAll(path);
+        nestedPath.add(statement.getPropertyName());
+
+        if (!resourceDef.getPropertyByPath(nestedPath).isPresent()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Resource type '%s' does not define property '%s'.",
-                            resourceDef.getRef(), statement.getMemberName()
+                            resourceDef.getRef(), statement.getPropertyName()
                     )
             );
         }
+
+        statement.getStatements()
+                .forEach(stmt -> preflightStatement(resourceDef, stmt, nestedPath));
     }
 
-    private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement) {
-        Optional<AssociationDef> associationDefOpt = resourceDef.getAssociation(statement.getAssociationName());
+    private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement, Stack<String> path) {
+        Stack<String> associationPath = new Stack<>();
+        associationPath.addAll(path);
+        associationPath.add(statement.getAssociationName());
+
+        Optional<AssociationDef> associationDefOpt = resourceDef.getAssociationByPath(associationPath);
         if (!associationDefOpt.isPresent()) {
             throw new CloudSpecPreflightException(
                     String.format(
@@ -136,11 +152,31 @@ public class CloudSpecPreflight {
         }
 
         ResourceDef associatedResourceDef = associatedResourceDefOpt.get();
-        statement.getStatements().forEach(stmt -> preflightStatement(associatedResourceDef, stmt));
+        statement.getStatements().forEach(stmt -> preflightStatement(associatedResourceDef, stmt, associationPath));
     }
 
-    private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement) {
-        if (!resourceDef.getProperty(statement.getPropertyName()).isPresent()) {
+    private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement, Stack<String> path) {
+        Stack<String> propertyPath = new Stack<>();
+        propertyPath.addAll(path);
+        propertyPath.add(statement.getPropertyName());
+
+        if (!resourceDef.getPropertyByPath(propertyPath).isPresent()) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Resource type '%s' does not define property '%s'.",
+                            resourceDef.getRef(),
+                            String.join(".", propertyPath)
+                    )
+            );
+        }
+    }
+
+    private void preflightKeyValueStatement(ResourceDef resourceDef, KeyValueStatement statement, List<String> path) {
+        Stack<String> propertyPath = new Stack<>();
+        propertyPath.addAll(path);
+        propertyPath.add(statement.getPropertyName());
+
+        if (!resourceDef.getPropertyByPath(propertyPath).isPresent()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Resource type '%s' does not define property '%s'.",
@@ -149,31 +185,5 @@ public class CloudSpecPreflight {
                     )
             );
         }
-    }
-
-    private void preflightKeyValueStatement(ResourceDef resourceDef, KeyValueStatement statement) {
-        if (!resourceDef.getProperty(statement.getPropertyName()).isPresent()) {
-            throw new CloudSpecPreflightException(
-                    String.format(
-                            "Resource type '%s' does not define property '%s'.",
-                            resourceDef.getRef(),
-                            statement.getPropertyName()
-                    )
-            );
-        }
-    }
-
-    private List<String> toPath(Statement statement) {
-        if (statement instanceof NestedStatement) {
-            List<String> path = new ArrayList<>();
-            path.add(((NestedStatement) statement).getMemberName());
-            path.addAll(toPath(((NestedStatement) statement).getStatement()));
-            return path;
-        } else if (statement instanceof PropertyStatement) {
-            return Collections.singletonList(((PropertyStatement) statement).getPropertyName());
-        } else if (statement instanceof AssociationStatement) {
-            return Collections.singletonList(((AssociationStatement) statement).getAssociationName());
-        }
-        return Collections.emptyList();
     }
 }

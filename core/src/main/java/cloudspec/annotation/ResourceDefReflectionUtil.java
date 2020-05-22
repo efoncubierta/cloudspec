@@ -145,6 +145,7 @@ public class ResourceDefReflectionUtil {
         switch (propertyType) {
             case KEY_VALUE:
             case INTEGER:
+            case DOUBLE:
             case STRING:
             case BOOLEAN:
                 return Optional.of(
@@ -161,20 +162,28 @@ public class ResourceDefReflectionUtil {
                         (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0] :
                         field.getType();
 
+                // get property definitions
                 List<PropertyDef> propertyDefs = Stream.of(type.getDeclaredFields())
                         .map(subField -> toPropertyDef(type, subField))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toList());
 
-                if (propertyDefs.size() > 0) {
+                List<AssociationDef> associationDefs = Stream.of(type.getDeclaredFields())
+                        .map(subField -> toAssociationDef(type, subField))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList());
+
+                if (propertyDefs.size() > 0 || associationDefs.size() > 0) {
                     return Optional.of(
                             new PropertyDef(
                                     propertyDefAnnotation.name(),
                                     propertyDefAnnotation.description(),
                                     PropertyType.NESTED,
                                     multiValued,
-                                    propertyDefs
+                                    propertyDefs,
+                                    associationDefs
                             )
                     );
                 }
@@ -254,6 +263,8 @@ public class ResourceDefReflectionUtil {
 
         if (clazz.isAssignableFrom(Integer.class)) {
             return PropertyType.INTEGER;
+        } else if (clazz.isAssignableFrom(Double.class)) {
+            return PropertyType.DOUBLE;
         } else if (clazz.isAssignableFrom(String.class)) {
             return PropertyType.STRING;
         } else if (clazz.isAssignableFrom(Boolean.class)) {

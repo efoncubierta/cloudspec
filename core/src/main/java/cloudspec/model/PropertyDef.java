@@ -33,10 +33,11 @@ import java.util.List;
  * <p>
  * Properties must be defined so resources integrity can be validated.
  */
-public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer {
+public class PropertyDef extends BaseMemberDef implements MemberDefsContainer {
     private final PropertyType propertyType;
     private final Boolean multiValued;
     private final List<PropertyDef> properties;
+    private final List<AssociationDef> associations;
 
     /**
      * Constructor.
@@ -47,7 +48,7 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
      * @param multiValued  Flag the property as multi-valued.
      */
     public PropertyDef(String name, String description, PropertyType propertyType, Boolean multiValued) {
-        this(name, description, propertyType, multiValued, Collections.emptyList());
+        this(name, description, propertyType, multiValued, Collections.emptyList(), Collections.emptyList());
     }
 
     /**
@@ -58,12 +59,37 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
      * @param propertyType Property type.
      * @param multiValued  Flag the property as multi-valued.
      * @param properties   List of sub properties (when type is nested).
+     * @param associations List of sub associations (when type is nested).
      */
-    public PropertyDef(String name, String description, PropertyType propertyType, Boolean multiValued, List<PropertyDef> properties) {
+    public PropertyDef(String name, String description, PropertyType propertyType, Boolean multiValued,
+                       List<PropertyDef> properties, List<AssociationDef> associations) {
         super(name, description);
         this.propertyType = propertyType;
         this.multiValued = multiValued;
         this.properties = properties;
+        this.associations = associations;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof PropertyDef)) {
+            return false;
+        }
+
+        PropertyDef propertyDef = (PropertyDef) obj;
+
+        return getName().equals(propertyDef.getName()) &&
+                getDescription().equals(propertyDef.getDescription()) &&
+                getPropertyType().equals(propertyDef.getPropertyType()) &&
+                isMultiValued().equals(propertyDef.isMultiValued()) &&
+                getProperties().size() == propertyDef.getProperties().size() &&
+                getProperties().containsAll(propertyDef.getProperties()) &&
+                getAssociations().size() == propertyDef.getAssociations().size() &&
+                getAssociations().containsAll(propertyDef.getAssociations());
     }
 
     /**
@@ -90,23 +116,8 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof PropertyDef)) {
-            return false;
-        }
-
-        PropertyDef propertyDef = (PropertyDef) obj;
-
-        return getName().equals(propertyDef.getName()) &&
-                getDescription().equals(propertyDef.getDescription()) &&
-                getPropertyType().equals(propertyDef.getPropertyType()) &&
-                isMultiValued().equals(propertyDef.isMultiValued()) &&
-                getProperties().size() == propertyDef.getProperties().size() &&
-                getProperties().containsAll(propertyDef.getProperties());
+    public List<AssociationDef> getAssociations() {
+        return associations;
     }
 
     @Override
@@ -117,6 +128,7 @@ public class PropertyDef extends BaseMemberDef implements PropertyDefsContainer 
                 ", propertyType=" + propertyType +
                 ", multiValued=" + multiValued +
                 ", properties=" + properties +
+                ", associations=" + associations +
                 '}';
     }
 }

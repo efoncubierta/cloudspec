@@ -104,6 +104,20 @@ public class GraphResourceValidator implements ResourceValidator {
                 .collect(Collectors.toList());
     }
 
+    private GraphTraversal<Vertex, ?> buildGetResourceByIdTraversal(ResourceDefRef resourceDefRef,
+                                                                    String resourceId) {
+        return graphTraversal.V()
+                .has(
+                        GraphResourceStore.LABEL_RESOURCE,
+                        GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
+                        resourceDefRef
+                )
+                .has(
+                        GraphResourceStore.PROPERTY_RESOURCE_ID,
+                        resourceId
+                );
+    }
+
     private ResourceValidationResult validateResource(ResourceDefRef resourceDefRef,
                                                       String resourceId,
                                                       List<Statement> assertStatements) {
@@ -121,20 +135,6 @@ public class GraphResourceValidator implements ResourceValidator {
                         .collect(Collectors.toList())
         );
 
-    }
-
-    private GraphTraversal<Vertex, ?> buildGetResourceByIdTraversal(ResourceDefRef resourceDefRef,
-                                                                    String resourceId) {
-        return graphTraversal.V()
-                .has(
-                        GraphResourceStore.LABEL_RESOURCE,
-                        GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
-                        resourceDefRef
-                )
-                .has(
-                        GraphResourceStore.PROPERTY_RESOURCE_ID,
-                        resourceId
-                );
     }
 
     private GraphTraversal<Vertex, Vertex> buildGetResourceByIdFilteringTraversal(ResourceDefRef resourceDefRef,
@@ -324,10 +324,13 @@ public class GraphResourceValidator implements ResourceValidator {
 
     private GraphTraversal<?, ?> buildNestedFilteringTraversal(NestedStatement statement) {
         return __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
-                .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
                 .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                 .and(
-                        buildFilteringTraversal(statement.getStatement())
+                        statement.getStatements()
+                                .stream()
+                                .map(this::buildFilteringTraversal)
+                                .toArray(GraphTraversal<?, ?>[]::new)
                 );
     }
 
@@ -335,17 +338,18 @@ public class GraphResourceValidator implements ResourceValidator {
     private List<GraphTraversal<?, AssertValidationResult>> buildNestedAssertionTraversal(List<String> parentPath,
                                                                                           NestedStatement statement) {
         List<String> nestedPath = new ArrayList<>(parentPath);
-        nestedPath.add(statement.getMemberName());
+        nestedPath.add(statement.getPropertyName());
 
 
-        return buildAssertionTraversals(nestedPath, statement.getStatement())
+        return statement.getStatements()
                 .stream()
+                .flatMap(stmt -> buildAssertionTraversals(nestedPath, stmt).stream())
                 .map(traversal ->
                         __.out(GraphResourceStore.LABEL_HAS_PROPERTY)
                                 .fold()
                                 .coalesce(
                                         __.unfold()
-                                                .has(GraphResourceStore.PROPERTY_NAME, statement.getMemberName())
+                                                .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
                                                 .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                                                 .flatMap(traversal),
                                         __.constant(
@@ -354,7 +358,7 @@ public class GraphResourceValidator implements ResourceValidator {
                                                         Boolean.FALSE,
                                                         String.format(
                                                                 "Property '%s' does not exist",
-                                                                statement.getMemberName()
+                                                                statement.getPropertyName()
                                                         )
                                                 )
                                         )

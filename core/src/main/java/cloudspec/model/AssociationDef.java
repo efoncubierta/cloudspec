@@ -45,15 +45,6 @@ public class AssociationDef extends BaseMemberDef {
         this.resourceDefRef = resourceDefRef;
     }
 
-    /**
-     * Get the resource definition reference of the target resource.
-     *
-     * @return Resource definition reference.
-     */
-    public ResourceDefRef getResourceDefRef() {
-        return resourceDefRef;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -67,6 +58,15 @@ public class AssociationDef extends BaseMemberDef {
         return getName().equals(((AssociationDef) obj).getName()) &&
                 getDescription().equals(((AssociationDef) obj).getDescription()) &&
                 getResourceDefRef().equals(((AssociationDef) obj).getResourceDefRef());
+    }
+
+    /**
+     * Get the resource definition reference of the target resource.
+     *
+     * @return Resource definition reference.
+     */
+    public ResourceDefRef getResourceDefRef() {
+        return resourceDefRef;
     }
 
     @Override
