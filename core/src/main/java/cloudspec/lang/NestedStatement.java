@@ -79,7 +79,7 @@ public class NestedStatement implements Statement {
         sb.appendln(
                 statements.stream()
                         .map(statement -> statement.toCloudSpecSyntax(spaces + 4))
-                        .collect(Collectors.joining(",\n"))
+                        .collect(Collectors.joining(" and \n"))
         );
 
         sb.appendln(

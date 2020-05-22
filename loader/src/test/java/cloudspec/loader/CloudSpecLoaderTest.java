@@ -39,7 +39,9 @@ public class CloudSpecLoaderTest {
     @Test
     public void shouldLoadFullSpec() throws Exception {
         CloudSpec cloudSpecOriginal = CloudSpecGenerator.fullSpec();
-        CloudSpec cloudSpecLoaded = cloudSpecLoader.load(new ByteArrayInputStream(cloudSpecOriginal.toCloudSpecSyntax().getBytes()));
+        CloudSpec cloudSpecLoaded = cloudSpecLoader.load(
+                new ByteArrayInputStream(cloudSpecOriginal.toCloudSpecSyntax().getBytes())
+        );
 
         assertNotNull(cloudSpecLoaded);
         assertEquals(cloudSpecOriginal, cloudSpecLoaded);

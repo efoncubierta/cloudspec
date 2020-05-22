@@ -22,10 +22,10 @@ predicate: IS? ('==' | EQUAL TO) value      # PropertyEqualPredicate
          | IS? NOT WITHIN array             # PropertyNotWithinPredicate
          ;
 
-statement: MEMBER_NAME predicate                              # PropertyStatement
-         | MEMBER_NAME '[' STRING ']' predicate               # KeyValuePropertyStatement
-         | MEMBER_NAME '('  statement (',' statement)* ')'    # NestedPropertyStatement
-         | '>' MEMBER_NAME '(' statement (',' statement)* ')' # AssociationStatement
+statement: MEMBER_NAME predicate                      # PropertyStatement
+         | MEMBER_NAME '[' STRING ']' predicate       # KeyValuePropertyStatement
+         | MEMBER_NAME '('  statement andDecl* ')'    # NestedPropertyStatement
+         | '>' MEMBER_NAME '(' statement andDecl* ')' # AssociationStatement
          ;
 
 value: STRING                    # StringValue
