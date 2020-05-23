@@ -33,7 +33,7 @@ each different type of resource.
 
 A provider defines the shape of each resource type, properties and associations, and the logic to load those resources.
 
-You can find the available providers and resources they provide in the [CloudSpec Reference](/doc) documentation.
+You can find the available providers and resources they provide in the [CloudSpec Reference](/doc/index.md) documentation.
 
 ## CloudSpec Syntax
 
@@ -72,7 +72,7 @@ PROVIDER:GROUP:RESOURCE_NAME. For example, `aws:s3:bucket`, where `aws` is the p
 the resource name. Resource definition references avoids naming collision on resources with the same name but different
 providers.
 
-For a complete list of supported providers and resources, check the [CloudSpec Reference](/doc) documentation.
+For a complete list of supported providers and resources, check the [CloudSpec Reference](/doc/index.md) documentation.
 
 When the scope (i.e. resource type) of the rule is defined, you can then filter out resources using `With` statements.
 A `With` statement is used to narrow down the resource the rule is applied to, like `WHERE` clauses in SQL. `With`
@@ -155,7 +155,7 @@ And my_other_property IS DISABLED
 The different between `With` and `Assert` is that the first is used to narrow down the scope, while the second is to
 actually validate the resources in the scope.
 
-You can find more information in the [CloudSpec Reference](/doc) documentation.
+You can find more information in the [CloudSpec Reference](/doc/index.md) documentation.
 
 ## Build and run CloudSpec
 

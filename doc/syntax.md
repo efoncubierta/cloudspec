@@ -1,28 +1,4 @@
-# CloudSpec Reference
-
-_This documentation has been generated with the `cloudspec-codgen` tool._
-
-**THIS PROJECT IS STILL IN ITS EARLY DAYS. PLEASE CHECK THIS REFERENCE DOCUMENT OFTEN.**
-
-This is the reference documentation for CloudSpec. If you need an introduction to CloudSpec, read the
-[README file](https://github.com/efoncubierta/cloudspec) at the root of this repository.
-
-## Table of contents
-
-1. [What is CloudSpec](#what-is-cloudspec)
-2. [CloudSpec syntax](#cloudspec-syntax)
-3. [CloudSpec providers](#cloudspec-providers)
-
-## What is CloudSpec
-
-CloudSpec is an open source tool for validating your resources in your cloud providers using a logical language that
-everybody can understand. With its reasonably simple syntax, you can validate the configuration of your cloud resources,
-avoiding mistakes that can lead to availability or confidentiality issues.
-
-With CloudSpec you validate resources in your cloud provider. A resource can be anything, from an EC2 Instance to an SES
-rule. Anything that a CloudSpec provider implements.
-
-## CloudSpec Syntax
+# CloudSpec Syntax
 
 CloudSpec definition files are written in natural English language syntax. Validations of cloud resources are defined
 with rules. Each rule defines a set of widths and assert statements for filtering and asserting the resources. Similar
@@ -45,7 +21,7 @@ Spec :spec_description
 )+
 ```
 
-### Spec clause
+## Spec clause
 
 All `.cloudspec` files must start with a `Spec` declaration:
 
@@ -56,7 +32,7 @@ Spec :spec_description
 
 Where `:spec_description` is a quoted `"string"` describing what the specification is about.
 
-### Group clause
+## Group clause
 
 In each specification file there must be at least one `Group` clause.
 
@@ -70,7 +46,7 @@ In each specification file there must be at least one `Group` clause.
 
 Where `:group_description` is a quoted `"string"` describing what the group is about.
 
-### Rule clause
+## Rule clause
 
 ```
 ...
@@ -86,7 +62,7 @@ resource definition reference (e.g. aws:ec2:instance).
 
 The `:resource_reference` is used to define the scope of the rule to only one kind of resource.
 
-### With clause
+## With clause
 
 A `With` clause narrows down the scope of the rule. It is similar to the `WHERE` clause in SQL. `With` clause is
 optional, but if the `With` clause is missing, the scope of the rule would be all resources of a kind.
@@ -101,7 +77,7 @@ optional, but if the `With` clause is missing, the scope of the rule would be al
 
 Multiple `With` clauses can be concatenated with `And`.
 
-### Assert clause
+## Assert clause
 
 An `Assert` clause does the actual validation of the resources in the scope. Its syntax is similar to the `With`
 clause, but its purpose is completely different. While the `With` clause is used to narrow down the scope, the `Assert`
@@ -116,7 +92,7 @@ clause validates whether a resource in the scope is properly configured. `Assert
 
 Multiple `Assert` clauses can be concatenated with `And`.
 
-### Members paths
+## Members paths
 
 A resource have two types of members: property and association. A property has a value, while an association is a
 reference to another resource. Both `With` and `Assert` clauses works on properties and associations. A property
@@ -204,7 +180,7 @@ my (
 )
 ```
 
-### Predicates
+## Predicates
 
 - `== :value`: property value is equal to a value.
 - `EQUAL TO :value`: same equal predicate but using words.
@@ -215,7 +191,7 @@ my (
 - `ENABLED`: synonym for `== true`.
 - `DISABLED`: synonym for `== false`.
 
-### Property values
+## Property values
 
 A property can be of one of the following types:
 
@@ -226,7 +202,7 @@ A property can be of one of the following types:
 - A key value (e.g. `key="foo", value="bar"`).
 - A container for nested properties (e.g. `{prop1=1, prop2="foo"}`).
 
-### Examples
+## Examples
 
 ```
 Spec "Production environment"
@@ -239,9 +215,3 @@ Group "S3 validations"
     And
       versioning_enabled is true
 ```
-
-## CloudSpec providers
-
-CloudSpec supports the following providers:
-
-* [aws](aws): Amazon Web Services

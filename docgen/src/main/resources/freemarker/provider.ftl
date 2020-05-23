@@ -1,11 +1,11 @@
 <#include "/macros.ftl">
 
-# CloudSpec Provider: ${provider.name}
+# CloudSpec Provider: ${provider.description}
 
 ## Resource definitions
 
 <#list provider.resourceDefs as resourceDef>
-* [${resourceDef.ref}](${resourceDef.ref}): ${resourceDef.description}
+* [${resourceDef.ref}](#${resourceDef.description?lower_case?replace(' ', '-')}): ${resourceDef.description}
 </#list>
 
 <#list provider.resourceDefs as resourceDef>

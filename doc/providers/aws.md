@@ -1,18 +1,18 @@
 
-# CloudSpec Provider: aws
+# CloudSpec Provider: Amazon Web Services
 
 ## Resource definitions
 
-* [aws:ec2:ami](aws:ec2:ami): Amazon Machine Image
-* [aws:ec2:ebs_volume](aws:ec2:ebs_volume): EBS Volume
-* [aws:ec2:instance](aws:ec2:instance): EC2 Instance
-* [aws:ec2:network_interface](aws:ec2:network_interface): Network Interface
-* [aws:ec2:vpc](aws:ec2:vpc): Virtual Private Cloud
-* [aws:ec2:subnet](aws:ec2:subnet): VPC Subnet
-* [aws:iam:iam_instance_profile](aws:iam:iam_instance_profile): Amazon Machine Image
-* [aws:s3:bucket](aws:s3:bucket): S3 Bucket
-* [aws:sqs:queue](aws:sqs:queue): SQS Queue
-* [aws:sns:topic](aws:sns:topic): SNS Topic
+* [aws:ec2:ami](#amazon-machine-image): Amazon Machine Image
+* [aws:ec2:ebs_volume](#ebs-volume): EBS Volume
+* [aws:ec2:instance](#ec2-instance): EC2 Instance
+* [aws:ec2:network_interface](#network-interface): Network Interface
+* [aws:ec2:vpc](#virtual-private-cloud): Virtual Private Cloud
+* [aws:ec2:subnet](#vpc-subnet): VPC Subnet
+* [aws:iam:iam_instance_profile](#amazon-machine-image): Amazon Machine Image
+* [aws:s3:bucket](#s3-bucket): S3 Bucket
+* [aws:sqs:queue](#sqs-queue): SQS Queue
+* [aws:sns:topic](#sns-topic): SNS Topic
 
 ### Amazon Machine Image
 
