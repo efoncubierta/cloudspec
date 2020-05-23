@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,8 +25,8 @@
  */
 package cloudspec.model;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 
 /**
  * Interface for classes that manage properties and associations definitions.
@@ -38,15 +38,14 @@ public interface MemberDefsContainer extends PropertyDefsContainer, AssociationD
      * @param path Property path
      * @return Optional property.
      */
-    default Optional<PropertyDef> getPropertyByPath(Stack<String> path) {
-        if (path.size() > 0) {
-            Optional<PropertyDef> initialPropertyDefOpt = getProperty(path.get(0));
-            return path.stream().skip(1).reduce(
-                    initialPropertyDefOpt,
-                    (propertyDefOpt, s) -> propertyDefOpt.isPresent() ? getProperty(s) : propertyDefOpt,
-                    (propertyDefOpt, propertyDef2Opt) -> propertyDefOpt.flatMap(propertyDef -> propertyDef2Opt)
-            );
+    default Optional<PropertyDef> getPropertyByPath(List<String> path) {
+        if (path.size() == 1) {
+            return getProperty(path.get(0));
+        } else if (path.size() > 1) {
+            return getProperty(path.get(0))
+                    .flatMap(propertyDef -> propertyDef.getPropertyByPath(path.subList(1, path.size())));
         }
+
         return Optional.empty();
     }
 
@@ -56,21 +55,14 @@ public interface MemberDefsContainer extends PropertyDefsContainer, AssociationD
      * @param path Association path
      * @return Optional association.
      */
-    default Optional<AssociationDef> getAssociationByPath(Stack<String> path) {
-        String associationName = path.pop();
-
-        if (path.size() > 0) {
-            Optional<PropertyDef> initialPropertyDefOpt = getProperty(path.get(0));
-            return path.stream()
-                    .skip(1)
-                    .reduce(
-                            initialPropertyDefOpt,
-                            (propertyDefOpt, s) -> propertyDefOpt.isPresent() ? getProperty(s) : propertyDefOpt,
-                            (propertyDefOpt, propertyDef2Opt) -> propertyDefOpt.flatMap(propertyDef -> propertyDef2Opt)
-                    )
-                    .flatMap(propertyDef -> propertyDef.getAssociation(associationName));
+    default Optional<AssociationDef> getAssociationByPath(List<String> path) {
+        if (path.size() == 1) {
+            return getAssociation(path.get(0));
+        } else if (path.size() > 1) {
+            return getProperty(path.get(0))
+                    .flatMap(propertyDef -> propertyDef.getAssociationByPath(path.subList(1, path.size())));
         }
 
-        return getAssociation(associationName);
+        return Optional.empty();
     }
 }

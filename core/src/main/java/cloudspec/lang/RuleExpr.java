@@ -28,6 +28,7 @@ package cloudspec.lang;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrBuilder;
 
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -144,8 +145,8 @@ public class RuleExpr implements CloudSpecSyntaxProducer {
     public static class RuleExprBuilder {
         private String name;
         private String resourceDefRef;
-        private WithExpr withExpr;
-        private AssertExpr assertExpr;
+        private WithExpr withExpr = new WithExpr(Collections.emptyList());
+        private AssertExpr assertExpr = new AssertExpr(Collections.emptyList());
 
         public RuleExprBuilder setName(String name) {
             this.name = name;

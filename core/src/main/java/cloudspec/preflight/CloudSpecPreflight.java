@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.Stack;
 
 public class CloudSpecPreflight {
-    private final Logger LOGGER = LoggerFactory.getLogger(ResourceLoader.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(CloudSpecPreflight.class);
 
     private final ResourceDefStore resourceDefStore;
 
@@ -58,6 +58,7 @@ public class CloudSpecPreflight {
     }
 
     private void preflightGroup(GroupExpr group) {
+        LOGGER.debug("Preflight of group {}", group.getName());
         preflightRules(group.getRules());
     }
 
@@ -66,6 +67,7 @@ public class CloudSpecPreflight {
     }
 
     private void preflightRule(RuleExpr rule) {
+        LOGGER.debug("Preflight of rule {}", rule.getName());
         Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(rule.getResourceDefRef());
         if (!resourceDefRefOpt.isPresent()) {
             throw new CloudSpecPreflightException(
@@ -97,10 +99,10 @@ public class CloudSpecPreflight {
     private void preflightStatement(ResourceDef resourceDef, Statement statement, Stack<String> path) {
         if (statement instanceof NestedStatement) {
             preflightNestedStatement(resourceDef, ((NestedStatement) statement), path);
-        } else if (statement instanceof PropertyStatement) {
-            preflightPropertyStatement(resourceDef, (PropertyStatement) statement, path);
         } else if (statement instanceof KeyValueStatement) {
             preflightKeyValueStatement(resourceDef, (KeyValueStatement) statement, path);
+        } else if (statement instanceof PropertyStatement) {
+            preflightPropertyStatement(resourceDef, (PropertyStatement) statement, path);
         } else if (statement instanceof AssociationStatement) {
             preflightAssociationStatement(resourceDef, (AssociationStatement) statement, path);
         }
