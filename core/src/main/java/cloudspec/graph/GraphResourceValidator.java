@@ -27,9 +27,10 @@ package cloudspec.graph;
 
 import cloudspec.lang.*;
 import cloudspec.model.ResourceDefRef;
-import cloudspec.validator.AssertValidationResult;
-import cloudspec.validator.ResourceValidationResult;
-import cloudspec.validator.ResourceValidator;
+import cloudspec.validator.*;
+import org.apache.tinkerpop.gremlin.process.traversal.Compare;
+import org.apache.tinkerpop.gremlin.process.traversal.Contains;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
@@ -248,32 +249,31 @@ public class GraphResourceValidator implements ResourceValidator {
                                                                 Boolean.TRUE
                                                         )
                                                 ),
-                                        __.constant(
-                                                new AssertValidationResult(
-                                                        propertyPath,
-                                                        Boolean.FALSE,
-                                                        // TODO build message for each type of predicate
-                                                        String.format(
-                                                                "Property '%s' does not match predicate [%s]",
-                                                                statement.getPropertyName(),
-                                                                statement.getPredicate()
+                                        __.unfold()
+                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
+                                                .map(propertyValueV ->
+                                                        new AssertValidationResult(
+                                                                propertyPath,
+                                                                Boolean.FALSE,
+                                                                buildAssertionError(
+                                                                        statement.getPredicate(),
+                                                                        propertyValueV.get().value(GraphResourceStore.PROPERTY_VALUE)
+                                                                )
                                                         )
                                                 )
-                                        )
                                 ),
                         __.constant(
                                 new AssertValidationResult(
                                         propertyPath,
                                         Boolean.FALSE,
-                                        String.format(
-                                                "Property '%s' does not exist",
-                                                statement.getPropertyName()
-                                        )
+                                        new AssertValidationMemberNotFoundError("Property does not exist")
+
                                 )
                         )
                 );
     }
 
+    @SuppressWarnings("unchecked")
     private GraphTraversal<?, AssertValidationResult> buildKeyValueAssertionTraversal(List<String> parentPath,
                                                                                       KeyValueStatement statement) {
         List<String> propertyPath = new ArrayList<>(parentPath);
@@ -296,27 +296,24 @@ public class GraphResourceValidator implements ResourceValidator {
                                                                 Boolean.TRUE
                                                         )
                                                 ),
-                                        __.constant(
-                                                new AssertValidationResult(
-                                                        propertyPath,
-                                                        Boolean.FALSE,
-                                                        // TODO build message for each type of predicate
-                                                        String.format(
-                                                                "Property '%s' does not match predicate [%s]",
-                                                                statement.getPropertyName(),
-                                                                statement.getPredicate()
+                                        __.unfold()
+                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
+                                                .map(propertyValueV ->
+                                                        new AssertValidationResult(
+                                                                propertyPath,
+                                                                Boolean.FALSE,
+                                                                buildAssertionError(
+                                                                        statement.getPredicate(),
+                                                                        propertyValueV.get().value(GraphResourceStore.PROPERTY_VALUE)
+                                                                )
                                                         )
                                                 )
-                                        )
                                 ),
                         __.constant(
                                 new AssertValidationResult(
                                         propertyPath,
                                         Boolean.FALSE,
-                                        String.format(
-                                                "Property '%s' does not exist",
-                                                statement.getPropertyName()
-                                        )
+                                        new AssertValidationMemberNotFoundError("Property does not exist")
                                 )
                         )
                 );
@@ -356,10 +353,7 @@ public class GraphResourceValidator implements ResourceValidator {
                                                 new AssertValidationResult(
                                                         nestedPath,
                                                         Boolean.FALSE,
-                                                        String.format(
-                                                                "Property '%s' does not exist",
-                                                                statement.getPropertyName()
-                                                        )
+                                                        new AssertValidationMemberNotFoundError("Property does not exist")
                                                 )
                                         )
                                 )
@@ -408,15 +402,31 @@ public class GraphResourceValidator implements ResourceValidator {
                                                 new AssertValidationResult(
                                                         associationPath,
                                                         Boolean.FALSE,
-                                                        String.format(
-                                                                "Association '%s' does not exist",
-                                                                statement.getAssociationName()
-                                                        )
+                                                        new AssertValidationMemberNotFoundError("Association does not exist")
                                                 )
                                         )
                                 )
 
                 )
                 .collect(Collectors.toList());
+    }
+
+    private AssertValidationError buildAssertionError(P<?> predicate, Object value) {
+        if (predicate.getBiPredicate().equals(Compare.eq) || predicate.getBiPredicate().equals(Compare.neq)) {
+            return new AssertValidationMismatchError(
+                    predicate.getOriginalValue(),
+                    value
+            );
+        } else if (predicate.getBiPredicate().equals(Contains.within) || predicate.getBiPredicate().equals(Contains.within)) {
+            return new AssertValidationContainError(
+                    (List<Object>) value,
+                    predicate.getOriginalValue()
+
+            );
+        }
+
+        return new AssertValidationUnknownError(
+                String.format("Unknown predicate %s", predicate.getBiPredicate())
+        );
     }
 }

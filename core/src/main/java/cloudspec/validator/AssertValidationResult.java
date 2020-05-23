@@ -26,20 +26,21 @@
 package cloudspec.validator;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AssertValidationResult {
     private final List<String> path;
     private final Boolean success;
-    private final String message;
+    private final Optional<AssertValidationError> error;
 
     public AssertValidationResult(List<String> path, Boolean success) {
-        this(path, success, "");
+        this(path, success, null);
     }
 
-    public AssertValidationResult(List<String> path, Boolean success, String message) {
+    public AssertValidationResult(List<String> path, Boolean success, AssertValidationError error) {
         this.path = path;
         this.success = success;
-        this.message = message;
+        this.error = Optional.ofNullable(error);
     }
 
     public List<String> getPath() {
@@ -50,8 +51,8 @@ public class AssertValidationResult {
         return success;
     }
 
-    public String getMessage() {
-        return message;
+    public Optional<AssertValidationError> getError() {
+        return error;
     }
 
     public Boolean isSuccess() {
@@ -63,7 +64,7 @@ public class AssertValidationResult {
         return "AssertValidationResult{" +
                 "path='" + path + '\'' +
                 ", success=" + success +
-                ", message='" + message + '\'' +
+                ", message='" + error + '\'' +
                 '}';
     }
 }
