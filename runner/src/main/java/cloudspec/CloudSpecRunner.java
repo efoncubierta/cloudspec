@@ -164,6 +164,15 @@ public class CloudSpecRunner {
                                                             notFoundError.getMessage()
                                                     ),
                                                     Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+                                        } else if (assertValidationError instanceof AssertValidationKeyNotFoundError) {
+                                            AssertValidationKeyNotFoundError notFoundError = (AssertValidationKeyNotFoundError) assertValidationError;
+                                            cp.println(
+                                                    String.format(
+                                                            " - %s: %s",
+                                                            String.join(".", assertValidationResult.getPath()),
+                                                            notFoundError.getMessage()
+                                                    ),
+                                                    Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
                                         } else if (assertValidationError instanceof AssertValidationUnknownError) {
                                             AssertValidationUnknownError unknownError = (AssertValidationUnknownError) assertValidationError;
                                             cp.println(

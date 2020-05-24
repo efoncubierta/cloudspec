@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -193,13 +193,13 @@ public class GraphResourceValidator implements ResourceValidator {
 
     private List<GraphTraversal<?, AssertValidationResult>> buildAssertionTraversals(List<String> parentPath,
                                                                                      Statement statement) {
-        if (statement instanceof PropertyStatement) {
-            return Collections.singletonList(
-                    buildPropertyAssertionTraversal(parentPath, (PropertyStatement) statement)
-            );
-        } else if (statement instanceof KeyValueStatement) {
+        if (statement instanceof KeyValueStatement) {
             return Collections.singletonList(
                     buildKeyValueAssertionTraversal(parentPath, (KeyValueStatement) statement)
+            );
+        } else if (statement instanceof PropertyStatement) {
+            return Collections.singletonList(
+                    buildPropertyAssertionTraversal(parentPath, (PropertyStatement) statement)
             );
         } else if (statement instanceof AssociationStatement) {
             return buildAssociationAssertionTraversal(parentPath, (AssociationStatement) statement);
@@ -238,10 +238,8 @@ public class GraphResourceValidator implements ResourceValidator {
                 .coalesce(
                         __.unfold()
                                 .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
-                                .fold()
                                 .coalesce(
-                                        __.unfold()
-                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
+                                        __.out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                                                 .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
                                                 .constant(
                                                         new AssertValidationResult(
@@ -249,8 +247,7 @@ public class GraphResourceValidator implements ResourceValidator {
                                                                 Boolean.TRUE
                                                         )
                                                 ),
-                                        __.unfold()
-                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
+                                        __.out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                                                 .map(propertyValueV ->
                                                         new AssertValidationResult(
                                                                 propertyPath,
@@ -284,30 +281,40 @@ public class GraphResourceValidator implements ResourceValidator {
                 .coalesce(
                         __.unfold()
                                 .has(GraphResourceStore.PROPERTY_NAME, statement.getPropertyName())
-                                .fold()
                                 .coalesce(
-                                        __.unfold()
-                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
+                                        __.out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
                                                 .has(GraphResourceStore.PROPERTY_KEY, statement.getKey())
-                                                .has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
-                                                .constant(
-                                                        new AssertValidationResult(
-                                                                propertyPath,
-                                                                Boolean.TRUE
+                                                .coalesce(
+                                                        __.has(GraphResourceStore.PROPERTY_VALUE, statement.getPredicate())
+                                                                .constant(
+                                                                        new AssertValidationResult(
+                                                                                propertyPath,
+                                                                                Boolean.TRUE
+                                                                        )
+                                                                ),
+                                                        __.map(propertyValueV ->
+                                                                new AssertValidationResult(
+                                                                        propertyPath,
+                                                                        Boolean.FALSE,
+                                                                        buildAssertionError(
+                                                                                statement.getPredicate(),
+                                                                                ((Vertex) propertyValueV.get()).value(GraphResourceStore.PROPERTY_VALUE)
+                                                                        )
+                                                                )
                                                         )
                                                 ),
-                                        __.unfold()
-                                                .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
-                                                .map(propertyValueV ->
-                                                        new AssertValidationResult(
-                                                                propertyPath,
-                                                                Boolean.FALSE,
-                                                                buildAssertionError(
-                                                                        statement.getPredicate(),
-                                                                        propertyValueV.get().value(GraphResourceStore.PROPERTY_VALUE)
+                                        __.constant(
+                                                new AssertValidationResult(
+                                                        propertyPath,
+                                                        Boolean.FALSE,
+                                                        new AssertValidationKeyNotFoundError(
+                                                                String.format(
+                                                                        "Key %s not found",
+                                                                        statement.getKey()
                                                                 )
                                                         )
                                                 )
+                                        )
                                 ),
                         __.constant(
                                 new AssertValidationResult(
@@ -419,9 +426,8 @@ public class GraphResourceValidator implements ResourceValidator {
             );
         } else if (predicate.getBiPredicate().equals(Contains.within) || predicate.getBiPredicate().equals(Contains.within)) {
             return new AssertValidationContainError(
-                    (List<Object>) value,
-                    predicate.getOriginalValue()
-
+                    (List<Object>) predicate.getOriginalValue(),
+                    value
             );
         }
 

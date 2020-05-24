@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,10 +26,11 @@
 package cloudspec.graph;
 
 import cloudspec.lang.AssociationStatement;
+import cloudspec.lang.KeyValueStatement;
 import cloudspec.lang.NestedStatement;
 import cloudspec.lang.PropertyStatement;
 import cloudspec.util.ModelTestUtils;
-import cloudspec.validator.ResourceValidationResult;
+import cloudspec.validator.*;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -87,7 +88,7 @@ public class GraphResourceValidatorTest {
     }
 
     @Test
-    public void shouldExistResourceByPropertyFiltering() {
+    public void shouldExistResourceByProperty() {
         assertTrue(
                 validator.existAny(
                         ModelTestUtils.RESOURCE_DEF_REF,
@@ -102,13 +103,45 @@ public class GraphResourceValidatorTest {
     }
 
     @Test
-    public void shouldNotExistResourceByPropertyFiltering() {
+    public void shouldNotExistResourceByProperty() {
         assertFalse(
                 validator.existAny(
                         ModelTestUtils.RESOURCE_DEF_REF,
                         Collections.singletonList(
                                 new PropertyStatement(
                                         ModelTestUtils.PROP_STRING_NAME,
+                                        P.eq("zzz")
+                                )
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void shouldExistResourceByKeyValuePropertyFiltering() {
+        assertTrue(
+                validator.existAny(
+                        ModelTestUtils.RESOURCE_DEF_REF,
+                        Collections.singletonList(
+                                new KeyValueStatement(
+                                        ModelTestUtils.PROP_KEY_VALUE_NAME,
+                                        ModelTestUtils.PROP_KEY_VALUE_VALUE.getKey(),
+                                        P.eq(ModelTestUtils.PROP_KEY_VALUE_VALUE.getValue())
+                                )
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void shouldNotExistResourceByKeyValuePropertyFiltering() {
+        assertFalse(
+                validator.existAny(
+                        ModelTestUtils.RESOURCE_DEF_REF,
+                        Collections.singletonList(
+                                new KeyValueStatement(
+                                        ModelTestUtils.PROP_KEY_VALUE_NAME,
+                                        ModelTestUtils.PROP_KEY_VALUE_VALUE.getKey(),
                                         P.eq("zzz")
                                 )
                         )
@@ -178,6 +211,301 @@ public class GraphResourceValidatorTest {
                         )
                 )
         );
+    }
+
+    @Test
+    public void shouldExistResourceByPropertyFiltering() {
+        assertTrue(
+                validator.existAny(
+                        ModelTestUtils.RESOURCE_DEF_REF,
+                        Collections.singletonList(
+                                new PropertyStatement(
+                                        ModelTestUtils.PROP_STRING_NAME,
+                                        P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                )
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void shouldReturnMemberNotFoundErrorOnPropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new PropertyStatement(
+                                "unknown",
+                                P.eq("zzz")
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationMemberNotFoundError);
+        });
+    }
+
+    @Test
+    public void shouldReturnMemberNotFoundErrorOnKeyValuePropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new KeyValueStatement(
+                                "unknown",
+                                "unknown",
+                                P.eq("zzz")
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            System.out.println(result.getAssertResults().get(0).getError().get());
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationMemberNotFoundError);
+        });
+    }
+
+    @Test
+    public void shouldReturnKeyNotFoundErrorOnKeyValuePropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new KeyValueStatement(
+                                ModelTestUtils.PROP_KEY_VALUE_NAME,
+                                "unknown",
+                                P.eq("zzz")
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationKeyNotFoundError);
+        });
+    }
+
+    @Test
+    public void shouldReturnMemberNotFoundErrorOnNestedPropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new NestedStatement(
+                                "unknown",
+                                Collections.singletonList(
+                                        new PropertyStatement(
+                                                ModelTestUtils.PROP_STRING_NAME,
+                                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                        )
+                                )
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationMemberNotFoundError);
+        });
+    }
+
+    @Test
+    public void shouldReturnMemberNotFoundErrorOnAssociationAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new AssociationStatement(
+                                "unknown",
+                                Collections.singletonList(
+                                        new PropertyStatement(
+                                                ModelTestUtils.PROP_STRING_NAME,
+                                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                        )
+                                )
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationMemberNotFoundError);
+        });
+    }
+
+    @Test
+    public void shouldReturnMistMatchErrorOnPropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new PropertyStatement(
+                                ModelTestUtils.PROP_STRING_NAME,
+                                P.eq("zzz")
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationMismatchError);
+        });
+    }
+
+    @Test
+    public void shouldReturnMistMatchErrorOnNestedPropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new NestedStatement(
+                                ModelTestUtils.PROP_NESTED_NAME,
+                                Collections.singletonList(
+                                        new PropertyStatement(
+                                                ModelTestUtils.PROP_STRING_NAME,
+                                                P.eq("zzz")
+                                        )
+                                )
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationMismatchError);
+        });
+    }
+
+    @Test
+    public void shouldReturnMisMatchErrorOnKeyValuePropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new KeyValueStatement(
+                                ModelTestUtils.PROP_KEY_VALUE_NAME,
+                                ModelTestUtils.PROP_KEY_VALUE_VALUE.getKey(),
+                                P.eq("zzz")
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationMismatchError);
+        });
+    }
+
+    @Test
+    public void shouldReturnContainErrorOnPropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new PropertyStatement(
+                                ModelTestUtils.PROP_STRING_NAME,
+                                P.within("zzz")
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationContainError);
+        });
+    }
+
+    @Test
+    public void shouldReturnContainErrorOnKeyValuePropertyAssertion() {
+        Optional<ResourceValidationResult> resultOpt = validator.validateById(
+                ModelTestUtils.RESOURCE_DEF_REF,
+                ModelTestUtils.RESOURCE_ID,
+                Collections.emptyList(),
+                Collections.singletonList(
+                        new KeyValueStatement(
+                                ModelTestUtils.PROP_KEY_VALUE_NAME,
+                                ModelTestUtils.PROP_KEY_VALUE_VALUE.getKey(),
+                                P.within("zzz")
+                        )
+                )
+        );
+
+        assertNotNull(resultOpt);
+        assertTrue(resultOpt.isPresent());
+
+        resultOpt.ifPresent(result -> {
+            assertFalse(result.isSuccess());
+            assertEquals(1, result.getAssertResults().size());
+            assertFalse(result.getAssertResults().get(0).getSuccess());
+            assertTrue(result.getAssertResults().get(0).getError().isPresent());
+            assertTrue(result.getAssertResults().get(0).getError().get() instanceof AssertValidationContainError);
+        });
     }
 
     @Test
