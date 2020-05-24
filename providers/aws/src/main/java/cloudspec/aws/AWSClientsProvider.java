@@ -25,6 +25,7 @@
  */
 package cloudspec.aws;
 
+import software.amazon.awssdk.core.retry.RetryMode;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.iam.IamClient;
@@ -35,31 +36,44 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 public class AWSClientsProvider implements IAWSClientsProvider {
     @Override
     public IamClient getIamClient() {
-        return IamClient.builder().build();
+        return IamClient.builder()
+                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                .build();
     }
 
     @Override
     public Ec2Client getEc2Client() {
-        return Ec2Client.create();
+        return Ec2Client.builder()
+                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                .build();
     }
 
     @Override
     public Ec2Client getEc2ClientForRegion(String region) {
-        return Ec2Client.builder().region(Region.of(region)).build();
+        return Ec2Client.builder()
+                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                .region(Region.of(region))
+                .build();
     }
 
     @Override
     public S3Client getS3Client() {
-        return S3Client.create();
+        return S3Client.builder()
+                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                .build();
     }
 
     @Override
     public SqsClient getSqsClient() {
-        return SqsClient.create();
+        return SqsClient.builder()
+                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                .build();
     }
 
     @Override
     public SnsClient getSnsClient() {
-        return SnsClient.create();
+        return SnsClient.builder()
+                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                .build();
     }
 }

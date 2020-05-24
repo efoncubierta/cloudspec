@@ -99,27 +99,27 @@ List of tags
 **Properties**
 
 * **id** (*string*):
-The ID of the instance. *(Example: i-00370a471026eb7f8)
+The ID of the instance. *(Example: i-00370a471026eb7f8)*
 * **region** (*string*):
-The AWS region *(Example: us-east-1, eu-west-1)
+The AWS region *(Example: us-east-1, eu-west-1)*
 * **type** (*string*):
-The instance type *(Example: t2.nano, m5.xlarge)
+The instance type *(Example: t2.nano, m5.xlarge)*
 * **key_name** (*string*):
 The name of the key pair, if this instance was launched with an associated key pair
 * **architecture** (*string*):
-The architecture of the image *(Example: i386, x86_64, arm64)
+The architecture of the image *(Example: i386, x86_64, arm64)*
 * **kernel_id** (*string*):
 The kernel associated with this instance, if applicable
 * **ebs_optimized** (*boolean*):
 Indicates whether the instance is optimized for Amazon EBS I/O
 * **private_ip** (*string*):
-The private IPv4 address assigned to the instance *(Example: 172.31.40.126)
+The private IPv4 address assigned to the instance *(Example: 172.31.40.126)*
 * **public_ip** (*string*):
-The public IPv4 address assigned to the instance *(Example: 34.241.109.11)
+The public IPv4 address assigned to the instance *(Example: 34.241.109.11)*
 * **private_dns** (*string*):
-The private DNS hostname name assigned to the instance *(Example: ip-172-31-40-126.eu-west-1.compute.internal)
+The private DNS hostname name assigned to the instance *(Example: ip-172-31-40-126.eu-west-1.compute.internal)*
 * **public_dns** (*string*):
-The public DNS hostname name assigned to the instance *(Example: ec2-34-241-109-11.eu-west-1.compute.amazonaws.com)
+The public DNS hostname name assigned to the instance *(Example: ec2-34-241-109-11.eu-west-1.compute.amazonaws.com)*
 * **root_device** (*nested*):
 The root device attached to the instance
     * **name** (*string*):
@@ -141,7 +141,7 @@ Private DNS address
 * **hibernation_configured** (*boolean*):
 Indicates whether the instance is enabled for hibernation
 * **tags** (*key_value[]*):
-Any tags assigned to the instance *(Example: tags["my_key"] = "my_value")
+Any tags assigned to the instance *(Example: tags["my_key"] = "my_value")*
 
 **Associations**
 
