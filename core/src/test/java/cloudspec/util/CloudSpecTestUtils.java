@@ -50,6 +50,11 @@ public class CloudSpecTestUtils {
                             ModelTestUtils.PROP_BOOLEAN_NAME,
                             P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
                     ),
+                    new KeyValueStatement(
+                            ModelTestUtils.PROP_KEY_VALUE_NAME,
+                            ModelTestUtils.PROP_KEY_VALUE_VALUE.getKey(),
+                            P.eq(ModelTestUtils.PROP_KEY_VALUE_VALUE.getValue())
+                    ),
                     new NestedStatement(
                             ModelTestUtils.PROP_NESTED_NAME,
                             Collections.singletonList(
@@ -97,6 +102,11 @@ public class CloudSpecTestUtils {
                     new PropertyStatement(
                             ModelTestUtils.PROP_BOOLEAN_NAME,
                             P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
+                    ),
+                    new KeyValueStatement(
+                            ModelTestUtils.PROP_KEY_VALUE_NAME,
+                            ModelTestUtils.PROP_KEY_VALUE_VALUE.getKey(),
+                            P.eq(ModelTestUtils.PROP_KEY_VALUE_VALUE.getValue())
                     ),
                     new NestedStatement(
                             ModelTestUtils.PROP_NESTED_NAME,

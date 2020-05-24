@@ -139,6 +139,42 @@ public class CloudSpecPreflightTest {
     }
 
     @Test
+    public void shouldFailWithRandomKeyValuePropertyDef() {
+        ResourceDef resourceDef = ModelGenerator.randomResourceDef();
+
+        resourceDefStore.createResourceDef(resourceDef);
+
+        CloudSpec spec = new CloudSpec(
+                ModelGenerator.randomName(),
+                Collections.singletonList(
+                        new GroupExpr(
+                                ModelGenerator.randomName(),
+                                Collections.singletonList(
+                                        new RuleExpr(
+                                                ModelGenerator.randomName(),
+                                                resourceDef.getRef().toString(),
+                                                new WithExpr(
+                                                        Collections.singletonList(
+                                                                new KeyValueStatement(
+                                                                        ModelGenerator.randomName(),
+                                                                        ModelGenerator.randomName(),
+                                                                        P.eq(0)
+                                                                )
+                                                        )
+                                                ),
+                                                new AssertExpr(
+                                                        Collections.emptyList()
+                                                )
+                                        )
+                                )
+                        )
+                )
+        );
+
+        assertThrows(CloudSpecPreflightException.class, () -> preflight.preflight(spec));
+    }
+
+    @Test
     public void shouldFailWithRandomNestedPropertyDef() {
         ResourceDef resourceDef = ModelGenerator.randomResourceDef();
 
