@@ -96,6 +96,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
     public static final String PROPERTY_PROVIDER_NAME = "providerName";
     public static final String PROPERTY_GROUP_NAME = "groupName";
     public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_EXAMPLE_VALUES = "exampleValues";
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_TYPE = "type";
     public static final String PROPERTY_IS_MULTIVALUED = "isArray";
@@ -124,6 +125,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                         propertyDefV.value(PROPERTY_DESCRIPTION),
                         propertyDefV.value(PROPERTY_TYPE),
                         propertyDefV.value(PROPERTY_IS_MULTIVALUED),
+                        propertyDefV.value(PROPERTY_EXAMPLE_VALUES),
                         getPropertyDefs(propertyDefV),
                         getAssociationDefs(propertyDefV)
                 ))
@@ -227,6 +229,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .property(PROPERTY_DESCRIPTION, propertyDef.getDescription())
                 .property(PROPERTY_TYPE, propertyDef.getPropertyType())
                 .property(PROPERTY_IS_MULTIVALUED, propertyDef.isMultiValued())
+                .property(PROPERTY_EXAMPLE_VALUES, propertyDef.getExampleValues())
                 .next();
 
         // link property definition to source vertex

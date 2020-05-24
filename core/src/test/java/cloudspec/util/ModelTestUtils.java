@@ -58,7 +58,8 @@ public class ModelTestUtils {
             PROP_ID_NAME,
             PROP_ID_DESCRIPTION,
             PROP_ID_TYPE,
-            Boolean.FALSE
+            Boolean.FALSE,
+            "The ID property"
     );
     public static final Property PROP_ID = new Property(PROP_ID_NAME, RESOURCE_ID);
 
@@ -70,7 +71,8 @@ public class ModelTestUtils {
             PROP_INTEGER_NAME,
             PROP_INTEGER_DESCRIPTION,
             PROP_INTEGER_TYPE,
-            Boolean.FALSE
+            Boolean.FALSE,
+            "The integer property"
     );
     public static final Property PROP_INTEGER = new Property(PROP_INTEGER_NAME, PROP_INTEGER_VALUE);
 
@@ -82,7 +84,8 @@ public class ModelTestUtils {
             PROP_INTEGER_LIST_NAME,
             PROP_INTEGER_LIST_DESCRIPTION,
             PROP_INTEGER_LIST_TYPE,
-            Boolean.TRUE
+            Boolean.TRUE,
+            "The list of integers property"
     );
     public static final Property PROP_INTEGER_LIST = new Property(PROP_INTEGER_LIST_NAME, PROP_INTEGER_LIST_VALUE);
 
@@ -94,7 +97,8 @@ public class ModelTestUtils {
             PROP_DOUBLE_NAME,
             PROP_DOUBLE_DESCRIPTION,
             PROP_DOUBLE_TYPE,
-            Boolean.FALSE
+            Boolean.FALSE,
+            "The double property"
     );
     public static final Property PROP_DOUBLE = new Property(PROP_DOUBLE_NAME, PROP_DOUBLE_VALUE);
 
@@ -106,7 +110,8 @@ public class ModelTestUtils {
             PROP_DOUBLE_LIST_NAME,
             PROP_DOUBLE_LIST_DESCRIPTION,
             PROP_DOUBLE_LIST_TYPE,
-            Boolean.TRUE
+            Boolean.TRUE,
+            "The list of doubles property"
     );
     public static final Property PROP_DOUBLE_LIST = new Property(PROP_DOUBLE_LIST_NAME, PROP_DOUBLE_LIST_VALUE);
 
@@ -118,7 +123,8 @@ public class ModelTestUtils {
             PROP_STRING_NAME,
             PROP_STRING_DESCRIPTION,
             PROP_STRING_TYPE,
-            Boolean.FALSE
+            Boolean.FALSE,
+            "The string property"
     );
     public static final Property PROP_STRING = new Property(PROP_STRING_NAME, PROP_STRING_VALUE);
 
@@ -130,7 +136,8 @@ public class ModelTestUtils {
             PROP_STRING_LIST_NAME,
             PROP_STRING_LIST_DESCRIPTION,
             PROP_STRING_LIST_TYPE,
-            Boolean.TRUE
+            Boolean.TRUE,
+            "The list of strings property"
     );
     public static final Property PROP_STRING_LIST = new Property(PROP_STRING_LIST_NAME, PROP_STRING_LIST_VALUE);
 
@@ -142,7 +149,8 @@ public class ModelTestUtils {
             PROP_BOOLEAN_NAME,
             PROP_BOOLEAN_DESCRIPTION,
             PROP_BOOLEAN_TYPE,
-            Boolean.FALSE
+            Boolean.FALSE,
+            "The boolean property"
     );
     public static final Property PROP_BOOLEAN = new Property(PROP_BOOLEAN_NAME, PROP_BOOLEAN_VALUE);
 
@@ -154,7 +162,8 @@ public class ModelTestUtils {
             PROP_BOOLEAN_LIST_NAME,
             PROP_BOOLEAN_LIST_DESCRIPTION,
             PROP_BOOLEAN_LIST_TYPE,
-            Boolean.TRUE
+            Boolean.TRUE,
+            "The list of booleans property"
     );
     public static final Property PROP_BOOLEAN_LIST = new Property(PROP_BOOLEAN_LIST_NAME, PROP_BOOLEAN_LIST_VALUE);
 
@@ -166,7 +175,8 @@ public class ModelTestUtils {
             PROP_KEY_VALUE_NAME,
             PROP_KEY_VALUE_DESCRIPTION,
             PROP_KEY_VALUE_TYPE,
-            Boolean.FALSE
+            Boolean.FALSE,
+            "The key value property"
     );
     public static final Property PROP_KEY_VALUE = new Property(PROP_KEY_VALUE_NAME, PROP_KEY_VALUE_VALUE);
 
@@ -178,7 +188,8 @@ public class ModelTestUtils {
             PROP_KEY_VALUE_LIST_NAME,
             PROP_KEY_VALUE_LIST_DESCRIPTION,
             PROP_KEY_VALUE_LIST_TYPE,
-            Boolean.TRUE
+            Boolean.TRUE,
+            "The list of key values property"
     );
     public static final Property PROP_KEY_VALUE_LIST = new Property(PROP_KEY_VALUE_LIST_NAME, PROP_KEY_VALUE_LIST_VALUE);
 
@@ -197,6 +208,7 @@ public class ModelTestUtils {
             PROP_NESTED_DESCRIPTION,
             PROP_NESTED_TYPE,
             Boolean.FALSE,
+            "The nested property",
             Arrays.asList(
                     PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
                     PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
@@ -217,6 +229,7 @@ public class ModelTestUtils {
             PROP_NESTED_LIST_DESCRIPTION,
             PROP_NESTED_LIST_TYPE,
             Boolean.TRUE,
+            "The list of nested properties property",
             Arrays.asList(
                     PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
                     PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,

@@ -52,117 +52,126 @@ public class EC2InstanceResource extends EC2Resource {
     @IdDefinition
     @PropertyDefinition(
             name = "id",
-            description = "EC2 Instance ID"
+            description = "The ID of the instance.",
+            exampleValues = "i-00370a471026eb7f8"
     )
     public String id;
 
     @PropertyDefinition(
             name = "region",
-            description = "AWS Region"
+            description = "The AWS region",
+            exampleValues = "us-east-1, eu-west-1"
     )
     public String region;
 
     @PropertyDefinition(
             name = "type",
-            description = "EC2 Instance Type"
+            description = "The instance type",
+            exampleValues = "t2.nano, m5.xlarge"
     )
     public String type;
 
     @PropertyDefinition(
             name = "key_name",
-            description = "Name of the key pair"
+            description = "The name of the key pair, if this instance was launched with an associated key pair"
     )
     public String keyName;
 
     @PropertyDefinition(
             name = "architecture",
-            description = "Type of architecture"
+            description = "The architecture of the image",
+            exampleValues = "i386, x86_64, arm64"
     )
     public String architecture;
 
     @PropertyDefinition(
             name = "kernel_id",
-            description = "ID of the Kernel"
+            description = "The kernel associated with this instance, if applicable"
     )
     public String kernelId;
 
     @PropertyDefinition(
             name = "ebs_optimized",
-            description = "Flag indicating if the instance is optimized for EBS"
+            description = "Indicates whether the instance is optimized for Amazon EBS I/O"
     )
     public Boolean ebsOptimized;
 
     @PropertyDefinition(
             name = "private_ip",
-            description = "Private IP address"
+            description = "The private IPv4 address assigned to the instance",
+            exampleValues = "172.31.40.126"
     )
     public String privateIp;
 
     @PropertyDefinition(
             name = "public_ip",
-            description = "Public IP address"
+            description = "The public IPv4 address assigned to the instance",
+            exampleValues = "34.241.109.11"
     )
     public String publicIp;
 
     @PropertyDefinition(
             name = "private_dns",
-            description = "Private DNS name"
+            description = "The private DNS hostname name assigned to the instance",
+            exampleValues = "ip-172-31-40-126.eu-west-1.compute.internal"
     )
     public String privateDns;
 
     @PropertyDefinition(
             name = "public_dns",
-            description = "Public DNS"
+            description = "The public DNS hostname name assigned to the instance",
+            exampleValues = "ec2-34-241-109-11.eu-west-1.compute.amazonaws.com"
     )
     public String publicDns;
 
     @PropertyDefinition(
             name = "root_device",
-            description = "Root Device"
+            description = "The root device attached to the instance"
     )
     public RootDevice rootDevice = new RootDevice();
 
     @PropertyDefinition(
             name = "devices",
-            description = "List of devices attached"
+            description = "The devices attached to the instance"
     )
     public List<Device> devices = new ArrayList<>();
 
     @PropertyDefinition(
             name = "network_interfaces",
-            description = "List of network interfaces attached"
+            description = "The network interfaces attached to the instance"
     )
     public List<NetworkInterface> networkInterfaces = new ArrayList<>();
 
     @PropertyDefinition(
             name = "hibernation_configured",
-            description = "Flag indicating if hibernation is configured"
+            description = "Indicates whether the instance is enabled for hibernation"
     )
     public Boolean hibernationConfigured;
 
     @PropertyDefinition(
             name = "tags",
-            description = "List of tags"
+            description = "Any tags assigned to the instance",
+            exampleValues = "tags[\"my_key\"] = \"my_value\""
     )
     public List<KeyValue> tags;
 
     @AssociationDefinition(
             name = "ami",
-            description = "AMI",
+            description = "The AMI used to launch the instance",
             targetClass = EC2AmiResource.class
     )
     public String imageId;
 
     @AssociationDefinition(
             name = "vpc",
-            description = "VPC",
+            description = "The VPC in which the instance is running",
             targetClass = EC2VpcResource.class
     )
     public String vpcId;
 
     @AssociationDefinition(
             name = "subnet",
-            description = "Subnet",
+            description = "The subnet in which the instance is running",
             targetClass = EC2SubnetResource.class
     )
     public String subnetId;
@@ -230,13 +239,13 @@ public class EC2InstanceResource extends EC2Resource {
     public static class RootDevice {
         @PropertyDefinition(
                 name = "name",
-                description = "Device name"
+                description = "The device name of the root device volume"
         )
         public String name;
 
         @PropertyDefinition(
                 name = "type",
-                description = "Device type"
+                description = "The root device type used by the AMI"
         )
         public String type;
 

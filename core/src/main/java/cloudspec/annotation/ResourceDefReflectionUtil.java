@@ -153,7 +153,8 @@ public class ResourceDefReflectionUtil {
                                 propertyDefAnnotation.name(),
                                 propertyDefAnnotation.description(),
                                 propertyType,
-                                multiValued
+                                multiValued,
+                                propertyDefAnnotation.exampleValues()
                         )
                 );
             case NESTED:
@@ -182,6 +183,7 @@ public class ResourceDefReflectionUtil {
                                     propertyDefAnnotation.description(),
                                     PropertyType.NESTED,
                                     multiValued,
+                                    propertyDefAnnotation.exampleValues(),
                                     propertyDefs,
                                     associationDefs
                             )

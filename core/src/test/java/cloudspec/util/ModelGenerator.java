@@ -74,6 +74,7 @@ public class ModelGenerator {
                         randomDescription(),
                         PropertyType.NESTED,
                         faker.random().nextBoolean(),
+                        faker.lorem().word(),
                         randomPropertyDefs(3, Boolean.TRUE),
                         randomAssociationDefs(3)
                 );
@@ -83,7 +84,8 @@ public class ModelGenerator {
                         randomName(),
                         randomDescription(),
                         propertyType,
-                        faker.random().nextBoolean()
+                        faker.random().nextBoolean(),
+                        faker.lorem().word()
                 );
         }
     }
