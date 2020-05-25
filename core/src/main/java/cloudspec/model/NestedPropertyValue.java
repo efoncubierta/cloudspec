@@ -25,29 +25,39 @@
  */
 package cloudspec.model;
 
-import java.util.Optional;
+public class NestedPropertyValue implements MembersContainer {
+    private final Properties properties;
+    private final Associations associations;
 
-/**
- * Interface for classes that manage properties.
- */
-public interface PropertiesContainer {
-    /**
-     * Get a property by name.
-     *
-     * @param propertyName Property name.
-     * @return Optional property.
-     */
-    default Optional<Property<?>> getProperty(String propertyName) {
-        return getProperties()
-                .stream()
-                .filter(p -> p.getName().equals(propertyName))
-                .findFirst();
+    public NestedPropertyValue(Properties properties, Associations associations) {
+        this.properties = properties;
+        this.associations = associations;
     }
 
-    /**
-     * Get all properties.
-     *
-     * @return List of properties.
-     */
-    Properties getProperties();
+    @Override
+    public Associations getAssociations() {
+        return associations;
+    }
+
+    @Override
+    public Properties getProperties() {
+        return properties;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NestedPropertyValue that = (NestedPropertyValue) o;
+        return properties.equals(that.properties) &&
+                associations.equals(that.associations);
+    }
+
+    @Override
+    public String toString() {
+        return "NestedPropertyValue{" +
+                "properties=" + properties +
+                ", associations=" + associations +
+                '}';
+    }
 }

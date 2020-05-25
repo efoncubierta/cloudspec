@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResourceStore {
-    void createResource(ResourceDefRef resourceDefRef, String resourceId);
+    void saveResource(ResourceDefRef resourceDefRef, String resourceId);
 
-    void createResource(ResourceDefRef resourceDefRef, String resourceId,
-                        Properties properties, Associations associations);
+    void saveResource(ResourceDefRef resourceDefRef, String resourceId,
+                      Properties properties, Associations associations);
 
     Boolean exists(ResourceDefRef resourceDefRef, String resourceId);
 
@@ -44,13 +44,13 @@ public interface ResourceStore {
 
     Properties getProperties(ResourceDefRef resourceDefRef, String resourceId);
 
-    void setProperty(ResourceDefRef resourceDefRef, String resourceId, Property property);
+    void saveProperty(ResourceDefRef resourceDefRef, String resourceId, Property<?> property);
 
-    void setProperties(ResourceDefRef resourceDefRef, String resourceId, Properties properties);
+    void saveProperties(ResourceDefRef resourceDefRef, String resourceId, Properties properties);
 
     Associations getAssociations(ResourceDefRef resourceDefRef, String resourceId);
 
-    void setAssociation(ResourceDefRef resourceDefRef, String resourceId, Association association);
+    void saveAssociation(ResourceDefRef resourceDefRef, String resourceId, Association association);
 
-    void setAssociations(ResourceDefRef resourceDefRef, String resourceId, Associations associations);
+    void saveAssociations(ResourceDefRef resourceDefRef, String resourceId, Associations associations);
 }

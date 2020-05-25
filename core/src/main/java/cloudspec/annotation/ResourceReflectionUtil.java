@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -130,45 +130,61 @@ public class ResourceReflectionUtil {
                                 Boolean multiValued = ResourceDefReflectionUtil.guessMultiValued(field);
                                 field.setAccessible(true);
 
-                                switch (ResourceDefReflectionUtil.guessPropertyType(field)) {
-                                    case INTEGER:
-                                    case DOUBLE:
-                                    case STRING:
-                                    case BOOLEAN:
-                                    case KEY_VALUE:
-                                        return Stream.of(new Property(propertyDefAnnotation.name(), value));
-                                    case NESTED:
-                                    default:
-                                        if (multiValued) {
-                                            return Stream.of(
-                                                    new Property(
-                                                            propertyDefAnnotation.name(),
-                                                            ((List<?>) value)
-                                                                    .stream()
-                                                                    .map(ResourceReflectionUtil::toProperties)
-                                                                    .collect(Collectors.toList())
-                                                    )
-                                            );
-                                        }
-
-                                        Properties properties = toProperties(value);
-                                        Associations associations = toAssociations(value);
-                                        if (properties.size() > 0 || associations.size() > 0) {
-                                            return Stream.of(
-                                                    new Property(
-                                                            propertyDefAnnotation.name(),
-                                                            new Properties(properties, associations)
-                                                    )
-                                            );
-                                        }
+                                Stream<?> valueStream;
+                                if (multiValued) {
+                                    valueStream = ((List<?>) value).stream();
+                                } else {
+                                    valueStream = Stream.of(value);
                                 }
 
-                                LOGGER.warn("Type {} of property '{}' in class {} is not supported",
-                                        field.getType().getCanonicalName(),
-                                        field.getName(),
-                                        obj.getClass().getCanonicalName()
-                                );
-                                return Stream.empty();
+                                return valueStream
+                                        .map(item -> {
+                                            switch (ResourceDefReflectionUtil.guessPropertyType(field)) {
+                                                case INTEGER:
+                                                    return new IntegerProperty(
+                                                            propertyDefAnnotation.name(),
+                                                            (Integer) item
+                                                    );
+                                                case DOUBLE:
+                                                    return new DoubleProperty(
+                                                            propertyDefAnnotation.name(),
+                                                            (Double) item
+                                                    );
+                                                case STRING:
+                                                    return new StringProperty(
+                                                            propertyDefAnnotation.name(),
+                                                            (String) item
+                                                    );
+                                                case BOOLEAN:
+                                                    return new BooleanProperty(
+                                                            propertyDefAnnotation.name(),
+                                                            (Boolean) item
+                                                    );
+                                                case KEY_VALUE:
+                                                    return new KeyValueProperty(
+                                                            propertyDefAnnotation.name(),
+                                                            (KeyValue) item
+                                                    );
+                                                case NESTED:
+                                                default:
+                                                    Properties properties = toProperties(item);
+                                                    Associations associations = toAssociations(item);
+                                                    if (properties.size() > 0 || associations.size() > 0) {
+                                                        return new NestedProperty(
+                                                                propertyDefAnnotation.name(),
+                                                                new NestedPropertyValue(properties, associations)
+                                                        );
+                                                    }
+
+                                                    LOGGER.warn("Type {} of property '{}' in class {} is not supported",
+                                                            field.getType().getCanonicalName(),
+                                                            field.getName(),
+                                                            obj.getClass().getCanonicalName()
+                                                    );
+                                                    return null;
+                                            }
+                                        })
+                                        .filter(Objects::nonNull);
                             } catch (IllegalAccessException exception) {
                                 throw new RuntimeException(
                                         String.format(
@@ -215,14 +231,24 @@ public class ResourceReflectionUtil {
 
                             try {
                                 field.setAccessible(true);
-                                String id = (String) field.get(obj);
+                                Boolean multiValued = ResourceDefReflectionUtil.guessMultiValued(field);
+                                Object id = field.get(obj);
                                 field.setAccessible(true);
 
-                                return Stream.of(new Association(
-                                        associationName,
-                                        resourceDefRefOptional.get(),
-                                        id)
-                                );
+                                if (multiValued) {
+                                    return ((List<String>) id).stream().map(resourceId ->
+                                            new Association(
+                                                    associationName,
+                                                    resourceDefRefOptional.get(),
+                                                    resourceId)
+                                    );
+                                } else {
+                                    return Stream.of(new Association(
+                                            associationName,
+                                            resourceDefRefOptional.get(),
+                                            (String) id)
+                                    );
+                                }
                             } catch (IllegalAccessException exception) {
                                 throw new RuntimeException(
                                         String.format(

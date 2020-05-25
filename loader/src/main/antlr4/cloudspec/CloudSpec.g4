@@ -64,7 +64,6 @@ FALSE: [Ff][Aa][Ll][Ss][Ee];
 HAS: [Hh][Aa][Ss];
 BEFORE: [Bb][Ee][Ff][Oo][Rr][Ee];
 AFTER: [Aa][Ff][Tt][Ee][Rr];
-AT: [Aa][Tt];
 NOT: [Nn][Oo][Tt];
 TO: [Tt][Oo];
 LESS_THAN: LESS THAN;

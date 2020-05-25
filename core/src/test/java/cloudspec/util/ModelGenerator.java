@@ -122,10 +122,13 @@ public class ModelGenerator {
     public static Object randomPropertyValue(PropertyDef propertyDef) {
         switch (propertyDef.getPropertyType()) {
             case NESTED:
-                return new Properties(
-                        propertyDef.getProperties()
-                                .stream()
-                                .map(ModelGenerator::randomProperty)
+                return new NestedPropertyValue(
+                        new Properties(
+                                propertyDef.getProperties()
+                                        .stream()
+                                        .map(ModelGenerator::randomProperty)
+                        ),
+                        new Associations()
                 );
             case KEY_VALUE:
                 return new KeyValue(faker.lorem().word(), faker.lorem().word());
@@ -152,20 +155,46 @@ public class ModelGenerator {
         );
     }
 
-    public static Property randomProperty() {
+    public static Property<?> randomProperty() {
         return randomProperty(randomPropertyDef());
     }
 
-    public static Property randomProperty(PropertyDef propertyDef) {
-        return new Property(
-                propertyDef.getName(),
-                propertyDef.isMultiValued() ?
-                        randomPropertyValues(
-                                faker.random().nextInt(3, 5),
-                                propertyDef
-                        ) :
-                        randomPropertyValue(propertyDef)
-        );
+    public static Property<?> randomProperty(PropertyDef propertyDef) {
+        switch (propertyDef.getPropertyType()) {
+            case INTEGER:
+                return new IntegerProperty(
+                        propertyDef.getName(),
+                        (Integer) randomPropertyValue(propertyDef)
+                );
+            case DOUBLE:
+                return new DoubleProperty(
+                        propertyDef.getName(),
+                        (Double) randomPropertyValue(propertyDef)
+                );
+
+            case BOOLEAN:
+                return new BooleanProperty(
+                        propertyDef.getName(),
+                        (Boolean) randomPropertyValue(propertyDef)
+                );
+            case KEY_VALUE:
+                return new KeyValueProperty(
+                        propertyDef.getName(),
+                        (KeyValue) randomPropertyValue(propertyDef)
+                );
+            case NESTED:
+                return new NestedProperty(
+                        propertyDef.getName(),
+                        (NestedPropertyValue) randomPropertyValue(propertyDef)
+                );
+            case STRING:
+            default:
+                return new StringProperty(
+                        propertyDef.getName(),
+                        (String) randomPropertyValue(propertyDef)
+                );
+        }
+
     }
 
     public static Associations randomAssociations(Integer n) {

@@ -25,13 +25,11 @@
  */
 package cloudspec.model;
 
-import java.util.List;
-
 /**
  * Define a resource property.
  */
-public class Property extends BaseMember implements PropertiesContainer {
-    private final Object value;
+public abstract class Property<T> extends BaseMember implements MembersContainer {
+    private final T value;
 
     /**
      * Constructor.
@@ -39,22 +37,35 @@ public class Property extends BaseMember implements PropertiesContainer {
      * @param name  Property name.
      * @param value Property value.
      */
-    public Property(String name, Object value) {
+    public Property(String name, T value) {
         super(name);
 
         this.value = value;
     }
 
+    /**
+     * Get property value.
+     *
+     * @return Property value.
+     */
+    public T getValue() {
+        return value;
+    }
+
     @Override
     public Properties getProperties() {
-        // TODO review this code
-        if (value instanceof List) {
-            List<?> values = ((List<?>) value);
-            if (values.size() > 0 && values.get(0) instanceof Property) {
-                return (Properties) values;
-            }
+        if (value instanceof NestedPropertyValue) {
+            return ((NestedPropertyValue) value).getProperties();
         }
         return new Properties();
+    }
+
+    @Override
+    public Associations getAssociations() {
+        if (value instanceof NestedPropertyValue) {
+            return ((NestedPropertyValue) value).getAssociations();
+        }
+        return new Associations();
     }
 
     @Override
@@ -67,22 +78,10 @@ public class Property extends BaseMember implements PropertiesContainer {
             return false;
         }
 
-        Property property = (Property) obj;
+        Property<?> property = (Property<?>) obj;
 
         return getName().equals(property.getName()) &&
-                getValue() instanceof List && property.getValue() instanceof List ?
-                ((List<?>) getValue()).size() == ((List<?>) getValue()).size() &&
-                        ((List<?>) getValue()).containsAll((List<?>) getValue()) :
                 getValue().equals(property.getValue());
-    }
-
-    /**
-     * Get property value.
-     *
-     * @return Property value.
-     */
-    public Object getValue() {
-        return value;
     }
 
     @Override

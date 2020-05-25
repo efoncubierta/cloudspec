@@ -82,9 +82,28 @@ public class CloudSpecTestUtils {
                                     )
                             )
                     ),
+                    new NestedStatement(
+                            ModelTestUtils.PROP_NESTED_NAME,
+                            Collections.singletonList(
+                                    new AssociationStatement(
+                                            ModelTestUtils.ASSOC_NAME,
+                                            Collections.singletonList(
+                                                    new PropertyStatement(
+                                                            ModelTestUtils.PROP_STRING_NAME,
+                                                            P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                                    )
+                                            )
+                                    )
+                            )
+                    ),
                     new AssociationStatement(
                             ModelTestUtils.ASSOC_NAME,
-                            Collections.emptyList()
+                            Collections.singletonList(
+                                    new PropertyStatement(
+                                            ModelTestUtils.PROP_STRING_NAME,
+                                            P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                    )
+                            )
                     )
             )
     );
@@ -129,15 +148,25 @@ public class CloudSpecTestUtils {
                     new NestedStatement(
                             ModelTestUtils.PROP_NESTED_NAME,
                             Collections.singletonList(
-                                    new PropertyStatement(
-                                            ModelTestUtils.PROP_BOOLEAN_NAME,
-                                            P.eq(ModelTestUtils.PROP_BOOLEAN_VALUE)
+                                    new AssociationStatement(
+                                            ModelTestUtils.ASSOC_NAME,
+                                            Collections.singletonList(
+                                                    new PropertyStatement(
+                                                            ModelTestUtils.PROP_STRING_NAME,
+                                                            P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                                    )
+                                            )
                                     )
                             )
                     ),
                     new AssociationStatement(
                             ModelTestUtils.ASSOC_NAME,
-                            Collections.emptyList()
+                            Collections.singletonList(
+                                    new PropertyStatement(
+                                            ModelTestUtils.PROP_STRING_NAME,
+                                            P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                    )
+                            )
                     )
             )
     );

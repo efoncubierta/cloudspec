@@ -49,13 +49,13 @@ public class GraphResourceStoreTest {
 
         resourceDefStore.createResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
         resourceDefStore.createResourceDef(ModelTestUtils.RESOURCE_DEF);
-        resourceStore.createResource(
+        resourceStore.saveResource(
                 ModelTestUtils.TARGET_RESOURCE_DEF_REF,
                 ModelTestUtils.TARGET_RESOURCE_ID,
                 ModelTestUtils.TARGET_PROPERTIES,
                 ModelTestUtils.TARGET_ASSOCIATIONS
         );
-        resourceStore.createResource(
+        resourceStore.saveResource(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID,
                 ModelTestUtils.PROPERTIES,
@@ -123,8 +123,6 @@ public class GraphResourceStoreTest {
         assertNotNull(properties);
         assertFalse(properties.isEmpty());
         assertEquals(ModelTestUtils.PROPERTIES.size(), properties.size());
-        System.out.println(ModelTestUtils.PROPERTIES);
-        System.out.println(properties);
         assertTrue(ModelTestUtils.PROPERTIES.containsAll(properties));
     }
 
@@ -175,7 +173,7 @@ public class GraphResourceStoreTest {
         String resourceId = ModelGenerator.randomResourceId();
         Property property = ModelGenerator.randomProperty();
 
-        resourceStore.setProperty(
+        resourceStore.saveProperty(
                 resourceDefRef,
                 resourceId,
                 property
@@ -190,11 +188,11 @@ public class GraphResourceStoreTest {
     public void shouldNotSetRandomPropertyToResource() {
         ResourceDef resourceDef = ModelGenerator.randomResourceDef();
         Resource resource = ModelGenerator.randomResource(resourceDef);
-        Property property = ModelGenerator.randomProperty();
+        Property<?> property = ModelGenerator.randomProperty();
 
         resourceDefStore.createResourceDef(resourceDef);
-        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
-        resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
+        resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
+        assertThrows(RuntimeException.class, () -> resourceStore.saveProperty(resource.getResourceDefRef(), resource.getResourceId(), property));
 
         Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(properties);
@@ -205,11 +203,11 @@ public class GraphResourceStoreTest {
     public void shouldSetPropertyToResource() {
         ResourceDef resourceDef = ModelGenerator.randomResourceDef();
         Resource resource = ModelGenerator.randomResource(resourceDef);
-        Property property = resource.getProperties().get(0);
+        Property<?> property = resource.getProperties().get(0);
 
         resourceDefStore.createResourceDef(resourceDef);
-        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
-        resourceStore.setProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
+        resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.saveProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
 
         Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(properties);
@@ -224,8 +222,8 @@ public class GraphResourceStoreTest {
         Resource resource = ModelGenerator.randomResource(resourceDef);
 
         resourceDefStore.createResourceDef(resourceDef);
-        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
-        resourceStore.setProperties(resource.getResourceDefRef(), resource.getResourceId(), resource.getProperties());
+        resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.saveProperties(resource.getResourceDefRef(), resource.getResourceId(), resource.getProperties());
 
         Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(properties);
@@ -239,7 +237,7 @@ public class GraphResourceStoreTest {
         String resourceId = ModelGenerator.randomResourceId();
         Association association = ModelGenerator.randomAssociation();
 
-        resourceStore.setAssociation(
+        resourceStore.saveAssociation(
                 resourceDefRef,
                 resourceId,
                 association
@@ -257,12 +255,12 @@ public class GraphResourceStoreTest {
         Association association = ModelGenerator.randomAssociation();
 
         resourceDefStore.createResourceDef(resourceDef);
-        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
-        resourceStore.setAssociation(
+        resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
+        assertThrows(RuntimeException.class, () -> resourceStore.saveAssociation(
                 resource.getResourceDefRef(),
                 resource.getResourceId(),
                 association
-        );
+        ));
 
         Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);
@@ -277,8 +275,8 @@ public class GraphResourceStoreTest {
 
         resourceDefStore.createResourceDef(resourceDef);
 
-        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
-        resourceStore.setAssociation(resource.getResourceDefRef(), resource.getResourceId(), association);
+        resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
+        assertThrows(RuntimeException.class, () -> resourceStore.saveAssociation(resource.getResourceDefRef(), resource.getResourceId(), association));
 
         Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);
@@ -290,16 +288,16 @@ public class GraphResourceStoreTest {
         ResourceDef resourceDef = ModelGenerator.randomResourceDef();
         Resource resource = ModelGenerator.randomResource(resourceDef);
         Association association = resource.getAssociations().get(0);
+        ResourceDef targetResourceDef = ModelGenerator.randomResourceDef(association.getResourceDefRef());
 
+        // create target resource
+        resourceDefStore.createResourceDef(targetResourceDef);
+        resourceStore.saveResource(association.getResourceDefRef(), association.getResourceId());
+
+        // create resource
         resourceDefStore.createResourceDef(resourceDef);
-
-        // create associated resources
-        resourceDefStore.createResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
-        resourceStore.createResource(association.getResourceDefRef(), association.getResourceId());
-
-
-        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
-        resourceStore.setAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
+        resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.saveAssociation(resource.getResourceDefRef(), resource.getResourceId(), association);
 
         Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);
@@ -318,11 +316,11 @@ public class GraphResourceStoreTest {
         // create associated resources
         resource.getAssociations().forEach(association -> {
             resourceDefStore.createResourceDef(ModelGenerator.randomResourceDef(association.getResourceDefRef()));
-            resourceStore.createResource(association.getResourceDefRef(), association.getResourceId());
+            resourceStore.saveResource(association.getResourceDefRef(), association.getResourceId());
         });
 
-        resourceStore.createResource(resource.getResourceDefRef(), resource.getResourceId());
-        resourceStore.setAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
+        resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
+        resourceStore.saveAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
 
         Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
         assertNotNull(associations);

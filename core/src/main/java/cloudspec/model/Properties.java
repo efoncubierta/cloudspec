@@ -34,18 +34,14 @@ import java.util.stream.Stream;
 /**
  * Class that manage properties based on {@link ArrayList}.
  */
-public class Properties extends ArrayList<Property> implements MembersContainer {
-    private final Associations associations;
-
+public class Properties extends ArrayList<Property<?>> {
     /**
      * Constructor.
      *
      * @param properties Properties array
      */
-    public Properties(Property... properties) {
+    public Properties(Property<?>... properties) {
         super(Arrays.asList(properties));
-
-        associations = new Associations();
     }
 
     /**
@@ -53,22 +49,8 @@ public class Properties extends ArrayList<Property> implements MembersContainer 
      *
      * @param propertiesStream Properties stream
      */
-    public Properties(Stream<Property> propertiesStream) {
+    public Properties(Stream<Property<?>> propertiesStream) {
         super(propertiesStream.collect(Collectors.toList()));
-
-        associations = new Associations();
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param propertiesStream   Properties stream
-     * @param associationsStream Associations stream
-     */
-    public Properties(Stream<Property> propertiesStream, Stream<Association> associationsStream) {
-        super(propertiesStream.collect(Collectors.toList()));
-
-        associations = new Associations(associationsStream);
     }
 
     /**
@@ -76,32 +58,8 @@ public class Properties extends ArrayList<Property> implements MembersContainer 
      *
      * @param propertiesList Properties list
      */
-    public Properties(List<Property> propertiesList) {
+    public Properties(List<Property<?>> propertiesList) {
         super(propertiesList);
-
-        associations = new Associations();
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param propertiesList   Properties list
-     * @param associationsList Associations list
-     */
-    public Properties(List<Property> propertiesList, List<Association> associationsList) {
-        super(propertiesList);
-
-        associations = new Associations(associationsList);
-    }
-
-    @Override
-    public Properties getProperties() {
-        return this;
-    }
-
-    @Override
-    public Associations getAssociations() {
-        return associations;
     }
 
     @Override
@@ -117,8 +75,6 @@ public class Properties extends ArrayList<Property> implements MembersContainer 
         Properties properties = (Properties) obj;
 
         return size() == properties.size() &&
-                containsAll(properties) &&
-                associations.size() == properties.associations.size() &&
-                associations.containsAll(properties.associations);
+                containsAll(properties);
     }
 }

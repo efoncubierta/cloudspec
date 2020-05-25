@@ -53,13 +53,13 @@ public class GraphResourceValidatorTest {
 
         resourceDefStore.createResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF);
         resourceDefStore.createResourceDef(ModelTestUtils.RESOURCE_DEF);
-        resourceStore.createResource(
+        resourceStore.saveResource(
                 ModelTestUtils.TARGET_RESOURCE_DEF_REF,
                 ModelTestUtils.TARGET_RESOURCE_ID,
                 ModelTestUtils.TARGET_PROPERTIES,
                 ModelTestUtils.TARGET_ASSOCIATIONS
         );
-        resourceStore.createResource(
+        resourceStore.saveResource(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID,
                 ModelTestUtils.PROPERTIES,

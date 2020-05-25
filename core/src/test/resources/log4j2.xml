@@ -10,6 +10,6 @@
       <AppenderRef ref="ConsoleAppender"/>
     </Root>
 
-    <Logger name="cloudspec" level="DEBUG"/>
+    <Logger name="cloudspec" level="INFO"/>
   </Loggers>
 </Configuration>

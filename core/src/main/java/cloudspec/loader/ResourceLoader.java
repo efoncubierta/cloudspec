@@ -29,7 +29,6 @@ import cloudspec.ProvidersRegistry;
 import cloudspec.annotation.ResourceReflectionUtil;
 import cloudspec.lang.*;
 import cloudspec.model.Association;
-import cloudspec.model.Associations;
 import cloudspec.model.Resource;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
@@ -37,9 +36,7 @@ import cloudspec.store.ResourceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class ResourceLoader {
@@ -80,28 +77,34 @@ public class ResourceLoader {
                     // load dependent resources from each statement
                     ruleExpr.getWithExpr()
                             .getStatements()
-                            .forEach(statement -> loadFromStatement(resource, statement));
+                            .forEach(statement -> loadFromStatement(resource, statement, new ArrayList<>()));
 
                     // load dependent resources from each statement
                     ruleExpr.getAssertExpr()
                             .getStatements()
-                            .forEach(statement -> loadFromStatement(resource, statement));
+                            .forEach(statement -> loadFromStatement(resource, statement, new ArrayList<>()));
                 });
     }
 
-    private void loadFromStatement(Resource resource, Statement statement) {
+    private void loadFromStatement(Resource resource, Statement statement, List<String> path) {
         if (statement instanceof NestedStatement) {
+            List<String> nestedPath = new ArrayList<>(path);
+            nestedPath.add(((NestedStatement) statement).getPropertyName());
             ((NestedStatement) statement).getStatements()
-                    .forEach(stmt -> loadFromStatement(resource, stmt));
+                    .forEach(stmt -> loadFromStatement(resource, stmt, nestedPath));
         } else if (statement instanceof AssociationStatement) {
-            loadFromAssociationStatement(resource, (AssociationStatement) statement);
+            loadFromAssociationStatement(resource, (AssociationStatement) statement, path);
         }
     }
 
-    private void loadFromAssociationStatement(Resource resource, AssociationStatement statement) {
+    private void loadFromAssociationStatement(Resource resource, AssociationStatement statement, List<String> path) {
+        List<String> associationPath = new ArrayList<>(path);
+        associationPath.add(statement.getAssociationName());
+
         LOGGER.debug("Loading resources for association '{}' in resource '{}' with id '{}'",
                 statement.getAssociationName(), resource.getResourceDefRef(), resource.getResourceId());
-        Optional<Association> associationOpt = resource.getAssociation(statement.getAssociationName());
+
+        Optional<Association> associationOpt = resource.getAssociationByPath(associationPath);
         if (!associationOpt.isPresent()) {
             LOGGER.error(
                     "Association '{}' does not exist in resource '{}' with id '{}'. Ignoring it.",
@@ -125,17 +128,10 @@ public class ResourceLoader {
             return;
         }
 
-        // create association to target resource
-        resourceStore.setAssociation(
-                resource.getResourceDefRef(),
-                resource.getResourceId(),
-                association
-        );
-
         // load resources from each sub statement
         statement.getStatements()
                 .forEach(stmt ->
-                        loadFromStatement(associatedResourceOpt.get(), stmt)
+                        loadFromStatement(associatedResourceOpt.get(), stmt, new ArrayList<>())
                 );
     }
 
@@ -151,11 +147,11 @@ public class ResourceLoader {
                     .map(ResourceReflectionUtil::toResource)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .peek(resource -> resourceStore.createResource(
+                    .peek(resource -> resourceStore.saveResource(
                             resource.getResourceDefRef(),
                             resource.getResourceId(),
                             resource.getProperties(),
-                            new Associations()
+                            resource.getAssociations()
                     ));
         } else {
             return resourceStore.getResourcesByDefinition(resourceDefRef).stream();
@@ -163,23 +159,24 @@ public class ResourceLoader {
     }
 
     private Optional<Resource> getResourceById(ResourceDefRef resourceDefRef, String resourceId) {
-        Optional<Resource> resourceOpt = resourceStore.getResource(resourceDefRef, resourceId);
-        if (!resourceOpt.isPresent()) {
-            LOGGER.debug("Loading resource of type '{}' with id '{}'", resourceDefRef, resourceId);
+        // TODO load incomplete resource from store
+//        Optional<Resource> resourceOpt = resourceStore.getResource(resourceDefRef, resourceId);
+//        if (!resourceOpt.isPresent()) {
+        LOGGER.debug("Loading resource of type '{}' with id '{}'", resourceDefRef, resourceId);
 
-            resourceOpt = providersRegistry.getProvider(resourceDefRef.getProviderName())
-                    .map(provider -> provider.getResource(resourceDefRef, resourceId))
-                    .flatMap(ResourceReflectionUtil::toResource);
+        Optional<Resource> resourceOpt = providersRegistry.getProvider(resourceDefRef.getProviderName())
+                .flatMap(provider -> provider.getResource(resourceDefRef, resourceId))
+                .flatMap(ResourceReflectionUtil::toResource);
 
-            resourceOpt.ifPresent(resource -> resourceStore.createResource(
-                    resource.getResourceDefRef(),
-                    resource.getResourceId(),
-                    resource.getProperties(),
-                    new Associations()
-            ));
+        resourceOpt.ifPresent(resource -> resourceStore.saveResource(
+                resource.getResourceDefRef(),
+                resource.getResourceId(),
+                resource.getProperties(),
+                resource.getAssociations()
+        ));
 
-            return resourceOpt;
-        }
-        return Optional.empty();
+        return resourceOpt;
+//        }
+//        return resourceOpt;
     }
 }

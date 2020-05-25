@@ -25,29 +25,8 @@
  */
 package cloudspec.model;
 
-import java.util.Optional;
-
-/**
- * Interface for classes that manage properties.
- */
-public interface PropertiesContainer {
-    /**
-     * Get a property by name.
-     *
-     * @param propertyName Property name.
-     * @return Optional property.
-     */
-    default Optional<Property<?>> getProperty(String propertyName) {
-        return getProperties()
-                .stream()
-                .filter(p -> p.getName().equals(propertyName))
-                .findFirst();
+public class KeyValueProperty extends Property<KeyValue> {
+    public KeyValueProperty(String name, KeyValue value) {
+        super(name, value);
     }
-
-    /**
-     * Get all properties.
-     *
-     * @return List of properties.
-     */
-    Properties getProperties();
 }

@@ -26,7 +26,6 @@
 package cloudspec.preflight;
 
 import cloudspec.lang.*;
-import cloudspec.loader.ResourceLoader;
 import cloudspec.model.AssociationDef;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceDefRef;
@@ -34,9 +33,9 @@ import cloudspec.store.ResourceDefStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 
 public class CloudSpecPreflight {
     private final Logger LOGGER = LoggerFactory.getLogger(CloudSpecPreflight.class);
@@ -87,16 +86,16 @@ public class CloudSpecPreflight {
         rule.getWithExpr()
                 .getStatements()
                 .forEach(statement ->
-                        preflightStatement(resourceDef, statement, new Stack<>())
+                        preflightStatement(resourceDef, statement, new ArrayList<>())
                 );
         rule.getAssertExpr()
                 .getStatements()
                 .forEach(statement ->
-                        preflightStatement(resourceDef, statement, new Stack<>())
+                        preflightStatement(resourceDef, statement, new ArrayList<>())
                 );
     }
 
-    private void preflightStatement(ResourceDef resourceDef, Statement statement, Stack<String> path) {
+    private void preflightStatement(ResourceDef resourceDef, Statement statement, List<String> path) {
         if (statement instanceof NestedStatement) {
             preflightNestedStatement(resourceDef, ((NestedStatement) statement), path);
         } else if (statement instanceof KeyValueStatement) {
@@ -108,9 +107,8 @@ public class CloudSpecPreflight {
         }
     }
 
-    private void preflightNestedStatement(ResourceDef resourceDef, NestedStatement statement, Stack<String> path) {
-        Stack<String> nestedPath = new Stack<>();
-        nestedPath.addAll(path);
+    private void preflightNestedStatement(ResourceDef resourceDef, NestedStatement statement, List<String> path) {
+        List<String> nestedPath = new ArrayList<>(path);
         nestedPath.add(statement.getPropertyName());
 
         if (!resourceDef.getPropertyByPath(nestedPath).isPresent()) {
@@ -126,9 +124,8 @@ public class CloudSpecPreflight {
                 .forEach(stmt -> preflightStatement(resourceDef, stmt, nestedPath));
     }
 
-    private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement, Stack<String> path) {
-        Stack<String> associationPath = new Stack<>();
-        associationPath.addAll(path);
+    private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement, List<String> path) {
+        List<String> associationPath = new ArrayList<>(path);
         associationPath.add(statement.getAssociationName());
 
         Optional<AssociationDef> associationDefOpt = resourceDef.getAssociationByPath(associationPath);
@@ -154,12 +151,11 @@ public class CloudSpecPreflight {
         }
 
         ResourceDef associatedResourceDef = associatedResourceDefOpt.get();
-        statement.getStatements().forEach(stmt -> preflightStatement(associatedResourceDef, stmt, associationPath));
+        statement.getStatements().forEach(stmt -> preflightStatement(associatedResourceDef, stmt, new ArrayList<>()));
     }
 
-    private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement, Stack<String> path) {
-        Stack<String> propertyPath = new Stack<>();
-        propertyPath.addAll(path);
+    private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement, List<String> path) {
+        List<String> propertyPath = new ArrayList<>(path);
         propertyPath.add(statement.getPropertyName());
 
         if (!resourceDef.getPropertyByPath(propertyPath).isPresent()) {
@@ -174,8 +170,7 @@ public class CloudSpecPreflight {
     }
 
     private void preflightKeyValueStatement(ResourceDef resourceDef, KeyValueStatement statement, List<String> path) {
-        Stack<String> propertyPath = new Stack<>();
-        propertyPath.addAll(path);
+        List<String> propertyPath = new ArrayList<>(path);
         propertyPath.add(statement.getPropertyName());
 
         if (!resourceDef.getPropertyByPath(propertyPath).isPresent()) {

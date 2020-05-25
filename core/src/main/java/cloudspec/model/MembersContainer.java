@@ -25,8 +25,44 @@
  */
 package cloudspec.model;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Interface for classes that manage properties and associations.
  */
 public interface MembersContainer extends PropertiesContainer, AssociationsContainer {
+    /**
+     * Get a property by its path.
+     *
+     * @param path Property path
+     * @return Optional property.
+     */
+    default Optional<Property<?>> getPropertyByPath(List<String> path) {
+        if (path.size() == 1) {
+            return getProperty(path.get(0));
+        } else if (path.size() > 1) {
+            return getProperty(path.get(0))
+                    .flatMap(property -> property.getPropertyByPath(path.subList(1, path.size())));
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Get an association by its path.
+     *
+     * @param path Association path
+     * @return Optional association.
+     */
+    default Optional<Association> getAssociationByPath(List<String> path) {
+        if (path.size() == 1) {
+            return getAssociation(path.get(0));
+        } else if (path.size() > 1) {
+            return getProperty(path.get(0))
+                    .flatMap(property -> property.getAssociationByPath(path.subList(1, path.size())));
+        }
+
+        return Optional.empty();
+    }
 }

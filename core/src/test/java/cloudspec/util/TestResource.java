@@ -43,79 +43,92 @@ public class TestResource {
     @IdDefinition
     @PropertyDefinition(
             name = ModelTestUtils.PROP_ID_NAME,
-            description = ModelTestUtils.PROP_ID_DESCRIPTION
+            description = ModelTestUtils.PROP_ID_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_ID_EXAMPLE_VALUES
     )
     private final String id;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_INTEGER_NAME,
-            description = ModelTestUtils.PROP_INTEGER_DESCRIPTION
+            description = ModelTestUtils.PROP_INTEGER_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_INTEGER_EXAMPLE_VALUES
     )
     private final Integer integerProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_INTEGER_LIST_NAME,
-            description = ModelTestUtils.PROP_INTEGER_LIST_DESCRIPTION
+            description = ModelTestUtils.PROP_INTEGER_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_INTEGER_LIST_EXAMPLE_VALUES
     )
     private final List<Integer> integerListProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_DOUBLE_NAME,
-            description = ModelTestUtils.PROP_DOUBLE_DESCRIPTION
+            description = ModelTestUtils.PROP_DOUBLE_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_DOUBLE_EXAMPLE_VALUES
     )
     private final Double doubleProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_DOUBLE_LIST_NAME,
-            description = ModelTestUtils.PROP_DOUBLE_LIST_DESCRIPTION
+            description = ModelTestUtils.PROP_DOUBLE_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_DOUBLE_LIST_EXAMPLE_VALUES
     )
     private final List<Double> doubleListProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_STRING_NAME,
-            description = ModelTestUtils.PROP_STRING_DESCRIPTION
+            description = ModelTestUtils.PROP_STRING_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_STRING_EXAMPLE_VALUES
     )
     private final String stringProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_STRING_LIST_NAME,
-            description = ModelTestUtils.PROP_STRING_LIST_DESCRIPTION
+            description = ModelTestUtils.PROP_STRING_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_STRING_LIST_EXAMPLE_VALUES
     )
     private final List<String> stringListProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_BOOLEAN_NAME,
-            description = ModelTestUtils.PROP_BOOLEAN_DESCRIPTION
+            description = ModelTestUtils.PROP_BOOLEAN_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_BOOLEAN_EXAMPLE_VALUES
     )
     private final Boolean booleanProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_BOOLEAN_LIST_NAME,
-            description = ModelTestUtils.PROP_BOOLEAN_LIST_DESCRIPTION
+            description = ModelTestUtils.PROP_BOOLEAN_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_BOOLEAN_LIST_EXAMPLE_VALUES
     )
     private final List<Boolean> booleanListProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_KEY_VALUE_NAME,
-            description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION
+            description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_KEY_VALUE_EXAMPLE_VALUES
     )
     private final KeyValue keyValueProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_KEY_VALUE_LIST_NAME,
-            description = ModelTestUtils.PROP_KEY_VALUE_LIST_DESCRIPTION
+            description = ModelTestUtils.PROP_KEY_VALUE_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_KEY_VALUE_LIST_EXAMPLE_VALUES
     )
     private final List<KeyValue> keyValueListProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_NESTED_NAME,
-            description = ModelTestUtils.PROP_NESTED_DESCRIPTION
+            description = ModelTestUtils.PROP_NESTED_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_NESTED_EXAMPLE_VALUES
     )
     private final TestNestedProperty nestedProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_NESTED_LIST_NAME,
-            description = ModelTestUtils.PROP_NESTED_LIST_DESCRIPTION
+            description = ModelTestUtils.PROP_NESTED_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_NESTED_LIST_EXAMPLE_VALUES
     )
     private final List<TestNestedProperty> nestedListProperty;
 
