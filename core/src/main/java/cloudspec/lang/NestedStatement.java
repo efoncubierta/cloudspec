@@ -73,7 +73,7 @@ public class NestedStatement implements Statement {
         StrBuilder sb = new StrBuilder();
 
         sb.appendln(
-                String.format("%s%s ( ", StringUtils.repeat(" ", spaces), propertyName)
+                String.format("%s%s ( ", " ".repeat(spaces), propertyName)
         );
 
         sb.appendln(
@@ -83,7 +83,7 @@ public class NestedStatement implements Statement {
         );
 
         sb.appendln(
-                String.format("%s)", StringUtils.repeat(" ", spaces))
+                String.format("%s)", " ".repeat(spaces))
         );
 
         return sb.toString();

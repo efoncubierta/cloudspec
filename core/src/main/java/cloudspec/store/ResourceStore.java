@@ -42,13 +42,13 @@ public interface ResourceStore {
 
     List<Resource> getResourcesByDefinition(ResourceDefRef resourceDefRef);
 
-    Properties getProperties(ResourceDefRef resourceDefRef, String resourceId);
+    Optional<Properties> getProperties(ResourceDefRef resourceDefRef, String resourceId);
 
     void saveProperty(ResourceDefRef resourceDefRef, String resourceId, Property<?> property);
 
     void saveProperties(ResourceDefRef resourceDefRef, String resourceId, Properties properties);
 
-    Associations getAssociations(ResourceDefRef resourceDefRef, String resourceId);
+    Optional<Associations> getAssociations(ResourceDefRef resourceDefRef, String resourceId);
 
     void saveAssociation(ResourceDefRef resourceDefRef, String resourceId, Association association);
 

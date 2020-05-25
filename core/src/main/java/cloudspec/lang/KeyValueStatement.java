@@ -63,7 +63,7 @@ public class KeyValueStatement extends PropertyStatement {
         StrBuilder sb = new StrBuilder();
 
         sb.append(
-                String.format("%s%s[\"%s\"] ", StringUtils.repeat(" ", spaces), propertyName, key)
+                String.format("%s%s[\"%s\"] ", " ".repeat(spaces), propertyName, key)
         );
 
         sb.append(predicateToCloudSpecSyntax(predicate));

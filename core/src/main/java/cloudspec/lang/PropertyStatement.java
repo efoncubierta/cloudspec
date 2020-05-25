@@ -76,7 +76,7 @@ public class PropertyStatement implements Statement {
         StrBuilder sb = new StrBuilder();
 
         sb.append(
-                String.format("%s%s ", StringUtils.repeat(" ", spaces), propertyName)
+                String.format("%s%s ", " ".repeat(spaces), propertyName)
         );
 
         sb.append(predicateToCloudSpecSyntax(predicate));

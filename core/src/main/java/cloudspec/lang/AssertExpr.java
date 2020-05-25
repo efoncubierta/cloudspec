@@ -71,13 +71,13 @@ public class AssertExpr implements CloudSpecSyntaxProducer {
                     if (i == 0) {
                         sb.appendln(
                                 String.format(
-                                        "%sAssert", StringUtils.repeat(" ", spaces)
+                                        "%sAssert", " ".repeat(spaces)
                                 )
                         );
                     } else {
                         sb.appendln(
                                 String.format(
-                                        "%sAnd", StringUtils.repeat(" ", spaces)
+                                        "%sAnd", " ".repeat(spaces)
                                 )
                         );
                     }

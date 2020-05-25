@@ -71,13 +71,13 @@ public class WithExpr implements CloudSpecSyntaxProducer {
                     if (i == 0) {
                         sb.appendln(
                                 String.format(
-                                        "%sWith", StringUtils.repeat(" ", spaces)
+                                        "%sWith", " ".repeat(spaces)
                                 )
                         );
                     } else {
                         sb.appendln(
                                 String.format(
-                                        "%sAnd", StringUtils.repeat(" ", spaces)
+                                        "%sAnd", " ".repeat(spaces)
                                 )
                         );
                     }

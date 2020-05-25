@@ -106,45 +106,45 @@ public class GraphResourceStoreTest {
 
     @Test
     public void shouldNotGetPropertiesOfRandomResource() {
-        Properties properties = resourceStore.getProperties(
+        Optional<Properties> propertiesOpt = resourceStore.getProperties(
                 ModelGenerator.randomResourceDefRef(),
                 ModelGenerator.randomResourceId()
         );
-        assertNotNull(properties);
-        assertTrue(properties.isEmpty());
+        assertNotNull(propertiesOpt);
+        assertTrue(propertiesOpt.isEmpty());
     }
 
     @Test
     public void shouldGetPropertiesOfResource() {
-        Properties properties = resourceStore.getProperties(
+        Optional<Properties> propertiesOpt = resourceStore.getProperties(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID
         );
-        assertNotNull(properties);
-        assertFalse(properties.isEmpty());
-        assertEquals(ModelTestUtils.PROPERTIES.size(), properties.size());
-        assertTrue(ModelTestUtils.PROPERTIES.containsAll(properties));
+        assertNotNull(propertiesOpt);
+        assertTrue(propertiesOpt.isPresent());
+        assertEquals(ModelTestUtils.PROPERTIES.size(), propertiesOpt.get().size());
+        assertTrue(ModelTestUtils.PROPERTIES.containsAll(propertiesOpt.get()));
     }
 
     @Test
     public void shouldNotGetAssociationsOfRandomResource() {
-        Associations associations = resourceStore.getAssociations(
+        Optional<Associations> associationsOpt = resourceStore.getAssociations(
                 ModelGenerator.randomResourceDefRef(),
                 ModelGenerator.randomResourceId()
         );
-        assertNotNull(associations);
-        assertTrue(associations.isEmpty());
+        assertNotNull(associationsOpt);
+        assertTrue(associationsOpt.isEmpty());
     }
 
     @Test
     public void shouldGetAssociationsOfResource() {
-        Associations associations = resourceStore.getAssociations(
+        Optional<Associations> associationsOpt = resourceStore.getAssociations(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID
         );
-        assertNotNull(associations);
-        assertFalse(associations.isEmpty());
-        assertEquals(ModelTestUtils.ASSOCIATIONS, associations);
+        assertNotNull(associationsOpt);
+        assertTrue(associationsOpt.isPresent());
+        assertEquals(ModelTestUtils.ASSOCIATIONS, associationsOpt.get());
     }
 
     @Test
@@ -179,9 +179,9 @@ public class GraphResourceStoreTest {
                 property
         );
 
-        Properties properties = resourceStore.getProperties(resourceDefRef, resourceId);
-        assertNotNull(properties);
-        assertTrue(properties.isEmpty());
+        Optional<Properties> propertiesOpt = resourceStore.getProperties(resourceDefRef, resourceId);
+        assertNotNull(propertiesOpt);
+        assertTrue(propertiesOpt.isEmpty());
     }
 
     @Test
@@ -194,9 +194,10 @@ public class GraphResourceStoreTest {
         resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
         assertThrows(RuntimeException.class, () -> resourceStore.saveProperty(resource.getResourceDefRef(), resource.getResourceId(), property));
 
-        Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
-        assertNotNull(properties);
-        assertTrue(properties.isEmpty());
+        Optional<Properties> propertiesOpt = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(propertiesOpt);
+        assertTrue(propertiesOpt.isPresent());
+        assertTrue(propertiesOpt.get().isEmpty());
     }
 
     @Test
@@ -209,11 +210,11 @@ public class GraphResourceStoreTest {
         resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.saveProperty(resource.getResourceDefRef(), resource.getResourceId(), property);
 
-        Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
-        assertNotNull(properties);
-        assertFalse(properties.isEmpty());
-        assertEquals(1, properties.size());
-        assertEquals(property, resource.getProperties().get(0));
+        Optional<Properties> propertiesOpt = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(propertiesOpt);
+        assertTrue(propertiesOpt.isPresent());
+        assertEquals(1, propertiesOpt.get().size());
+        assertEquals(property, propertiesOpt.get().get(0));
     }
 
     @Test
@@ -225,10 +226,10 @@ public class GraphResourceStoreTest {
         resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.saveProperties(resource.getResourceDefRef(), resource.getResourceId(), resource.getProperties());
 
-        Properties properties = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
-        assertNotNull(properties);
-        assertFalse(properties.isEmpty());
-        assertEquals(resource.getProperties(), properties);
+        Optional<Properties> propertiesOpt = resourceStore.getProperties(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(propertiesOpt);
+        assertTrue(propertiesOpt.isPresent());
+        assertEquals(resource.getProperties(), propertiesOpt.get());
     }
 
     @Test
@@ -243,9 +244,9 @@ public class GraphResourceStoreTest {
                 association
         );
 
-        Associations associations = resourceStore.getAssociations(resourceDefRef, resourceId);
-        assertNotNull(associations);
-        assertTrue(associations.isEmpty());
+        Optional<Associations> associationsOpt = resourceStore.getAssociations(resourceDefRef, resourceId);
+        assertNotNull(associationsOpt);
+        assertTrue(associationsOpt.isEmpty());
     }
 
     @Test
@@ -262,9 +263,10 @@ public class GraphResourceStoreTest {
                 association
         ));
 
-        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
-        assertNotNull(associations);
-        assertTrue(associations.isEmpty());
+        Optional<Associations> associationsOpt = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associationsOpt);
+        assertTrue(associationsOpt.isPresent());
+        assertTrue(associationsOpt.get().isEmpty());
     }
 
     @Test
@@ -278,9 +280,10 @@ public class GraphResourceStoreTest {
         resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
         assertThrows(RuntimeException.class, () -> resourceStore.saveAssociation(resource.getResourceDefRef(), resource.getResourceId(), association));
 
-        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
-        assertNotNull(associations);
-        assertTrue(associations.isEmpty());
+        Optional<Associations> associationsOpt = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associationsOpt);
+        assertTrue(associationsOpt.isPresent());
+        assertTrue(associationsOpt.get().isEmpty());
     }
 
     @Test
@@ -299,11 +302,11 @@ public class GraphResourceStoreTest {
         resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.saveAssociation(resource.getResourceDefRef(), resource.getResourceId(), association);
 
-        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
-        assertNotNull(associations);
-        assertFalse(associations.isEmpty());
-        assertEquals(1, associations.size());
-        assertEquals(association, associations.get(0));
+        Optional<Associations> associationsOpt = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associationsOpt);
+        assertFalse(associationsOpt.isEmpty());
+        assertEquals(1, associationsOpt.get().size());
+        assertEquals(association, associationsOpt.get().get(0));
     }
 
     @Test
@@ -322,9 +325,9 @@ public class GraphResourceStoreTest {
         resourceStore.saveResource(resource.getResourceDefRef(), resource.getResourceId());
         resourceStore.saveAssociations(resource.getResourceDefRef(), resource.getResourceId(), resource.getAssociations());
 
-        Associations associations = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
-        assertNotNull(associations);
-        assertFalse(associations.isEmpty());
-        assertEquals(resource.getAssociations(), associations);
+        Optional<Associations> associationsOpt = resourceStore.getAssociations(resource.getResourceDefRef(), resource.getResourceId());
+        assertNotNull(associationsOpt);
+        assertFalse(associationsOpt.isEmpty());
+        assertEquals(resource.getAssociations(), associationsOpt.get());
     }
 }

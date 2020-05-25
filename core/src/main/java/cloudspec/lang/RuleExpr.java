@@ -101,10 +101,10 @@ public class RuleExpr implements CloudSpecSyntaxProducer {
     public String toCloudSpecSyntax(Integer spaces) {
         StrBuilder sb = new StrBuilder();
         sb.appendln(
-                String.format("%sRule \"%s\"", StringUtils.repeat(" ", spaces), name)
+                String.format("%sRule \"%s\"", " ".repeat(spaces), name)
         );
         sb.appendln(
-                String.format("%sOn %s", StringUtils.repeat(" ", spaces), resourceDefRef)
+                String.format("%sOn %s", " ".repeat(spaces), resourceDefRef)
         );
 
         // add with statements

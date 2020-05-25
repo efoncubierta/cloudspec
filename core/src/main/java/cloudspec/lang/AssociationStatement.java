@@ -73,7 +73,7 @@ public class AssociationStatement implements Statement {
         StrBuilder sb = new StrBuilder();
 
         sb.appendln(
-                String.format("%s> %s ( ", StringUtils.repeat(" ", spaces), associationName)
+                String.format("%s> %s ( ", " ".repeat(spaces), associationName)
         );
 
         sb.appendln(
@@ -83,7 +83,7 @@ public class AssociationStatement implements Statement {
         );
 
         sb.appendln(
-                String.format("%s)", StringUtils.repeat(" ", spaces))
+                String.format("%s)", " ".repeat(spaces))
         );
 
         return sb.toString();

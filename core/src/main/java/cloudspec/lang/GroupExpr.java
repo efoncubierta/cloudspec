@@ -79,7 +79,7 @@ public class GroupExpr implements CloudSpecSyntaxProducer {
     public String toCloudSpecSyntax(Integer spaces) {
         StrBuilder sb = new StrBuilder();
         sb.appendln(
-                String.format("%sGroup \"%s\"", StringUtils.repeat(" ", spaces), name)
+                String.format("%sGroup \"%s\"", " ".repeat(spaces), name)
         );
 
         // add rules

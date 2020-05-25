@@ -76,7 +76,7 @@ public class CloudSpec implements CloudSpecSyntaxProducer {
     public String toCloudSpecSyntax(Integer spaces) {
         StrBuilder sb = new StrBuilder();
         sb.appendln(
-                String.format("%sSpec \"%s\"", StringUtils.repeat(" ", spaces), name)
+                String.format("%sSpec \"%s\"", " ".repeat(spaces), name)
         );
 
         // add groups
