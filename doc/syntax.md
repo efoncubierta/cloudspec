@@ -208,10 +208,18 @@ A property can be of one of the following types:
 Spec "Production environment"
 
 Group "S3 validations"
-  Rule "S3 buckets must have access logs and versioning enabled"
-    On aws:s3:bucket
+  Rule "Buckets must have access logs enabled"
+  On aws:s3:bucket
+  Assert
+    access_logs is enabled
+
+Group "EC2 validations"
+  Rule "Instances must use 'gp2' volume types."
+    On aws:ec2:instance
     Assert
-      access_logs_enabled is true
-    And
-      versioning_enabled is true
+      devices (
+        > volume (
+            type equal to "gp2"
+        )
+      )
 ```
