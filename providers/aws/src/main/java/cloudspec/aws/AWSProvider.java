@@ -82,7 +82,7 @@ public class AWSProvider extends BaseProvider {
     @Override
     public Optional<?> getResource(ResourceDefRef resourceDefRef, String resourceId) {
         return getLoader(resourceDefRef)
-                .map(loader -> loader.getById(resourceId));
+                .flatMap(loader -> loader.getById(resourceId));
     }
 
     private Optional<AWSResourceLoader<?>> getLoader(ResourceDefRef resourceDefRef) {
