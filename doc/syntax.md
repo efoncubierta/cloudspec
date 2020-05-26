@@ -214,6 +214,8 @@ my (
 - `<= IP :ip_address` or `LESS THAN OR EQUAL TO IP :ip_address` or `LTE IP :ip_address`: ip address is less or equal than another ip address.
 - `WITHIN NETWORK :cidr_block`: ip address is within a network.
 - `NOT WITHIN NETWORK :cidr_block`: ip address is not within a network.
+- `IPV4`: true if value is a IPv4.
+- `IPV6`: true if value is a IPv6.
 
 **For boolean properties:**
 
