@@ -112,50 +112,14 @@ public class GraphResourceDefStore implements ResourceDefStore {
         this.graphTraversal = graph.traversal();
     }
 
-    private List<PropertyDef> getPropertyDefs(Vertex sourceV) {
-        return graphTraversal
-                .V(sourceV.id())
-                .out(LABEL_HAS_PROPERTY_DEF)
-                .toStream()
-                .peek(propertyDefV -> LOGGER.debug("- Found property definition '{}'",
-                        (Object) propertyDefV.value(PROPERTY_NAME))
-                )
-                .map(propertyDefV -> new PropertyDef(
-                        propertyDefV.value(PROPERTY_NAME),
-                        propertyDefV.value(PROPERTY_DESCRIPTION),
-                        propertyDefV.value(PROPERTY_TYPE),
-                        propertyDefV.value(PROPERTY_IS_MULTIVALUED),
-                        propertyDefV.value(PROPERTY_EXAMPLE_VALUES),
-                        getPropertyDefs(propertyDefV),
-                        getAssociationDefs(propertyDefV)
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private List<AssociationDef> getAssociationDefs(Vertex sourceV) {
-        return graphTraversal
-                .V(sourceV.id())
-                .out(LABEL_HAS_ASSOCIATION_DEF)
-                .toStream()
-                .peek(associationDefV -> LOGGER.debug("- Found association definition '{}'",
-                        (Object) associationDefV.value(PROPERTY_NAME))
-                )
-                .map(associationDefV -> new AssociationDef(
-                        associationDefV.value(PROPERTY_NAME),
-                        associationDefV.value(PROPERTY_DESCRIPTION),
-                        associationDefV.value(PROPERTY_RESOURCE_DEF_REF)
-                ))
-                .collect(Collectors.toList());
-    }
-
     @Override
     public void createResourceDef(ResourceDef resourceDef) {
         LOGGER.debug("Adding resource definition '{}'", resourceDef.getRef());
 
-        ResourceDefRef resourceDefRef = resourceDef.getRef();
+        var resourceDefRef = resourceDef.getRef();
 
         // create resource definition vertex
-        Vertex resourceV = graphTraversal
+        var resourceV = graphTraversal
                 .addV(LABEL_RESOURCE_DEF)
                 .property(PROPERTY_PROVIDER_NAME, resourceDefRef.getProviderName())
                 .property(PROPERTY_GROUP_NAME, resourceDefRef.getGroupName())
@@ -177,17 +141,20 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
         return graphTraversal
                 .V()
+                // get resource definition vertex by reference
                 .has(LABEL_RESOURCE_DEF, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
                 .toStream()
-                .peek(resourceDefV -> LOGGER.debug("- Found resource definition '{}'",
-                        (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF))
+                // print out debugging information
+                .peek(resourceDefV ->
+                        LOGGER.debug(
+                                "- Found resource definition '{}'",
+                                (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF)
+                        )
                 )
-                .map(resourceDefV -> new ResourceDef(
-                        resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
-                        resourceDefV.value(PROPERTY_DESCRIPTION),
-                        getPropertyDefs(resourceDefV),
-                        getAssociationDefs(resourceDefV)
-                ))
+                // map vertex to resource definition
+                .map(this::toResourceDefFromVertex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .findFirst();
     }
 
@@ -197,20 +164,108 @@ public class GraphResourceDefStore implements ResourceDefStore {
 
         return graphTraversal
                 .V()
+                // get all resource definition vertices
                 .hasLabel(LABEL_RESOURCE_DEF)
                 .toStream()
+                // print out debugging information
                 .peek(resourceDefV ->
                         LOGGER.debug(
                                 "- Found resource definition '{}'",
                                 (Object) resourceDefV.value(PROPERTY_RESOURCE_DEF_REF)
                         )
                 )
-                .map(resourceDefV -> new ResourceDef(
+                .map(this::toResourceDefFromVertex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    private Optional<ResourceDef> toResourceDefFromVertex(Vertex resourceDefV) {
+        // check whether the vertex is a resource definition
+        if (!resourceDefV.label().equals(LABEL_RESOURCE_DEF)) {
+            LOGGER.error("Vertex is not of type '{}'.", LABEL_RESOURCE_DEF);
+            return Optional.empty();
+        }
+
+        // return resource definition
+        return Optional.of(
+                new ResourceDef(
                         resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
                         resourceDefV.value(PROPERTY_DESCRIPTION),
                         getPropertyDefs(resourceDefV),
                         getAssociationDefs(resourceDefV)
-                ))
+                )
+        );
+    }
+
+    private Optional<PropertyDef> toPropertyDefFromVertex(Vertex propertyDefV) {
+        // check whether the vertex is a property definition
+        if (!propertyDefV.label().equals(LABEL_PROPERTY_DEF)) {
+            LOGGER.error("Vertex is not of type '{}'.", LABEL_PROPERTY_DEF);
+            return Optional.empty();
+        }
+
+        // return property definition
+        return Optional.of(
+                new PropertyDef(
+                        propertyDefV.value(PROPERTY_NAME),
+                        propertyDefV.value(PROPERTY_DESCRIPTION),
+                        propertyDefV.value(PROPERTY_TYPE),
+                        propertyDefV.value(PROPERTY_IS_MULTIVALUED),
+                        propertyDefV.value(PROPERTY_EXAMPLE_VALUES),
+                        getPropertyDefs(propertyDefV),
+                        getAssociationDefs(propertyDefV)
+                )
+        );
+    }
+
+    private Optional<AssociationDef> toAssociationDefFromVertex(Vertex associationDefV) {
+        // check whether the vertex is a property definition
+        if (!associationDefV.label().equals(LABEL_ASSOCIATION_DEF)) {
+            LOGGER.error("Vertex is not of type '{}'.", LABEL_ASSOCIATION_DEF);
+            return Optional.empty();
+        }
+
+        // return property definition
+        return Optional.of(
+                new AssociationDef(
+                        associationDefV.value(PROPERTY_NAME),
+                        associationDefV.value(PROPERTY_DESCRIPTION),
+                        associationDefV.value(PROPERTY_RESOURCE_DEF_REF)
+                )
+        );
+    }
+
+    private List<PropertyDef> getPropertyDefs(Vertex sourceV) {
+        return graphTraversal
+                .V(sourceV.id())
+                // get all property definition vertices
+                .out(LABEL_HAS_PROPERTY_DEF)
+                .toStream()
+                // print out debugging information
+                .peek(propertyDefV ->
+                        LOGGER.debug(
+                                "- Found property definition '{}'",
+                                (Object) propertyDefV.value(PROPERTY_NAME)
+                        )
+                )
+                .map(this::toPropertyDefFromVertex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    private List<AssociationDef> getAssociationDefs(Vertex sourceV) {
+        return graphTraversal
+                .V(sourceV.id())
+                .out(LABEL_HAS_ASSOCIATION_DEF)
+                .toStream()
+                .peek(associationDefV -> LOGGER.debug("- Found association definition '{}'",
+                        (Object) associationDefV.value(PROPERTY_NAME))
+                )
+                .map(this::toAssociationDefFromVertex)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
@@ -223,7 +278,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 getPropertyPath(sourceV, propertyDef.getName()), propertyDef);
 
         // create property definition vertex
-        Vertex propertyFromV = graphTraversal
+        var propertyFromV = graphTraversal
                 .addV(LABEL_PROPERTY_DEF)
                 .property(PROPERTY_NAME, propertyDef.getName())
                 .property(PROPERTY_DESCRIPTION, propertyDef.getDescription())
@@ -232,7 +287,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .property(PROPERTY_EXAMPLE_VALUES, propertyDef.getExampleValues())
                 .next();
 
-        // link property definition to source vertex
+        // create edge between source (resource or property def) and property definition vertices
         graphTraversal
                 .addE(LABEL_HAS_PROPERTY_DEF)
                 .from(sourceV)
@@ -255,14 +310,14 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 getPropertyPath(sourceV, associationDef.getName()), associationDef);
 
         // create association definition vertex
-        Vertex associationDefV = graphTraversal
+        var associationDefV = graphTraversal
                 .addV(LABEL_ASSOCIATION_DEF)
                 .property(PROPERTY_NAME, associationDef.getName())
                 .property(PROPERTY_DESCRIPTION, associationDef.getDescription())
                 .property(PROPERTY_RESOURCE_DEF_REF, associationDef.getResourceDefRef())
                 .next();
 
-        // link association definition to source vertex
+        // create edge between source (resource or property definition) and association definition vertices
         graphTraversal
                 .addE(LABEL_HAS_ASSOCIATION_DEF)
                 .from(sourceV)
