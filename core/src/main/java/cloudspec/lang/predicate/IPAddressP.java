@@ -83,4 +83,12 @@ public class IPAddressP extends P<String> {
     public static P<String> withoutNetwork(final String value) {
         return new IPAddressP(IPAddress.withoutNetwork, value);
     }
+
+    public static IPAddressP isIpv4() {
+        return new IPAddressP(IPAddress.isIpv4, "");
+    }
+
+    public static IPAddressP isIpv6() {
+        return new IPAddressP(IPAddress.isIpv6, "");
+    }
 }

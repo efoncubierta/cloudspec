@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -318,6 +318,16 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     @Override
     public void exitIpNotWithinNetworkPredicate(CloudSpecParser.IpNotWithinNetworkPredicateContext ctx) {
         currentPredicate = IPAddressP.withoutNetwork((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpIsIpv4Predicate(CloudSpecParser.IpIsIpv4PredicateContext ctx) {
+        currentPredicate = IPAddressP.isIpv4();
+    }
+
+    @Override
+    public void exitIpIsIpv6Predicate(CloudSpecParser.IpIsIpv6PredicateContext ctx) {
+        currentPredicate = IPAddressP.isIpv6();
     }
 
     @Override

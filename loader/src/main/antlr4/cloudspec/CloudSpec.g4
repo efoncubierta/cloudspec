@@ -16,35 +16,37 @@ assertDecl: ASSERT statement andDecl*;
 
 andDecl: AND statement;
 
-predicate: IS? ('==' | EQUAL_TO) value                      # ValueEqualPredicate
-         | IS? ('!=' | NOT EQUAL_TO) value                  # ValueNotEqualPredicate
-         | IS? WITHIN array                                 # ValueWithinPredicate
-         | IS? NOT WITHIN array                             # ValueNotWithinPredicate
+predicate: IS_EQUAL_TO value              # ValueEqualPredicate
+         | IS_NOT_EQUAL_TO value          # ValueNotEqualPredicate
+         | IS_WITHIN array                # ValueWithinPredicate
+         | IS_NOT_WITHIN array            # ValueNotWithinPredicate
          // number predicates
-         | IS? ('<' | LESS_THAN) value                      # NumberLessThanPredicate
-         | IS? ('<=' | LESS_THAN_EQUAL) value               # NumberLessThanEqualPredicate
-         | IS? ('>' | GREATER_THAN) value                   # NumberGreaterThanPredicate
-         | IS? ('>=' | GREATER_THAN_EQUAL) value            # NumberGreaterThanEqualPredicate
-         | IS? BETWEEN value AND value                      # NumberBetweenPredicate
+         | IS_LESS_THAN value             # NumberLessThanPredicate
+         | IS_LESS_THAN_EQUAL value       # NumberLessThanEqualPredicate
+         | IS_GREATER_THAN value          # NumberGreaterThanPredicate
+         | IS_GREATER_THAN_EQUAL value    # NumberGreaterThanEqualPredicate
+         | IS_BETWEEN value AND value     # NumberBetweenPredicate
          // string predicates
-         | STARTING_WITH value                              # StringStartingWithPredicate
-         | NOT_STARTING_WITH value                          # StringNotStartingWithPredicate
-         | ENDING_WITH value                                # StringEndingWithPredicate
-         | NOT_ENDING_WITH value                            # StringNotEndingWithPredicate
-         | CONTAINING value                                 # StringContainingPredicate
-         | NOT_CONTAINING value                             # StringNotContainingPredicate
+         | IS_STARTING_WITH value         # StringStartingWithPredicate
+         | IS_NOT_STARTING_WITH value     # StringNotStartingWithPredicate
+         | IS_ENDING_WITH value           # StringEndingWithPredicate
+         | IS_NOT_ENDING_WITH value       # StringNotEndingWithPredicate
+         | IS_CONTAINING value            # StringContainingPredicate
+         | IS_NOT_CONTAINING value        # StringNotContainingPredicate
          // ip addresses predicates
-         | IS? ('==' | EQUAL_TO) IP_ADDRESS value           # IpAddressEqualPredicate
-         | IS? ('!=' | NOT EQUAL_TO) IP_ADDRESS value       # IpAddressNotEqualPredicate
-         | IS? ('<'  | LESS_THAN) IP_ADDRESS value          # IpAddressLessThanPredicate
-         | IS? ('<=' | LESS_THAN_EQUAL) IP_ADDRESS value    # IpAddressLessThanEqualPredicate
-         | IS? ('>'  | GREATER_THAN) IP_ADDRESS value       # IpAddressGreaterThanPredicate
-         | IS? ('>=' | GREATER_THAN_EQUAL) IP_ADDRESS value # IpAddressGreaterThanEqualPredicate
-         | IS? WITHIN NETWORK value                         # IpWithinNetworkPredicate
-         | IS? NOT WITHIN NETWORK value                     # IpNotWithinNetworkPredicate
+         | IS_EQUAL_TO_IP_ADDRESS value             # IpAddressEqualPredicate
+         | IS_NOT_EQUAL_TO_IP_ADDRESS value         # IpAddressNotEqualPredicate
+         | IS_LESS_THAN_IP_ADDRESS value            # IpAddressLessThanPredicate
+         | IS_LESS_THAN_EQUAL_IP_ADDRESS value      # IpAddressLessThanEqualPredicate
+         | IS_GREATER_THAN_IP_ADDRESS value         # IpAddressGreaterThanPredicate
+         | IS_GREATER_THAN_EQUAL_IP_ADDRESS value   # IpAddressGreaterThanEqualPredicate
+         | IS_WITHIN_NETWORK value                  # IpWithinNetworkPredicate
+         | IS_NOT_WITHIN_NETWORK value              # IpNotWithinNetworkPredicate
+         | IS_IPV4                                  # IpIsIpv4Predicate
+         | IS_IPV6                                  # IpIsIpv6Predicate
          // boolean predicates
-         | IS? ENABLED                                      # EnabledPredicate
-         | IS? DISABLED                                     # DisabledPredicate
+         | IS_ENABLED                               # EnabledPredicate
+         | IS_DISABLED                              # DisabledPredicate
          ;
 
 statement: MEMBER_NAME predicate                      # PropertyStatement
@@ -70,50 +72,83 @@ fragment DIGIT: [0-9];
 fragment DOT: '.';
 fragment NEGATIVE: '-';
 
+// Predicates
+IS_EQUAL_TO:           (IS ' ')? ('==' | EQUAL ' ' TO);
+IS_NOT_EQUAL_TO:       (IS ' ')? ('!=' | NOT ' ' EQUAL ' ' TO);
+IS_WITHIN:             (IS ' ')? WITHIN;
+IS_NOT_WITHIN:         (IS ' ')? NOT ' ' WITHIN;
+
+IS_LESS_THAN:          (IS ' ')? ('<'  | LESS_THAN);
+IS_LESS_THAN_EQUAL:    (IS ' ')? ('<=' | LESS_THAN_EQUAL);
+IS_GREATER_THAN:       (IS ' ')? ('>'  | GREATER_THAN);
+IS_GREATER_THAN_EQUAL: (IS ' ')? ('>=' | GREATER_THAN_EQUAL);
+IS_BETWEEN:            (IS ' ')? BETWEEN;
+
+IS_STARTING_WITH:      (IS ' ')? STARTING ' ' WITH;
+IS_NOT_STARTING_WITH:  (IS ' ')? NOT ' ' STARTING ' ' WITH;
+IS_ENDING_WITH:        (IS ' ')? ENDING ' ' WITH;
+IS_NOT_ENDING_WITH:    (IS ' ')? NOT ' ' ENDING ' ' WITH;
+IS_CONTAINING:         (IS ' ')? CONTAINING;
+IS_NOT_CONTAINING:     (IS ' ')? NOT CONTAINING;
+
+IS_EQUAL_TO_IP_ADDRESS:           IS_EQUAL_TO ' ' IP (' ' ADDRESS)?;
+IS_NOT_EQUAL_TO_IP_ADDRESS:       IS_NOT_EQUAL_TO ' ' (' ' ADDRESS)?;
+IS_LESS_THAN_IP_ADDRESS:          IS_LESS_THAN ' ' (' ' ADDRESS)?;
+IS_LESS_THAN_EQUAL_IP_ADDRESS:    IS_LESS_THAN_EQUAL ' ' (' ' ADDRESS)?;
+IS_GREATER_THAN_IP_ADDRESS:       IS_GREATER_THAN ' ' (' ' ADDRESS)?;
+IS_GREATER_THAN_EQUAL_IP_ADDRESS: IS_GREATER_THAN_EQUAL ' ' (' ' ADDRESS)?;
+IS_WITHIN_NETWORK:                IS_WITHIN ' ' NETWORK (' ' CIDR)?;
+IS_NOT_WITHIN_NETWORK:            IS_NOT_WITHIN ' ' NETWORK (' ' CIDR)?;
+IS_IPV4:                          (IS ' ')? IPV4;
+IS_IPV6:                          (IS ' ')? IPV6;
+
+IS_ENABLED:                       (IS ' ')? ENABLED;
+IS_DISABLED:                      (IS ' ')? DISABLED;
+
 // Vocabulary
-LESS_THAN: (LESS ' ' THAN | LT);
-GREATER_THAN: (GREATER ' ' THAN | GT);
-LESS_THAN_EQUAL: (LESS ' ' THAN ' ' OR ' ' EQUAL ' ' TO | LTE);
-GREATER_THAN_EQUAL: (GREATER ' ' THAN ' ' OR ' ' EQUAL ' ' TO | LTE);
-STARTING_WITH: STARTING ' ' WITH;
-NOT_STARTING_WITH: STARTING ' ' WITH;
-fragment STARTING: [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg];
-ENDING_WITH: ENDING ' ' WITH;
-NOT_ENDING_WITH: ENDING ' ' WITH;
-fragment ENDING: [Ee][Nn][Dd][Ii][Nn][Gg];
-NOT_CONTAINING: NOT ' ' CONTAINING;
-CONTAINING: [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Gg];
 SPEC: [Ss][Pp][Ee][Cc];
 GROUP: [Gg][Rr][Oo][Uu][Pp];
 RULE: [Rr][Uu][Ll][Ee];
 ON: [Oo][Nn];
 WITH: [Ww][Ii][Tt][Hh];
 ASSERT: [Aa][Ss][Ss][Ee][Rr][Tt];
-WITHIN: [Ww][Ii][Tt][Hh][Ii][Nn];
-IS: [Ii][Ss];
 AND: [Aa][Nn][Dd];
-OR: [Oo][Rr];
-EQUAL_TO: EQUAL ' ' TO;
-fragment EQUAL: [Ee][Qq][Uu][Aa][Ll];
-ENABLED: [Ee][Nn][Aa][Bb][Ll][Ee][Dd];
-DISABLED: [Dd][Ii][Ss][Aa][Bb][Ll][Ee][Dd];
-TRUE: [Tt][Rr][Uu][Ee];
-FALSE: [Ff][Aa][Ll][Ss][Ee];
-NOT: [Nn][Oo][Tt];
-fragment TO: [Tt][Oo];
-fragment GT: [Gg][Tt];
-fragment GTE: [Gg][Tt][Ee];
+
+fragment STARTING:   [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg];
+fragment ENDING:     [Ee][Nn][Dd][Ii][Nn][Gg];
+fragment CONTAINING: [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Gg];
+
+// Comparators vocabulary
+fragment LESS_THAN:          (LESS    ' ' THAN                         | LT);
+fragment LESS_THAN_EQUAL:    (LESS    ' ' THAN ' ' OR ' ' EQUAL ' ' TO | LTE);
+fragment GREATER_THAN:       (GREATER ' ' THAN                         | GT);
+fragment GREATER_THAN_EQUAL: (GREATER ' ' THAN ' ' OR ' ' EQUAL ' ' TO | GTE);
+fragment LESS: [Ll][Ee][Ss][Ss];
 fragment LT: [Ll][Tt];
 fragment LTE: [Ll][Tt][Ee];
-fragment LESS: [Ll][Ee][Ss][Ss];
 fragment GREATER: [Gg][Rr][Ee][Aa][Tt][Ee][Rr];
+fragment GT: [Gg][Tt];
+fragment GTE: [Gg][Tt][Ee];
 fragment THAN: [Tt][Hh][Aa][Nn];
-BETWEEN: [Bb][Ee][Tt][Ww][Ee][Ee][Nn];
-IP_ADDRESS: IP ' ' ADDRESS?;
-NETWORK: [Nn][Ee][Tt][Ww][Oo][Rr][Kk];
-fragment ADDRESS: [Aa][Dd][Dd][Rr][Ee][Ss];
-fragment CIDR: [Cc][Ii][Dd][Rr];
+fragment IS: [Ii][Ss];
+fragment WITHIN: [Ww][Ii][Tt][Hh][Ii][Nn];
+fragment OR: [Oo][Rr];
+fragment EQUAL: [Ee][Qq][Uu][Aa][Ll];
+fragment ENABLED: [Ee][Nn][Aa][Bb][Ll][Ee][Dd];
+fragment DISABLED: [Dd][Ii][Ss][Aa][Bb][Ll][Ee][Dd];
+fragment TRUE: [Tt][Rr][Uu][Ee];
+fragment FALSE: [Ff][Aa][Ll][Ss][Ee];
+fragment NOT: [Nn][Oo][Tt];
+fragment TO: [Tt][Oo];
+fragment BETWEEN: [Bb][Ee][Tt][Ww][Ee][Ee][Nn];
+
+// Network vocabulary
 fragment IP: [Ii][Pp];
+fragment ADDRESS: [Aa][Dd][Dd][Rr][Ee][Ss];
+fragment NETWORK: [Nn][Ee][Tt][Ww][Oo][Rr][Kk];
+fragment CIDR: [Cc][Ii][Dd][Rr];
+fragment IPV4: [Ii][Pp][Vv][4];
+fragment IPV6: [Ii][Pp][Vv][6];
 
 // Values
 fragment LETTER: [a-zA-Z];

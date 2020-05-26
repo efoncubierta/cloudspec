@@ -142,5 +142,25 @@ public enum IPAddress implements BiPredicate<String, String> {
         public IPAddress negate() {
             return withinNetwork;
         }
+    },
+    isIpv4 {
+        public boolean test(final String ipAddressStr, final String ignored) {
+            IPAddressString ipAddress = new IPAddressString(ipAddressStr);
+            return ipAddress.isValid() && ipAddress.isIPv4();
+        }
+
+        public IPAddress negate() {
+            return neq;
+        }
+    },
+    isIpv6 {
+        public boolean test(final String ipAddressStr, final String ignored) {
+            IPAddressString ipAddress = new IPAddressString(ipAddressStr);
+            return ipAddress.isValid() && ipAddress.isIPv6();
+        }
+
+        public IPAddress negate() {
+            return neq;
+        }
     }
 }
