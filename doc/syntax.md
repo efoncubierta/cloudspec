@@ -182,14 +182,20 @@ my (
 
 ## Predicates
 
-- `== :value`: property value is equal to a value.
-- `EQUAL TO :value`: same equal predicate but using words.
-- `!= :value`: property value is not equal to a value.
-- `NOT EQUAL TO :value`: same not equal predicate but using words.
+- `== :value` or `EQUAL TO :value`: property value is equal to a value.
+- `!= :value` or `NOT EQUAL TO :value`: property value is not equal to a value.
 - `WITHIN [:value1, :value2...]`: property value is in a list of values.
 - `NOT WITHIN [:value1, :value2...]`: property value is not in a list of values.
-- `ENABLED`: synonym for `== true`.
-- `DISABLED`: synonym for `== false`.
+- `> :value` or `GREATER THAN :value` or `GT :value`: property value is greater than a value.
+- `>=` or `GREATER THAN OR EQUAL TO :value` or `GTE :value`: property value is greater than or equal to a value.
+- `< :value` or `LESS THAN :value` or `LT :value`: property value is less than a value.
+- `<=` or `LESS THAN OR EQUAL TO :value` or `LTE :value`: property value is less than or equal to a value.
+- `BETWEEN :value AND :value`: property value is between to values.
+- `STARTING WITH :value`: property value starts with a some value.
+- `ENDING WITH :value`: property value ends with a some value.
+- `CONTAINING :value`: property value contains a some value.
+- `ENABLED`: synonym for `EQUAL TO true`.
+- `DISABLED`: synonym for `EQUAL TO false`.
 
 ## Property values
 
@@ -214,12 +220,13 @@ Group "S3 validations"
     access_logs is enabled
 
 Group "EC2 validations"
-  Rule "Instances must use 'gp2' volume types."
+  Rule "Instances must use 'gp2' volume types and at least 50GiBs large."
     On aws:ec2:instance
     Assert
       devices (
         > volume (
-            type equal to "gp2"
+            type equal to "gp2" and
+            size gte 50
         )
       )
 ```

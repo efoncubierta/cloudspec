@@ -16,10 +16,20 @@ assertDecl: ASSERT statement andDecl*;
 
 andDecl: AND statement;
 
-predicate: IS? ('==' | EQUAL TO) value      # PropertyEqualPredicate
-         | IS? ('!=' | NOT EQUAL TO) value  # PropertyNotEqualPredicate
-         | IS? WITHIN array                 # PropertyWithinPredicate
-         | IS? NOT WITHIN array             # PropertyNotWithinPredicate
+predicate: IS? ('==' | EQUAL TO) value           # PropertyEqualPredicate
+         | IS? ('!=' | NOT EQUAL TO) value       # PropertyNotEqualPredicate
+         | IS? WITHIN array                      # PropertyWithinPredicate
+         | IS? NOT WITHIN array                  # PropertyNotWithinPredicate
+         | IS? ('<' | LESS_THAN) value           # PropertyLessThanPredicate
+         | IS? ('<=' | LESS_THAN_EQUAL) value    # PropertyLessThanEqualPredicate
+         | IS? ('>' | GREATER_THAN) value        # PropertyGreaterThanPredicate
+         | IS? ('>=' | GREATER_THAN_EQUAL) value # PropertyGreaterThanEqualPredicate
+         | IS? BETWEEN value AND value           # PropertyBetweenPredicate
+         | STARTING_WITH value                   # PropertyStartingWithPredicate
+         | ENDING_WITH value                     # PropertyEndingWithPredicate
+         | CONTAINING value                      # PropertyContainingPredicate
+         | IS? ENABLED                           # PropertyEnabledPredicate
+         | IS? DISABLED                          # PropertyDisabledPredicate
          ;
 
 statement: MEMBER_NAME predicate                      # PropertyStatement
@@ -46,6 +56,13 @@ fragment DOT: '.';
 fragment NEGATIVE: '-';
 
 // Vocabulary
+LESS_THAN: (LESS THAN | LT);
+GREATER_THAN: (GREATER THAN | GT);
+LESS_THAN_EQUAL: (LESS THAN OR EQUAL TO | LTE);
+GREATER_THAN_EQUAL: (GREATER THAN OR EQUAL TO | LTE);
+STARTING_WITH: [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg] WITH;
+ENDING_WITH: [Ee][Nn][Dd][Ii][Nn][Gg] WITH;
+CONTAINING: [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Gg];
 SPEC: [Ss][Pp][Ee][Cc];
 GROUP: [Gg][Rr][Oo][Uu][Pp];
 RULE: [Rr][Uu][Ll][Ee];
@@ -66,11 +83,14 @@ BEFORE: [Bb][Ee][Ff][Oo][Rr][Ee];
 AFTER: [Aa][Ff][Tt][Ee][Rr];
 NOT: [Nn][Oo][Tt];
 TO: [Tt][Oo];
-LESS_THAN: LESS THAN;
-GREATER_THAN: GREATER THAN;
+GT: [Gg][Tt];
+GTE: [Gg][Tt][Ee];
+LT: [Ll][Tt];
+LTE: [Ll][Tt][Ee];
 LESS: [Ll][Ee][Ss][Ss];
 GREATER: [Gg][Rr][Ee][Aa][Tt][Ee][Rr];
 THAN: [Tt][Hh][Aa][Nn];
+BETWEEN: [Bb][Ee][Tt][Ww][Ee][Ee][Nn];
 
 // Values
 fragment LETTER: [a-zA-Z];
