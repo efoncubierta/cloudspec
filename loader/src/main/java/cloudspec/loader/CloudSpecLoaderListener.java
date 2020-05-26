@@ -28,6 +28,7 @@ package cloudspec.loader;
 import cloudspec.CloudSpecBaseListener;
 import cloudspec.CloudSpecParser;
 import cloudspec.lang.*;
+import cloudspec.lang.predicate.IPAddressP;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.TextP;
 
@@ -202,90 +203,130 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     }
 
     @Override
-    public void exitPropertyEqualPredicate(CloudSpecParser.PropertyEqualPredicateContext ctx) {
+    public void exitValueEqualPredicate(CloudSpecParser.ValueEqualPredicateContext ctx) {
         currentPredicate = P.eq(currentValues.pop());
     }
 
     @Override
-    public void exitPropertyNotEqualPredicate(CloudSpecParser.PropertyNotEqualPredicateContext ctx) {
+    public void exitValueNotEqualPredicate(CloudSpecParser.ValueNotEqualPredicateContext ctx) {
         currentPredicate = P.neq(currentValues.pop());
     }
 
     @Override
-    public void exitPropertyWithinPredicate(CloudSpecParser.PropertyWithinPredicateContext ctx) {
+    public void exitValueWithinPredicate(CloudSpecParser.ValueWithinPredicateContext ctx) {
         currentPredicate = P.within(currentValues.toArray());
         currentValues.clear();
     }
 
     @Override
-    public void exitPropertyNotWithinPredicate(CloudSpecParser.PropertyNotWithinPredicateContext ctx) {
+    public void exitValueNotWithinPredicate(CloudSpecParser.ValueNotWithinPredicateContext ctx) {
         currentPredicate = P.without(currentValues.toArray());
         currentValues.clear();
     }
 
     @Override
-    public void exitPropertyLessThanPredicate(CloudSpecParser.PropertyLessThanPredicateContext ctx) {
+    public void exitNumberLessThanPredicate(CloudSpecParser.NumberLessThanPredicateContext ctx) {
         currentPredicate = P.lt(currentValues.pop());
     }
 
     @Override
-    public void exitPropertyLessThanEqualPredicate(CloudSpecParser.PropertyLessThanEqualPredicateContext ctx) {
+    public void exitNumberLessThanEqualPredicate(CloudSpecParser.NumberLessThanEqualPredicateContext ctx) {
         currentPredicate = P.lte(currentValues.pop());
     }
 
     @Override
-    public void exitPropertyGreaterThanPredicate(CloudSpecParser.PropertyGreaterThanPredicateContext ctx) {
+    public void exitNumberGreaterThanPredicate(CloudSpecParser.NumberGreaterThanPredicateContext ctx) {
         currentPredicate = P.gt(currentValues.pop());
     }
 
     @Override
-    public void exitPropertyGreaterThanEqualPredicate(CloudSpecParser.PropertyGreaterThanEqualPredicateContext ctx) {
+    public void exitNumberGreaterThanEqualPredicate(CloudSpecParser.NumberGreaterThanEqualPredicateContext ctx) {
         currentPredicate = P.gte(currentValues.pop());
     }
 
     @Override
-    public void exitPropertyBetweenPredicate(CloudSpecParser.PropertyBetweenPredicateContext ctx) {
+    public void exitNumberBetweenPredicate(CloudSpecParser.NumberBetweenPredicateContext ctx) {
         currentPredicate = P.between(currentValues.get(0), currentValues.get(1));
         currentValues.clear();
     }
 
     @Override
-    public void exitPropertyStartingWithPredicate(CloudSpecParser.PropertyStartingWithPredicateContext ctx) {
+    public void exitStringStartingWithPredicate(CloudSpecParser.StringStartingWithPredicateContext ctx) {
         currentPredicate = TextP.startingWith((String) currentValues.pop());
     }
 
     @Override
-    public void exitPropertyNotStartingWithPredicate(CloudSpecParser.PropertyNotStartingWithPredicateContext ctx) {
+    public void exitStringNotStartingWithPredicate(CloudSpecParser.StringNotStartingWithPredicateContext ctx) {
         currentPredicate = TextP.notStartingWith((String) currentValues.pop());
     }
 
     @Override
-    public void exitPropertyEndingWithPredicate(CloudSpecParser.PropertyEndingWithPredicateContext ctx) {
+    public void exitStringEndingWithPredicate(CloudSpecParser.StringEndingWithPredicateContext ctx) {
         currentPredicate = TextP.endingWith((String) currentValues.pop());
     }
 
     @Override
-    public void exitPropertyNotEndingWithPredicate(CloudSpecParser.PropertyNotEndingWithPredicateContext ctx) {
+    public void exitStringNotEndingWithPredicate(CloudSpecParser.StringNotEndingWithPredicateContext ctx) {
         currentPredicate = TextP.notEndingWith((String) currentValues.pop());
     }
 
     @Override
-    public void exitPropertyContainingPredicate(CloudSpecParser.PropertyContainingPredicateContext ctx) {
+    public void exitStringContainingPredicate(CloudSpecParser.StringContainingPredicateContext ctx) {
         currentPredicate = TextP.containing((String) currentValues.pop());
     }
 
     @Override
-    public void exitPropertyNotContainingPredicate(CloudSpecParser.PropertyNotContainingPredicateContext ctx) {
+    public void exitStringNotContainingPredicate(CloudSpecParser.StringNotContainingPredicateContext ctx) {
         currentPredicate = TextP.notContaining((String) currentValues.pop());
     }
 
     @Override
-    public void exitPropertyEnabledPredicate(CloudSpecParser.PropertyEnabledPredicateContext ctx) {
+    public void exitIpAddressEqualPredicate(CloudSpecParser.IpAddressEqualPredicateContext ctx) {
+        currentPredicate = IPAddressP.eq((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpAddressNotEqualPredicate(CloudSpecParser.IpAddressNotEqualPredicateContext ctx) {
+        currentPredicate = IPAddressP.neq((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpAddressLessThanPredicate(CloudSpecParser.IpAddressLessThanPredicateContext ctx) {
+        currentPredicate = IPAddressP.lt((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpAddressLessThanEqualPredicate(CloudSpecParser.IpAddressLessThanEqualPredicateContext ctx) {
+        currentPredicate = IPAddressP.lte((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpAddressGreaterThanPredicate(CloudSpecParser.IpAddressGreaterThanPredicateContext ctx) {
+        currentPredicate = IPAddressP.gt((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpAddressGreaterThanEqualPredicate(CloudSpecParser.IpAddressGreaterThanEqualPredicateContext ctx) {
+        currentPredicate = IPAddressP.gte((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpWithinNetworkPredicate(CloudSpecParser.IpWithinNetworkPredicateContext ctx) {
+        currentPredicate = IPAddressP.withinNetwork((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitIpNotWithinNetworkPredicate(CloudSpecParser.IpNotWithinNetworkPredicateContext ctx) {
+        currentPredicate = IPAddressP.withoutNetwork((String) currentValues.pop());
+    }
+
+    @Override
+    public void exitEnabledPredicate(CloudSpecParser.EnabledPredicateContext ctx) {
         currentPredicate = P.eq(true);
     }
 
     @Override
-    public void exitPropertyDisabledPredicate(CloudSpecParser.PropertyDisabledPredicateContext ctx) {
+    public void exitDisabledPredicate(CloudSpecParser.DisabledPredicateContext ctx) {
         currentPredicate = P.eq(false);
     }
 

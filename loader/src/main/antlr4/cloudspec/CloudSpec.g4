@@ -16,23 +16,35 @@ assertDecl: ASSERT statement andDecl*;
 
 andDecl: AND statement;
 
-predicate: IS? ('==' | EQUAL TO) value           # PropertyEqualPredicate
-         | IS? ('!=' | NOT EQUAL TO) value       # PropertyNotEqualPredicate
-         | IS? WITHIN array                      # PropertyWithinPredicate
-         | IS? NOT WITHIN array                  # PropertyNotWithinPredicate
-         | IS? ('<' | LESS_THAN) value           # PropertyLessThanPredicate
-         | IS? ('<=' | LESS_THAN_EQUAL) value    # PropertyLessThanEqualPredicate
-         | IS? ('>' | GREATER_THAN) value        # PropertyGreaterThanPredicate
-         | IS? ('>=' | GREATER_THAN_EQUAL) value # PropertyGreaterThanEqualPredicate
-         | IS? BETWEEN value AND value           # PropertyBetweenPredicate
-         | STARTING_WITH value                   # PropertyStartingWithPredicate
-         | NOT STARTING_WITH value               # PropertyNotStartingWithPredicate
-         | ENDING_WITH value                     # PropertyEndingWithPredicate
-         | NOT ENDING_WITH value                 # PropertyNotEndingWithPredicate
-         | CONTAINING value                      # PropertyContainingPredicate
-         | NOT CONTAINING value                  # PropertyNotContainingPredicate
-         | IS? ENABLED                           # PropertyEnabledPredicate
-         | IS? DISABLED                          # PropertyDisabledPredicate
+predicate: IS? ('==' | EQUAL_TO) value                      # ValueEqualPredicate
+         | IS? ('!=' | NOT EQUAL_TO) value                  # ValueNotEqualPredicate
+         | IS? WITHIN array                                 # ValueWithinPredicate
+         | IS? NOT WITHIN array                             # ValueNotWithinPredicate
+         // number predicates
+         | IS? ('<' | LESS_THAN) value                      # NumberLessThanPredicate
+         | IS? ('<=' | LESS_THAN_EQUAL) value               # NumberLessThanEqualPredicate
+         | IS? ('>' | GREATER_THAN) value                   # NumberGreaterThanPredicate
+         | IS? ('>=' | GREATER_THAN_EQUAL) value            # NumberGreaterThanEqualPredicate
+         | IS? BETWEEN value AND value                      # NumberBetweenPredicate
+         // string predicates
+         | STARTING_WITH value                              # StringStartingWithPredicate
+         | NOT_STARTING_WITH value                          # StringNotStartingWithPredicate
+         | ENDING_WITH value                                # StringEndingWithPredicate
+         | NOT_ENDING_WITH value                            # StringNotEndingWithPredicate
+         | CONTAINING value                                 # StringContainingPredicate
+         | NOT_CONTAINING value                             # StringNotContainingPredicate
+         // ip addresses predicates
+         | IS? ('==' | EQUAL_TO) IP_ADDRESS value           # IpAddressEqualPredicate
+         | IS? ('!=' | NOT EQUAL_TO) IP_ADDRESS value       # IpAddressNotEqualPredicate
+         | IS? ('<'  | LESS_THAN) IP_ADDRESS value          # IpAddressLessThanPredicate
+         | IS? ('<=' | LESS_THAN_EQUAL) IP_ADDRESS value    # IpAddressLessThanEqualPredicate
+         | IS? ('>'  | GREATER_THAN) IP_ADDRESS value       # IpAddressGreaterThanPredicate
+         | IS? ('>=' | GREATER_THAN_EQUAL) IP_ADDRESS value # IpAddressGreaterThanEqualPredicate
+         | IS? WITHIN NETWORK value                         # IpWithinNetworkPredicate
+         | IS? NOT WITHIN NETWORK value                     # IpNotWithinNetworkPredicate
+         // boolean predicates
+         | IS? ENABLED                                      # EnabledPredicate
+         | IS? DISABLED                                     # DisabledPredicate
          ;
 
 statement: MEMBER_NAME predicate                      # PropertyStatement
@@ -59,12 +71,17 @@ fragment DOT: '.';
 fragment NEGATIVE: '-';
 
 // Vocabulary
-LESS_THAN: (LESS THAN | LT);
-GREATER_THAN: (GREATER THAN | GT);
-LESS_THAN_EQUAL: (LESS THAN OR EQUAL TO | LTE);
-GREATER_THAN_EQUAL: (GREATER THAN OR EQUAL TO | LTE);
-STARTING_WITH: [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg] WITH;
-ENDING_WITH: [Ee][Nn][Dd][Ii][Nn][Gg] WITH;
+LESS_THAN: (LESS ' ' THAN | LT);
+GREATER_THAN: (GREATER ' ' THAN | GT);
+LESS_THAN_EQUAL: (LESS ' ' THAN ' ' OR ' ' EQUAL ' ' TO | LTE);
+GREATER_THAN_EQUAL: (GREATER ' ' THAN ' ' OR ' ' EQUAL ' ' TO | LTE);
+STARTING_WITH: STARTING ' ' WITH;
+NOT_STARTING_WITH: STARTING ' ' WITH;
+fragment STARTING: [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg];
+ENDING_WITH: ENDING ' ' WITH;
+NOT_ENDING_WITH: ENDING ' ' WITH;
+fragment ENDING: [Ee][Nn][Dd][Ii][Nn][Gg];
+NOT_CONTAINING: NOT ' ' CONTAINING;
 CONTAINING: [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Gg];
 SPEC: [Ss][Pp][Ee][Cc];
 GROUP: [Gg][Rr][Oo][Uu][Pp];
@@ -76,24 +93,27 @@ WITHIN: [Ww][Ii][Tt][Hh][Ii][Nn];
 IS: [Ii][Ss];
 AND: [Aa][Nn][Dd];
 OR: [Oo][Rr];
-EQUAL: [Ee][Qq][Uu][Aa][Ll];
+EQUAL_TO: EQUAL ' ' TO;
+fragment EQUAL: [Ee][Qq][Uu][Aa][Ll];
 ENABLED: [Ee][Nn][Aa][Bb][Ll][Ee][Dd];
 DISABLED: [Dd][Ii][Ss][Aa][Bb][Ll][Ee][Dd];
 TRUE: [Tt][Rr][Uu][Ee];
 FALSE: [Ff][Aa][Ll][Ss][Ee];
-HAS: [Hh][Aa][Ss];
-BEFORE: [Bb][Ee][Ff][Oo][Rr][Ee];
-AFTER: [Aa][Ff][Tt][Ee][Rr];
 NOT: [Nn][Oo][Tt];
-TO: [Tt][Oo];
-GT: [Gg][Tt];
-GTE: [Gg][Tt][Ee];
-LT: [Ll][Tt];
-LTE: [Ll][Tt][Ee];
-LESS: [Ll][Ee][Ss][Ss];
-GREATER: [Gg][Rr][Ee][Aa][Tt][Ee][Rr];
-THAN: [Tt][Hh][Aa][Nn];
+fragment TO: [Tt][Oo];
+fragment GT: [Gg][Tt];
+fragment GTE: [Gg][Tt][Ee];
+fragment LT: [Ll][Tt];
+fragment LTE: [Ll][Tt][Ee];
+fragment LESS: [Ll][Ee][Ss][Ss];
+fragment GREATER: [Gg][Rr][Ee][Aa][Tt][Ee][Rr];
+fragment THAN: [Tt][Hh][Aa][Nn];
 BETWEEN: [Bb][Ee][Tt][Ww][Ee][Ee][Nn];
+IP_ADDRESS: IP ' ' ADDRESS?;
+NETWORK: [Nn][Ee][Tt][Ww][Oo][Rr][Kk];
+fragment ADDRESS: [Aa][Dd][Dd][Rr][Ee][Ss];
+fragment CIDR: [Cc][Ii][Dd][Rr];
+fragment IP: [Ii][Pp];
 
 // Values
 fragment LETTER: [a-zA-Z];

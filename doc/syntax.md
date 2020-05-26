@@ -182,29 +182,38 @@ my (
 
 ## Predicates
 
-**For all atomic properties:**
+**For any value:**
 
-- `== :value` or `EQUAL TO :value`: property value is equal to a value.
-- `!= :value` or `NOT EQUAL TO :value`: property value is not equal to a value.
-- `WITHIN [:value1, :value2...]`: property value is in a list of values.
-- `NOT WITHIN [:value1, :value2...]`: property value is not in a list of values.
+- `== :value` or `EQUAL TO :value`: value is equal to another value.
+- `!= :value` or `NOT EQUAL TO :value`: value is not equal to another value.
+- `WITHIN [:value1, :value2...]`: value is in a list of values.
+- `NOT WITHIN [:value1, :value2...]`: value is not in a list of values.
 
-**For number properties:**
+**For number values (i.e. integer or double):**
 
-- `> :value` or `GREATER THAN :value` or `GT :value`: property value is greater than a value.
-- `>=` or `GREATER THAN OR EQUAL TO :value` or `GTE :value`: property value is greater than or equal to a value.
-- `< :value` or `LESS THAN :value` or `LT :value`: property value is less than a value.
-- `<=` or `LESS THAN OR EQUAL TO :value` or `LTE :value`: property value is less than or equal to a value.
-- `BETWEEN :value AND :value`: property value is between to values.
+- `> :number` or `GREATER THAN :number` or `GT :number`: number value is greater than another number.
+- `>= :number` or `GREATER THAN OR EQUAL TO :number` or `GTE :number`: number value is greater than or equal to another number.
+- `< :number` or `LESS THAN :number` or `LT :number`: number value is less than another number.
+- `<= :number` or `LESS THAN OR EQUAL TO :number` or `LTE :number`: number value is less than or equal to another number.
+- `BETWEEN :number AND :number`: number value is between two numbers.
 
-**For string properties:**
+**For string values:**
 
-- `STARTING WITH :value`: property value starts with a some value.
-- `NOT STARTING WITH :value`: property value does not start with a some value.
-- `ENDING WITH :value`: property value ends with a some value.
-- `NOT ENDING WITH :value`: property value does not end with a some value.
-- `CONTAINING :value`: property value contains a some value.
-- `NOT CONTAINING :value`: property value does not contain a some value.
+- `STARTING WITH :string`: string value starts with another string.
+- `NOT STARTING WITH :string`: string value does not start with another string.
+- `ENDING WITH :string`: string value ends with another string.
+- `NOT ENDING WITH :string`: string value does not end with another string.
+- `CONTAINING :string`: string value contains another string.
+- `NOT CONTAINING :string`: string value does not contain another string.
+
+**For string values representing an IP address**
+
+- `> IP :ip_address` or `GREATER THAN IP :ip_address` or `GT IP :ip_address`: ip address is greater than another ip address.
+- `>= IP :ip_address` or `GREATER THAN OR EQUAL TO IP :ip_address` or `GTE IP :ip_address`: ip address is greater or equal than another ip address.
+- `< IP :ip_address` or `LESS THAN IP :ip_address` or `LT IP :ip_address`: ip address is less than another ip address.
+- `<= IP :ip_address` or `LESS THAN OR EQUAL TO IP :ip_address` or `LTE IP :ip_address`: ip address is less or equal than another ip address.
+- `WITHIN NETWORK :cidr_block`: ip address is within a network.
+- `NOT WITHIN NETWORK :cidr_block`: ip address is not within a network.
 
 **For boolean properties:**
 

@@ -109,14 +109,43 @@ Properties can also be multi-valued (e.g. `[1, 2, 3]` or `["foo", "bar"]`).
 
 Predicates are used to validate the shape of the property. The following predicates are supported:
 
-- `== $VALUE`: property value is equal to a value.
-- `EQUAL TO $VALUE`: same equal predicate but using words.
-- `!= $VALUE`: property value is not equal to a value.
-- `NOT EQUAL TO $VALUE`: same not equal predicate but using words.
-- `WITHIN [$VALUE1, $VALUE2]`: property value is in a list of values.
-- `NOT WITHIN [$VALUE1, $VALUE2]`: property value is not in a list of values.
-- `ENABLED`: synonym for `== true`.
-- `DISABLED`: synonym for `== false`.
+**For any value:**
+
+- `== :value` or `EQUAL TO :value`: value is equal to another value.
+- `!= :value` or `NOT EQUAL TO :value`: value is not equal to another value.
+- `WITHIN [:value1, :value2...]`: value is in a list of values.
+- `NOT WITHIN [:value1, :value2...]`: value is not in a list of values.
+
+**For number values (i.e. integer or double):**
+
+- `> :number` or `GREATER THAN :number` or `GT :number`: number value is greater than another number.
+- `>= :number` or `GREATER THAN OR EQUAL TO :number` or `GTE :number`: number value is greater than or equal to another number.
+- `< :number` or `LESS THAN :number` or `LT :number`: number value is less than another number.
+- `<= :number` or `LESS THAN OR EQUAL TO :number` or `LTE :number`: number value is less than or equal to another number.
+- `BETWEEN :number AND :number`: number value is between two numbers.
+
+**For string values:**
+
+- `STARTING WITH :string`: string value starts with another string.
+- `NOT STARTING WITH :string`: string value does not start with another string.
+- `ENDING WITH :string`: string value ends with another string.
+- `NOT ENDING WITH :string`: string value does not end with another string.
+- `CONTAINING :string`: string value contains another string.
+- `NOT CONTAINING :string`: string value does not contain another string.
+
+**For string values representing an IP address**
+
+- `> IP :ip_address` or `GREATER THAN IP :ip_address` or `GT IP :ip_address`: ip address is greater than another ip address.
+- `>= IP :ip_address` or `GREATER THAN OR EQUAL TO IP :ip_address` or `GTE IP :ip_address`: ip address is greater or equal than another ip address.
+- `< IP :ip_address` or `LESS THAN IP :ip_address` or `LT IP :ip_address`: ip address is less than another ip address.
+- `<= IP :ip_address` or `LESS THAN OR EQUAL TO IP :ip_address` or `LTE IP :ip_address`: ip address is less or equal than another ip address.
+- `WITHIN NETWORK :cidr_block`: ip address is within a network.
+- `NOT WITHIN NETWORK :cidr_block`: ip address is not within a network.
+
+**For boolean properties:**
+
+- `ENABLED`: synonym for `EQUAL TO true`.
+- `DISABLED`: synonym for `EQUAL TO false`.
 
 These predicates are case-insensitive, and can be prefixed with `IS` to improve readability.
 
@@ -128,6 +157,8 @@ my_property IS EQUAL TO 1
 my_property IS NOT EQUAL TO "foo"
 my_property WITHIN [1, 2, 3]
 my_property IS NOT WITHIN ["foo", "bar"]
+my_property IS EQUAL TO IP "10.0.0.1"
+my_property IS WITHIN NETWORK "10.0.0.0/24"
 my_property IS ENABLED
 ```
 
