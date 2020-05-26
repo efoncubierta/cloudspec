@@ -107,49 +107,68 @@ A property can be of one of the following types:
 
 Properties can also be multi-valued (e.g. `[1, 2, 3]` or `["foo", "bar"]`).
 
-Predicates are used to validate the shape of the property. The following predicates are supported:
+Predicates are used to validate a property value. The following predicates are currently supported.
+Terms marked with `?` are optional, meaning that can be added only to improve readability of the specification.
+For example, both `is > ip address "10.0.0.1"` and `> ip "10.0.0.1"` are the same predicates. Also, predicates
+are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 
 **For any value:**
 
-- `== :value` or `EQUAL TO :value`: value is equal to another value.
-- `!= :value` or `NOT EQUAL TO :value`: value is not equal to another value.
-- `WITHIN [:value1, :value2...]`: value is in a list of values.
-- `NOT WITHIN [:value1, :value2...]`: value is not in a list of values.
+- `is? == :value`: value is equal to another value.
+- `is? equal to :value`: same as above.
+- `is? != :value`: value is not equal to another value.
+- `is? not equal to :value`: same as above.
+- `is? within [:value1, :value2...]`: value is in a list of values.
+- `is? not within [:value1, :value2...]`: value is not in a list of values.
 
 **For number values (i.e. integer or double):**
 
-- `> :number` or `GREATER THAN :number` or `GT :number`: number value is greater than another number.
-- `>= :number` or `GREATER THAN OR EQUAL TO :number` or `GTE :number`: number value is greater than or equal to another number.
-- `< :number` or `LESS THAN :number` or `LT :number`: number value is less than another number.
-- `<= :number` or `LESS THAN OR EQUAL TO :number` or `LTE :number`: number value is less than or equal to another number.
-- `BETWEEN :number AND :number`: number value is between two numbers.
+- `is? > :number`:number value is greater than another number.
+- `is? greater than :number`: same as above.
+- `is? gt :number`: same as above.
+- `is? >= :number`:number value is greater than or equal to another number.
+- `is? greater than or equal to :number`: same as above.
+- `is? gte :number`: same as above.
+- `is? < :number`: number value is less than another number.
+- `is? less than :number`: same as above.
+- `is? lt :number`: same as above.
+- `is? <= :number`: number value is less than or equal to another number.
+- `is? less than or equal to :number`: same as above.
+- `is? lte :number`: same as above.
+- `is? between :number and :number`: number value is between two numbers.
 
 **For string values:**
 
-- `STARTING WITH :string`: string value starts with another string.
-- `NOT STARTING WITH :string`: string value does not start with another string.
-- `ENDING WITH :string`: string value ends with another string.
-- `NOT ENDING WITH :string`: string value does not end with another string.
-- `CONTAINING :string`: string value contains another string.
-- `NOT CONTAINING :string`: string value does not contain another string.
+- `is? starting with :string`: string value starts with another string.
+- `is? not starting :string`: string value does not start with another string.
+- `is? ending with :string`: string value ends with another string.
+- `is? not ending with :string`: string value does not end with another string.
+- `is? containing :string`: string value contains another string.
+- `is? not containing :string`: string value does not contain another string.
 
 **For string values representing an IP address**
 
-- `> IP :ip_address` or `GREATER THAN IP :ip_address` or `GT IP :ip_address`: ip address is greater than another ip address.
-- `>= IP :ip_address` or `GREATER THAN OR EQUAL TO IP :ip_address` or `GTE IP :ip_address`: ip address is greater or equal than another ip address.
-- `< IP :ip_address` or `LESS THAN IP :ip_address` or `LT IP :ip_address`: ip address is less than another ip address.
-- `<= IP :ip_address` or `LESS THAN OR EQUAL TO IP :ip_address` or `LTE IP :ip_address`: ip address is less or equal than another ip address.
-- `WITHIN NETWORK :cidr_block`: ip address is within a network.
-- `NOT WITHIN NETWORK :cidr_block`: ip address is not within a network.
-- `IPV4`: true if value is a IPv4.
-- `IPV6`: true if value is a IPv6.
+- `is? > ip address? :ip_address`: ip address is greater than another ip address.
+- `is? greater than ip address? :ip_address`: same as above.
+- `is? gt ip address? :ip_address`: same as above.
+- `is? >= ip address? :ip_address`: ip address is greater or equal than another ip address.
+- `is? greater than or equal to ip address? :ip_address`: same as above.
+- `is? gte ip address? :ip_address`: same as above.
+- `is? < id address? :ip_address`: ip address is less than another ip address.
+- `is? less than ip address? :ip_address`: same as above.
+- `is? lt ip address? :ip_address`: same as above.
+- `is? <= ip address? :ip_address`: ip address is less or equal than another ip address.
+- `is? less than or equal to ip address? :ip_address`: same as above.
+- `is? lte ip address? :ip_address`: same as above.
+- `is? within network cidr? :cidr_block`: ip address is within a network.
+- `is? not within network cidr? :cidr_block`: ip address is not within a network.
+- `is? ipv4`: true if value is a IPv4.
+- `is? ipv6`: true if value is a IPv6.
 
 **For boolean properties:**
 
-- `ENABLED`: synonym for `EQUAL TO true`.
-- `DISABLED`: synonym for `EQUAL TO false`.
-
-These predicates are case-insensitive, and can be prefixed with `IS` to improve readability.
+- `is? enabled`: synonym for `EQUAL TO true`.
+- `is? disabled`: synonym for `EQUAL TO false`.
 
 Some predicate examples:
 
