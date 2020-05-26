@@ -225,7 +225,7 @@ public class ResourceReflectionUtil {
                             Optional<ResourceDefRef> resourceDefRefOptional = ResourceDefReflectionUtil.toResourceDefRef(associationDefinitionAnnotation.targetClass());
 
                             // TODO add validation for association name and resourceDefRef
-                            if (!resourceDefRefOptional.isPresent()) {
+                            if (resourceDefRefOptional.isEmpty()) {
                                 return Stream.empty();
                             }
 

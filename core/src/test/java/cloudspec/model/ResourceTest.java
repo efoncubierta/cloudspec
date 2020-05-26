@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 public class ResourceTest {
     @Test
     public void shouldGetPropertyByPath() {
-        Stack<String> path = new Stack<String>();
+        Stack<String> path = new Stack<>();
         path.add(ModelTestUtils.PROP_NESTED_NAME);
         path.add(ModelTestUtils.PROP_STRING_NAME);
         Optional<PropertyDef> propertyDefOpt = ModelTestUtils.RESOURCE_DEF.getPropertyByPath(path);

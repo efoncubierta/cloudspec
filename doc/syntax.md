@@ -182,18 +182,32 @@ my (
 
 ## Predicates
 
+**For all atomic properties:**
+
 - `== :value` or `EQUAL TO :value`: property value is equal to a value.
 - `!= :value` or `NOT EQUAL TO :value`: property value is not equal to a value.
 - `WITHIN [:value1, :value2...]`: property value is in a list of values.
 - `NOT WITHIN [:value1, :value2...]`: property value is not in a list of values.
+
+**For number properties:**
+
 - `> :value` or `GREATER THAN :value` or `GT :value`: property value is greater than a value.
 - `>=` or `GREATER THAN OR EQUAL TO :value` or `GTE :value`: property value is greater than or equal to a value.
 - `< :value` or `LESS THAN :value` or `LT :value`: property value is less than a value.
 - `<=` or `LESS THAN OR EQUAL TO :value` or `LTE :value`: property value is less than or equal to a value.
 - `BETWEEN :value AND :value`: property value is between to values.
+
+**For string properties:**
+
 - `STARTING WITH :value`: property value starts with a some value.
+- `NOT STARTING WITH :value`: property value does not start with a some value.
 - `ENDING WITH :value`: property value ends with a some value.
+- `NOT ENDING WITH :value`: property value does not end with a some value.
 - `CONTAINING :value`: property value contains a some value.
+- `NOT CONTAINING :value`: property value does not contain a some value.
+
+**For boolean properties:**
+
 - `ENABLED`: synonym for `EQUAL TO true`.
 - `DISABLED`: synonym for `EQUAL TO false`.
 
@@ -220,8 +234,10 @@ Group "S3 validations"
     access_logs is enabled
 
 Group "EC2 validations"
-  Rule "Instances must use 'gp2' volume types and at least 50GiBs large."
+  Rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
     On aws:ec2:instance
+    With
+      tags["environment"] equal to "production"
     Assert
       devices (
         > volume (

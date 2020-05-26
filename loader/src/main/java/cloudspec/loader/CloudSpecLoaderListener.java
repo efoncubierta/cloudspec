@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -225,62 +225,67 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
 
     @Override
     public void exitPropertyLessThanPredicate(CloudSpecParser.PropertyLessThanPredicateContext ctx) {
-        // TODO validate current value is a number
         currentPredicate = P.lt(currentValues.pop());
     }
 
     @Override
     public void exitPropertyLessThanEqualPredicate(CloudSpecParser.PropertyLessThanEqualPredicateContext ctx) {
-        // TODO validate current value is a number
         currentPredicate = P.lte(currentValues.pop());
     }
 
     @Override
     public void exitPropertyGreaterThanPredicate(CloudSpecParser.PropertyGreaterThanPredicateContext ctx) {
-        // TODO validate current value is a number
         currentPredicate = P.gt(currentValues.pop());
     }
 
     @Override
     public void exitPropertyGreaterThanEqualPredicate(CloudSpecParser.PropertyGreaterThanEqualPredicateContext ctx) {
-        // TODO validate current value is a number
         currentPredicate = P.gte(currentValues.pop());
     }
 
     @Override
     public void exitPropertyBetweenPredicate(CloudSpecParser.PropertyBetweenPredicateContext ctx) {
-        // TODO validate current value is a number
         currentPredicate = P.between(currentValues.get(0), currentValues.get(1));
         currentValues.clear();
     }
 
     @Override
     public void exitPropertyStartingWithPredicate(CloudSpecParser.PropertyStartingWithPredicateContext ctx) {
-        // TODO validate current value is a string
         currentPredicate = TextP.startingWith((String) currentValues.pop());
     }
 
     @Override
+    public void exitPropertyNotStartingWithPredicate(CloudSpecParser.PropertyNotStartingWithPredicateContext ctx) {
+        currentPredicate = TextP.notStartingWith((String) currentValues.pop());
+    }
+
+    @Override
     public void exitPropertyEndingWithPredicate(CloudSpecParser.PropertyEndingWithPredicateContext ctx) {
-        // TODO validate current value is a string
         currentPredicate = TextP.endingWith((String) currentValues.pop());
     }
 
     @Override
+    public void exitPropertyNotEndingWithPredicate(CloudSpecParser.PropertyNotEndingWithPredicateContext ctx) {
+        currentPredicate = TextP.notEndingWith((String) currentValues.pop());
+    }
+
+    @Override
     public void exitPropertyContainingPredicate(CloudSpecParser.PropertyContainingPredicateContext ctx) {
-        // TODO validate current value is a string
         currentPredicate = TextP.containing((String) currentValues.pop());
     }
 
     @Override
+    public void exitPropertyNotContainingPredicate(CloudSpecParser.PropertyNotContainingPredicateContext ctx) {
+        currentPredicate = TextP.notContaining((String) currentValues.pop());
+    }
+
+    @Override
     public void exitPropertyEnabledPredicate(CloudSpecParser.PropertyEnabledPredicateContext ctx) {
-        // TODO validate current value is a boolean
         currentPredicate = P.eq(true);
     }
 
     @Override
     public void exitPropertyDisabledPredicate(CloudSpecParser.PropertyDisabledPredicateContext ctx) {
-        // TODO validate current value is a boolean
         currentPredicate = P.eq(false);
     }
 

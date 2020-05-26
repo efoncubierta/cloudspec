@@ -26,16 +26,19 @@
 package cloudspec.preflight;
 
 import cloudspec.lang.*;
-import cloudspec.model.AssociationDef;
+import cloudspec.model.PropertyDef;
+import cloudspec.model.PropertyType;
 import cloudspec.model.ResourceDef;
 import cloudspec.model.ResourceDefRef;
 import cloudspec.store.ResourceDefStore;
+import org.apache.tinkerpop.gremlin.process.traversal.Compare;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
+import org.apache.tinkerpop.gremlin.process.traversal.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class CloudSpecPreflight {
     private final Logger LOGGER = LoggerFactory.getLogger(CloudSpecPreflight.class);
@@ -47,7 +50,7 @@ public class CloudSpecPreflight {
     }
 
     public void preflight(CloudSpec spec) {
-        LOGGER.info("Validating cloud specification");
+        LOGGER.info("Validating CloudSpec input");
 
         preflightGroups(spec.getGroups());
     }
@@ -67,20 +70,21 @@ public class CloudSpecPreflight {
 
     private void preflightRule(RuleExpr rule) {
         LOGGER.debug("Preflight of rule {}", rule.getName());
-        Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(rule.getResourceDefRef());
-        if (!resourceDefRefOpt.isPresent()) {
+
+        var resourceDefRefOpt = ResourceDefRef.fromString(rule.getResourceDefRef());
+        if (resourceDefRefOpt.isEmpty()) {
             throw new CloudSpecPreflightException(
                     String.format("Malformed resource definition reference '%s'", rule.getResourceDefRef())
             );
         }
 
         // lookup resource definition
-        Optional<ResourceDef> resourceDefOpt = resourceDefStore.getResourceDef(resourceDefRefOpt.get());
-        if (!resourceDefOpt.isPresent()) {
+        var resourceDefOpt = resourceDefStore.getResourceDef(resourceDefRefOpt.get());
+        if (resourceDefOpt.isEmpty()) {
             throw new CloudSpecPreflightException(String.format("Resource of type '%s' is not supported.", rule.getResourceDefRef()));
         }
 
-        ResourceDef resourceDef = resourceDefOpt.get();
+        var resourceDef = resourceDefOpt.get();
 
         // preflight withs and asserts
         rule.getWithExpr()
@@ -108,10 +112,10 @@ public class CloudSpecPreflight {
     }
 
     private void preflightNestedStatement(ResourceDef resourceDef, NestedStatement statement, List<String> path) {
-        List<String> nestedPath = new ArrayList<>(path);
+        var nestedPath = new ArrayList<>(path);
         nestedPath.add(statement.getPropertyName());
 
-        if (!resourceDef.getPropertyByPath(nestedPath).isPresent()) {
+        if (resourceDef.getPropertyByPath(nestedPath).isEmpty()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Resource type '%s' does not define property '%s'.",
@@ -125,11 +129,11 @@ public class CloudSpecPreflight {
     }
 
     private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement, List<String> path) {
-        List<String> associationPath = new ArrayList<>(path);
+        var associationPath = new ArrayList<>(path);
         associationPath.add(statement.getAssociationName());
 
-        Optional<AssociationDef> associationDefOpt = resourceDef.getAssociationByPath(associationPath);
-        if (!associationDefOpt.isPresent()) {
+        var associationDefOpt = resourceDef.getAssociationByPath(associationPath);
+        if (associationDefOpt.isEmpty()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Resource type '%s' does not define association '%s'.",
@@ -138,10 +142,10 @@ public class CloudSpecPreflight {
             );
         }
 
-        AssociationDef associationDef = associationDefOpt.get();
+        var associationDef = associationDefOpt.get();
 
-        Optional<ResourceDef> associatedResourceDefOpt = resourceDefStore.getResourceDef(associationDef.getResourceDefRef());
-        if (!associatedResourceDefOpt.isPresent()) {
+        var associatedResourceDefOpt = resourceDefStore.getResourceDef(associationDef.getResourceDefRef());
+        if (associatedResourceDefOpt.isEmpty()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Associated resource of type '%s' is not supported.",
@@ -150,15 +154,19 @@ public class CloudSpecPreflight {
             );
         }
 
-        ResourceDef associatedResourceDef = associatedResourceDefOpt.get();
-        statement.getStatements().forEach(stmt -> preflightStatement(associatedResourceDef, stmt, new ArrayList<>()));
+        var associatedResourceDef = associatedResourceDefOpt.get();
+        statement.getStatements()
+                .forEach(stmt ->
+                        preflightStatement(associatedResourceDef, stmt, new ArrayList<>())
+                );
     }
 
     private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement, List<String> path) {
-        List<String> propertyPath = new ArrayList<>(path);
+        var propertyPath = new ArrayList<>(path);
         propertyPath.add(statement.getPropertyName());
 
-        if (!resourceDef.getPropertyByPath(propertyPath).isPresent()) {
+        var propertyDefOpt = resourceDef.getPropertyByPath(propertyPath);
+        if (propertyDefOpt.isEmpty()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Resource type '%s' does not define property '%s'.",
@@ -167,13 +175,39 @@ public class CloudSpecPreflight {
                     )
             );
         }
+
+        var propertyDef = propertyDefOpt.get();
+
+        if (isNumberOnlyPredicate(statement.getPredicate()) && !isNumberProperty(propertyDef)) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Predicate %s is only supported on number properties (i.e. integer and double), " +
+                                    "and property '%s' is a '%s'",
+                            statement.getPredicate(),
+                            String.join(".", propertyPath),
+                            propertyDef.getPropertyType()
+                    )
+            );
+        }
+
+        if (isStringOnlyPredicate(statement.getPredicate()) && !isStringProperty(propertyDef)) {
+            throw new CloudSpecPreflightException(
+                    String.format(
+                            "Predicate %s is only supported on string properties, " +
+                                    "and property '%s' is a '%s'",
+                            statement.getPredicate(),
+                            String.join(".", propertyPath),
+                            propertyDef.getPropertyType()
+                    )
+            );
+        }
     }
 
     private void preflightKeyValueStatement(ResourceDef resourceDef, KeyValueStatement statement, List<String> path) {
-        List<String> propertyPath = new ArrayList<>(path);
+        var propertyPath = new ArrayList<>(path);
         propertyPath.add(statement.getPropertyName());
 
-        if (!resourceDef.getPropertyByPath(propertyPath).isPresent()) {
+        if (resourceDef.getPropertyByPath(propertyPath).isEmpty()) {
             throw new CloudSpecPreflightException(
                     String.format(
                             "Resource type '%s' does not define property '%s'.",
@@ -182,5 +216,32 @@ public class CloudSpecPreflight {
                     )
             );
         }
+    }
+
+    private Boolean isNumberOnlyPredicate(P<?> predicate) {
+        var biPredicate = predicate.getBiPredicate();
+        return (biPredicate.equals(Compare.lt) ||
+                biPredicate.equals(Compare.lte) ||
+                biPredicate.equals(Compare.gt) ||
+                biPredicate.equals(Compare.gte));
+    }
+
+    private Boolean isStringOnlyPredicate(P<?> predicate) {
+        var biPredicate = predicate.getBiPredicate();
+        return (biPredicate.equals(Text.startingWith) ||
+                biPredicate.equals(Text.notStartingWith) ||
+                biPredicate.equals(Text.endingWith) ||
+                biPredicate.equals(Text.notEndingWith) ||
+                biPredicate.equals(Text.containing) ||
+                biPredicate.equals(Text.notContaining));
+    }
+
+    private Boolean isNumberProperty(PropertyDef propertyDef) {
+        return (propertyDef.getPropertyType().equals(PropertyType.INTEGER) &&
+                propertyDef.getPropertyType().equals(PropertyType.DOUBLE));
+    }
+
+    private Boolean isStringProperty(PropertyDef propertyDef) {
+        return (propertyDef.getPropertyType().equals(PropertyType.STRING));
     }
 }

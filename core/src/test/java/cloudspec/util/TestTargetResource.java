@@ -135,48 +135,4 @@ public class TestTargetResource {
         this.keyValueProperty = keyValueProperty;
         this.keyValueListProperty = keyValueListProperty;
     }
-
-    public String getId() {
-        return id;
-    }
-
-    public Integer getIntegerProperty() {
-        return integerProperty;
-    }
-
-    public List<Integer> getIntegerListProperty() {
-        return integerListProperty;
-    }
-
-    public Double getDoubleProperty() {
-        return doubleProperty;
-    }
-
-    public List<Double> getDoubleListProperty() {
-        return doubleListProperty;
-    }
-
-    public String getStringProperty() {
-        return stringProperty;
-    }
-
-    public List<String> getStringListProperty() {
-        return stringListProperty;
-    }
-
-    public Boolean getBooleanProperty() {
-        return booleanProperty;
-    }
-
-    public List<Boolean> getBooleanListProperty() {
-        return booleanListProperty;
-    }
-
-    public KeyValue getKeyValueProperty() {
-        return keyValueProperty;
-    }
-
-    public List<KeyValue> getKeyValueListProperty() {
-        return keyValueListProperty;
-    }
 }

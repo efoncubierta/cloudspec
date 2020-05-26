@@ -39,7 +39,7 @@ import java.util.concurrent.Callable;
 )
 public class CloudSpecMain implements Callable<Integer> {
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         System.out.println("Please, use one of the following commands: ");
         System.out.println(" - run");
         System.out.println(" - doc");

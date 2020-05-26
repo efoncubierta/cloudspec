@@ -28,10 +28,8 @@ package cloudspec.loader;
 import cloudspec.ProvidersRegistry;
 import cloudspec.annotation.ResourceReflectionUtil;
 import cloudspec.lang.*;
-import cloudspec.model.Association;
 import cloudspec.model.Resource;
 import cloudspec.model.ResourceDefRef;
-import cloudspec.store.ResourceDefStore;
 import cloudspec.store.ResourceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,19 +43,16 @@ public class ResourceLoader {
     private final Set<ResourceDefRef> loadedResourceDefs = new HashSet<>();
 
     private final ProvidersRegistry providersRegistry;
-    private final ResourceDefStore resourceDefStore;
     private final ResourceStore resourceStore;
 
     public ResourceLoader(ProvidersRegistry providersRegistry,
-                          ResourceDefStore resourceDefStore,
                           ResourceStore resourceStore) {
         this.providersRegistry = providersRegistry;
-        this.resourceDefStore = resourceDefStore;
         this.resourceStore = resourceStore;
     }
 
     public void load(CloudSpec spec) {
-        LOGGER.info("Loading resources required by the cloud spec");
+        LOGGER.info("Loading resources required to run this test");
 
         spec.getGroups().stream()
                 .flatMap(groupExpr -> groupExpr.getRules().stream())
@@ -65,8 +60,8 @@ public class ResourceLoader {
     }
 
     private void loadFromRule(RuleExpr ruleExpr) {
-        Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(ruleExpr.getResourceDefRef());
-        if (!resourceDefRefOpt.isPresent()) {
+        var resourceDefRefOpt = ResourceDefRef.fromString(ruleExpr.getResourceDefRef());
+        if (resourceDefRefOpt.isEmpty()) {
             LOGGER.error("Malformed resource definition '{}'. Ignoring it.", resourceDefRefOpt);
             return;
         }
@@ -88,7 +83,7 @@ public class ResourceLoader {
 
     private void loadFromStatement(Resource resource, Statement statement, List<String> path) {
         if (statement instanceof NestedStatement) {
-            List<String> nestedPath = new ArrayList<>(path);
+            var nestedPath = new ArrayList<>(path);
             nestedPath.add(((NestedStatement) statement).getPropertyName());
             ((NestedStatement) statement).getStatements()
                     .forEach(stmt -> loadFromStatement(resource, stmt, nestedPath));
@@ -98,14 +93,14 @@ public class ResourceLoader {
     }
 
     private void loadFromAssociationStatement(Resource resource, AssociationStatement statement, List<String> path) {
-        List<String> associationPath = new ArrayList<>(path);
+        var associationPath = new ArrayList<>(path);
         associationPath.add(statement.getAssociationName());
 
         LOGGER.debug("Loading resources for association '{}' in resource '{}' with id '{}'",
                 statement.getAssociationName(), resource.getResourceDefRef(), resource.getResourceId());
 
-        Optional<Association> associationOpt = resource.getAssociationByPath(associationPath);
-        if (!associationOpt.isPresent()) {
+        var associationOpt = resource.getAssociationByPath(associationPath);
+        if (associationOpt.isEmpty()) {
             LOGGER.error(
                     "Association '{}' does not exist in resource '{}' with id '{}'. Ignoring it.",
                     statement.getAssociationName(),
@@ -116,9 +111,9 @@ public class ResourceLoader {
         }
 
         // load associated resource
-        Association association = associationOpt.get();
-        Optional<Resource> associatedResourceOpt = getResourceById(association.getResourceDefRef(), association.getResourceId());
-        if (!associatedResourceOpt.isPresent()) {
+        var association = associationOpt.get();
+        var associatedResourceOpt = getResourceById(association.getResourceDefRef(), association.getResourceId());
+        if (associatedResourceOpt.isEmpty()) {
             LOGGER.error(
                     "Associated resource '{}' in resource '{}' with id '{}' does not exist. Ignoring it.",
                     statement.getAssociationName(),
@@ -164,7 +159,7 @@ public class ResourceLoader {
 //        if (!resourceOpt.isPresent()) {
         LOGGER.debug("Loading resource of type '{}' with id '{}'", resourceDefRef, resourceId);
 
-        Optional<Resource> resourceOpt = providersRegistry.getProvider(resourceDefRef.getProviderName())
+        var resourceOpt = providersRegistry.getProvider(resourceDefRef.getProviderName())
                 .flatMap(provider -> provider.getResource(resourceDefRef, resourceId))
                 .flatMap(ResourceReflectionUtil::toResource);
 

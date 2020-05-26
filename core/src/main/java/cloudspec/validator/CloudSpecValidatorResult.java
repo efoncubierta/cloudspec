@@ -94,7 +94,7 @@ public class CloudSpecValidatorResult {
         }
 
         public Boolean isSuccess() {
-            return !throwableOpt.isPresent() &&
+            return throwableOpt.isEmpty() &&
                     resourceValidationResults
                             .stream()
                             .allMatch(ResourceValidationResult::isSuccess);

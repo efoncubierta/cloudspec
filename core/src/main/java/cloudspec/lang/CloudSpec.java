@@ -25,7 +25,6 @@
  */
 package cloudspec.lang;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrBuilder;
 
 import java.util.ArrayList;

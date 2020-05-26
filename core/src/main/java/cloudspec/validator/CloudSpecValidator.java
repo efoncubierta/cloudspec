@@ -59,7 +59,7 @@ public class CloudSpecValidator {
 
     private CloudSpecValidatorResult.RuleResult validateRule(RuleExpr rule) {
         Optional<ResourceDefRef> resourceDefRefOpt = ResourceDefRef.fromString(rule.getResourceDefRef());
-        if (!resourceDefRefOpt.isPresent()) {
+        if (resourceDefRefOpt.isEmpty()) {
             return new CloudSpecValidatorResult.RuleResult(
                     rule.getName(),
                     new RuntimeException(String.format("Malformed resource definition reference '%s'", rule.getResourceDefRef()))

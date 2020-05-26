@@ -171,7 +171,7 @@ public class GraphResourceStoreTest {
     public void shouldNotSetRandomPropertyToRandomResource() {
         ResourceDefRef resourceDefRef = ModelGenerator.randomResourceDefRef();
         String resourceId = ModelGenerator.randomResourceId();
-        Property property = ModelGenerator.randomProperty();
+        Property<?> property = ModelGenerator.randomProperty();
 
         resourceStore.saveProperty(
                 resourceDefRef,

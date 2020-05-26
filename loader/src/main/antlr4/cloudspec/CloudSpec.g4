@@ -26,8 +26,11 @@ predicate: IS? ('==' | EQUAL TO) value           # PropertyEqualPredicate
          | IS? ('>=' | GREATER_THAN_EQUAL) value # PropertyGreaterThanEqualPredicate
          | IS? BETWEEN value AND value           # PropertyBetweenPredicate
          | STARTING_WITH value                   # PropertyStartingWithPredicate
+         | NOT STARTING_WITH value               # PropertyNotStartingWithPredicate
          | ENDING_WITH value                     # PropertyEndingWithPredicate
+         | NOT ENDING_WITH value                 # PropertyNotEndingWithPredicate
          | CONTAINING value                      # PropertyContainingPredicate
+         | NOT CONTAINING value                  # PropertyNotContainingPredicate
          | IS? ENABLED                           # PropertyEnabledPredicate
          | IS? DISABLED                          # PropertyDisabledPredicate
          ;

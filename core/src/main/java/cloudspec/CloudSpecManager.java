@@ -41,8 +41,6 @@ public class CloudSpecManager {
 
     private final ProvidersRegistry providersRegistry;
     private final ResourceDefStore resourceDefStore;
-    private final ResourceStore resourceStore;
-    private final ResourceValidator resourceValidator;
 
     private final ResourceLoader resourceLoader;
     private final CloudSpecPreflight cloudSpecPreflight;
@@ -56,10 +54,8 @@ public class CloudSpecManager {
                             ResourceValidator resourceValidator) {
         this.providersRegistry = providersRegistry;
         this.resourceDefStore = resourceDefStore;
-        this.resourceStore = resourceStore;
-        this.resourceValidator = resourceValidator;
 
-        this.resourceLoader = new ResourceLoader(providersRegistry, resourceDefStore, resourceStore);
+        this.resourceLoader = new ResourceLoader(providersRegistry, resourceStore);
         this.cloudSpecPreflight = new CloudSpecPreflight(resourceDefStore);
         this.cloudSpecValidator = new CloudSpecValidator(resourceValidator);
     }

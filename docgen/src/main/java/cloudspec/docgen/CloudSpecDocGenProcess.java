@@ -50,7 +50,7 @@ public class CloudSpecDocGenProcess {
         this.providersRegistry = providersRegistry;
     }
 
-    public void generate(File outputDir, String format) throws Exception {
+    public void generate(File outputDir, String format) {
         // if output dir exists, throw exception
         if (outputDir.exists()) {
             throw new RuntimeException("Output directory already exists");

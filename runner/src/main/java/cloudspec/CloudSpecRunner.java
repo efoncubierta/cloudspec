@@ -77,7 +77,7 @@ public class CloudSpecRunner {
 
         printProviders();
 
-        System.out.println("");
+        System.out.println();
     }
 
     private void printResult(CloudSpecValidatorResult result) {
@@ -107,7 +107,7 @@ public class CloudSpecRunner {
         );
 
         if (!ruleResult.isSuccess()) {
-            System.out.println("");
+            System.out.println();
 
             if (ruleResult.getThrowable().isPresent()) {
                 cp.println(ruleResult.getThrowable().get().getMessage(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
@@ -190,7 +190,7 @@ public class CloudSpecRunner {
 
             }
 
-            System.out.println("");
+            System.out.println();
         }
     }
 
