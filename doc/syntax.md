@@ -190,26 +190,26 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 **For any value:**
 
 - `is? == :value`: value is equal to another value.
-- `is? equal to :value`: same as above.
+- `is? equal to :value`: synonym of `== :value`.
 - `is? != :value`: value is not equal to another value.
-- `is? not equal to :value`: same as above.
+- `is? not equal to :value`: synonym of `!= :value`.
 - `is? within [:value1, :value2...]`: value is in a list of values.
 - `is? not within [:value1, :value2...]`: value is not in a list of values.
 
 **For number values (i.e. integer or double):**
 
 - `is? > :number`:number value is greater than another number.
-- `is? greater than :number`: same as above.
-- `is? gt :number`: same as above.
+- `is? greater than :number`: synonym of `> :number`
+- `is? gt :number`: synonym of `> :number`
 - `is? >= :number`:number value is greater than or equal to another number.
-- `is? greater than or equal to :number`: same as above.
-- `is? gte :number`: same as above.
+- `is? greater than or equal to :number`: synonym of `>= :number`
+- `is? gte :number`: synonym of `>= :number`
 - `is? < :number`: number value is less than another number.
-- `is? less than :number`: same as above.
-- `is? lt :number`: same as above.
+- `is? less than :number`: synonym of `> :number`
+- `is? lt :number`: synonym of `< :number`
 - `is? <= :number`: number value is less than or equal to another number.
-- `is? less than or equal to :number`: same as above.
-- `is? lte :number`: same as above.
+- `is? less than or equal to :number`: synonym of `<= :number`
+- `is? lte :number`: synonym of `<= :number`
 - `is? between :number and :number`: number value is between two numbers.
 
 **For string values:**
@@ -224,17 +224,17 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 **For string values representing an IP address**
 
 - `is? > ip address? :ip_address`: ip address is greater than another ip address.
-- `is? greater than ip address? :ip_address`: same as above.
-- `is? gt ip address? :ip_address`: same as above.
+- `is? greater than ip address? :ip_address`: synonym of `> ip :ip_address`.
+- `is? gt ip address? :ip_address`: synonym of `> ip :ip_address`.
 - `is? >= ip address? :ip_address`: ip address is greater or equal than another ip address.
-- `is? greater than or equal to ip address? :ip_address`: same as above.
-- `is? gte ip address? :ip_address`: same as above.
+- `is? greater than or equal to ip address? :ip_address`: synonym of `>= ip :ip_address`.
+- `is? gte ip address? :ip_address`: synonym of `>= ip :ip_address`.
 - `is? < id address? :ip_address`: ip address is less than another ip address.
-- `is? less than ip address? :ip_address`: same as above.
-- `is? lt ip address? :ip_address`: same as above.
+- `is? less than ip address? :ip_address`: synonym of `< ip :ip_address`.
+- `is? lt ip address? :ip_address`: synonym of `> ip :ip_address`.
 - `is? <= ip address? :ip_address`: ip address is less or equal than another ip address.
-- `is? less than or equal to ip address? :ip_address`: same as above.
-- `is? lte ip address? :ip_address`: same as above.
+- `is? less than or equal to ip address? :ip_address`: synonym of `<= ip :ip_address`.
+- `is? lte ip address? :ip_address`: synonym of `<= ip :ip_address`.
 - `is? within network cidr? :cidr_block`: ip address is within a network.
 - `is? not within network cidr? :cidr_block`: ip address is not within a network.
 - `is? ipv4`: true if value is a IPv4.
@@ -242,8 +242,8 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 
 **For boolean properties:**
 
-- `is? enabled`: synonym for `EQUAL TO true`.
-- `is? disabled`: synonym for `EQUAL TO false`.
+- `is? enabled`: synonym for `is equal to true`.
+- `is? disabled`: synonym for `is equal to false`.
 
 ## Property values
 
