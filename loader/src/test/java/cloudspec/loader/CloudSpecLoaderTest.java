@@ -39,6 +39,7 @@ public class CloudSpecLoaderTest {
     @Test
     public void shouldLoadFullSpec() throws Exception {
         CloudSpec cloudSpecOriginal = CloudSpecGenerator.fullSpec();
+        System.out.println(cloudSpecOriginal.toCloudSpecSyntax());
         CloudSpec cloudSpecLoaded = cloudSpecLoader.load(
                 new ByteArrayInputStream(cloudSpecOriginal.toCloudSpecSyntax().getBytes())
         );

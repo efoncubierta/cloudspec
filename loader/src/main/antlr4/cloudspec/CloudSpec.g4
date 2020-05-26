@@ -52,7 +52,7 @@ predicate: IS_EQUAL_TO value              # ValueEqualPredicate
 statement: MEMBER_NAME predicate                      # PropertyStatement
          | MEMBER_NAME '[' STRING ']' predicate       # KeyValuePropertyStatement
          | MEMBER_NAME '('  statement andDecl* ')'    # NestedPropertyStatement
-         | '>' MEMBER_NAME '(' statement andDecl* ')' # AssociationStatement
+         | '>'MEMBER_NAME '(' statement andDecl* ')' # AssociationStatement
          ;
 
 value: STRING                    # StringValue
@@ -92,11 +92,11 @@ IS_CONTAINING:         (IS ' ')? CONTAINING;
 IS_NOT_CONTAINING:     (IS ' ')? NOT CONTAINING;
 
 IS_EQUAL_TO_IP_ADDRESS:           IS_EQUAL_TO ' ' IP (' ' ADDRESS)?;
-IS_NOT_EQUAL_TO_IP_ADDRESS:       IS_NOT_EQUAL_TO ' ' (' ' ADDRESS)?;
-IS_LESS_THAN_IP_ADDRESS:          IS_LESS_THAN ' ' (' ' ADDRESS)?;
-IS_LESS_THAN_EQUAL_IP_ADDRESS:    IS_LESS_THAN_EQUAL ' ' (' ' ADDRESS)?;
-IS_GREATER_THAN_IP_ADDRESS:       IS_GREATER_THAN ' ' (' ' ADDRESS)?;
-IS_GREATER_THAN_EQUAL_IP_ADDRESS: IS_GREATER_THAN_EQUAL ' ' (' ' ADDRESS)?;
+IS_NOT_EQUAL_TO_IP_ADDRESS:       IS_NOT_EQUAL_TO ' ' IP (' ' ADDRESS)?;
+IS_LESS_THAN_IP_ADDRESS:          IS_LESS_THAN ' ' IP (' ' ADDRESS)?;
+IS_LESS_THAN_EQUAL_IP_ADDRESS:    IS_LESS_THAN_EQUAL ' ' IP (' ' ADDRESS)?;
+IS_GREATER_THAN_IP_ADDRESS:       IS_GREATER_THAN ' ' IP (' ' ADDRESS)?;
+IS_GREATER_THAN_EQUAL_IP_ADDRESS: IS_GREATER_THAN_EQUAL ' ' IP (' ' ADDRESS)?;
 IS_WITHIN_NETWORK:                IS_WITHIN ' ' NETWORK (' ' CIDR)?;
 IS_NOT_WITHIN_NETWORK:            IS_NOT_WITHIN ' ' NETWORK (' ' CIDR)?;
 IS_IPV4:                          (IS ' ')? IPV4;
