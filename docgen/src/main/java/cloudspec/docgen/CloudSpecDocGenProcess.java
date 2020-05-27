@@ -27,6 +27,7 @@ package cloudspec.docgen;
 
 import cloudspec.ProvidersRegistry;
 import cloudspec.model.Provider;
+import cloudspec.model.ResourceDef;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -107,8 +108,13 @@ public class CloudSpecDocGenProcess {
 
     private void writeProviderInMarkdown(File outputDir,
                                          Provider provider) throws IOException, TemplateException {
-        // create provider file
-        File providerFile = new File(outputDir, provider.getName() + ".md");
+        // create provider directory
+        File providerDir = new File(outputDir, provider.getName());
+        if (!providerDir.exists() && !providerDir.mkdirs()) {
+            throw new RuntimeException("Cannot create provider directory " + providerDir.getAbsolutePath());
+        }
+
+        File providerFile = new File(providerDir, "index.md");
         try (Writer out = new OutputStreamWriter(new FileOutputStream(providerFile))) {
             // create data dictionary
             Map<String, Object> data = new HashMap<>();
@@ -116,6 +122,45 @@ public class CloudSpecDocGenProcess {
 
             // get provider template
             Template providerTpl = freemarkerCfg.getTemplate("provider.ftl");
+
+            // write file
+            providerTpl.process(data, out);
+        }
+
+        // write provider resources
+        provider.getResourceDefs().forEach(resourceDef ->
+                {
+                    try {
+                        writeResourceInMarkdown(providerDir, resourceDef);
+                    } catch (IOException | TemplateException e) {
+                        System.out.println(
+                                String.format(
+                                        "Error generating doc for resource '%s': %s",
+                                        resourceDef.getRef(),
+                                        e.getMessage()
+                                )
+                        );
+                    }
+                }
+        );
+    }
+
+    private void writeResourceInMarkdown(File providerDir, ResourceDef resourceDef) throws IOException, TemplateException {
+        // create group directory
+        File groupDir = new File(providerDir, resourceDef.getRef().getGroupName());
+        if (!groupDir.exists() && !groupDir.mkdirs()) {
+            throw new RuntimeException("Cannot create group directory " + groupDir.getAbsolutePath());
+        }
+
+        // create resource file
+        File resourceFile = new File(groupDir, resourceDef.getRef().getResourceName() + ".md");
+        try (Writer out = new OutputStreamWriter(new FileOutputStream(resourceFile))) {
+            // create data dictionary
+            Map<String, Object> data = new HashMap<>();
+            data.put("resourceDef", resourceDef);
+
+            // get resource template
+            Template providerTpl = freemarkerCfg.getTemplate("resource.ftl");
 
             // write file
             providerTpl.process(data, out);
