@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,10 +25,13 @@
  */
 package cloudspec.lang;
 
+import cloudspec.lang.predicate.IPAddress;
 import org.apache.commons.lang.text.StrBuilder;
 import org.apache.tinkerpop.gremlin.process.traversal.Compare;
 import org.apache.tinkerpop.gremlin.process.traversal.Contains;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
+import org.apache.tinkerpop.gremlin.process.traversal.Text;
+import org.apache.tinkerpop.gremlin.process.traversal.util.AndP;
 
 import java.util.List;
 import java.util.Objects;
@@ -79,20 +82,83 @@ public class PropertyStatement implements Statement {
         );
 
         sb.append(predicateToCloudSpecSyntax(predicate));
-        sb.append(valueToCloudSpecSyntax(predicate.getOriginalValue()));
 
         return sb.toString();
     }
 
     protected String predicateToCloudSpecSyntax(P<?> predicate) {
-        if (predicate.getBiPredicate().equals(Compare.eq)) {
-            return "EQUAL TO ";
-        } else if (predicate.getBiPredicate().equals(Compare.neq)) {
-            return "NOT EQUAL TO ";
-        } else if (predicate.getBiPredicate().equals(Contains.within)) {
-            return "WITHIN ";
-        } else if (predicate.getBiPredicate().equals(Contains.without)) {
-            return "NOT WITHIN ";
+        var biPredicate = predicate.getBiPredicate();
+        var originalValue = predicate.getOriginalValue();
+
+        if (biPredicate.equals(Compare.eq)) {
+            if (originalValue == "") {
+                return "is empty";
+            } else if (originalValue == null) {
+                return "is null";
+            } else {
+                return "is equal to " + valueToCloudSpecSyntax(originalValue);
+            }
+        } else if (biPredicate.equals(Compare.neq)) {
+            if (originalValue == "") {
+                return "is not empty";
+            } else if (originalValue == null) {
+                return "is not null";
+            } else {
+                return "is not equal to " + valueToCloudSpecSyntax(originalValue);
+            }
+        } else if (biPredicate.equals(Compare.lt)) {
+            return "is less than " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Compare.lte)) {
+            return "is less than or equal to " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Compare.gt)) {
+            return "is greater than " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Compare.gte)) {
+            return "is greater than or equal to " + valueToCloudSpecSyntax(originalValue);
+        } else if (predicate instanceof AndP<?>) {
+            var andP = (AndP<?>) predicate;
+            var leftPredicate = andP.getPredicates().get(0);
+            var rightPredicate = andP.getPredicates().get(1);
+            if (leftPredicate.getBiPredicate().equals(Compare.gte) &&
+                    rightPredicate.getBiPredicate().equals(Compare.lt)) {
+                return "is between " + valueToCloudSpecSyntax(leftPredicate.getOriginalValue()) +
+                        " and " + valueToCloudSpecSyntax(rightPredicate.getOriginalValue());
+            }
+        } else if (biPredicate.equals(Contains.within)) {
+            return "is within " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Contains.without)) {
+            return "is not within " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Text.startingWith)) {
+            return "is starting with " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Text.notStartingWith)) {
+            return "is not starting with " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Text.endingWith)) {
+            return "is ending with " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Text.notEndingWith)) {
+            return "is not ending with " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Text.containing)) {
+            return "is containing " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(Text.notContaining)) {
+            return "is not containing " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.eq)) {
+            return "is equal to ip address " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.neq)) {
+            return "is not equal to ip address " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.lt)) {
+            return "is less than ip address " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.lte)) {
+            return "is less than or equal to ip address " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.gt)) {
+            return "is greater than ip address " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.gte)) {
+            return "is greater than or equal to ip address " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.withinNetwork)) {
+            return "is within network cidr " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.withoutNetwork)) {
+            return "is not within network cidr " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(IPAddress.isIpv4)) {
+            return "is ipv4";
+        } else if (biPredicate.equals(IPAddress.isIpv6)) {
+            return "is ipv6";
         }
 
         return "UNKNOWN";
@@ -115,18 +181,18 @@ public class PropertyStatement implements Statement {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(propertyName, predicate);
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PropertyStatement that = (PropertyStatement) o;
+
         return propertyName.equals(that.propertyName) &&
-                predicate.getBiPredicate().equals(that.predicate.getBiPredicate()) &&
-                predicate.getOriginalValue().equals(that.predicate.getOriginalValue());
+                predicate.equals(that.predicate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(propertyName, predicate);
     }
 
     @Override

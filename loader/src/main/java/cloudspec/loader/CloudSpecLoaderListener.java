@@ -203,6 +203,16 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     }
 
     @Override
+    public void exitValueNullPredicate(CloudSpecParser.ValueNullPredicateContext ctx) {
+        currentPredicate = P.eq(null);
+    }
+
+    @Override
+    public void exitValueNotNullPredicate(CloudSpecParser.ValueNotNullPredicateContext ctx) {
+        currentPredicate = P.neq(null);
+    }
+
+    @Override
     public void exitValueEqualPredicate(CloudSpecParser.ValueEqualPredicateContext ctx) {
         currentPredicate = P.eq(currentValues.pop());
     }
@@ -251,6 +261,16 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     }
 
     @Override
+    public void exitStringEmptyPredicate(CloudSpecParser.StringEmptyPredicateContext ctx) {
+        currentPredicate = P.eq("");
+    }
+
+    @Override
+    public void exitStringNotEmptyPredicate(CloudSpecParser.StringNotEmptyPredicateContext ctx) {
+        currentPredicate = P.neq("");
+    }
+
+    @Override
     public void exitStringStartingWithPredicate(CloudSpecParser.StringStartingWithPredicateContext ctx) {
         currentPredicate = TextP.startingWith((String) currentValues.pop());
     }
@@ -287,7 +307,6 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
 
     @Override
     public void exitIpAddressNotEqualPredicate(CloudSpecParser.IpAddressNotEqualPredicateContext ctx) {
-        System.out.println(currentValues);
         currentPredicate = IPAddressP.neq((String) currentValues.pop());
     }
 
@@ -352,13 +371,12 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     }
 
     @Override
-    public void exitIntegerValue(CloudSpecParser.IntegerValueContext ctx) {
-        currentValues.add(Integer.parseInt(ctx.INTEGER().getText()));
-    }
-
-    @Override
-    public void exitDoubleValue(CloudSpecParser.DoubleValueContext ctx) {
-        currentValues.add(Double.parseDouble(ctx.DOUBLE().getText()));
+    public void exitNumberValue(CloudSpecParser.NumberValueContext ctx) {
+        if(ctx.INTEGER() != null && ctx.INTEGER().getText() != null & !ctx.INTEGER().getText().isEmpty()) {
+            currentValues.add(Integer.parseInt(ctx.INTEGER().getText()));
+        } else {
+            currentValues.add(Double.parseDouble(ctx.DOUBLE().getText()));
+        }
     }
 
     private String stripQuotes(String s) {

@@ -198,7 +198,7 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 
 **For number values (i.e. integer or double):**
 
-- `is? > :number`:number value is greater than another number.
+- `is? > :number`: number value is greater than another number.
 - `is? greater than :number`: synonym of `> :number`
 - `is? gt :number`: synonym of `> :number`
 - `is? >= :number`:number value is greater than or equal to another number.
@@ -237,8 +237,8 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 - `is? lte ip address? :ip_address`: synonym of `<= ip :ip_address`.
 - `is? within network cidr? :cidr_block`: ip address is within a network.
 - `is? not within network cidr? :cidr_block`: ip address is not within a network.
-- `is? ipv4`: true if value is a IPv4.
-- `is? ipv6`: true if value is a IPv6.
+- `is? ipv4`: true if value is an IPv4.
+- `is? ipv6`: true if value is an IPv6.
 
 **For boolean properties:**
 

@@ -89,11 +89,6 @@ public class AssociationStatement implements Statement {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(associationName, statements);
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -101,6 +96,11 @@ public class AssociationStatement implements Statement {
         return associationName.equals(statement.associationName) &&
                 statements.size() == statement.statements.size() &&
                 statements.containsAll(statement.statements);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(associationName, statements);
     }
 
     @Override

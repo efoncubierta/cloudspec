@@ -273,7 +273,6 @@ public class GraphResourceValidatorTest {
         assertTrue(resultOpt.isPresent());
 
         resultOpt.ifPresent(result -> {
-            System.out.println(result.getAssertResults().get(0).getError().get());
             assertFalse(result.isSuccess());
             assertEquals(1, result.getAssertResults().size());
             assertFalse(result.getAssertResults().get(0).getSuccess());

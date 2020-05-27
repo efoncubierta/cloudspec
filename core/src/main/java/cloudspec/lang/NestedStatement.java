@@ -89,11 +89,6 @@ public class NestedStatement implements Statement {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(propertyName, statements);
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -101,6 +96,11 @@ public class NestedStatement implements Statement {
         return propertyName.equals(that.propertyName) &&
                 statements.size() == that.statements.size() &&
                 statements.containsAll(that.statements);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(propertyName, statements);
     }
 
     @Override

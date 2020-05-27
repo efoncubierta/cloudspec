@@ -66,7 +66,6 @@ public class KeyValueStatement extends PropertyStatement {
         );
 
         sb.append(predicateToCloudSpecSyntax(predicate));
-        sb.append(valueToCloudSpecSyntax(predicate.getOriginalValue()));
 
         return sb.toString();
     }
