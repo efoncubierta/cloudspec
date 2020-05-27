@@ -30,6 +30,7 @@ import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.model.KeyValue;
 
+import java.util.Date;
 import java.util.List;
 
 @ResourceDefinition(
@@ -104,6 +105,20 @@ public class TestTargetResource {
     private final List<Boolean> booleanListProperty;
 
     @PropertyDefinition(
+            name = ModelTestUtils.PROP_DATE_NAME,
+            description = ModelTestUtils.PROP_DATE_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_DATE_EXAMPLE_VALUES
+    )
+    private final Date dateProperty;
+
+    @PropertyDefinition(
+            name = ModelTestUtils.PROP_DATE_LIST_NAME,
+            description = ModelTestUtils.PROP_DATE_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_DATE_LIST_EXAMPLE_VALUES
+    )
+    private final List<Date> dateListProperty;
+
+    @PropertyDefinition(
             name = ModelTestUtils.PROP_KEY_VALUE_NAME,
             description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION,
             exampleValues = ModelTestUtils.PROP_KEY_VALUE_EXAMPLE_VALUES
@@ -122,6 +137,7 @@ public class TestTargetResource {
                               Double doubleProperty, List<Double> doubleListProperty,
                               String stringProperty, List<String> stringListProperty,
                               Boolean booleanProperty, List<Boolean> booleanListProperty,
+                              Date dateProperty, List<Date> dateListProperty,
                               KeyValue keyValueProperty, List<KeyValue> keyValueListProperty) {
         this.id = id;
         this.integerProperty = integerProperty;
@@ -132,6 +148,8 @@ public class TestTargetResource {
         this.stringListProperty = stringListProperty;
         this.booleanProperty = booleanProperty;
         this.booleanListProperty = booleanListProperty;
+        this.dateProperty = dateProperty;
+        this.dateListProperty = dateListProperty;
         this.keyValueProperty = keyValueProperty;
         this.keyValueListProperty = keyValueListProperty;
     }

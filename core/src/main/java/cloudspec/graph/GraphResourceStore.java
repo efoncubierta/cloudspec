@@ -611,6 +611,10 @@ public class GraphResourceStore implements ResourceStore {
                 return Optional.of(
                         new BooleanProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
                 );
+            case DATE:
+                return Optional.of(
+                        new DateProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
+                );
             case KEY_VALUE:
                 return Optional.of(
                         new KeyValueProperty(

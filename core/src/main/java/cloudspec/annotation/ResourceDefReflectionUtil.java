@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -148,6 +149,7 @@ public class ResourceDefReflectionUtil {
             case DOUBLE:
             case STRING:
             case BOOLEAN:
+            case DATE:
                 return Optional.of(
                         new PropertyDef(
                                 propertyDefAnnotation.name(),
@@ -271,7 +273,9 @@ public class ResourceDefReflectionUtil {
             return PropertyType.STRING;
         } else if (clazz.isAssignableFrom(Boolean.class)) {
             return PropertyType.BOOLEAN;
-        } else if (clazz.isAssignableFrom(KeyValue.class)) {
+        } else if (clazz.isAssignableFrom(Date.class)) {
+            return PropertyType.DATE;
+        }else if (clazz.isAssignableFrom(KeyValue.class)) {
             return PropertyType.KEY_VALUE;
         }
 

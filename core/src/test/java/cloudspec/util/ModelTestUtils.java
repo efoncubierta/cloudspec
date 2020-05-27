@@ -25,12 +25,10 @@
  */
 package cloudspec.util;
 
+import cloudspec.model.Properties;
 import cloudspec.model.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -185,6 +183,34 @@ public class ModelTestUtils {
     );
     public static final BooleanProperty PROP_BOOLEAN_LIST = new BooleanProperty(PROP_BOOLEAN_LIST_NAME, PROP_BOOLEAN_VALUE);
 
+    public static final String PROP_DATE_NAME = "date_property";
+    public static final String PROP_DATE_DESCRIPTION = "Date property";
+    public static final String PROP_DATE_EXAMPLE_VALUES = "The date property";
+    public static final PropertyType PROP_DATE_TYPE = PropertyType.DATE;
+    public static final Date PROP_DATE_VALUE = new Date();
+    public static final PropertyDef PROP_DATE_DEF = new PropertyDef(
+            PROP_DATE_NAME,
+            PROP_DATE_DESCRIPTION,
+            PROP_DATE_TYPE,
+            Boolean.FALSE,
+            PROP_DATE_EXAMPLE_VALUES
+    );
+    public static final DateProperty PROP_DATE = new DateProperty(PROP_DATE_NAME, PROP_DATE_VALUE);
+
+    public static final String PROP_DATE_LIST_NAME = "date_list_property";
+    public static final String PROP_DATE_LIST_DESCRIPTION = "Date list property";
+    public static final String PROP_DATE_LIST_EXAMPLE_VALUES = "The list of dates property";
+    public static final PropertyType PROP_DATE_LIST_TYPE = PropertyType.DATE;
+    public static final List<Date> PROP_DATE_LIST_VALUE = Arrays.asList(PROP_DATE_VALUE, PROP_DATE_VALUE);
+    public static final PropertyDef PROP_DATE_LIST_DEF = new PropertyDef(
+            PROP_DATE_LIST_NAME,
+            PROP_DATE_LIST_DESCRIPTION,
+            PROP_DATE_LIST_TYPE,
+            Boolean.TRUE,
+            PROP_DATE_LIST_EXAMPLE_VALUES
+    );
+    public static final DateProperty PROP_DATE_LIST = new DateProperty(PROP_DATE_LIST_NAME, PROP_DATE_VALUE);
+
     public static final String PROP_KEY_VALUE_NAME = "key_value_property";
     public static final String PROP_KEY_VALUE_DESCRIPTION = "KeyValue property";
     public static final String PROP_KEY_VALUE_EXAMPLE_VALUES = "The key value property";
@@ -223,6 +249,7 @@ public class ModelTestUtils {
                     PROP_DOUBLE, PROP_DOUBLE_LIST, PROP_DOUBLE_LIST,
                     PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
                     PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
+                    PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
                     PROP_KEY_VALUE, PROP_KEY_VALUE_LIST, PROP_KEY_VALUE_LIST
             ),
             new Associations(
@@ -240,6 +267,7 @@ public class ModelTestUtils {
                     PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+                    PROP_DATE_DEF, PROP_DATE_LIST_DEF,
                     PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
             ),
             Collections.singletonList(ASSOCIATION_DEF)
@@ -262,6 +290,7 @@ public class ModelTestUtils {
                     PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+                    PROP_DATE_DEF, PROP_DATE_LIST_DEF,
                     PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
             ),
             Collections.singletonList(ASSOCIATION_DEF)
@@ -274,6 +303,7 @@ public class ModelTestUtils {
             PROP_DOUBLE, PROP_DOUBLE_LIST, PROP_DOUBLE_LIST,
             PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
             PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
+            PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
             PROP_KEY_VALUE, PROP_KEY_VALUE_LIST, PROP_KEY_VALUE_LIST,
             PROP_NESTED, PROP_NESTED_LIST
     );
@@ -283,6 +313,7 @@ public class ModelTestUtils {
             PROP_DOUBLE, PROP_DOUBLE_LIST, PROP_DOUBLE_LIST,
             PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
             PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
+            PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
             PROP_KEY_VALUE, PROP_KEY_VALUE_LIST, PROP_KEY_VALUE_LIST
     );
     public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(
@@ -291,6 +322,7 @@ public class ModelTestUtils {
             PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF,
             PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+            PROP_DATE_DEF, PROP_DATE_LIST_DEF,
             PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF,
             PROP_NESTED_DEF, PROP_NESTED_LIST_DEF
     );
@@ -300,6 +332,7 @@ public class ModelTestUtils {
             PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF,
             PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
+            PROP_DATE_DEF, PROP_DATE_LIST_DEF,
             PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
     );
 
@@ -340,6 +373,8 @@ public class ModelTestUtils {
             PROP_STRING_LIST_VALUE,
             PROP_BOOLEAN_VALUE,
             PROP_BOOLEAN_LIST_VALUE,
+            PROP_DATE_VALUE,
+            PROP_DATE_LIST_VALUE,
             PROP_KEY_VALUE_VALUE,
             PROP_KEY_VALUE_LIST_VALUE,
             new TestNestedProperty(
@@ -351,6 +386,8 @@ public class ModelTestUtils {
                     PROP_STRING_LIST_VALUE,
                     PROP_BOOLEAN_VALUE,
                     PROP_BOOLEAN_LIST_VALUE,
+                    PROP_DATE_VALUE,
+                    PROP_DATE_LIST_VALUE,
                     PROP_KEY_VALUE_VALUE,
                     PROP_KEY_VALUE_LIST_VALUE,
                     TARGET_RESOURCE_ID
@@ -365,6 +402,8 @@ public class ModelTestUtils {
                             PROP_STRING_LIST_VALUE,
                             PROP_BOOLEAN_VALUE,
                             PROP_BOOLEAN_LIST_VALUE,
+                            PROP_DATE_VALUE,
+                            PROP_DATE_LIST_VALUE,
                             PROP_KEY_VALUE_VALUE,
                             PROP_KEY_VALUE_LIST_VALUE,
                             TARGET_RESOURCE_ID

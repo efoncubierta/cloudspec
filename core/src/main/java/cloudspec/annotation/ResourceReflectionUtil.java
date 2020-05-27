@@ -29,6 +29,7 @@ import cloudspec.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -159,6 +160,11 @@ public class ResourceReflectionUtil {
                                                     return new BooleanProperty(
                                                             propertyDefAnnotation.name(),
                                                             (Boolean) item
+                                                    );
+                                                case DATE:
+                                                    return new DateProperty(
+                                                            propertyDefAnnotation.name(),
+                                                            (Date) item
                                                     );
                                                 case KEY_VALUE:
                                                     return new KeyValueProperty(

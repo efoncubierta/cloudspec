@@ -25,26 +25,10 @@
  */
 package cloudspec.model;
 
-/**
- * Property type.
- */
-public enum PropertyType {
-    STRING("string"),
-    BOOLEAN("boolean"),
-    INTEGER("integer"),
-    DOUBLE("double"),
-    DATE("date"),
-    KEY_VALUE("key_value"),
-    NESTED("nested");
+import java.util.Date;
 
-    private final String text;
-
-    PropertyType(final String text) {
-        this.text = text;
-    }
-
-    @Override
-    public String toString() {
-        return text;
+public class DateProperty extends Property<Date> {
+    public DateProperty(String name, Date value) {
+        super(name, value);
     }
 }

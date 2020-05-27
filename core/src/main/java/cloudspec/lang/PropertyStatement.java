@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,6 +25,7 @@
  */
 package cloudspec.lang;
 
+import cloudspec.lang.predicate.DateCompare;
 import cloudspec.lang.predicate.IPAddress;
 import org.apache.commons.lang.text.StrBuilder;
 import org.apache.tinkerpop.gremlin.process.traversal.Compare;
@@ -33,6 +34,9 @@ import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.Text;
 import org.apache.tinkerpop.gremlin.process.traversal.util.AndP;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -114,15 +118,6 @@ public class PropertyStatement implements Statement {
             return "is greater than " + valueToCloudSpecSyntax(originalValue);
         } else if (biPredicate.equals(Compare.gte)) {
             return "is greater than or equal to " + valueToCloudSpecSyntax(originalValue);
-        } else if (predicate instanceof AndP<?>) {
-            var andP = (AndP<?>) predicate;
-            var leftPredicate = andP.getPredicates().get(0);
-            var rightPredicate = andP.getPredicates().get(1);
-            if (leftPredicate.getBiPredicate().equals(Compare.gte) &&
-                    rightPredicate.getBiPredicate().equals(Compare.lt)) {
-                return "is between " + valueToCloudSpecSyntax(leftPredicate.getOriginalValue()) +
-                        " and " + valueToCloudSpecSyntax(rightPredicate.getOriginalValue());
-            }
         } else if (biPredicate.equals(Contains.within)) {
             return "is within " + valueToCloudSpecSyntax(originalValue);
         } else if (biPredicate.equals(Contains.without)) {
@@ -159,6 +154,26 @@ public class PropertyStatement implements Statement {
             return "is ipv4";
         } else if (biPredicate.equals(IPAddress.isIpv6)) {
             return "is ipv6";
+        } else if (biPredicate.equals(DateCompare.before)) {
+            return "is before " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(DateCompare.notBefore)) {
+            return "is not before " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(DateCompare.after)) {
+            return "is after " + valueToCloudSpecSyntax(originalValue);
+        } else if (biPredicate.equals(DateCompare.notAfter)) {
+            return "is not after " + valueToCloudSpecSyntax(originalValue);
+        } else if (predicate instanceof AndP<?>) {
+            var andP = (AndP<?>) predicate;
+            var leftPredicate = andP.getPredicates().get(0);
+            var rightPredicate = andP.getPredicates().get(1);
+            if ((leftPredicate.getBiPredicate().equals(Compare.gte) &&
+                    rightPredicate.getBiPredicate().equals(Compare.lt)) ||
+                    (leftPredicate.getBiPredicate().equals(DateCompare.notBefore) &&
+                            rightPredicate.getBiPredicate().equals(DateCompare.before))
+            ) {
+                return "is between " + valueToCloudSpecSyntax(leftPredicate.getOriginalValue()) +
+                        " and " + valueToCloudSpecSyntax(rightPredicate.getOriginalValue());
+            }
         }
 
         return "UNKNOWN";
@@ -175,6 +190,9 @@ public class PropertyStatement implements Statement {
 
         } else if (value instanceof String) {
             return String.format("\"%s\"", value);
+        } else if (value instanceof Date) {
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return String.format("\"%s\"", df.format(value));
         } else {
             return value.toString();
         }

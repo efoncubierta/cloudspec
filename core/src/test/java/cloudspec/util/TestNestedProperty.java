@@ -29,6 +29,7 @@ import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.model.KeyValue;
 
+import java.util.Date;
 import java.util.List;
 
 public class TestNestedProperty {
@@ -89,6 +90,20 @@ public class TestNestedProperty {
     private final List<Boolean> booleanListProperty;
 
     @PropertyDefinition(
+            name = ModelTestUtils.PROP_DATE_NAME,
+            description = ModelTestUtils.PROP_DATE_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_DATE_EXAMPLE_VALUES
+    )
+    private final Date dateProperty;
+
+    @PropertyDefinition(
+            name = ModelTestUtils.PROP_DATE_LIST_NAME,
+            description = ModelTestUtils.PROP_DATE_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_DATE_LIST_EXAMPLE_VALUES
+    )
+    private final List<Date> dateListProperty;
+
+    @PropertyDefinition(
             name = ModelTestUtils.PROP_KEY_VALUE_NAME,
             description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION,
             exampleValues = ModelTestUtils.PROP_KEY_VALUE_EXAMPLE_VALUES
@@ -113,6 +128,7 @@ public class TestNestedProperty {
                               Double doubleProperty, List<Double> doubleListProperty,
                               String stringProperty, List<String> stringListProperty,
                               Boolean booleanProperty, List<Boolean> booleanListProperty,
+                              Date dateProperty, List<Date> dateListProperty,
                               KeyValue keyValueProperty, List<KeyValue> keyValueListProperty,
                               String associationId) {
         this.integerProperty = integerProperty;
@@ -123,52 +139,10 @@ public class TestNestedProperty {
         this.stringListProperty = stringListProperty;
         this.booleanProperty = booleanProperty;
         this.booleanListProperty = booleanListProperty;
+        this.dateProperty = dateProperty;
+        this.dateListProperty = dateListProperty;
         this.keyValueProperty = keyValueProperty;
         this.keyValueListProperty = keyValueListProperty;
         this.associationId = associationId;
-    }
-
-    public Integer getIntegerProperty() {
-        return integerProperty;
-    }
-
-    public List<Integer> getIntegerListProperty() {
-        return integerListProperty;
-    }
-
-    public Double getDoubleProperty() {
-        return doubleProperty;
-    }
-
-    public List<Double> getDoubleListProperty() {
-        return doubleListProperty;
-    }
-
-    public String getStringProperty() {
-        return stringProperty;
-    }
-
-    public List<String> getStringListProperty() {
-        return stringListProperty;
-    }
-
-    public Boolean getBooleanProperty() {
-        return booleanProperty;
-    }
-
-    public List<Boolean> getBooleanListProperty() {
-        return booleanListProperty;
-    }
-
-    public KeyValue getKeyValueProperty() {
-        return keyValueProperty;
-    }
-
-    public List<KeyValue> getKeyValueListProperty() {
-        return keyValueListProperty;
-    }
-
-    public String getAssociationId() {
-        return associationId;
     }
 }

@@ -51,6 +51,12 @@ predicate: IS_NULL                        # ValueNullPredicate
          // boolean predicates
          | IS_ENABLED                               # EnabledPredicate
          | IS_DISABLED                              # DisabledPredicate
+         // date predicates
+         | IS_BEFORE dateValue                      # DateBeforePredicate
+         | IS_NOT_BEFORE dateValue                  # DateNotBeforePredicate
+         | IS_AFTER dateValue                       # DateAfterPredicate
+         | IS_NOT_AFTER dateValue                   # DateNotAfterPredicate
+         | IS_BETWEEN dateValue AND dateValue       # DateBetweenPredicate
          ;
 
 statement: MEMBER_NAME predicate                      # PropertyStatement
@@ -62,19 +68,30 @@ statement: MEMBER_NAME predicate                      # PropertyStatement
 stringValue: STRING;
 numberValue: (INTEGER | DOUBLE);
 booleanValue: BOOLEAN;
+dateValue: DATE_STRING;
 
 value: numberValue
      | stringValue
      | booleanValue
+     | dateValue
      ;
 
 array: '[' value (',' value)* ']';
 
-// Values
+// Date value
+DATE_STRING: '"' DATE_FORMAT (' ' TIME_FORMAT)? '"';
 STRING: '"' ('\\"'|.)*? '"';
 BOOLEAN: (TRUE | FALSE);
 DOUBLE: NEGATIVE? DIGIT+ DOT DIGIT+;
 INTEGER: NEGATIVE? DIGIT+;
+fragment DATE_FORMAT: YEAR_FORMAT '-' MONTH_FORMAT '-' DAY_FORMAT;
+fragment TIME_FORMAT: HOUR_FORMAT ':' MINUTE_FORMAT ':' SECOND_FORMAT;
+fragment YEAR_FORMAT: DIGIT DIGIT DIGIT DIGIT;
+fragment MONTH_FORMAT: DIGIT DIGIT;
+fragment DAY_FORMAT: DIGIT DIGIT;
+fragment HOUR_FORMAT: DIGIT DIGIT;
+fragment MINUTE_FORMAT: DIGIT DIGIT;
+fragment SECOND_FORMAT: DIGIT DIGIT;
 fragment DIGIT: [0-9];
 fragment DOT: '.';
 fragment NEGATIVE: '-';
@@ -116,6 +133,11 @@ IS_IPV6:                          (IS ' ')? IPV6;
 IS_ENABLED:                       (IS ' ')? (TRUE | ENABLED);
 IS_DISABLED:                      (IS ' ')? (FALSE | DISABLED);
 
+IS_BEFORE:                        (IS ' ')? BEFORE;
+IS_NOT_BEFORE:                    (IS ' ')? NOT ' ' BEFORE;
+IS_AFTER:                         (IS ' ')? AFTER;
+IS_NOT_AFTER:                     (IS ' ')? NOT ' ' AFTER;
+
 // Vocabulary
 SPEC: [Ss][Pp][Ee][Cc];
 GROUP: [Gg][Rr][Oo][Uu][Pp];
@@ -154,6 +176,8 @@ fragment TO: [Tt][Oo];
 fragment BETWEEN: [Bb][Ee][Tt][Ww][Ee][Ee][Nn];
 fragment NULL: [Nn][Uu][Ll][Ll];
 fragment EMPTY: [Ee][Mm][Pp][Tt][Yy];
+fragment BEFORE: [Bb][Ee][Ff][Oo][Rr][Ee];
+fragment AFTER: [Aa][Ff][Tt][Ee][Rr];
 
 // Network vocabulary
 fragment IP: [Ii][Pp];

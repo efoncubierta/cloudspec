@@ -23,28 +23,46 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.lang.predicate;
 
-/**
- * Property type.
- */
-public enum PropertyType {
-    STRING("string"),
-    BOOLEAN("boolean"),
-    INTEGER("integer"),
-    DOUBLE("double"),
-    DATE("date"),
-    KEY_VALUE("key_value"),
-    NESTED("nested");
+import java.util.Date;
+import java.util.function.BiPredicate;
 
-    private final String text;
+public enum DateCompare implements BiPredicate<Date, Date> {
+    before {
+        public boolean test(final Date value, final Date input) {
+            return value.compareTo(input) < 0;
+        }
 
-    PropertyType(final String text) {
-        this.text = text;
-    }
+        public DateCompare negate() {
+            return notBefore;
+        }
+    },
+    notBefore {
+        public boolean test(final Date value, final Date input) {
+            return value.compareTo(input) >= 0;
+        }
 
-    @Override
-    public String toString() {
-        return text;
+        public DateCompare negate() {
+            return before;
+        }
+    },
+    after {
+        public boolean test(final Date value, final Date input) {
+            return value.compareTo(input) > 0;
+        }
+
+        public DateCompare negate() {
+            return notAfter;
+        }
+    },
+    notAfter {
+        public boolean test(final Date value, final Date input) {
+            return value.compareTo(input) <= 0;
+        }
+
+        public DateCompare negate() {
+            return after;
+        }
     }
 }

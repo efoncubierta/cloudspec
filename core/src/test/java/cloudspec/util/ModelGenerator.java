@@ -29,7 +29,9 @@ import cloudspec.model.*;
 import com.github.javafaker.Faker;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -46,9 +48,10 @@ public class ModelGenerator {
                 PropertyType.DOUBLE,
                 PropertyType.STRING,
                 PropertyType.BOOLEAN,
+                PropertyType.DATE,
                 PropertyType.KEY_VALUE,
                 PropertyType.NESTED
-        ).get(faker.random().nextInt(0, excludeNested ? 4 : 5));
+        ).get(faker.random().nextInt(0, excludeNested ? 5 : 6));
     }
 
     public static List<PropertyDef> randomPropertyDefs(Integer n) {
@@ -138,6 +141,8 @@ public class ModelGenerator {
                 return faker.random().nextDouble();
             case BOOLEAN:
                 return faker.random().nextBoolean();
+            case DATE:
+                return faker.date().past(1000, TimeUnit.DAYS);
             case STRING:
             default:
                 return faker.lorem().sentence();
@@ -176,6 +181,11 @@ public class ModelGenerator {
                 return new BooleanProperty(
                         propertyDef.getName(),
                         (Boolean) randomPropertyValue(propertyDef)
+                );
+            case DATE:
+                return new DateProperty(
+                        propertyDef.getName(),
+                        (Date) randomPropertyValue(propertyDef)
                 );
             case KEY_VALUE:
                 return new KeyValueProperty(

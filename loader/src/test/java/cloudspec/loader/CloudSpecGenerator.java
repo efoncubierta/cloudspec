@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,8 +26,8 @@
 package cloudspec.loader;
 
 import cloudspec.lang.*;
+import cloudspec.lang.predicate.DateP;
 import cloudspec.lang.predicate.IPAddressP;
-import cloudspec.model.Property;
 import cloudspec.model.PropertyType;
 import com.github.javafaker.Faker;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
@@ -35,7 +35,9 @@ import org.apache.tinkerpop.gremlin.process.traversal.TextP;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -119,6 +121,12 @@ public class CloudSpecGenerator {
         statements.add(randomNotIpWithinNetworkPredicateStatement());
         statements.add(randomIpIsIpv4PredicateStatement());
         statements.add(randomIpIsIpv6PredicateStatement());
+
+        statements.add(randomDateBeforePredicateStatement());
+        statements.add(randomDateNotBeforePredicateStatement());
+        statements.add(randomDateAfterPredicateStatement());
+        statements.add(randomDateNotAfterPredicateStatement());
+        statements.add(randomDateBetweenPredicateStatement());
 
         statements.add(randomKeyValueEqualPredicateStatement());
         statements.add(randomKeyValueNotEqualPredicateStatement());
@@ -339,6 +347,44 @@ public class CloudSpecGenerator {
         );
     }
 
+    public static PropertyStatement randomDateBeforePredicateStatement() {
+        return new PropertyStatement(
+                faker.lorem().word(),
+                DateP.before(randomDate())
+        );
+    }
+
+    public static PropertyStatement randomDateNotBeforePredicateStatement() {
+        return new PropertyStatement(
+                faker.lorem().word(),
+                DateP.notBefore(randomDate())
+        );
+    }
+
+    public static PropertyStatement randomDateAfterPredicateStatement() {
+        return new PropertyStatement(
+                faker.lorem().word(),
+                DateP.after(randomDate())
+        );
+    }
+
+    public static PropertyStatement randomDateNotAfterPredicateStatement() {
+        return new PropertyStatement(
+                faker.lorem().word(),
+                DateP.notAfter(randomDate())
+        );
+    }
+
+    public static PropertyStatement randomDateBetweenPredicateStatement() {
+        return new PropertyStatement(
+                faker.lorem().word(),
+                DateP.between(
+                        randomDate(),
+                        randomDate()
+                )
+        );
+    }
+
     public static KeyValueStatement randomKeyValueEqualPredicateStatement() {
         return new KeyValueStatement(
                 faker.lorem().word(),
@@ -431,6 +477,8 @@ public class CloudSpecGenerator {
                 return faker.random().nextDouble();
             case BOOLEAN:
                 return faker.random().nextBoolean();
+            case DATE:
+                return randomDate();
             case STRING:
             default:
                 return faker.lorem().word();
@@ -446,5 +494,12 @@ public class CloudSpecGenerator {
         return IntStream.range(0, 5)
                 .mapToObj(i -> randomValue(propertyType))
                 .collect(Collectors.toList());
+    }
+
+    public static Date randomDate() {
+        // return a date rounded to seconds
+        Date date = faker.date().past(1000, TimeUnit.DAYS);
+        Long seconds = date.getTime() - (date.getTime() % 1000);
+        return new Date(seconds);
     }
 }

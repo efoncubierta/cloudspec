@@ -23,28 +23,35 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.model;
+package cloudspec.lang.predicate;
 
-/**
- * Property type.
- */
-public enum PropertyType {
-    STRING("string"),
-    BOOLEAN("boolean"),
-    INTEGER("integer"),
-    DOUBLE("double"),
-    DATE("date"),
-    KEY_VALUE("key_value"),
-    NESTED("nested");
+import com.github.javafaker.Faker;
+import org.junit.Test;
 
-    private final String text;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
-    PropertyType(final String text) {
-        this.text = text;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class DateCompareTest {
+    private final Faker faker = new Faker();
+
+    @Test
+    public void shouldValidateBeforeDate() {
+        Date baseDate = faker.date().past(1000, TimeUnit.DAYS);
+        Date targetDate = new Date();
+
+        assertTrue(DateCompare.before.test(baseDate, targetDate));
+        assertFalse(DateCompare.notBefore.test(baseDate, targetDate));
     }
 
-    @Override
-    public String toString() {
-        return text;
+    @Test
+    public void shouldValidateAfterDate() {
+        Date baseDate = new Date();
+        Date targetDate = faker.date().past(1000, TimeUnit.DAYS);
+
+        assertTrue(DateCompare.after.test(baseDate, targetDate));
+        assertFalse(DateCompare.notAfter.test(baseDate, targetDate));
     }
 }

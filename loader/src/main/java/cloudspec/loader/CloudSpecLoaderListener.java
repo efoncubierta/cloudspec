@@ -28,11 +28,15 @@ package cloudspec.loader;
 import cloudspec.CloudSpecBaseListener;
 import cloudspec.CloudSpecParser;
 import cloudspec.lang.*;
+import cloudspec.lang.predicate.DateP;
 import cloudspec.lang.predicate.IPAddressP;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.TextP;
 
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
@@ -361,6 +365,32 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     }
 
     @Override
+    public void exitDateBeforePredicate(CloudSpecParser.DateBeforePredicateContext ctx) {
+        currentPredicate = DateP.before((Date) currentValues.pop());
+    }
+
+    @Override
+    public void exitDateNotBeforePredicate(CloudSpecParser.DateNotBeforePredicateContext ctx) {
+        currentPredicate = DateP.notBefore((Date) currentValues.pop());
+    }
+
+    @Override
+    public void exitDateAfterPredicate(CloudSpecParser.DateAfterPredicateContext ctx) {
+        currentPredicate = DateP.after((Date) currentValues.pop());
+    }
+
+    @Override
+    public void exitDateNotAfterPredicate(CloudSpecParser.DateNotAfterPredicateContext ctx) {
+        currentPredicate = DateP.notAfter((Date) currentValues.pop());
+    }
+
+    @Override
+    public void exitDateBetweenPredicate(CloudSpecParser.DateBetweenPredicateContext ctx) {
+        currentPredicate = DateP.between((Date) currentValues.get(0), (Date) currentValues.get(1));
+        currentValues.clear();
+    }
+
+    @Override
     public void exitStringValue(CloudSpecParser.StringValueContext ctx) {
         currentValues.add(stripQuotes(ctx.STRING().getText()));
     }
@@ -371,8 +401,21 @@ public class CloudSpecLoaderListener extends CloudSpecBaseListener {
     }
 
     @Override
+    public void exitDateValue(CloudSpecParser.DateValueContext ctx) {
+        try {
+            Date dateTime = DateUtils.parseDate(
+                    stripQuotes(ctx.DATE_STRING().getText()),
+                    "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"
+            );
+            currentValues.add(dateTime);
+        } catch (ParseException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
     public void exitNumberValue(CloudSpecParser.NumberValueContext ctx) {
-        if(ctx.INTEGER() != null && ctx.INTEGER().getText() != null & !ctx.INTEGER().getText().isEmpty()) {
+        if (ctx.INTEGER() != null && ctx.INTEGER().getText() != null & !ctx.INTEGER().getText().isEmpty()) {
             currentValues.add(Integer.parseInt(ctx.INTEGER().getText()));
         } else {
             currentValues.add(Double.parseDouble(ctx.DOUBLE().getText()));
