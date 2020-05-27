@@ -189,6 +189,8 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 
 **For any value:**
 
+- `is? null`: value doesn't exist.
+- `is? not null`: value exists.
 - `is? == :value`: value is equal to another value.
 - `is? equal to :value`: synonym of `== :value`.
 - `is? != :value`: value is not equal to another value.
@@ -214,6 +216,8 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 
 **For string values:**
 
+- `is? empty`: synonym of `is equal to ""`.
+- `is? not empty`: synonym of `is not equal to ""`.
 - `is? starting with :string`: string value starts with another string.
 - `is? not starting :string`: string value does not start with another string.
 - `is? ending with :string`: string value ends with another string.
@@ -237,13 +241,15 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 - `is? lte ip address? :ip_address`: synonym of `<= ip :ip_address`.
 - `is? within network cidr? :cidr_block`: ip address is within a network.
 - `is? not within network cidr? :cidr_block`: ip address is not within a network.
-- `is? ipv4`: true if value is an IPv4.
-- `is? ipv6`: true if value is an IPv6.
+- `is? ipv4`: value is an IPv4.
+- `is? ipv6`: value is an IPv6.
 
 **For boolean properties:**
 
-- `is? enabled`: synonym for `is equal to true`.
-- `is? disabled`: synonym for `is equal to false`.
+- `is? true`: synonym of `is equal to true`.
+- `is? false`: synonym of `is equal to false`.
+- `is? enabled`: synonym of `is equal to true`.
+- `is? disabled`: synonym of `is equal to false`.
 
 ## Property values
 
