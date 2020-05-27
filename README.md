@@ -40,20 +40,26 @@ You can find the available providers and resources they provide in the [CloudSpe
 This is what a simple CloudSpec file looks like:
 
 ```
-Spec "Production account"
+Spec "Production environment"
 
-Group "S3 Buckets"
-  Rule "All S3 buckets must have Access Logs enabled"
+Group "S3 validations"
+  Rule "Buckets must have access logs enabled"
   On aws:s3:bucket
   Assert
     access_logs is enabled
 
-  Rule "Images S3 bucket must have Versioning enabled"
-  On aws:s3:bucket
-  With
-    name equal to "my-images-bucket"
-  Assert
-    versioning is enabled
+Group "EC2 validations"
+  Rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
+    On aws:ec2:instance
+    With
+      tags["environment"] equal to "production"
+    Assert
+      devices (
+        > volume (
+            type equal to "gp2" and
+            size gte 50
+        )
+      )
 ```
 
 A CloudSpec file starts with a `Spec` declaration followed by `Group`'s and `Rule`'s declarations.
