@@ -182,8 +182,9 @@ public class ResourceReflectionUtil {
                                                         );
                                                     }
 
+                                                    Class<?> realClazz = ResourceDefReflectionUtil.getContainedClass(field);
                                                     LOGGER.warn("Type {} of property '{}' in class {} is not supported",
-                                                            field.getType().getCanonicalName(),
+                                                            realClazz.getCanonicalName(),
                                                             field.getName(),
                                                             obj.getClass().getCanonicalName()
                                                     );
@@ -215,10 +216,12 @@ public class ResourceReflectionUtil {
                 Stream.of(obj.getClass().getDeclaredFields())
                         .filter(field -> field.isAnnotationPresent(AssociationDefinition.class))
                         .flatMap(field -> {
+                            Class<?> realClazz = ResourceDefReflectionUtil.getContainedClass(field);
+
                             // validate field is a string
-                            if (!field.getType().isAssignableFrom(String.class)) {
+                            if (!realClazz.isAssignableFrom(String.class)) {
                                 LOGGER.warn("Type {} of association '{}' in class {} is not supported",
-                                        field.getType().getCanonicalName(),
+                                        realClazz.getCanonicalName(),
                                         field.getName(),
                                         obj.getClass().getCanonicalName()
                                 );

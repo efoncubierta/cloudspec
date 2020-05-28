@@ -51,7 +51,8 @@ public class ModelTestUtils {
 
     public static final String ASSOC_NAME = "myassociation";
     public static final String ASSOC_DESCRIPTION = "My association";
-    public static final AssociationDef ASSOCIATION_DEF = new AssociationDef(ASSOC_NAME, ASSOC_DESCRIPTION, TARGET_RESOURCE_DEF_REF);
+    public static final AssociationDef ASSOCIATION_DEF = new AssociationDef(ASSOC_NAME, ASSOC_DESCRIPTION,
+            TARGET_RESOURCE_DEF_REF, Boolean.FALSE);
     public static final Association ASSOCIATION = new Association(ASSOC_NAME, TARGET_RESOURCE_DEF_REF, TARGET_RESOURCE_ID);
     public static final Associations ASSOCIATIONS = new Associations(ASSOCIATION);
     public static final List<AssociationDef> ASSOCIATION_DEFS = Collections.singletonList(ASSOCIATION_DEF);

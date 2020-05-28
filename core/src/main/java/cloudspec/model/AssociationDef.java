@@ -32,6 +32,7 @@ package cloudspec.model;
  */
 public class AssociationDef extends BaseMemberDef {
     private final ResourceDefRef resourceDefRef;
+    private final Boolean many;
 
     /**
      * Constructor.
@@ -39,10 +40,30 @@ public class AssociationDef extends BaseMemberDef {
      * @param name           Association name.
      * @param description    Association description.
      * @param resourceDefRef Resource definition reference of the target resource.
+     * @param many           Indicates whether the association is to many resources of the same kind
      */
-    public AssociationDef(String name, String description, ResourceDefRef resourceDefRef) {
+    public AssociationDef(String name, String description, ResourceDefRef resourceDefRef, Boolean many) {
         super(name, description);
         this.resourceDefRef = resourceDefRef;
+        this.many = many;
+    }
+
+    /**
+     * Get the resource definition reference of the target resource.
+     *
+     * @return Resource definition reference.
+     */
+    public ResourceDefRef getResourceDefRef() {
+        return resourceDefRef;
+    }
+
+    /**
+     * Check whether the association is to many resources of the same kind.
+     *
+     * @return True if association is to many.
+     */
+    public Boolean isMany() {
+        return many;
     }
 
     @Override
@@ -55,18 +76,11 @@ public class AssociationDef extends BaseMemberDef {
             return false;
         }
 
-        return getName().equals(((AssociationDef) obj).getName()) &&
-                getDescription().equals(((AssociationDef) obj).getDescription()) &&
-                getResourceDefRef().equals(((AssociationDef) obj).getResourceDefRef());
-    }
-
-    /**
-     * Get the resource definition reference of the target resource.
-     *
-     * @return Resource definition reference.
-     */
-    public ResourceDefRef getResourceDefRef() {
-        return resourceDefRef;
+        var associationDef = (AssociationDef) obj;
+        return getName().equals(associationDef.getName()) &&
+                getDescription().equals(associationDef.getDescription()) &&
+                getResourceDefRef().equals(associationDef.getResourceDefRef()) &&
+                isMany().equals(associationDef.many);
     }
 
     @Override
@@ -75,6 +89,7 @@ public class AssociationDef extends BaseMemberDef {
                 "name=" + getName() +
                 ", description=" + getDescription() +
                 ", resourceDefRef=" + resourceDefRef +
+                ", many=" + many +
                 '}';
     }
 }

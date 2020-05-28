@@ -99,7 +99,8 @@ public class GraphResourceDefStore implements ResourceDefStore {
     public static final String PROPERTY_EXAMPLE_VALUES = "exampleValues";
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_TYPE = "type";
-    public static final String PROPERTY_IS_MULTIVALUED = "isArray";
+    public static final String PROPERTY_IS_MULTIVALUED = "isMultivalued";
+    public static final String PROPERTY_IS_MANY = "isMany";
     private final Logger LOGGER = LoggerFactory.getLogger(GraphResourceDefStore.class);
     private final GraphTraversalSource graphTraversal;
 
@@ -231,7 +232,8 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 new AssociationDef(
                         associationDefV.value(PROPERTY_NAME),
                         associationDefV.value(PROPERTY_DESCRIPTION),
-                        associationDefV.value(PROPERTY_RESOURCE_DEF_REF)
+                        associationDefV.value(PROPERTY_RESOURCE_DEF_REF),
+                        associationDefV.value(PROPERTY_IS_MANY)
                 )
         );
     }
@@ -315,6 +317,7 @@ public class GraphResourceDefStore implements ResourceDefStore {
                 .property(PROPERTY_NAME, associationDef.getName())
                 .property(PROPERTY_DESCRIPTION, associationDef.getDescription())
                 .property(PROPERTY_RESOURCE_DEF_REF, associationDef.getResourceDefRef())
+                .property(PROPERTY_IS_MANY, associationDef.isMany())
                 .next();
 
         // create edge between source (resource or property definition) and association definition vertices

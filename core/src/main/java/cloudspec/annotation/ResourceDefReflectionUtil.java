@@ -193,8 +193,9 @@ public class ResourceDefReflectionUtil {
                 }
         }
 
+        Class<?> realClazz = getContainedClass(field);
         LOGGER.warn("Type {} of property '{}' in class {} is not supported",
-                field.getDeclaringClass().getCanonicalName(),
+                realClazz.getCanonicalName(),
                 field.getName(),
                 resourceClass.getCanonicalName()
         );
@@ -223,9 +224,12 @@ public class ResourceDefReflectionUtil {
 
         AssociationDefinition associationDefAnnotation = field.getAnnotation(AssociationDefinition.class);
 
-        if (!field.getType().isAssignableFrom(String.class)) {
+        Boolean multiValued = guessMultiValued(field);
+        Class<?> realClazz = getContainedClass(field);
+
+        if (!realClazz.isAssignableFrom(String.class)) {
             LOGGER.warn("Type {} of association '{}' in class {} is not supported",
-                    field.getDeclaringClass().getCanonicalName(),
+                    realClazz.getCanonicalName(),
                     field.getName(),
                     resourceClass.getCanonicalName()
             );
@@ -233,12 +237,12 @@ public class ResourceDefReflectionUtil {
             return Optional.empty();
         }
 
-
         return toResourceDefRef(associationDefAnnotation.targetClass())
                 .map(resourceDefRef -> new AssociationDef(
                         associationDefAnnotation.name(),
                         associationDefAnnotation.description(),
-                        resourceDefRef
+                        resourceDefRef,
+                        multiValued
                 ));
     }
 
@@ -275,11 +279,21 @@ public class ResourceDefReflectionUtil {
             return PropertyType.BOOLEAN;
         } else if (clazz.isAssignableFrom(Date.class)) {
             return PropertyType.DATE;
-        }else if (clazz.isAssignableFrom(KeyValue.class)) {
+        } else if (clazz.isAssignableFrom(KeyValue.class)) {
             return PropertyType.KEY_VALUE;
         }
 
         // otherwise it must be nested
         return PropertyType.NESTED;
+    }
+
+    public static Class<?> getContainedClass(Field field) {
+        Class<?> clazz = field.getType();
+
+        if (field.getType().isAssignableFrom(List.class)) {
+            clazz = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+        }
+
+        return clazz;
     }
 }

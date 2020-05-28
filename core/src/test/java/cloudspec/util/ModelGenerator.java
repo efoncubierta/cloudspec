@@ -237,7 +237,8 @@ public class ModelGenerator {
         return new AssociationDef(
                 randomName(),
                 randomDescription(),
-                randomResourceDefRef()
+                randomResourceDefRef(),
+                faker.random().nextBoolean()
         );
     }
 
