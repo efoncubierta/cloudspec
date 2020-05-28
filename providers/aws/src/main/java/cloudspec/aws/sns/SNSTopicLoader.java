@@ -82,7 +82,7 @@ public class SNSTopicLoader implements SNSResourceLoader<SNSTopicResource> {
     }
 
     private SNSTopicResource toResource(String topicArn, Map<String, String> queueAttributes) {
-        SNSTopicResource resource = new SNSTopicResource();
+        SNSTopicResource resource = new SNSTopicResource("");
         resource.topicArn = topicArn;
         resource.enabled = Boolean.valueOf(queueAttributes.get("enable"));
         return resource;

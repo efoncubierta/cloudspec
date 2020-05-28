@@ -26,7 +26,8 @@
 package cloudspec.aws;
 
 import cloudspec.annotation.ProviderDefinition;
-import cloudspec.aws.ec2.*;
+import cloudspec.aws.ec2.loader.*;
+import cloudspec.aws.ec2.resource.*;
 import cloudspec.aws.iam.IAMInstanceProfileResource;
 import cloudspec.aws.s3.S3BucketLoader;
 import cloudspec.aws.s3.S3BucketResource;
@@ -44,11 +45,17 @@ import java.util.*;
         description = "Amazon Web Services",
         resources = {
                 EC2AmiResource.class,
-                EC2EbsVolumeResource.class,
+                EC2CapacityReservationResource.class,
+                EC2DhcpOptionsResource.class,
+                EC2ElasticGpuResource.class,
                 EC2InstanceResource.class,
                 EC2NetworkInterfaceResource.class,
-                EC2VpcResource.class,
+                EC2ReservedInstancesResource.class,
+                EC2SecurityGroupResource.class,
+                EC2SnapshotResource.class,
                 EC2SubnetResource.class,
+                EC2VolumeResource.class,
+                EC2VpcResource.class,
                 IAMInstanceProfileResource.class,
                 S3BucketResource.class,
                 SQSQueueResource.class,
@@ -61,15 +68,66 @@ public class AWSProvider extends BaseProvider {
     private final Map<String, AWSResourceLoader<?>> loaders = new HashMap<>();
 
     public AWSProvider(IAWSClientsProvider clientsProvider) {
-        loaders.put(EC2AmiResource.RESOURCE_DEF_REF.toString(), new EC2AmiLoader(clientsProvider));
-        loaders.put(EC2EbsVolumeResource.RESOURCE_DEF_REF.toString(), new EC2EbsVolumeLoader(clientsProvider));
-        loaders.put(EC2InstanceResource.RESOURCE_DEF_REF.toString(), new EC2InstanceLoader(clientsProvider));
-        loaders.put(EC2NetworkInterfaceResource.RESOURCE_DEF_REF.toString(), new EC2NetworkInterfaceLoader(clientsProvider));
-        loaders.put(EC2VpcResource.RESOURCE_DEF_REF.toString(), new EC2VpcLoader(clientsProvider));
-        loaders.put(EC2SubnetResource.RESOURCE_DEF_REF.toString(), new EC2SubnetLoader(clientsProvider));
-        loaders.put(S3BucketResource.RESOURCE_DEF_REF.toString(), new S3BucketLoader(clientsProvider));
-        loaders.put(SQSQueueResource.RESOURCE_DEF_REF.toString(), new SQSQueueLoader(clientsProvider));
-        loaders.put(SNSTopicResource.RESOURCE_DEF_REF.toString(), new SNSTopicLoader(clientsProvider));
+        loaders.put(
+                EC2AmiResource.RESOURCE_DEF_REF.toString(),
+                new EC2AmiLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2CapacityReservationResource.RESOURCE_DEF_REF.toString(),
+                new EC2CapacityReservationLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2DhcpOptionsResource.RESOURCE_DEF_REF.toString(),
+                new EC2DhcpOptionsLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2ElasticGpuResource.RESOURCE_DEF_REF.toString(),
+                new EC2ElasticGpuLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2InstanceResource.RESOURCE_DEF_REF.toString(),
+                new EC2InstanceLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2NetworkInterfaceResource.RESOURCE_DEF_REF.toString(),
+                new EC2NetworkInterfaceLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2ReservedInstancesResource.RESOURCE_DEF_REF.toString(),
+                new EC2ReservedInstancesLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2SecurityGroupResource.RESOURCE_DEF_REF.toString(),
+                new EC2SecurityGroupLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2SnapshotResource.RESOURCE_DEF_REF.toString(),
+                new EC2SnapshotLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2SubnetResource.RESOURCE_DEF_REF.toString(),
+                new EC2SubnetLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2VolumeResource.RESOURCE_DEF_REF.toString(),
+                new EC2VolumeLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2VpcResource.RESOURCE_DEF_REF.toString(),
+                new EC2VpcLoader(clientsProvider)
+        );
+        loaders.put(
+                S3BucketResource.RESOURCE_DEF_REF.toString(),
+                new S3BucketLoader(clientsProvider)
+        );
+        loaders.put(
+                SQSQueueResource.RESOURCE_DEF_REF.toString(),
+                new SQSQueueLoader(clientsProvider)
+        );
+        loaders.put(
+                SNSTopicResource.RESOURCE_DEF_REF.toString(),
+                new SNSTopicLoader(clientsProvider)
+        );
     }
 
     @Override
@@ -89,3 +147,4 @@ public class AWSProvider extends BaseProvider {
         return Optional.ofNullable(loaders.get(resourceDefRef.toString()));
     }
 }
+

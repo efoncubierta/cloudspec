@@ -66,10 +66,14 @@ public class IAMInstanceProfileResource extends IAMResource {
     )
     public String path;
 
-    @AssociationDefinition(
-            name = "roles",
-            description = "IAM Roles",
-            targetClass = IAMRoleResource.class
-    )
+//    @AssociationDefinition(
+//            name = "roles",
+//            description = "IAM Roles",
+//            targetClass = IAMRoleResource.class
+//    )
     public List<String> roleIds;
+
+    public IAMInstanceProfileResource(String ownerId) {
+        super(ownerId);
+    }
 }

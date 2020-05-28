@@ -3,30 +3,41 @@
 
 ## Properties
 
-* **id**
+* **capacity_reservation_id**
 (`string`):
 The ID of the Capacity Reservation.
-Example values: `snap-1234567890abcdef0`
-* **region**
+* **capacity_reservation_arn**
 (`string`):
-The AWS region.
-Example values: `us-east-1 | eu-west-1 ...`
+The Amazon Resource Name (ARN) of the Capacity Reservation.
+* **instance_type**
+(`string`):
+The type of instance for which the Capacity Reservation reserves capacity.
+* **instance_platform**
+(`string`):
+The type of operating system for which the Capacity Reservation reserves capacity.
 * **availability_zone**
 (`string`):
-The AWS availability zone.
-Example values: `us-east-1a | eu-west-1a ...`
-* **available_instance_count**
-(`integer`):
-Indicates the number of instances that can be launched in the Capacity Reservation.
+The Availability Zone in which the capacity is reserved.
+* **tenancy**
+(`string`):
+Indicates the tenancy of the Capacity Reservation.
+Example values: `default | dedicated`
 * **total_instance_count**
 (`integer`):
 The total number of instances for which the Capacity Reservation reserves capacity.
+* **available_instance_count**
+(`integer`):
+The remaining capacity. Indicates the number of instances that can be launched in the Capacity Reservation.
 * **ebs_optimized**
 (`boolean`):
 Indicates whether the Capacity Reservation supports EBS-optimized instances.
-* **support_ephemeral_storage**
+* **ephemeral_storage**
 (`boolean`):
-Indicates whether the Capacity Reservation supports instances with temporary, block-level storage.
+Indicates whether the Capacity Reservation supports instances with temporary, block-level storage..
+* **state**
+(`string`):
+The current state of the Capacity Reservation.
+Example values: `active | expired | cancelled | pending | failed`
 * **end_date**
 (`date`):
 The date and time at which the Capacity Reservation expires.
@@ -34,22 +45,13 @@ The date and time at which the Capacity Reservation expires.
 (`string`):
 Indicates the way in which the Capacity Reservation ends.
 Example values: `unlimited | limited`
-* **instance_platform**
+* **instance_match_criteria**
 (`string`):
-The type of operating system for which the Capacity Reservation reserves capacity.
-Example values: `Linux/UNIX | Red Hat Enterprise Linux | Windows ...`
-* **instance_type**
-(`string`):
-The type of instance for which the Capacity Reservation reserves capacity.
-Example values: `t2.nano | m5.xlarge ...`
-* **tenancy**
-(`string`):
-Indicates the tenancy of the Capacity Reservation.
-Example values: `default | dedicated ...`
-* **state**
-(`string`):
-The Capacity Reservation state.
-Example values: `active | expired | cancelled | pending | failed`
+Indicates the type of instance launches that the Capacity Reservation accepts.
+Example values: `open | targeted`
+* **create_date**
+(`date`):
+The date and time at which the Capacity Reservation was created.
 * **tags**
 (`key_value[]`):
 Any tags assigned to the Capacity Reservation.

@@ -68,4 +68,8 @@ public class SQSQueueResource extends SQSResource {
             description = "Message retention period"
     )
     public Integer messageRetentionPeriod;
+
+    public SQSQueueResource(String ownerId) {
+        super(ownerId);
+    }
 }

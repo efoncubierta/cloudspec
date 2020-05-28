@@ -77,7 +77,7 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
     }
 
     private S3BucketResource toResource(S3Client s3Client, String bucketName) {
-        S3BucketResource resource = new S3BucketResource();
+        S3BucketResource resource = new S3BucketResource("");
         resource.bucketName = bucketName;
 
         // load region

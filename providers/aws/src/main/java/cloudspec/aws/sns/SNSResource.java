@@ -29,4 +29,8 @@ import cloudspec.aws.AWSResource;
 
 public abstract class SNSResource extends AWSResource {
     public static final String GROUP_NAME = "sns";
+
+    public SNSResource(String ownerId) {
+        super(ownerId);
+    }
 }

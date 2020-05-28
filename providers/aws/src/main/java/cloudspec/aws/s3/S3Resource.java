@@ -29,4 +29,8 @@ import cloudspec.aws.AWSResource;
 
 public abstract class S3Resource extends AWSResource {
     public static final String GROUP_NAME = "s3";
+
+    public S3Resource(String ownerId) {
+        super(ownerId);
+    }
 }

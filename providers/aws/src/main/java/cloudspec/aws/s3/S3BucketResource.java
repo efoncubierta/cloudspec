@@ -89,4 +89,8 @@ public class S3BucketResource extends S3Resource {
         )
         public Boolean enabled;
     }
+
+    public S3BucketResource(String ownerId) {
+        super(ownerId);
+    }
 }

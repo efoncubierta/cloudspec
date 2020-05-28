@@ -29,4 +29,8 @@ import cloudspec.aws.AWSResource;
 
 public abstract class SQSResource extends AWSResource {
     public static final String GROUP_NAME = "sqs";
+
+    public SQSResource(String ownerId) {
+        super(ownerId);
+    }
 }

@@ -56,4 +56,8 @@ public class SNSTopicResource extends SNSResource {
             description = "Enabled"
     )
     public Boolean enabled;
+
+    public SNSTopicResource(String ownerId) {
+        super(ownerId);
+    }
 }
