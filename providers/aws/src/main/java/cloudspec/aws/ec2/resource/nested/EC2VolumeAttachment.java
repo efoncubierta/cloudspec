@@ -104,11 +104,8 @@ public class EC2VolumeAttachment {
     }
 
     public static List<EC2VolumeAttachment> fromSdk(List<VolumeAttachment> volumeAttachments) {
-        if (Objects.isNull(volumeAttachments)) {
-            return Collections.emptyList();
-        }
-
-        return volumeAttachments
+        return Optional.ofNullable(volumeAttachments)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(EC2VolumeAttachment::fromSdk)
                 .collect(Collectors.toList());

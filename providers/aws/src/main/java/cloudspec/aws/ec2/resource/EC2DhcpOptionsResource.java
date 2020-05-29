@@ -29,13 +29,13 @@ import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.ec2.resource.nested.EC2DhcpConfiguration;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.DhcpOptions;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -52,6 +52,13 @@ public class EC2DhcpOptionsResource extends EC2Resource {
     );
 
     @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
+
+    @PropertyDefinition(
             name = "dhcp_configurations",
             description = "One or more DHCP options in the set"
     )
@@ -65,16 +72,23 @@ public class EC2DhcpOptionsResource extends EC2Resource {
     private final String dhcpOptionsId;
 
     @PropertyDefinition(
+            name = "owner_id",
+            description = "The ID of the AWS account that owns the Capacity Reservation"
+    )
+    private final String ownerId;
+
+    @PropertyDefinition(
             name = "tags",
             description = "Any tags assigned to the DHCP options set"
     )
     private final List<KeyValue> tags;
 
-    public EC2DhcpOptionsResource(String ownerId, String region, List<EC2DhcpConfiguration> dhcpConfigurations,
-                                  String dhcpOptionsId, List<KeyValue> tags) {
-        super(ownerId, region);
+    public EC2DhcpOptionsResource(String region, List<EC2DhcpConfiguration> dhcpConfigurations,
+                                  String dhcpOptionsId, String ownerId, List<KeyValue> tags) {
+        this.region = region;
         this.dhcpConfigurations = dhcpConfigurations;
         this.dhcpOptionsId = dhcpOptionsId;
+        this.ownerId = ownerId;
         this.tags = tags;
     }
 
@@ -83,23 +97,27 @@ public class EC2DhcpOptionsResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2DhcpOptionsResource that = (EC2DhcpOptionsResource) o;
-        return Objects.equals(dhcpConfigurations, that.dhcpConfigurations) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(dhcpConfigurations, that.dhcpConfigurations) &&
                 Objects.equals(dhcpOptionsId, that.dhcpOptionsId) &&
+                Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(tags, that.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dhcpConfigurations, dhcpOptionsId, tags);
+        return Objects.hash(region, dhcpConfigurations, dhcpOptionsId, ownerId, tags);
     }
 
     public static EC2DhcpOptionsResource fromSdk(String regionName, DhcpOptions dhcpOptions) {
-        return new EC2DhcpOptionsResource(
-                dhcpOptions.ownerId(),
-                regionName,
-                EC2DhcpConfiguration.fromSdk(dhcpOptions.dhcpConfigurations()),
-                dhcpOptions.dhcpOptionsId(),
-                tagsFromSdk(dhcpOptions.tags())
-        );
+        return Optional.ofNullable(dhcpOptions)
+                .map(v -> new EC2DhcpOptionsResource(
+                        regionName,
+                        EC2DhcpConfiguration.fromSdk(v.dhcpConfigurations()),
+                        v.dhcpOptionsId(),
+                        v.ownerId(),
+                        tagsFromSdk(v.tags())
+                ))
+                .orElse(null);
     }
 }

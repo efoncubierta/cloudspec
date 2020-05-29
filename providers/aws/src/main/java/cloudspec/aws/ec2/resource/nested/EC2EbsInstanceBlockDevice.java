@@ -33,6 +33,7 @@ import software.amazon.awssdk.services.ec2.model.EbsInstanceBlockDevice;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 public class EC2EbsInstanceBlockDevice {
     @PropertyDefinition(
@@ -85,15 +86,14 @@ public class EC2EbsInstanceBlockDevice {
     }
 
     public static EC2EbsInstanceBlockDevice fromSdk(EbsInstanceBlockDevice ebsInstanceBlockDevice) {
-        if (Objects.isNull(ebsInstanceBlockDevice)) {
-            return null;
-        }
-
-        return new EC2EbsInstanceBlockDevice(
-                AWSResource.dateFromSdk(ebsInstanceBlockDevice.attachTime()),
-                ebsInstanceBlockDevice.deleteOnTermination(),
-                ebsInstanceBlockDevice.statusAsString(),
-                ebsInstanceBlockDevice.volumeId()
-        );
+        return Optional.ofNullable(ebsInstanceBlockDevice)
+                .map(v -> new EC2EbsInstanceBlockDevice(
+                                AWSResource.dateFromSdk(v.attachTime()),
+                                v.deleteOnTermination(),
+                                v.statusAsString(),
+                                v.volumeId()
+                        )
+                )
+                .orElse(null);
     }
 }

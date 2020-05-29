@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.ec2.model.NetworkInterfacePrivateIpAddres
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2NetworkInterfacePrivateIpAddress {
@@ -83,25 +84,22 @@ public class EC2NetworkInterfacePrivateIpAddress {
     }
 
     public static List<EC2NetworkInterfacePrivateIpAddress> fromSdk(List<NetworkInterfacePrivateIpAddress> networkInterfacePrivateIpAddresses) {
-        if (Objects.isNull(networkInterfacePrivateIpAddresses)) {
-            return Collections.emptyList();
-        }
-
-        return networkInterfacePrivateIpAddresses.stream()
+        return Optional.ofNullable(networkInterfacePrivateIpAddresses)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2NetworkInterfacePrivateIpAddress::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2NetworkInterfacePrivateIpAddress fromSdk(NetworkInterfacePrivateIpAddress networkInterfacePrivateIpAddress) {
-        if (Objects.isNull(networkInterfacePrivateIpAddress)) {
-            return null;
-        }
-
-        return new EC2NetworkInterfacePrivateIpAddress(
-                EC2NetworkInterfaceAssociation.fromSdk(networkInterfacePrivateIpAddress.association()),
-                networkInterfacePrivateIpAddress.primary(),
-                networkInterfacePrivateIpAddress.privateDnsName(),
-                networkInterfacePrivateIpAddress.privateIpAddress()
-        );
+        return Optional.ofNullable(networkInterfacePrivateIpAddress)
+                .map(v -> new EC2NetworkInterfacePrivateIpAddress(
+                                EC2NetworkInterfaceAssociation.fromSdk(v.association()),
+                                v.primary(),
+                                v.privateDnsName(),
+                                v.privateIpAddress()
+                        )
+                )
+                .orElse(null);
     }
 }

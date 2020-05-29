@@ -32,6 +32,7 @@ import software.amazon.awssdk.services.ec2.model.PrefixListId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2IpPermission {
@@ -108,37 +109,32 @@ public class EC2IpPermission {
     }
 
     public static List<EC2IpPermission> fromSdk(List<IpPermission> ipPermissions) {
-        if (Objects.isNull(ipPermissions)) {
-            return Collections.emptyList();
-        }
-
-        return ipPermissions.stream()
+        return Optional.ofNullable(ipPermissions)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2IpPermission::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2IpPermission fromSdk(IpPermission ipPermission) {
-        if (Objects.isNull(ipPermission)) {
-            return null;
-        }
-
-        return new EC2IpPermission(
-                ipPermission.fromPort(),
-                ipPermission.ipProtocol(),
-                EC2IpRange.fromSdk(ipPermission.ipRanges()),
-                EC2Ipv6Range.fromSdk(ipPermission.ipv6Ranges()),
-                prefixListIdsFromSdk(ipPermission.prefixListIds()),
-                ipPermission.toPort(),
-                EC2UserIdGroupPair.fromSdk(ipPermission.userIdGroupPairs())
-        );
+        return Optional.ofNullable(ipPermission)
+                .map(v -> new EC2IpPermission(
+                                v.fromPort(),
+                                v.ipProtocol(),
+                                EC2IpRange.fromSdk(v.ipRanges()),
+                                EC2Ipv6Range.fromSdk(v.ipv6Ranges()),
+                                prefixListIdsFromSdk(v.prefixListIds()),
+                                v.toPort(),
+                                EC2UserIdGroupPair.fromSdk(v.userIdGroupPairs())
+                        )
+                )
+                .orElse(null);
     }
 
     public static List<String> prefixListIdsFromSdk(List<PrefixListId> prefixListIds) {
-        if (Objects.isNull(prefixListIds)) {
-            return Collections.emptyList();
-        }
-
-        return prefixListIds.stream()
+        return Optional.ofNullable(prefixListIds)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(PrefixListId::prefixListId)
                 .collect(Collectors.toList());
     }

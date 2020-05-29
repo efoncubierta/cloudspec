@@ -29,7 +29,6 @@ import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.aws.ec2.resource.nested.EC2SubnetIpv6CidrBlockAssociation;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
@@ -52,6 +51,13 @@ public class EC2SubnetResource extends EC2Resource {
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
+
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
 
     @PropertyDefinition(
             name = "availability_zone",
@@ -105,6 +111,12 @@ public class EC2SubnetResource extends EC2Resource {
     private final String vpcId;
 
     @PropertyDefinition(
+            name = "owner_id",
+            description = "The ID of the AWS account that owns the subnet"
+    )
+    private final String ownerId;
+
+    @PropertyDefinition(
             name = "assign_ipv6_address_on_creation",
             description = "Indicates whether a network interface created in this subnet receives an IPv6 address."
     )
@@ -134,12 +146,12 @@ public class EC2SubnetResource extends EC2Resource {
     )
     private final String outpostArn;
 
-    public EC2SubnetResource(String ownerId, String region, String availabilityZone, Integer availableIpAddressCount,
+    public EC2SubnetResource(String region, String availabilityZone, Integer availableIpAddressCount,
                              String cidrBlock, Boolean defaultForAz, Boolean mapPublicIpOnLaunch, String state,
-                             String subnetId, String vpcId, Boolean assignIpv6AddressOnCreation,
+                             String subnetId, String vpcId, String ownerId, Boolean assignIpv6AddressOnCreation,
                              List<EC2SubnetIpv6CidrBlockAssociation> ipv6CidrBlockAssociationSet, List<KeyValue> tags,
                              String subnetArn, String outpostArn) {
-        super(ownerId, region);
+        this.region = region;
         this.availabilityZone = availabilityZone;
         this.availableIpAddressCount = availableIpAddressCount;
         this.cidrBlock = cidrBlock;
@@ -148,6 +160,7 @@ public class EC2SubnetResource extends EC2Resource {
         this.state = state;
         this.subnetId = subnetId;
         this.vpcId = vpcId;
+        this.ownerId = ownerId;
         this.assignIpv6AddressOnCreation = assignIpv6AddressOnCreation;
         this.ipv6CidrBlockAssociationSet = ipv6CidrBlockAssociationSet;
         this.tags = tags;
@@ -160,7 +173,8 @@ public class EC2SubnetResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2SubnetResource that = (EC2SubnetResource) o;
-        return Objects.equals(availabilityZone, that.availabilityZone) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(availabilityZone, that.availabilityZone) &&
                 Objects.equals(availableIpAddressCount, that.availableIpAddressCount) &&
                 Objects.equals(cidrBlock, that.cidrBlock) &&
                 Objects.equals(defaultForAz, that.defaultForAz) &&
@@ -168,6 +182,7 @@ public class EC2SubnetResource extends EC2Resource {
                 Objects.equals(state, that.state) &&
                 Objects.equals(subnetId, that.subnetId) &&
                 Objects.equals(vpcId, that.vpcId) &&
+                Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(assignIpv6AddressOnCreation, that.assignIpv6AddressOnCreation) &&
                 Objects.equals(ipv6CidrBlockAssociationSet, that.ipv6CidrBlockAssociationSet) &&
                 Objects.equals(tags, that.tags) &&
@@ -177,16 +192,15 @@ public class EC2SubnetResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(availabilityZone, availableIpAddressCount, cidrBlock, defaultForAz, mapPublicIpOnLaunch,
-                state, subnetId, vpcId, assignIpv6AddressOnCreation, ipv6CidrBlockAssociationSet, tags, subnetArn,
-                outpostArn);
+        return Objects.hash(region, availabilityZone, availableIpAddressCount, cidrBlock, defaultForAz,
+                mapPublicIpOnLaunch, state, subnetId, vpcId, ownerId, assignIpv6AddressOnCreation,
+                ipv6CidrBlockAssociationSet, tags, subnetArn, outpostArn);
     }
 
     public static EC2SubnetResource fromSdk(String regionName, Subnet subnet) {
         return Optional.ofNullable(subnet)
                 .map(v ->
                         new EC2SubnetResource(
-                                v.ownerId(),
                                 regionName,
                                 v.availabilityZone(),
                                 v.availableIpAddressCount(),
@@ -196,6 +210,7 @@ public class EC2SubnetResource extends EC2Resource {
                                 v.stateAsString(),
                                 v.subnetId(),
                                 v.vpcId(),
+                                v.ownerId(),
                                 v.assignIpv6AddressOnCreation(),
                                 EC2SubnetIpv6CidrBlockAssociation.fromSdk(v.ipv6CidrBlockAssociationSet()),
                                 tagsFromSdk(v.tags()),

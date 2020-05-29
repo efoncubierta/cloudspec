@@ -30,7 +30,6 @@ import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.AWSProvider;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.ElasticGpuHealth;
@@ -38,6 +37,7 @@ import software.amazon.awssdk.services.ec2.model.ElasticGpus;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -52,6 +52,13 @@ public class EC2ElasticGpuResource extends EC2Resource {
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
+
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
 
     @IdDefinition
     @PropertyDefinition(
@@ -99,10 +106,10 @@ public class EC2ElasticGpuResource extends EC2Resource {
     )
     private final List<KeyValue> tags;
 
-    public EC2ElasticGpuResource(String ownerId, String region, String elasticGpuId, String availabilityZone,
+    public EC2ElasticGpuResource(String region, String elasticGpuId, String availabilityZone,
                                  String elasticGpuType, String elasticGpuHealth, String elasticGpuState,
                                  String instanceId, List<KeyValue> tags) {
-        super(ownerId, region);
+        this.region = region;
         this.elasticGpuId = elasticGpuId;
         this.availabilityZone = availabilityZone;
         this.elasticGpuType = elasticGpuType;
@@ -117,7 +124,8 @@ public class EC2ElasticGpuResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2ElasticGpuResource that = (EC2ElasticGpuResource) o;
-        return Objects.equals(elasticGpuId, that.elasticGpuId) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(elasticGpuId, that.elasticGpuId) &&
                 Objects.equals(availabilityZone, that.availabilityZone) &&
                 Objects.equals(elasticGpuType, that.elasticGpuType) &&
                 Objects.equals(elasticGpuHealth, that.elasticGpuHealth) &&
@@ -128,33 +136,28 @@ public class EC2ElasticGpuResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(elasticGpuId, availabilityZone, elasticGpuType, elasticGpuHealth, elasticGpuState,
-                instanceId, tags);
+        return Objects.hash(region, elasticGpuId, availabilityZone, elasticGpuType, elasticGpuHealth,
+                elasticGpuState, instanceId, tags);
     }
 
     public static EC2ElasticGpuResource fromSdk(String regionName, ElasticGpus elasticGpus) {
-        if (Objects.isNull(elasticGpus)) {
-            return null;
-        }
-
-        return new EC2ElasticGpuResource(
-                "",
-                regionName,
-                elasticGpus.elasticGpuId(),
-                elasticGpus.availabilityZone(),
-                elasticGpus.elasticGpuType(),
-                elasticGpuHealthStatusFromSdk(elasticGpus.elasticGpuHealth()),
-                elasticGpus.elasticGpuStateAsString(),
-                elasticGpus.instanceId(),
-                tagsFromSdk(elasticGpus.tags())
-        );
+        return Optional.ofNullable(elasticGpus)
+                .map(v -> new EC2ElasticGpuResource(
+                        regionName,
+                        v.elasticGpuId(),
+                        v.availabilityZone(),
+                        v.elasticGpuType(),
+                        elasticGpuHealthStatusFromSdk(v.elasticGpuHealth()),
+                        v.elasticGpuStateAsString(),
+                        v.instanceId(),
+                        tagsFromSdk(v.tags())
+                ))
+                .orElse(null);
     }
 
     public static String elasticGpuHealthStatusFromSdk(ElasticGpuHealth elasticGpuHealth) {
-        if (Objects.isNull(elasticGpuHealth)) {
-            return null;
-        }
-
-        return elasticGpuHealth.statusAsString();
+        return Optional.ofNullable(elasticGpuHealth)
+                .map(ElasticGpuHealth::statusAsString)
+                .orElse(null);
     }
 }

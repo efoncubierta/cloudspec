@@ -25,42 +25,31 @@
  */
 package cloudspec.aws;
 
-import cloudspec.annotation.PropertyDefinition;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Objects;
+import java.util.Optional;
 
 public abstract class AWSResource {
-    @PropertyDefinition(
-            name = "owner_id",
-            description = "The AWS account ID of the image owner"
-    )
-    protected String ownerId;
-
-    public AWSResource(String ownerId) {
-        this.ownerId = ownerId;
-    }
-
     public static Date dateFromSdk(Instant instant) {
         return Date.from(instant);
     }
 
     public static Date dateFromSdk(String iso8601Date) {
-        if (Objects.isNull(iso8601Date)) {
-            return null;
-        }
-
-        try {
-            return DateUtils.parseDate(
-                    iso8601Date,
-                    DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.getPattern()
-            );
-        } catch (ParseException e) {
-            return null;
-        }
+        return Optional.ofNullable(iso8601Date)
+                .map(v -> {
+                    try {
+                        return DateUtils.parseDate(
+                                iso8601Date,
+                                DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.getPattern()
+                        );
+                    } catch (ParseException e) {
+                        return null;
+                    }
+                })
+                .orElse(null);
     }
 }

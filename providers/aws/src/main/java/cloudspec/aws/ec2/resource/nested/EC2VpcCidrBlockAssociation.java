@@ -74,11 +74,9 @@ public class EC2VpcCidrBlockAssociation {
     }
 
     public static List<EC2VpcCidrBlockAssociation> fromSdk(List<VpcCidrBlockAssociation> vpcCidrBlockAssociations) {
-        if (Objects.isNull(vpcCidrBlockAssociations)) {
-            return Collections.emptyList();
-        }
-
-        return vpcCidrBlockAssociations.stream()
+        return Optional.ofNullable(vpcCidrBlockAssociations)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2VpcCidrBlockAssociation::fromSdk)
                 .collect(Collectors.toList());
     }

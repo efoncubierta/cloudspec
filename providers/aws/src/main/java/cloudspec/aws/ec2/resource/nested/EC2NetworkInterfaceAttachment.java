@@ -33,6 +33,7 @@ import software.amazon.awssdk.services.ec2.model.NetworkInterfaceAttachment;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 public class EC2NetworkInterfaceAttachment {
     @PropertyDefinition(
@@ -99,16 +100,15 @@ public class EC2NetworkInterfaceAttachment {
     }
 
     public static EC2NetworkInterfaceAttachment fromSdk(NetworkInterfaceAttachment networkInterfaceAttachment) {
-        if (Objects.isNull(networkInterfaceAttachment)) {
-            return null;
-        }
-
-        return new EC2NetworkInterfaceAttachment(
-                AWSResource.dateFromSdk(networkInterfaceAttachment.attachTime()),
-                networkInterfaceAttachment.deleteOnTermination(),
-                networkInterfaceAttachment.instanceId(),
-                networkInterfaceAttachment.instanceOwnerId(),
-                networkInterfaceAttachment.statusAsString()
-        );
+        return Optional.ofNullable(networkInterfaceAttachment)
+                .map(v -> new EC2NetworkInterfaceAttachment(
+                                AWSResource.dateFromSdk(v.attachTime()),
+                                v.deleteOnTermination(),
+                                v.instanceId(),
+                                v.instanceOwnerId(),
+                                v.statusAsString()
+                        )
+                )
+                .orElse(null);
     }
 }

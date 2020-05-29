@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,10 +27,7 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2CapacityReservationResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeCapacityReservationsResponse;
-import software.amazon.awssdk.services.ec2.model.Filter;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Region;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,37 +57,32 @@ public class EC2CapacityReservationLoader extends EC2ResourceLoader<EC2CapacityR
     }
 
     private Stream<EC2CapacityReservationResource> getCapacityReservations(List<String> capacityReservationIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
+        try (var ec2Client = clientsProvider.getEc2Client()) {
             return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getCapacityReservationsInRegion(region, capacityReservationIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
+                            .regions()
+                            .stream()
+                            .map(Region::regionName)
+                            .flatMap(regionName -> getCapacityReservationsInRegion(regionName, capacityReservationIds));
         }
-
     }
 
-    private Stream<EC2CapacityReservationResource> getCapacityReservationsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
+    private Stream<EC2CapacityReservationResource> getCapacityReservationsInRegion(String regionName,
                                                                                    List<String> capacityReservationIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeCapacityReservationsResponse response = capacityReservationIds != null && !capacityReservationIds.isEmpty() ?
-                    client.describeCapacityReservations(builder -> builder.filters(
-                            Filter.builder()
-                                    .name("capacity-reservation-id")
-                                    .values(capacityReservationIds.toArray(new String[0])).build())
-                    ) :
-                    client.describeCapacityReservations();
+        try (var client = clientsProvider.getEc2ClientForRegion(regionName)) {
+            var response = capacityReservationIds != null && !capacityReservationIds.isEmpty() ?
+                           client.describeCapacityReservations(builder ->
+                                                                       builder.capacityReservationIds(
+                                                                               capacityReservationIds.toArray(new String[0])
+                                                                       )
+                           ) :
+                           client.describeCapacityReservations();
 
             return response.capacityReservations()
-                    .stream()
-                    .map(capacityReservation -> EC2CapacityReservationResource.fromSdk(region.regionName(), capacityReservation));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(capacityReservation ->
+                                        EC2CapacityReservationResource.fromSdk(regionName,
+                                                                               capacityReservation)
+                           );
         }
     }
 }

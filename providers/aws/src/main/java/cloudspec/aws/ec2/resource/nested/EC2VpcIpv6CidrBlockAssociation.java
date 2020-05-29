@@ -90,11 +90,9 @@ public class EC2VpcIpv6CidrBlockAssociation {
     }
 
     public static List<EC2VpcIpv6CidrBlockAssociation> fromSdk(List<VpcIpv6CidrBlockAssociation> vpcIpv6CidrBlockAssociations) {
-        if (Objects.isNull(vpcIpv6CidrBlockAssociations)) {
-            return Collections.emptyList();
-        }
-
-        return vpcIpv6CidrBlockAssociations.stream()
+        return Optional.ofNullable(vpcIpv6CidrBlockAssociations)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2VpcIpv6CidrBlockAssociation::fromSdk)
                 .collect(Collectors.toList());
     }

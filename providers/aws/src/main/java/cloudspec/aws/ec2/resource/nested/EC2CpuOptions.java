@@ -29,6 +29,7 @@ import cloudspec.annotation.PropertyDefinition;
 import software.amazon.awssdk.services.ec2.model.CpuOptions;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class EC2CpuOptions {
     @PropertyDefinition(
@@ -63,13 +64,12 @@ public class EC2CpuOptions {
     }
 
     public static EC2CpuOptions fromSdk(CpuOptions cpuOptions) {
-        if (Objects.isNull(cpuOptions)) {
-            return null;
-        }
-
-        return new EC2CpuOptions(
-                cpuOptions.coreCount(),
-                cpuOptions.threadsPerCore()
-        );
+        return Optional.ofNullable(cpuOptions)
+                .map(v -> new EC2CpuOptions(
+                                v.coreCount(),
+                                v.threadsPerCore()
+                        )
+                )
+                .orElse(null);
     }
 }

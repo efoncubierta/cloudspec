@@ -29,6 +29,7 @@ import cloudspec.annotation.PropertyDefinition;
 import software.amazon.awssdk.services.ec2.model.NetworkInterfaceAssociation;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class EC2NetworkInterfaceAssociation {
 
@@ -84,14 +85,13 @@ public class EC2NetworkInterfaceAssociation {
     }
 
     public static EC2NetworkInterfaceAssociation fromSdk(NetworkInterfaceAssociation networkInterfaceAssociation) {
-        if (Objects.isNull(networkInterfaceAssociation)) {
-            return null;
-        }
-
-        return new EC2NetworkInterfaceAssociation(
-                networkInterfaceAssociation.ipOwnerId(),
-                networkInterfaceAssociation.publicDnsName(),
-                networkInterfaceAssociation.publicIp()
-        );
+        return Optional.ofNullable(networkInterfaceAssociation)
+                .map(v -> new EC2NetworkInterfaceAssociation(
+                                v.ipOwnerId(),
+                                v.publicDnsName(),
+                                v.publicIp()
+                        )
+                )
+                .orElse(null);
     }
 }

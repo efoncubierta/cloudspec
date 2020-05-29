@@ -26,7 +26,7 @@
 package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.AWSResourceLoader;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
+import cloudspec.aws.ec2.resource.EC2Resource;
 
 public abstract class EC2ResourceLoader<T extends EC2Resource> implements AWSResourceLoader<T> {
 }

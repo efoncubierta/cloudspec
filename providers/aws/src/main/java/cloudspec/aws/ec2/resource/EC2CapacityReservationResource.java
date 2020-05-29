@@ -28,7 +28,6 @@ package cloudspec.aws.ec2.resource;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.CapacityReservation;
@@ -36,6 +35,7 @@ import software.amazon.awssdk.services.ec2.model.CapacityReservation;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -51,12 +51,25 @@ public class EC2CapacityReservationResource extends EC2Resource {
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
 
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
+
     @IdDefinition
     @PropertyDefinition(
             name = "capacity_reservation_id",
             description = "The ID of the Capacity Reservation"
     )
     private final String capacityReservationId;
+
+    @PropertyDefinition(
+            name = "owner_id",
+            description = "The ID of the AWS account that owns the DHCP options set"
+    )
+    private final String ownerId;
 
     @PropertyDefinition(
             name = "capacity_reservation_arn",
@@ -152,14 +165,15 @@ public class EC2CapacityReservationResource extends EC2Resource {
     )
     private final List<KeyValue> tags;
 
-    public EC2CapacityReservationResource(String ownerId, String region, String capacityReservationId,
+    public EC2CapacityReservationResource(String region, String capacityReservationId, String ownerId,
                                           String capacityReservationArn, String instanceType, String instancePlatform,
                                           String availabilityZone, String tenancy, Integer totalInstanceCount,
                                           Integer availableInstanceCount, Boolean ebsOptimized, Boolean ephemeralStorage,
                                           String state, Date endDate, String endDateType, String instanceMatchCriteria,
                                           Date createDate, List<KeyValue> tags) {
-        super(ownerId, region);
+        this.region = region;
         this.capacityReservationId = capacityReservationId;
+        this.ownerId = ownerId;
         this.capacityReservationArn = capacityReservationArn;
         this.instanceType = instanceType;
         this.instancePlatform = instancePlatform;
@@ -182,7 +196,9 @@ public class EC2CapacityReservationResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2CapacityReservationResource that = (EC2CapacityReservationResource) o;
-        return Objects.equals(capacityReservationId, that.capacityReservationId) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(capacityReservationId, that.capacityReservationId) &&
+                Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(capacityReservationArn, that.capacityReservationArn) &&
                 Objects.equals(instanceType, that.instanceType) &&
                 Objects.equals(instancePlatform, that.instancePlatform) &&
@@ -202,35 +218,33 @@ public class EC2CapacityReservationResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(capacityReservationId, capacityReservationArn, instanceType, instancePlatform,
-                availabilityZone, tenancy, totalInstanceCount, availableInstanceCount, ebsOptimized, ephemeralStorage,
-                state, endDate, endDateType, instanceMatchCriteria, createDate, tags);
+        return Objects.hash(region, capacityReservationId, ownerId, capacityReservationArn, instanceType,
+                instancePlatform, availabilityZone, tenancy, totalInstanceCount, availableInstanceCount,
+                ebsOptimized, ephemeralStorage, state, endDate, endDateType, instanceMatchCriteria, createDate, tags);
     }
 
     public static EC2CapacityReservationResource fromSdk(String regionName, CapacityReservation capacityReservation) {
-        if (Objects.isNull(capacityReservation)) {
-            return null;
-        }
-
-        return new EC2CapacityReservationResource(
-                capacityReservation.ownerId(),
-                regionName,
-                capacityReservation.capacityReservationId(),
-                capacityReservation.capacityReservationArn(),
-                capacityReservation.instanceType(),
-                capacityReservation.instancePlatformAsString(),
-                capacityReservation.availabilityZone(),
-                capacityReservation.tenancyAsString(),
-                capacityReservation.totalInstanceCount(),
-                capacityReservation.availableInstanceCount(),
-                capacityReservation.ebsOptimized(),
-                capacityReservation.ephemeralStorage(),
-                capacityReservation.stateAsString(),
-                dateFromSdk(capacityReservation.endDate()),
-                capacityReservation.endDateTypeAsString(),
-                capacityReservation.instanceMatchCriteriaAsString(),
-                dateFromSdk(capacityReservation.createDate()),
-                tagsFromSdk(capacityReservation.tags())
-        );
+        return Optional.ofNullable(capacityReservation)
+                .map(v -> new EC2CapacityReservationResource(
+                        regionName,
+                        v.capacityReservationId(),
+                        v.ownerId(),
+                        v.capacityReservationArn(),
+                        v.instanceType(),
+                        v.instancePlatformAsString(),
+                        v.availabilityZone(),
+                        v.tenancyAsString(),
+                        v.totalInstanceCount(),
+                        v.availableInstanceCount(),
+                        v.ebsOptimized(),
+                        v.ephemeralStorage(),
+                        v.stateAsString(),
+                        dateFromSdk(v.endDate()),
+                        v.endDateTypeAsString(),
+                        v.instanceMatchCriteriaAsString(),
+                        dateFromSdk(v.createDate()),
+                        tagsFromSdk(v.tags())
+                ))
+                .orElse(null);
     }
 }

@@ -29,8 +29,4 @@ import cloudspec.aws.AWSResource;
 
 public abstract class IAMResource extends AWSResource {
     public static final String GROUP_NAME = "iam";
-
-    public IAMResource(String ownerId) {
-        super(ownerId);
-    }
 }

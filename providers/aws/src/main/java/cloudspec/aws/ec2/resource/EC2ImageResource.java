@@ -30,7 +30,6 @@ import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.ec2.resource.nested.EC2BlockDeviceMapping;
 import cloudspec.aws.ec2.resource.nested.EC2ProductCode;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.Image;
@@ -38,20 +37,28 @@ import software.amazon.awssdk.services.ec2.model.Image;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
 @ResourceDefinition(
         provider = PROVIDER_NAME,
         group = EC2Resource.GROUP_NAME,
-        name = EC2AmiResource.RESOURCE_NAME,
+        name = EC2ImageResource.RESOURCE_NAME,
         description = "Amazon Machine Image"
 )
-public class EC2AmiResource extends EC2Resource {
-    public static final String RESOURCE_NAME = "ami";
+public class EC2ImageResource extends EC2Resource {
+    public static final String RESOURCE_NAME = "image";
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
+
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
 
     @PropertyDefinition(
             name = "architecture",
@@ -91,6 +98,12 @@ public class EC2AmiResource extends EC2Resource {
             description = "The kernel associated with the image, if any. Only applicable for machine images"
     )
     private String kernelId;
+
+    @PropertyDefinition(
+            name = "owner_id",
+            description = "The AWS account ID of the image owner"
+    )
+    private final String ownerId;
 
     @PropertyDefinition(
             name = "platform",
@@ -172,19 +185,20 @@ public class EC2AmiResource extends EC2Resource {
     )
     private Boolean publicLaunchPermissions;
 
-    public EC2AmiResource(String ownerId, String region, String architecture, Date creationDate, String imageId,
-                          String imageLocation, String imageType, String kernelId, String platform,
-                          List<EC2ProductCode> productCodes, String state, List<EC2BlockDeviceMapping> blockDeviceMappings,
-                          Boolean enaSupport, String hypervisor, String name, String rootDeviceName,
-                          String rootDeviceType, String sriovNetSupport, List<KeyValue> tags,
-                          String virtualizationType, Boolean publicLaunchPermissions) {
-        super(ownerId, region);
+    public EC2ImageResource(String region, String architecture, Date creationDate, String imageId,
+                            String imageLocation, String imageType, String kernelId, String ownerId, String platform,
+                            List<EC2ProductCode> productCodes, String state, List<EC2BlockDeviceMapping> blockDeviceMappings,
+                            Boolean enaSupport, String hypervisor, String name, String rootDeviceName,
+                            String rootDeviceType, String sriovNetSupport, List<KeyValue> tags,
+                            String virtualizationType, Boolean publicLaunchPermissions) {
+        this.region = region;
         this.architecture = architecture;
         this.creationDate = creationDate;
         this.imageId = imageId;
         this.imageLocation = imageLocation;
         this.imageType = imageType;
         this.kernelId = kernelId;
+        this.ownerId = ownerId;
         this.platform = platform;
         this.productCodes = productCodes;
         this.state = state;
@@ -204,13 +218,15 @@ public class EC2AmiResource extends EC2Resource {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EC2AmiResource that = (EC2AmiResource) o;
-        return Objects.equals(architecture, that.architecture) &&
+        EC2ImageResource that = (EC2ImageResource) o;
+        return Objects.equals(region, that.region) &&
+                Objects.equals(architecture, that.architecture) &&
                 Objects.equals(creationDate, that.creationDate) &&
                 Objects.equals(imageId, that.imageId) &&
                 Objects.equals(imageLocation, that.imageLocation) &&
                 Objects.equals(imageType, that.imageType) &&
                 Objects.equals(kernelId, that.kernelId) &&
+                Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(platform, that.platform) &&
                 Objects.equals(productCodes, that.productCodes) &&
                 Objects.equals(state, that.state) &&
@@ -228,38 +244,36 @@ public class EC2AmiResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(architecture, creationDate, imageId, imageLocation, imageType, kernelId, platform,
-                productCodes, state, blockDeviceMappings, enaSupport, hypervisor, name, rootDeviceName,
-                rootDeviceType, sriovNetSupport, tags, virtualizationType, publicLaunchPermissions);
+        return Objects.hash(region, architecture, creationDate, imageId, imageLocation, imageType, kernelId,
+                ownerId, platform, productCodes, state, blockDeviceMappings, enaSupport, hypervisor, name,
+                rootDeviceName, rootDeviceType, sriovNetSupport, tags, virtualizationType, publicLaunchPermissions);
     }
 
-    public static EC2AmiResource fromSdk(String regionName, Image image) {
-        if (Objects.isNull(image)) {
-            return null;
-        }
-
-        return new EC2AmiResource(
-                image.ownerId(),
-                regionName,
-                image.architectureAsString(),
-                dateFromSdk(image.creationDate()),
-                image.imageId(),
-                image.imageLocation(),
-                image.imageTypeAsString(),
-                image.kernelId(),
-                image.platformAsString(),
-                EC2ProductCode.fromSdk(image.productCodes()),
-                image.stateAsString(),
-                EC2BlockDeviceMapping.fromSdk(image.blockDeviceMappings()),
-                image.enaSupport(),
-                image.hypervisorAsString(),
-                image.name(),
-                image.rootDeviceName(),
-                image.rootDeviceTypeAsString(),
-                image.sriovNetSupport(),
-                tagsFromSdk(image.tags()),
-                image.virtualizationTypeAsString(),
-                image.publicLaunchPermissions()
-        );
+    public static EC2ImageResource fromSdk(String regionName, Image image) {
+        return Optional.ofNullable(image)
+                .map(v -> new EC2ImageResource(
+                        regionName,
+                        v.architectureAsString(),
+                        dateFromSdk(v.creationDate()),
+                        v.imageId(),
+                        v.imageLocation(),
+                        v.imageTypeAsString(),
+                        v.kernelId(),
+                        v.ownerId(),
+                        v.platformAsString(),
+                        EC2ProductCode.fromSdk(v.productCodes()),
+                        v.stateAsString(),
+                        EC2BlockDeviceMapping.fromSdk(v.blockDeviceMappings()),
+                        v.enaSupport(),
+                        v.hypervisorAsString(),
+                        v.name(),
+                        v.rootDeviceName(),
+                        v.rootDeviceTypeAsString(),
+                        v.sriovNetSupport(),
+                        tagsFromSdk(v.tags()),
+                        v.virtualizationTypeAsString(),
+                        v.publicLaunchPermissions()
+                ))
+                .orElse(null);
     }
 }

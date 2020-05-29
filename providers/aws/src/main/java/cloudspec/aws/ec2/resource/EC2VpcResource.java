@@ -29,7 +29,6 @@ import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.aws.ec2.resource.nested.EC2VpcCidrBlockAssociation;
 import cloudspec.aws.ec2.resource.nested.EC2VpcIpv6CidrBlockAssociation;
 import cloudspec.model.KeyValue;
@@ -53,6 +52,13 @@ public class EC2VpcResource extends EC2Resource {
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
+
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
 
     @PropertyDefinition(
             name = "cidr_block",
@@ -79,6 +85,12 @@ public class EC2VpcResource extends EC2Resource {
             description = "The ID of the VPC"
     )
     private final String vpcId;
+
+    @PropertyDefinition(
+            name = "owner_id",
+            description = "The ID of the AWS account that owns the VPC"
+    )
+    private final String ownerId;
 
     @PropertyDefinition(
             name = "instance_tenancy",
@@ -111,14 +123,17 @@ public class EC2VpcResource extends EC2Resource {
     )
     private final List<KeyValue> tags;
 
-    public EC2VpcResource(String ownerId, String region, String cidrBlock, String dhcpOptionsId, String state,
-                          String vpcId, String instanceTenancy, List<EC2VpcIpv6CidrBlockAssociation> ipv6CidrBlockAssociationSet,
-                          List<EC2VpcCidrBlockAssociation> cidrBlockAssociationSet, Boolean isDefault, List<KeyValue> tags) {
-        super(ownerId, region);
+    public EC2VpcResource(String region, String cidrBlock, String dhcpOptionsId, String state,
+                          String vpcId, String ownerId, String instanceTenancy,
+                          List<EC2VpcIpv6CidrBlockAssociation> ipv6CidrBlockAssociationSet,
+                          List<EC2VpcCidrBlockAssociation> cidrBlockAssociationSet,
+                          Boolean isDefault, List<KeyValue> tags) {
+        this.region = region;
         this.cidrBlock = cidrBlock;
         this.dhcpOptionsId = dhcpOptionsId;
         this.state = state;
         this.vpcId = vpcId;
+        this.ownerId = ownerId;
         this.instanceTenancy = instanceTenancy;
         this.ipv6CidrBlockAssociationSet = ipv6CidrBlockAssociationSet;
         this.cidrBlockAssociationSet = cidrBlockAssociationSet;
@@ -131,10 +146,12 @@ public class EC2VpcResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2VpcResource that = (EC2VpcResource) o;
-        return Objects.equals(cidrBlock, that.cidrBlock) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(cidrBlock, that.cidrBlock) &&
                 Objects.equals(dhcpOptionsId, that.dhcpOptionsId) &&
                 Objects.equals(state, that.state) &&
                 Objects.equals(vpcId, that.vpcId) &&
+                Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(instanceTenancy, that.instanceTenancy) &&
                 Objects.equals(ipv6CidrBlockAssociationSet, that.ipv6CidrBlockAssociationSet) &&
                 Objects.equals(cidrBlockAssociationSet, that.cidrBlockAssociationSet) &&
@@ -144,20 +161,20 @@ public class EC2VpcResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(cidrBlock, dhcpOptionsId, state, vpcId, instanceTenancy, ipv6CidrBlockAssociationSet,
-                cidrBlockAssociationSet, isDefault, tags);
+        return Objects.hash(region, cidrBlock, dhcpOptionsId, state, vpcId, ownerId, instanceTenancy,
+                ipv6CidrBlockAssociationSet, cidrBlockAssociationSet, isDefault, tags);
     }
 
     public static EC2VpcResource fromSdk(String regionName, Vpc vpc) {
         return Optional.ofNullable(vpc)
                 .map(v ->
                         new EC2VpcResource(
-                                v.ownerId(),
                                 regionName,
                                 v.cidrBlock(),
                                 v.dhcpOptionsId(),
                                 v.stateAsString(),
                                 v.vpcId(),
+                                v.ownerId(),
                                 v.instanceTenancyAsString(),
                                 EC2VpcIpv6CidrBlockAssociation.fromSdk(v.ipv6CidrBlockAssociationSet()),
                                 EC2VpcCidrBlockAssociation.fromSdk(v.cidrBlockAssociationSet()),

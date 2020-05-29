@@ -35,6 +35,7 @@ import software.amazon.awssdk.services.ec2.model.UserIdGroupPair;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2UserIdGroupPair {
@@ -106,27 +107,24 @@ public class EC2UserIdGroupPair {
     }
 
     public static List<EC2UserIdGroupPair> fromSdk(List<UserIdGroupPair> userIdGroupPairs) {
-        if (Objects.isNull(userIdGroupPairs)) {
-            return Collections.emptyList();
-        }
-
-        return userIdGroupPairs.stream()
+        return Optional.ofNullable(userIdGroupPairs)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2UserIdGroupPair::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2UserIdGroupPair fromSdk(UserIdGroupPair userIdGroupPair) {
-        if (Objects.isNull(userIdGroupPair)) {
-            return null;
-        }
-
-        return new EC2UserIdGroupPair(
-                userIdGroupPair.groupId(),
-                userIdGroupPair.groupName(),
-                userIdGroupPair.peeringStatus(),
-                userIdGroupPair.userId(),
-                userIdGroupPair.vpcId(),
-                userIdGroupPair.vpcPeeringConnectionId()
-        );
+        return Optional.ofNullable(userIdGroupPair)
+                .map(v -> new EC2UserIdGroupPair(
+                                v.groupId(),
+                                v.groupName(),
+                                v.peeringStatus(),
+                                v.userId(),
+                                v.vpcId(),
+                                v.vpcPeeringConnectionId()
+                        )
+                )
+                .orElse(null);
     }
 }

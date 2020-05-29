@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.ec2.model.IpRange;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2IpRange {
@@ -58,22 +59,19 @@ public class EC2IpRange {
     }
 
     public static List<EC2IpRange> fromSdk(List<IpRange> ipRanges) {
-        if (Objects.isNull(ipRanges)) {
-            return Collections.emptyList();
-        }
-
-        return ipRanges.stream()
+        return Optional.ofNullable(ipRanges)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2IpRange::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2IpRange fromSdk(IpRange ipRange) {
-        if (Objects.isNull(ipRange)) {
-            return null;
-        }
-
-        return new EC2IpRange(
-                ipRange.cidrIp()
-        );
+        return Optional.ofNullable(ipRange)
+                .map(v -> new EC2IpRange(
+                                v.cidrIp()
+                        )
+                )
+                .orElse(null);
     }
 }

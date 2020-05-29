@@ -35,10 +35,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.*;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
@@ -55,10 +52,17 @@ public class EC2InstanceResource extends EC2Resource {
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
 
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
+
     @AssociationDefinition(
             name = "image",
             description = "The AMI used to launch the instance",
-            targetClass = EC2AmiResource.class
+            targetClass = EC2ImageResource.class
     )
     private final String imageId;
 
@@ -307,7 +311,7 @@ public class EC2InstanceResource extends EC2Resource {
     )
     private final List<String> licenseConfigurationArns;
 
-    public EC2InstanceResource(String ownerId, String region, String imageId, String instanceId, String instanceType,
+    public EC2InstanceResource(String region, String imageId, String instanceId, String instanceType,
                                String kernelId, String keyName, Date launchTime, EC2Monitoring monitoring,
                                EC2Placement placement, String platform, String privateDnsName, String privateIpAddress,
                                List<EC2ProductCode> productCodes, String publicDnsName, String publicIpAddress,
@@ -319,7 +323,7 @@ public class EC2InstanceResource extends EC2Resource {
                                String rootDeviceType, List<String> securityGroupIds, Boolean sourceDestCheck, String sriovNetSupport,
                                List<KeyValue> tags, String virtualizationType, EC2CpuOptions cpuOptions, String capacityReservationId,
                                Boolean hibernationConfigured, List<String> licenseConfigurationArns) {
-        super(ownerId, region);
+        this.region = region;
         this.imageId = imageId;
         this.instanceId = instanceId;
         this.instanceType = instanceType;
@@ -366,7 +370,8 @@ public class EC2InstanceResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2InstanceResource that = (EC2InstanceResource) o;
-        return Objects.equals(imageId, that.imageId) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(imageId, that.imageId) &&
                 Objects.equals(instanceId, that.instanceId) &&
                 Objects.equals(instanceType, that.instanceType) &&
                 Objects.equals(kernelId, that.kernelId) &&
@@ -409,7 +414,7 @@ public class EC2InstanceResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(imageId, instanceId, instanceType, kernelId, keyName, launchTime, monitoring,
+        return Objects.hash(region, imageId, instanceId, instanceType, kernelId, keyName, launchTime, monitoring,
                 placement, platform, privateDnsName, privateIpAddress, productCodes, publicDnsName,
                 publicIpAddress, state, subnetId, vpcId, architecture, blockDeviceMappings, ebsOptimized,
                 enaSupport, hypervisor, iamInstanceProfileId, instanceLifecycle, elasticGpuIds,
@@ -419,99 +424,84 @@ public class EC2InstanceResource extends EC2Resource {
     }
 
     public static EC2InstanceResource fromSdk(String regionName, Instance instance) {
-        if (Objects.isNull(instance)) {
-            return null;
-        }
-
-        return new EC2InstanceResource(
-                "",
-                regionName,
-                instance.imageId(),
-                instance.instanceId(),
-                instance.instanceTypeAsString(),
-                instance.kernelId(),
-                instance.keyName(),
-                dateFromSdk(instance.launchTime()),
-                EC2Monitoring.fromSdk(instance.monitoring()),
-                EC2Placement.fromSdk(instance.placement()),
-                instance.platformAsString(),
-                instance.privateDnsName(),
-                instance.privateIpAddress(),
-                EC2ProductCode.fromSdk(instance.productCodes()),
-                instance.publicDnsName(),
-                instance.publicIpAddress(),
-                instance.state().nameAsString(),
-                instance.subnetId(),
-                instance.vpcId(),
-                instance.architectureAsString(),
-                EC2InstanceBlockDeviceMapping.fromSdk(instance.blockDeviceMappings()),
-                instance.ebsOptimized(),
-                instance.enaSupport(),
-                instance.hypervisorAsString(),
-                iamInstanceProfileIdFromSdk(instance.iamInstanceProfile()),
-                instance.instanceLifecycleAsString(),
-                elasticGpuIdsFromSdk(instance.elasticGpuAssociations()),
-                elasticInferenceAcceleratorArnsFromSdk(instance.elasticInferenceAcceleratorAssociations()),
-                EC2InstanceNetworkInterface.fromSdk(instance.networkInterfaces()),
-                instance.outpostArn(),
-                instance.rootDeviceName(),
-                instance.rootDeviceTypeAsString(),
-                EC2InstanceNetworkInterface.securityGroupIdsFromSdk(instance.securityGroups()),
-                instance.sourceDestCheck(),
-                instance.sriovNetSupport(),
-                tagsFromSdk(instance.tags()),
-                instance.virtualizationTypeAsString(),
-                EC2CpuOptions.fromSdk(instance.cpuOptions()),
-                instance.capacityReservationId(),
-                hibernationConfiguredFromSdk(instance.hibernationOptions()),
-                licenseArnsFromSdk(instance.licenses())
-        );
+        return Optional.ofNullable(instance)
+                .map(v -> new EC2InstanceResource(
+                                regionName,
+                                v.imageId(),
+                                v.instanceId(),
+                                v.instanceTypeAsString(),
+                                v.kernelId(),
+                                v.keyName(),
+                                dateFromSdk(v.launchTime()),
+                                EC2Monitoring.fromSdk(v.monitoring()),
+                                EC2Placement.fromSdk(v.placement()),
+                                v.platformAsString(),
+                                v.privateDnsName(),
+                                v.privateIpAddress(),
+                                EC2ProductCode.fromSdk(v.productCodes()),
+                                v.publicDnsName(),
+                                v.publicIpAddress(),
+                                v.state().nameAsString(),
+                                v.subnetId(),
+                                v.vpcId(),
+                                v.architectureAsString(),
+                                EC2InstanceBlockDeviceMapping.fromSdk(v.blockDeviceMappings()),
+                                v.ebsOptimized(),
+                                v.enaSupport(),
+                                v.hypervisorAsString(),
+                                iamInstanceProfileIdFromSdk(v.iamInstanceProfile()),
+                                v.instanceLifecycleAsString(),
+                                elasticGpuIdsFromSdk(v.elasticGpuAssociations()),
+                                elasticInferenceAcceleratorArnsFromSdk(v.elasticInferenceAcceleratorAssociations()),
+                                EC2InstanceNetworkInterface.fromSdk(v.networkInterfaces()),
+                                v.outpostArn(),
+                                v.rootDeviceName(),
+                                v.rootDeviceTypeAsString(),
+                                EC2InstanceNetworkInterface.securityGroupIdsFromSdk(v.securityGroups()),
+                                v.sourceDestCheck(),
+                                v.sriovNetSupport(),
+                                tagsFromSdk(v.tags()),
+                                v.virtualizationTypeAsString(),
+                                EC2CpuOptions.fromSdk(v.cpuOptions()),
+                                v.capacityReservationId(),
+                                hibernationConfiguredFromSdk(v.hibernationOptions()),
+                                licenseArnsFromSdk(v.licenses())
+                        )
+                )
+                .orElse(null);
     }
 
     public static String iamInstanceProfileIdFromSdk(IamInstanceProfile iamInstanceProfile) {
-        if (Objects.isNull(iamInstanceProfile)) {
-            return null;
-        }
-
-        return iamInstanceProfile.id();
+        return Optional.ofNullable(iamInstanceProfile)
+                .map(IamInstanceProfile::id)
+                .orElse(null);
     }
 
     public static List<String> elasticGpuIdsFromSdk(List<ElasticGpuAssociation> elasticGpuAssociations) {
-        if (Objects.isNull(elasticGpuAssociations)) {
-            return Collections.emptyList();
-        }
-
-        return elasticGpuAssociations
+        return Optional.ofNullable(elasticGpuAssociations)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(ElasticGpuAssociation::elasticGpuId)
                 .collect(Collectors.toList());
     }
 
     public static List<String> elasticInferenceAcceleratorArnsFromSdk(List<ElasticInferenceAcceleratorAssociation> elasticInferenceAcceleratorAssociations) {
-        if (Objects.isNull(elasticInferenceAcceleratorAssociations)) {
-            return Collections.emptyList();
-        }
-
-        return elasticInferenceAcceleratorAssociations
+        return Optional.ofNullable(elasticInferenceAcceleratorAssociations)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(ElasticInferenceAcceleratorAssociation::elasticInferenceAcceleratorArn)
                 .collect(Collectors.toList());
     }
 
     public static Boolean hibernationConfiguredFromSdk(HibernationOptions hibernationOptions) {
-        if (Objects.isNull(hibernationOptions)) {
-            return null;
-        }
-
-        return hibernationOptions.configured();
+        return Optional.ofNullable(hibernationOptions)
+                .map(HibernationOptions::configured)
+                .orElse(null);
     }
 
     public static List<String> licenseArnsFromSdk(List<LicenseConfiguration> licenseConfigurations) {
-        if (Objects.isNull(licenseConfigurations)) {
-            return Collections.emptyList();
-        }
-
-        return licenseConfigurations
+        return Optional.ofNullable(licenseConfigurations)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(LicenseConfiguration::licenseConfigurationArn)
                 .collect(Collectors.toList());

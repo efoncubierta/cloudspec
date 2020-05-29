@@ -30,13 +30,13 @@ import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.ec2.resource.nested.EC2IpPermission;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.SecurityGroup;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -53,6 +53,13 @@ public class EC2SecurityGroupResource extends EC2Resource {
     );
 
     @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
+
+    @PropertyDefinition(
             name = "group_name",
             description = "The name of the security group"
     )
@@ -63,6 +70,12 @@ public class EC2SecurityGroupResource extends EC2Resource {
             description = "The inbound rules associated with the security group"
     )
     private final List<EC2IpPermission> ipPermissions;
+
+    @PropertyDefinition(
+            name = "owner_id",
+            description = "The AWS account ID of the owner of the security group"
+    )
+    private final String ownerId;
 
     @IdDefinition
     @PropertyDefinition(
@@ -90,12 +103,13 @@ public class EC2SecurityGroupResource extends EC2Resource {
     )
     private final String vpcId;
 
-    public EC2SecurityGroupResource(String ownerId, String region, String groupName, List<EC2IpPermission> ipPermissions,
-                                    String groupId, List<EC2IpPermission> ipPermissionsEgress, List<KeyValue> tags,
-                                    String vpcId) {
-        super(ownerId, region);
+    public EC2SecurityGroupResource(String region, String groupName, List<EC2IpPermission> ipPermissions,
+                                    String ownerId, String groupId, List<EC2IpPermission> ipPermissionsEgress,
+                                    List<KeyValue> tags, String vpcId) {
+        this.region = region;
         this.groupName = groupName;
         this.ipPermissions = ipPermissions;
+        this.ownerId = ownerId;
         this.groupId = groupId;
         this.ipPermissionsEgress = ipPermissionsEgress;
         this.tags = tags;
@@ -107,8 +121,10 @@ public class EC2SecurityGroupResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2SecurityGroupResource that = (EC2SecurityGroupResource) o;
-        return Objects.equals(groupName, that.groupName) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(groupName, that.groupName) &&
                 Objects.equals(ipPermissions, that.ipPermissions) &&
+                Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(groupId, that.groupId) &&
                 Objects.equals(ipPermissionsEgress, that.ipPermissionsEgress) &&
                 Objects.equals(tags, that.tags) &&
@@ -117,23 +133,21 @@ public class EC2SecurityGroupResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupName, ipPermissions, groupId, ipPermissionsEgress, tags, vpcId);
+        return Objects.hash(region, groupName, ipPermissions, ownerId, groupId, ipPermissionsEgress, tags, vpcId);
     }
 
     public static EC2SecurityGroupResource fromSdk(String regionName, SecurityGroup securityGroup) {
-        if (Objects.isNull(securityGroup)) {
-            return null;
-        }
-
-        return new EC2SecurityGroupResource(
-                securityGroup.ownerId(),
-                regionName,
-                securityGroup.groupName(),
-                EC2IpPermission.fromSdk(securityGroup.ipPermissions()),
-                securityGroup.groupId(),
-                EC2IpPermission.fromSdk(securityGroup.ipPermissionsEgress()),
-                tagsFromSdk(securityGroup.tags()),
-                securityGroup.vpcId()
-        );
+        return Optional.ofNullable(securityGroup)
+                .map(v -> new EC2SecurityGroupResource(
+                        regionName,
+                        v.groupName(),
+                        EC2IpPermission.fromSdk(v.ipPermissions()),
+                        v.ownerId(),
+                        v.groupId(),
+                        EC2IpPermission.fromSdk(v.ipPermissionsEgress()),
+                        tagsFromSdk(v.tags()),
+                        v.vpcId()
+                ))
+                .orElse(null);
     }
 }

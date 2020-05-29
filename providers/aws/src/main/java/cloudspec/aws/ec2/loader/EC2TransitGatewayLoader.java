@@ -26,10 +26,9 @@
 package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
-import cloudspec.aws.ec2.resource.EC2AmiResource;
+import cloudspec.aws.ec2.resource.EC2TransitGatewayResource;
 import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeImagesResponse;
-import software.amazon.awssdk.services.ec2.model.Filter;
+import software.amazon.awssdk.services.ec2.model.DescribeTransitGatewaysResponse;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.util.Collections;
@@ -38,57 +37,52 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EC2AmiLoader extends EC2ResourceLoader<EC2AmiResource> {
+public class EC2TransitGatewayLoader extends EC2ResourceLoader<EC2TransitGatewayResource> {
     private final IAWSClientsProvider clientsProvider;
 
-    public EC2AmiLoader(IAWSClientsProvider clientsProvider) {
+    public EC2TransitGatewayLoader(IAWSClientsProvider clientsProvider) {
         this.clientsProvider = clientsProvider;
     }
 
     @Override
-    public Optional<EC2AmiResource> getById(String imageId) {
-        return getImages(Collections.singletonList(imageId)).findFirst();
+    public Optional<EC2TransitGatewayResource> getById(String transitGatewayId) {
+        return getTransitGateways(Collections.singletonList(transitGatewayId)).findFirst();
     }
 
     @Override
-    public List<EC2AmiResource> getAll() {
-        return getImages().collect(Collectors.toList());
+    public List<EC2TransitGatewayResource> getAll() {
+        return getTransitGateways().collect(Collectors.toList());
     }
 
-    private Stream<EC2AmiResource> getImages() {
-        return getImages(Collections.emptyList());
+    private Stream<EC2TransitGatewayResource> getTransitGateways() {
+        return getTransitGateways(Collections.emptyList());
     }
 
-    private Stream<EC2AmiResource> getImages(List<String> imageIds) {
+    private Stream<EC2TransitGatewayResource> getTransitGateways(List<String> transitGatewayIds) {
         Ec2Client ec2Client = clientsProvider.getEc2Client();
 
         try {
             return ec2Client.describeRegions()
                     .regions()
                     .stream()
-                    .flatMap(region -> getImagesInRegion(region, imageIds));
+                    .flatMap(region -> getTransitGatewaysInRegion(region, transitGatewayIds));
         } finally {
             IoUtils.closeQuietly(ec2Client, null);
         }
-
     }
 
-    private Stream<EC2AmiResource> getImagesInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                     List<String> imageIds) {
+    private Stream<EC2TransitGatewayResource> getTransitGatewaysInRegion(software.amazon.awssdk.services.ec2.model.Region region,
+                                                                         List<String> transitGatewayIds) {
         Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
 
         try {
-            DescribeImagesResponse response = imageIds != null && !imageIds.isEmpty() ?
-                    client.describeImages(builder -> builder.filters(
-                            Filter.builder()
-                                    .name("image-id")
-                                    .values(imageIds.toArray(new String[0])).build())
-                    ) :
-                    client.describeImages();
+            DescribeTransitGatewaysResponse response = transitGatewayIds != null && !transitGatewayIds.isEmpty() ?
+                    client.describeTransitGateways(builder -> builder.transitGatewayIds(transitGatewayIds.toArray(new String[0]))) :
+                    client.describeTransitGateways();
 
-            return response.images()
+            return response.transitGateways()
                     .stream()
-                    .map(image -> EC2AmiResource.fromSdk(region.regionName(), image));
+                    .map(transitGateway -> EC2TransitGatewayResource.fromSdk(region.regionName(), transitGateway));
         } finally {
             IoUtils.closeQuietly(client, null);
         }

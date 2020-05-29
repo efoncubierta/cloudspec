@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.ec2.model.ProductCode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2ProductCode {
@@ -67,27 +68,20 @@ public class EC2ProductCode {
     }
 
     public static List<EC2ProductCode> fromSdk(List<ProductCode> productCodes) {
-        if (Objects.isNull(productCodes)) {
-            return Collections.emptyList();
-        }
-
-        return productCodes.stream()
+        return Optional.ofNullable(productCodes)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2ProductCode::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2ProductCode fromSdk(ProductCode productCode) {
-        if (Objects.isNull(productCode)) {
-            return null;
-        }
-
-        return new EC2ProductCode(
-                productCode
-                        .getValueForField("ProductCodeId", String.class)
-                        .orElse(null),
-                productCode
-                        .getValueForField("ProductCodeType", String.class)
-                        .orElse(null)
-        );
+        return Optional.ofNullable(productCode)
+                .map(v -> new EC2ProductCode(
+                                v.productCodeId(),
+                                v.productCodeTypeAsString()
+                        )
+                )
+                .orElse(null);
     }
 }

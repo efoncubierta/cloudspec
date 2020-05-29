@@ -32,6 +32,7 @@ import software.amazon.awssdk.services.ec2.model.DhcpConfiguration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2DhcpConfiguration {
@@ -67,32 +68,27 @@ public class EC2DhcpConfiguration {
     }
 
     public static List<EC2DhcpConfiguration> fromSdk(List<DhcpConfiguration> dhcpConfigurations) {
-        if (Objects.isNull(dhcpConfigurations)) {
-            return Collections.emptyList();
-        }
-
-        return dhcpConfigurations.stream()
+        return Optional.ofNullable(dhcpConfigurations)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2DhcpConfiguration::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2DhcpConfiguration fromSdk(DhcpConfiguration dhcpConfiguration) {
-        if (Objects.isNull(dhcpConfiguration)) {
-            return null;
-        }
-
-        return new EC2DhcpConfiguration(
-                dhcpConfiguration.key(),
-                EC2DhcpConfiguration.valuesFromSdk(dhcpConfiguration.values())
-        );
+        return Optional.ofNullable(dhcpConfiguration)
+                .map(v -> new EC2DhcpConfiguration(
+                                v.key(),
+                                EC2DhcpConfiguration.valuesFromSdk(v.values())
+                        )
+                )
+                .orElse(null);
     }
 
     public static List<String> valuesFromSdk(List<AttributeValue> attributeValues) {
-        if (Objects.isNull(attributeValues)) {
-            return Collections.emptyList();
-        }
-
-        return attributeValues.stream()
+        return Optional.ofNullable(attributeValues)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(AttributeValue::value)
                 .collect(Collectors.toList());
     }

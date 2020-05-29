@@ -29,7 +29,6 @@ import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.aws.ec2.resource.nested.EC2VolumeAttachment;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
@@ -53,6 +52,13 @@ public class EC2VolumeResource extends EC2Resource {
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
+
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
 
     @PropertyDefinition(
             name = "attachments",
@@ -148,11 +154,11 @@ public class EC2VolumeResource extends EC2Resource {
     )
     private final Boolean multiAttachEnabled;
 
-    public EC2VolumeResource(String ownerId, String region, List<EC2VolumeAttachment> attachments, String availabilityZone,
+    public EC2VolumeResource(String region, List<EC2VolumeAttachment> attachments, String availabilityZone,
                              Date createTime, Boolean encrypted, String kmsKeyId, String outpostArn, Integer size,
                              String snapshotId, String state, String volumeId, Integer iops, List<KeyValue> tags,
                              String volumeType, Boolean fastRestored, Boolean multiAttachEnabled) {
-        super(ownerId, region);
+        this.region = region;
         this.attachments = attachments;
         this.availabilityZone = availabilityZone;
         this.createTime = createTime;
@@ -175,7 +181,8 @@ public class EC2VolumeResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2VolumeResource that = (EC2VolumeResource) o;
-        return Objects.equals(attachments, that.attachments) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(attachments, that.attachments) &&
                 Objects.equals(availabilityZone, that.availabilityZone) &&
                 Objects.equals(createTime, that.createTime) &&
                 Objects.equals(encrypted, that.encrypted) &&
@@ -194,7 +201,7 @@ public class EC2VolumeResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(attachments, availabilityZone, createTime, encrypted, kmsKeyId, outpostArn, size,
+        return Objects.hash(region, attachments, availabilityZone, createTime, encrypted, kmsKeyId, outpostArn, size,
                 snapshotId, state, volumeId, iops, tags, volumeType, fastRestored, multiAttachEnabled);
     }
 
@@ -202,7 +209,6 @@ public class EC2VolumeResource extends EC2Resource {
         return Optional.ofNullable(volume)
                 .map(v ->
                         new EC2VolumeResource(
-                                "",
                                 regionName,
                                 EC2VolumeAttachment.fromSdk(v.attachments()),
                                 v.availabilityZone(),

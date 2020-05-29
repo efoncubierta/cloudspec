@@ -81,7 +81,7 @@ public class SQSQueueLoader implements SQSResourceLoader<SQSQueueResource> {
     }
 
     private SQSQueueResource toResource(Map<QueueAttributeName, String> queueAttributes) {
-        SQSQueueResource resource = new SQSQueueResource("");
+        SQSQueueResource resource = new SQSQueueResource();
         resource.queueArn = queueAttributes.get(QueueAttributeName.QUEUE_ARN);
         resource.visibilityTimeout = Integer.valueOf(queueAttributes.get(QueueAttributeName.VISIBILITY_TIMEOUT));
         resource.delaySeconds = Integer.valueOf(queueAttributes.get(QueueAttributeName.DELAY_SECONDS));

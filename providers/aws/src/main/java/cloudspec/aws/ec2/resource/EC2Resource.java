@@ -23,50 +23,34 @@
  * THE SOFTWARE.
  * #L%
  */
-package cloudspec.aws.ec2.resource.nested;
+package cloudspec.aws.ec2.resource;
 
-import cloudspec.annotation.PropertyDefinition;
 import cloudspec.aws.AWSResource;
 import cloudspec.model.KeyValue;
 import software.amazon.awssdk.services.ec2.model.Tag;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class EC2Resource extends AWSResource {
     public static final String GROUP_NAME = "ec2";
 
-    @PropertyDefinition(
-            name = "region",
-            description = "The AWS region",
-            exampleValues = "us-east-1 | eu-west-1"
-    )
-    protected String region;
-
-    public EC2Resource(String ownerId, String region) {
-        super(ownerId);
-        this.region = region;
-    }
-
     protected static List<KeyValue> tagsFromSdk(List<Tag> tags) {
-        if (Objects.isNull(tags)) {
-            return Collections.emptyList();
-        }
-
-        return tags.stream()
+        return Optional.ofNullable(tags)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2Resource::tagFromSdk)
                 .collect(Collectors.toList());
     }
 
     protected static KeyValue tagFromSdk(Tag tag) {
-        if (Objects.isNull(tag)) {
-            return null;
-        }
-
-        return new KeyValue(
-                tag.key(), tag.value()
-        );
+        return Optional.ofNullable(tag)
+                .map(v -> new KeyValue(
+                        v.key(),
+                        v.value()
+                ))
+                .orElse(null);
     }
 }

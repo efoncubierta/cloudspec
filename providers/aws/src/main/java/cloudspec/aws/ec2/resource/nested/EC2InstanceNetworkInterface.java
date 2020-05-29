@@ -38,6 +38,7 @@ import software.amazon.awssdk.services.ec2.model.InstanceNetworkInterface;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2InstanceNetworkInterface {
@@ -164,11 +165,8 @@ public class EC2InstanceNetworkInterface {
     }
 
     public static List<EC2InstanceNetworkInterface> fromSdk(List<InstanceNetworkInterface> instanceNetworkInterfaces) {
-        if (Objects.isNull(instanceNetworkInterfaces)) {
-            return Collections.emptyList();
-        }
-
-        return instanceNetworkInterfaces
+        return Optional.ofNullable(instanceNetworkInterfaces)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(EC2InstanceNetworkInterface::fromSdk)
                 .collect(Collectors.toList());
@@ -192,22 +190,16 @@ public class EC2InstanceNetworkInterface {
     }
 
     public static List<String> securityGroupIdsFromSdk(List<GroupIdentifier> groupIdentifiers) {
-        if (Objects.isNull(groupIdentifiers)) {
-            return Collections.emptyList();
-        }
-
-        return groupIdentifiers
+        return Optional.ofNullable(groupIdentifiers)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(GroupIdentifier::groupId)
                 .collect(Collectors.toList());
     }
 
     public static List<String> ipv6AddressesFromSdk(List<InstanceIpv6Address> instanceIpv6Addresses) {
-        if (Objects.isNull(instanceIpv6Addresses)) {
-            return Collections.emptyList();
-        }
-
-        return instanceIpv6Addresses
+        return Optional.ofNullable(instanceIpv6Addresses)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(InstanceIpv6Address::ipv6Address)
                 .collect(Collectors.toList());

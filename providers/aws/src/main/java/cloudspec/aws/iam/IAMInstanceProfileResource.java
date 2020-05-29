@@ -25,7 +25,6 @@
  */
 package cloudspec.aws.iam;
 
-import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
@@ -66,14 +65,10 @@ public class IAMInstanceProfileResource extends IAMResource {
     )
     public String path;
 
-//    @AssociationDefinition(
+    //    @AssociationDefinition(
 //            name = "roles",
 //            description = "IAM Roles",
 //            targetClass = IAMRoleResource.class
 //    )
     public List<String> roleIds;
-
-    public IAMInstanceProfileResource(String ownerId) {
-        super(ownerId);
-    }
 }

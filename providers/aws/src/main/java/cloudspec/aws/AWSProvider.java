@@ -44,17 +44,25 @@ import java.util.*;
         name = "aws",
         description = "Amazon Web Services",
         resources = {
-                EC2AmiResource.class,
+                EC2ImageResource.class,
                 EC2CapacityReservationResource.class,
                 EC2DhcpOptionsResource.class,
                 EC2ElasticGpuResource.class,
+                EC2FlowLogResource.class,
                 EC2InstanceResource.class,
+                EC2InternetGatewayResource.class,
+                EC2LocalGatewayResource.class,
+                EC2NatGatewayResource.class,
+                EC2NetworkAclResource.class,
                 EC2NetworkInterfaceResource.class,
                 EC2ReservedInstancesResource.class,
+                EC2RouteTableResource.class,
                 EC2SecurityGroupResource.class,
                 EC2SnapshotResource.class,
                 EC2SubnetResource.class,
+                EC2TransitGatewayResource.class,
                 EC2VolumeResource.class,
+                EC2VpcPeeringConnectionResource.class,
                 EC2VpcResource.class,
                 IAMInstanceProfileResource.class,
                 S3BucketResource.class,
@@ -69,8 +77,8 @@ public class AWSProvider extends BaseProvider {
 
     public AWSProvider(IAWSClientsProvider clientsProvider) {
         loaders.put(
-                EC2AmiResource.RESOURCE_DEF_REF.toString(),
-                new EC2AmiLoader(clientsProvider)
+                EC2ImageResource.RESOURCE_DEF_REF.toString(),
+                new EC2ImageLoader(clientsProvider)
         );
         loaders.put(
                 EC2CapacityReservationResource.RESOURCE_DEF_REF.toString(),
@@ -85,8 +93,28 @@ public class AWSProvider extends BaseProvider {
                 new EC2ElasticGpuLoader(clientsProvider)
         );
         loaders.put(
+                EC2FlowLogResource.RESOURCE_DEF_REF.toString(),
+                new EC2FlowLogLoader(clientsProvider)
+        );
+        loaders.put(
                 EC2InstanceResource.RESOURCE_DEF_REF.toString(),
                 new EC2InstanceLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2InternetGatewayResource.RESOURCE_DEF_REF.toString(),
+                new EC2InternetGatewayLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2LocalGatewayResource.RESOURCE_DEF_REF.toString(),
+                new EC2LocalGatewayLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2NatGatewayResource.RESOURCE_DEF_REF.toString(),
+                new EC2NatGatewayLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2NetworkAclResource.RESOURCE_DEF_REF.toString(),
+                new EC2NetworkAclLoader(clientsProvider)
         );
         loaders.put(
                 EC2NetworkInterfaceResource.RESOURCE_DEF_REF.toString(),
@@ -95,6 +123,10 @@ public class AWSProvider extends BaseProvider {
         loaders.put(
                 EC2ReservedInstancesResource.RESOURCE_DEF_REF.toString(),
                 new EC2ReservedInstancesLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2RouteTableResource.RESOURCE_DEF_REF.toString(),
+                new EC2RouteTableLoader(clientsProvider)
         );
         loaders.put(
                 EC2SecurityGroupResource.RESOURCE_DEF_REF.toString(),
@@ -109,8 +141,16 @@ public class AWSProvider extends BaseProvider {
                 new EC2SubnetLoader(clientsProvider)
         );
         loaders.put(
+                EC2TransitGatewayResource.RESOURCE_DEF_REF.toString(),
+                new EC2TransitGatewayLoader(clientsProvider)
+        );
+        loaders.put(
                 EC2VolumeResource.RESOURCE_DEF_REF.toString(),
                 new EC2VolumeLoader(clientsProvider)
+        );
+        loaders.put(
+                EC2VpcPeeringConnectionResource.RESOURCE_DEF_REF.toString(),
+                new EC2VpcPeeringConnectionLoader(clientsProvider)
         );
         loaders.put(
                 EC2VpcResource.RESOURCE_DEF_REF.toString(),

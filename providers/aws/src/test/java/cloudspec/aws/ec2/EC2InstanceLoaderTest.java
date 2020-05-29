@@ -40,7 +40,7 @@ public class EC2InstanceLoaderTest {
 //                .regions(
 //                        software.amazon.awssdk.services.ec2.model.Region
 //                                .builder()
-//                                .regionName(TEST_EC2_INSTANCE.region)
+//                                .regionName(TEST_EC2_INSTANCE.)
 //                                .build()
 //                )
 //                .build()

@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.ec2.model.InstanceBlockDeviceMapping;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2InstanceBlockDeviceMapping {
@@ -66,23 +67,20 @@ public class EC2InstanceBlockDeviceMapping {
     }
 
     public static List<EC2InstanceBlockDeviceMapping> fromSdk(List<InstanceBlockDeviceMapping> instanceBlockDeviceMappings) {
-        if (Objects.isNull(instanceBlockDeviceMappings)) {
-            return Collections.emptyList();
-        }
-
-        return instanceBlockDeviceMappings.stream()
+        return Optional.ofNullable(instanceBlockDeviceMappings)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2InstanceBlockDeviceMapping::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2InstanceBlockDeviceMapping fromSdk(InstanceBlockDeviceMapping instanceBlockDeviceMapping) {
-        if (Objects.isNull(instanceBlockDeviceMapping)) {
-            return null;
-        }
-
-        return new EC2InstanceBlockDeviceMapping(
-                instanceBlockDeviceMapping.deviceName(),
-                EC2EbsInstanceBlockDevice.fromSdk(instanceBlockDeviceMapping.ebs())
-        );
+        return Optional.ofNullable(instanceBlockDeviceMapping)
+                .map(v -> new EC2InstanceBlockDeviceMapping(
+                                v.deviceName(),
+                                EC2EbsInstanceBlockDevice.fromSdk(v.ebs())
+                        )
+                )
+                .orElse(null);
     }
 }

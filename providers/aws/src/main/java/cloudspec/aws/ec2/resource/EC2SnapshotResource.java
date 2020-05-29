@@ -29,7 +29,6 @@ import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.Snapshot;
@@ -37,6 +36,7 @@ import software.amazon.awssdk.services.ec2.model.Snapshot;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -52,6 +52,13 @@ public class EC2SnapshotResource extends EC2Resource {
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
 
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
+
     // private final String dataEncryptionKeyId;
 
     @PropertyDefinition(
@@ -61,6 +68,12 @@ public class EC2SnapshotResource extends EC2Resource {
     private final Boolean encrypted;
 
     // private final String kmsKeyId;
+
+    @PropertyDefinition(
+            name = "owner_id",
+            description = "The AWS account ID of the EBS snapshot owner"
+    )
+    private final String ownerId;
 
     @PropertyDefinition(
             name = "progress",
@@ -106,10 +119,11 @@ public class EC2SnapshotResource extends EC2Resource {
     )
     private final List<KeyValue> tags;
 
-    public EC2SnapshotResource(String ownerId, String region, Boolean encrypted, String progress, String snapshotId,
+    public EC2SnapshotResource(String region, Boolean encrypted, String ownerId, String progress, String snapshotId,
                                Date startTime, String state, String volumeId, Integer volumeSize, List<KeyValue> tags) {
-        super(ownerId, region);
+        this.region = region;
         this.encrypted = encrypted;
+        this.ownerId = ownerId;
         this.progress = progress;
         this.snapshotId = snapshotId;
         this.startTime = startTime;
@@ -124,7 +138,9 @@ public class EC2SnapshotResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2SnapshotResource that = (EC2SnapshotResource) o;
-        return Objects.equals(encrypted, that.encrypted) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(encrypted, that.encrypted) &&
+                Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(progress, that.progress) &&
                 Objects.equals(snapshotId, that.snapshotId) &&
                 Objects.equals(startTime, that.startTime) &&
@@ -136,25 +152,25 @@ public class EC2SnapshotResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(encrypted, progress, snapshotId, startTime, state, volumeId, volumeSize, tags);
+        return Objects.hash(region, encrypted, ownerId, progress, snapshotId,
+                startTime, state, volumeId, volumeSize, tags);
     }
 
     public static EC2SnapshotResource fromSdk(String regionName, Snapshot snapshot) {
-        if (Objects.isNull(snapshot)) {
-            return null;
-        }
-
-        return new EC2SnapshotResource(
-                snapshot.ownerId(),
-                regionName,
-                snapshot.encrypted(),
-                snapshot.progress(),
-                snapshot.snapshotId(),
-                dateFromSdk(snapshot.startTime()),
-                snapshot.stateAsString(),
-                snapshot.volumeId(),
-                snapshot.volumeSize(),
-                tagsFromSdk(snapshot.tags())
-        );
+        return Optional.ofNullable(snapshot)
+                .map(v -> new EC2SnapshotResource(
+                                regionName,
+                                v.encrypted(),
+                                v.ownerId(),
+                                v.progress(),
+                                v.snapshotId(),
+                                dateFromSdk(v.startTime()),
+                                v.stateAsString(),
+                                v.volumeId(),
+                                v.volumeSize(),
+                                tagsFromSdk(v.tags())
+                        )
+                )
+                .orElse(null);
     }
 }

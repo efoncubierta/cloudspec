@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.ec2.model.InstancePrivateIpAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2InstancePrivateIpAddress {
@@ -74,24 +75,21 @@ public class EC2InstancePrivateIpAddress {
     }
 
     public static List<EC2InstancePrivateIpAddress> fromSdk(List<InstancePrivateIpAddress> instancePrivateIpAddress) {
-        if (Objects.isNull(instancePrivateIpAddress)) {
-            return Collections.emptyList();
-        }
-
-        return instancePrivateIpAddress.stream()
+        return Optional.ofNullable(instancePrivateIpAddress)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2InstancePrivateIpAddress::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2InstancePrivateIpAddress fromSdk(InstancePrivateIpAddress instancePrivateIpAddress) {
-        if (Objects.isNull(instancePrivateIpAddress)) {
-            return null;
-        }
-
-        return new EC2InstancePrivateIpAddress(
-                instancePrivateIpAddress.primary(),
-                instancePrivateIpAddress.privateDnsName(),
-                instancePrivateIpAddress.privateIpAddress()
-        );
+        return Optional.ofNullable(instancePrivateIpAddress)
+                .map(v -> new EC2InstancePrivateIpAddress(
+                                v.primary(),
+                                v.privateDnsName(),
+                                v.privateIpAddress()
+                        )
+                )
+                .orElse(null);
     }
 }

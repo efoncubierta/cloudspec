@@ -29,7 +29,6 @@ import cloudspec.annotation.IdDefinition;
 import cloudspec.annotation.PropertyDefinition;
 import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.ec2.resource.nested.EC2RecurringCharge;
-import cloudspec.aws.ec2.resource.nested.EC2Resource;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.ReservedInstances;
@@ -37,6 +36,7 @@ import software.amazon.awssdk.services.ec2.model.ReservedInstances;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
 
@@ -51,6 +51,13 @@ public class EC2ReservedInstancesResource extends EC2Resource {
     public static final ResourceDefRef RESOURCE_DEF_REF = new ResourceDefRef(
             PROVIDER_NAME, GROUP_NAME, RESOURCE_NAME
     );
+
+    @PropertyDefinition(
+            name = "region",
+            description = "The AWS region",
+            exampleValues = "us-east-1 | eu-west-1"
+    )
+    private final String region;
 
     @PropertyDefinition(
             name = "availability_zone",
@@ -160,13 +167,13 @@ public class EC2ReservedInstancesResource extends EC2Resource {
     )
     private final List<KeyValue> tags;
 
-    public EC2ReservedInstancesResource(String ownerId, String region, String availabilityZone, Long duration, Date end,
+    public EC2ReservedInstancesResource(String region, String availabilityZone, Long duration, Date end,
                                         Double fixedPrice, Integer instanceCount, String instanceType,
                                         String reservedInstancesId, Date start, String state, Double usagePrice,
                                         String currencyCode, String instanceTenancy, String offeringClass,
                                         String offeringType, List<EC2RecurringCharge> recurringCharges, String scope,
                                         List<KeyValue> tags) {
-        super(ownerId, region);
+        this.region = region;
         this.availabilityZone = availabilityZone;
         this.duration = duration;
         this.end = end;
@@ -191,7 +198,8 @@ public class EC2ReservedInstancesResource extends EC2Resource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EC2ReservedInstancesResource that = (EC2ReservedInstancesResource) o;
-        return Objects.equals(availabilityZone, that.availabilityZone) &&
+        return Objects.equals(region, that.region) &&
+                Objects.equals(availabilityZone, that.availabilityZone) &&
                 Objects.equals(duration, that.duration) &&
                 Objects.equals(end, that.end) &&
                 Objects.equals(fixedPrice, that.fixedPrice) &&
@@ -212,36 +220,34 @@ public class EC2ReservedInstancesResource extends EC2Resource {
 
     @Override
     public int hashCode() {
-        return Objects.hash(availabilityZone, duration, end, fixedPrice, instanceCount, instanceType,
+        return Objects.hash(region, availabilityZone, duration, end, fixedPrice, instanceCount, instanceType,
                 reservedInstancesId, start, state, usagePrice, currencyCode, instanceTenancy, offeringClass,
                 offeringType, recurringCharges, scope, tags);
     }
 
     public static EC2ReservedInstancesResource fromSdk(String regionName, ReservedInstances reservedInstances) {
-        if (Objects.isNull(reservedInstances)) {
-            return null;
-        }
-
-        return new EC2ReservedInstancesResource(
-                "",
-                regionName,
-                reservedInstances.availabilityZone(),
-                reservedInstances.duration(),
-                dateFromSdk(reservedInstances.end()),
-                Double.valueOf(reservedInstances.fixedPrice()),
-                reservedInstances.instanceCount(),
-                reservedInstances.instanceTypeAsString(),
-                reservedInstances.reservedInstancesId(),
-                dateFromSdk(reservedInstances.start()),
-                reservedInstances.stateAsString(),
-                Double.valueOf(reservedInstances.usagePrice()),
-                reservedInstances.currencyCodeAsString(),
-                reservedInstances.instanceTenancyAsString(),
-                reservedInstances.offeringClassAsString(),
-                reservedInstances.offeringTypeAsString(),
-                EC2RecurringCharge.fromSdk(reservedInstances.recurringCharges()),
-                reservedInstances.scopeAsString(),
-                tagsFromSdk(reservedInstances.tags())
-        );
+        return Optional.ofNullable(reservedInstances)
+                .map(v -> new EC2ReservedInstancesResource(
+                                regionName,
+                                v.availabilityZone(),
+                                v.duration(),
+                                dateFromSdk(v.end()),
+                                Double.valueOf(v.fixedPrice()),
+                                v.instanceCount(),
+                                v.instanceTypeAsString(),
+                                v.reservedInstancesId(),
+                                dateFromSdk(v.start()),
+                                v.stateAsString(),
+                                Double.valueOf(v.usagePrice()),
+                                v.currencyCodeAsString(),
+                                v.instanceTenancyAsString(),
+                                v.offeringClassAsString(),
+                                v.offeringTypeAsString(),
+                                EC2RecurringCharge.fromSdk(v.recurringCharges()),
+                                v.scopeAsString(),
+                                tagsFromSdk(v.tags())
+                        )
+                )
+                .orElse(null);
     }
 }

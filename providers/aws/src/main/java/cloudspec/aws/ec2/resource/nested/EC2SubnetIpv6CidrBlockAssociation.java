@@ -75,11 +75,9 @@ public class EC2SubnetIpv6CidrBlockAssociation {
     }
 
     public static List<EC2SubnetIpv6CidrBlockAssociation> fromSdk(List<SubnetIpv6CidrBlockAssociation> subnetIpv6CidrBlockAssociations) {
-        if (Objects.isNull(subnetIpv6CidrBlockAssociations)) {
-            return Collections.emptyList();
-        }
-
-        return subnetIpv6CidrBlockAssociations.stream()
+        return Optional.ofNullable(subnetIpv6CidrBlockAssociations)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2SubnetIpv6CidrBlockAssociation::fromSdk)
                 .collect(Collectors.toList());
     }

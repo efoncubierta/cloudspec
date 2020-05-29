@@ -27,11 +27,11 @@ package cloudspec.aws.ec2.resource.nested;
 
 import cloudspec.annotation.PropertyDefinition;
 import software.amazon.awssdk.services.ec2.model.BlockDeviceMapping;
-import software.amazon.awssdk.services.ec2.model.EbsBlockDevice;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2BlockDeviceMapping {
@@ -76,31 +76,21 @@ public class EC2BlockDeviceMapping {
     }
 
     public static List<EC2BlockDeviceMapping> fromSdk(List<BlockDeviceMapping> blockDeviceMappings) {
-        if (Objects.isNull(blockDeviceMappings)) {
-            return Collections.emptyList();
-        }
-
-        return blockDeviceMappings.stream()
+        return Optional.ofNullable(blockDeviceMappings)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2BlockDeviceMapping::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2BlockDeviceMapping fromSdk(BlockDeviceMapping blockDeviceMapping) {
-        if (Objects.isNull(blockDeviceMapping)) {
-            return null;
-        }
-
-        return new EC2BlockDeviceMapping(
-                blockDeviceMapping
-                        .getValueForField("DeviceName", String.class)
-                        .orElse(null),
-                blockDeviceMapping
-                        .getValueForField("VirtualName", String.class)
-                        .orElse(null),
-                blockDeviceMapping
-                        .getValueForField("Ebs", EbsBlockDevice.class)
-                        .map(EC2EbsBlockDevice::fromSdk)
-                        .orElse(null)
-        );
+        return Optional.ofNullable(blockDeviceMapping)
+                .map(v -> new EC2BlockDeviceMapping(
+                                v.deviceName(),
+                                v.virtualName(),
+                                EC2EbsBlockDevice.fromSdk(v.ebs())
+                        )
+                )
+                .orElse(null);
     }
 }

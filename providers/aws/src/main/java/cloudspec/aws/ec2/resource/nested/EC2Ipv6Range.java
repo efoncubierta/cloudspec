@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.ec2.model.Ipv6Range;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2Ipv6Range {
@@ -58,22 +59,19 @@ public class EC2Ipv6Range {
     }
 
     public static List<EC2Ipv6Range> fromSdk(List<Ipv6Range> ipv6Ranges) {
-        if (Objects.isNull(ipv6Ranges)) {
-            return Collections.emptyList();
-        }
-
-        return ipv6Ranges.stream()
+        return Optional.ofNullable(ipv6Ranges)
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(EC2Ipv6Range::fromSdk)
                 .collect(Collectors.toList());
     }
 
     public static EC2Ipv6Range fromSdk(Ipv6Range ipRange) {
-        if (Objects.isNull(ipRange)) {
-            return null;
-        }
-
-        return new EC2Ipv6Range(
-                ipRange.cidrIpv6()
-        );
+        return Optional.ofNullable(ipRange)
+                .map(v -> new EC2Ipv6Range(
+                                v.cidrIpv6()
+                        )
+                )
+                .orElse(null);
     }
 }
