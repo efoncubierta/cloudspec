@@ -10,10 +10,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,6 +35,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Text;
 import org.apache.tinkerpop.gremlin.process.traversal.util.AndP;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -164,12 +165,18 @@ public class PropertyStatement implements Statement {
             return "is not after " + valueToCloudSpecSyntax(originalValue);
         } else if (predicate instanceof AndP<?>) {
             var andP = (AndP<?>) predicate;
-            var leftPredicate = andP.getPredicates().get(0);
-            var rightPredicate = andP.getPredicates().get(1);
-            if ((leftPredicate.getBiPredicate().equals(Compare.gte) &&
-                    rightPredicate.getBiPredicate().equals(Compare.lt)) ||
-                    (leftPredicate.getBiPredicate().equals(DateCompare.notBefore) &&
-                            rightPredicate.getBiPredicate().equals(DateCompare.before))
+            var leftPredicate = andP.getPredicates()
+                                    .get(0);
+            var rightPredicate = andP.getPredicates()
+                                     .get(1);
+            if ((leftPredicate.getBiPredicate()
+                              .equals(Compare.gte) &&
+                    rightPredicate.getBiPredicate()
+                                  .equals(Compare.lt)) ||
+                    (leftPredicate.getBiPredicate()
+                                  .equals(DateCompare.notBefore) &&
+                            rightPredicate.getBiPredicate()
+                                          .equals(DateCompare.before))
             ) {
                 return "is between " + valueToCloudSpecSyntax(leftPredicate.getOriginalValue()) +
                         " and " + valueToCloudSpecSyntax(rightPredicate.getOriginalValue());
@@ -184,8 +191,8 @@ public class PropertyStatement implements Statement {
             return String.format(
                     "[%s]",
                     ((List<?>) value).stream()
-                            .map(this::valueToCloudSpecSyntax)
-                            .collect(Collectors.joining(", "))
+                                     .map(this::valueToCloudSpecSyntax)
+                                     .collect(Collectors.joining(", "))
             );
 
         } else if (value instanceof String) {
@@ -193,6 +200,9 @@ public class PropertyStatement implements Statement {
         } else if (value instanceof Date) {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return String.format("\"%s\"", df.format(value));
+        } else if (value instanceof Double) {
+            DecimalFormat format = new DecimalFormat("0.0000000000000000000");
+            return format.format(value);
         } else {
             return value.toString();
         }
@@ -200,8 +210,12 @@ public class PropertyStatement implements Statement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PropertyStatement that = (PropertyStatement) o;
 
         return propertyName.equals(that.propertyName) &&
