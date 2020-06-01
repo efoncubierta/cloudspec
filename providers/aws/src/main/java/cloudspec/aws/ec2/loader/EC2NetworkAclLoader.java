@@ -27,64 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2NetworkAclResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeNetworkAclsResponse;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Filter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2NetworkAclLoader extends EC2ResourceLoader<EC2NetworkAclResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_NETWORK_ACL_ID = "network-acl-id";
 
     public EC2NetworkAclLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2NetworkAclResource> getById(String networkAclId) {
-        return getNetworkAcls(Collections.singletonList(networkAclId)).findFirst();
-    }
-
-    @Override
-    public List<EC2NetworkAclResource> getAll() {
-        return getNetworkAcls().collect(Collectors.toList());
-    }
-
-    private Stream<EC2NetworkAclResource> getNetworkAcls() {
-        return getNetworkAcls(Collections.emptyList());
-    }
-
-    private Stream<EC2NetworkAclResource> getNetworkAcls(List<String> networkAclIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getNetworkAclsInRegion(region, networkAclIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-    }
-
-    private Stream<EC2NetworkAclResource> getNetworkAclsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                                 List<String> networkAclIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeNetworkAclsResponse response = networkAclIds != null && !networkAclIds.isEmpty() ?
-                    client.describeNetworkAcls(builder -> builder.networkAclIds(networkAclIds.toArray(new String[0]))) :
-                    client.describeNetworkAcls();
+    protected Stream<EC2NetworkAclResource> getResourcesInRegion(String region,
+                                                                 List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkAcls.html
+            var response = client.describeNetworkAcls(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.networkAcls()
-                    .stream()
-                    .map(networkAcl -> EC2NetworkAclResource.fromSdk(region.regionName(), networkAcl));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(networkAcl -> EC2NetworkAclResource.fromSdk(region, networkAcl));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_NETWORK_ACL_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

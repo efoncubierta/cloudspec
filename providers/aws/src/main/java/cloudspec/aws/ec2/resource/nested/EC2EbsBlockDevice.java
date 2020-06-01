@@ -31,45 +31,46 @@ import cloudspec.aws.ec2.resource.EC2SnapshotResource;
 import software.amazon.awssdk.services.ec2.model.EbsBlockDevice;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class EC2EbsBlockDevice {
     @PropertyDefinition(
             name = "delete_on_termination",
             description = "Indicates whether the EBS volume is deleted on instance termination"
     )
-    private Boolean deleteOnTermination;
+    private final Boolean deleteOnTermination;
 
     @PropertyDefinition(
             name = "iops",
             description = "The number of I/O operations per second (IOPS) that the volume supports"
     )
-    private Integer iops;
+    private final Integer iops;
 
     @AssociationDefinition(
             name = "snapshot",
             description = "The ID of the snapshot",
             targetClass = EC2SnapshotResource.class
     )
-    private String snapshotId;
+    private final String snapshotId;
 
     @PropertyDefinition(
             name = "volume_size",
             description = "The size of the volume, in GiB"
     )
-    private Integer volumeSize;
+    private final Integer volumeSize;
 
     @PropertyDefinition(
             name = "volume_type",
             description = "The volume type",
             exampleValues = "gp2, st1, sc1, standard"
     )
-    private String volumeType;
+    private final String volumeType;
 
     @PropertyDefinition(
             name = "encrypted",
             description = "Indicates whether the encryption state of an EBS volume is changed while being restored from a backing snapshot"
     )
-    private Boolean encrypted;
+    private final Boolean encrypted;
 
     public EC2EbsBlockDevice(Boolean deleteOnTermination, Integer iops, String snapshotId, Integer volumeSize,
                              String volumeType, Boolean encrypted) {
@@ -83,8 +84,18 @@ public class EC2EbsBlockDevice {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof EbsBlockDevice))) {
+            return false;
+        }
+
+        if (o instanceof EbsBlockDevice) {
+            return sdkEquals((EbsBlockDevice) o);
+        }
+
         EC2EbsBlockDevice that = (EC2EbsBlockDevice) o;
         return Objects.equals(deleteOnTermination, that.deleteOnTermination) &&
                 Objects.equals(iops, that.iops) &&
@@ -94,31 +105,30 @@ public class EC2EbsBlockDevice {
                 Objects.equals(encrypted, that.encrypted);
     }
 
+    private boolean sdkEquals(EbsBlockDevice that) {
+        return Objects.equals(deleteOnTermination, that.deleteOnTermination()) &&
+                Objects.equals(iops, that.iops()) &&
+                Objects.equals(snapshotId, that.snapshotId()) &&
+                Objects.equals(volumeSize, that.volumeSize()) &&
+                Objects.equals(volumeType, that.volumeTypeAsString()) &&
+                Objects.equals(encrypted, that.encrypted());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(deleteOnTermination, iops, snapshotId, volumeSize, volumeType, encrypted);
     }
 
     public static EC2EbsBlockDevice fromSdk(EbsBlockDevice ebsBlockDevice) {
-        return new EC2EbsBlockDevice(
-                ebsBlockDevice
-                        .getValueForField("DeleteOnTermination", Boolean.class)
-                        .orElse(null),
-                ebsBlockDevice
-                        .getValueForField("Iops", Integer.class)
-                        .orElse(null),
-                ebsBlockDevice
-                        .getValueForField("SnapshotId", String.class)
-                        .orElse(null),
-                ebsBlockDevice
-                        .getValueForField("VolumeSize", Integer.class)
-                        .orElse(null),
-                ebsBlockDevice
-                        .getValueForField("VolumeType", String.class)
-                        .orElse(null),
-                ebsBlockDevice
-                        .getValueForField("Encrypted", Boolean.class)
-                        .orElse(null)
-        );
+        return Optional.ofNullable(ebsBlockDevice)
+                       .map(v -> new EC2EbsBlockDevice(
+                               v.deleteOnTermination(),
+                               v.iops(),
+                               v.snapshotId(),
+                               v.volumeSize(),
+                               v.volumeTypeAsString(),
+                               v.encrypted()
+                       ))
+                       .orElse(null);
     }
 }

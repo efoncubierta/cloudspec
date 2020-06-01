@@ -193,8 +193,18 @@ public class EC2CapacityReservationResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof CapacityReservation))) {
+            return false;
+        }
+
+        if (o instanceof CapacityReservation) {
+            return sdkEquals((CapacityReservation) o);
+        }
+
         EC2CapacityReservationResource that = (EC2CapacityReservationResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(capacityReservationId, that.capacityReservationId) &&
@@ -216,6 +226,26 @@ public class EC2CapacityReservationResource extends EC2Resource {
                 Objects.equals(tags, that.tags);
     }
 
+    private boolean sdkEquals(CapacityReservation that) {
+        return Objects.equals(capacityReservationId, that.capacityReservationId()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(capacityReservationArn, that.capacityReservationArn()) &&
+                Objects.equals(instanceType, that.instanceType()) &&
+                Objects.equals(instancePlatform, that.instancePlatformAsString()) &&
+                Objects.equals(availabilityZone, that.availabilityZone()) &&
+                Objects.equals(tenancy, that.tenancyAsString()) &&
+                Objects.equals(totalInstanceCount, that.totalInstanceCount()) &&
+                Objects.equals(availableInstanceCount, that.availableInstanceCount()) &&
+                Objects.equals(ebsOptimized, that.ebsOptimized()) &&
+                Objects.equals(ephemeralStorage, that.ephemeralStorage()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(endDate.toInstant(), that.endDate()) &&
+                Objects.equals(endDateType, that.endDateTypeAsString()) &&
+                Objects.equals(instanceMatchCriteria, that.instanceMatchCriteriaAsString()) &&
+                Objects.equals(createDate.toInstant(), that.createDate()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, capacityReservationId, ownerId, capacityReservationArn, instanceType,
@@ -225,26 +255,26 @@ public class EC2CapacityReservationResource extends EC2Resource {
 
     public static EC2CapacityReservationResource fromSdk(String regionName, CapacityReservation capacityReservation) {
         return Optional.ofNullable(capacityReservation)
-                .map(v -> new EC2CapacityReservationResource(
-                        regionName,
-                        v.capacityReservationId(),
-                        v.ownerId(),
-                        v.capacityReservationArn(),
-                        v.instanceType(),
-                        v.instancePlatformAsString(),
-                        v.availabilityZone(),
-                        v.tenancyAsString(),
-                        v.totalInstanceCount(),
-                        v.availableInstanceCount(),
-                        v.ebsOptimized(),
-                        v.ephemeralStorage(),
-                        v.stateAsString(),
-                        dateFromSdk(v.endDate()),
-                        v.endDateTypeAsString(),
-                        v.instanceMatchCriteriaAsString(),
-                        dateFromSdk(v.createDate()),
-                        tagsFromSdk(v.tags())
-                ))
-                .orElse(null);
+                       .map(v -> new EC2CapacityReservationResource(
+                               regionName,
+                               v.capacityReservationId(),
+                               v.ownerId(),
+                               v.capacityReservationArn(),
+                               v.instanceType(),
+                               v.instancePlatformAsString(),
+                               v.availabilityZone(),
+                               v.tenancyAsString(),
+                               v.totalInstanceCount(),
+                               v.availableInstanceCount(),
+                               v.ebsOptimized(),
+                               v.ephemeralStorage(),
+                               v.stateAsString(),
+                               dateFromSdk(v.endDate()),
+                               v.endDateTypeAsString(),
+                               v.instanceMatchCriteriaAsString(),
+                               dateFromSdk(v.createDate()),
+                               tagsFromSdk(v.tags())
+                       ))
+                       .orElse(null);
     }
 }

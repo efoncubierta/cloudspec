@@ -61,12 +61,28 @@ public class EC2InstancePrivateIpAddress {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof InstancePrivateIpAddress))) {
+            return false;
+        }
+
+        if (o instanceof InstancePrivateIpAddress) {
+            return sdkEquals((InstancePrivateIpAddress) o);
+        }
+
         EC2InstancePrivateIpAddress that = (EC2InstancePrivateIpAddress) o;
         return Objects.equals(primary, that.primary) &&
                 Objects.equals(privateDnsName, that.privateDnsName) &&
                 Objects.equals(privateIpAddress, that.privateIpAddress);
+    }
+
+    private boolean sdkEquals(InstancePrivateIpAddress that) {
+        return Objects.equals(primary, that.primary()) &&
+                Objects.equals(privateDnsName, that.privateDnsName()) &&
+                Objects.equals(privateIpAddress, that.privateIpAddress());
     }
 
     @Override
@@ -76,20 +92,20 @@ public class EC2InstancePrivateIpAddress {
 
     public static List<EC2InstancePrivateIpAddress> fromSdk(List<InstancePrivateIpAddress> instancePrivateIpAddress) {
         return Optional.ofNullable(instancePrivateIpAddress)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2InstancePrivateIpAddress::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2InstancePrivateIpAddress::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2InstancePrivateIpAddress fromSdk(InstancePrivateIpAddress instancePrivateIpAddress) {
         return Optional.ofNullable(instancePrivateIpAddress)
-                .map(v -> new EC2InstancePrivateIpAddress(
-                                v.primary(),
-                                v.privateDnsName(),
-                                v.privateIpAddress()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2InstancePrivateIpAddress(
+                                       v.primary(),
+                                       v.privateDnsName(),
+                                       v.privateIpAddress()
+                               )
+                       )
+                       .orElse(null);
     }
 }

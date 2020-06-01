@@ -90,8 +90,18 @@ public class EC2UserIdGroupPair {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof UserIdGroupPair))) {
+            return false;
+        }
+
+        if (o instanceof UserIdGroupPair) {
+            return sdkEquals((UserIdGroupPair) o);
+        }
+
         EC2UserIdGroupPair that = (EC2UserIdGroupPair) o;
         return Objects.equals(groupId, that.groupId) &&
                 Objects.equals(groupName, that.groupName) &&
@@ -101,6 +111,15 @@ public class EC2UserIdGroupPair {
                 Objects.equals(vpcPeeringConnectionId, that.vpcPeeringConnectionId);
     }
 
+    private boolean sdkEquals(UserIdGroupPair that) {
+        return Objects.equals(groupId, that.groupId()) &&
+                Objects.equals(groupName, that.groupName()) &&
+                Objects.equals(peeringStatus, that.peeringStatus()) &&
+                Objects.equals(userId, that.userId()) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(vpcPeeringConnectionId, that.vpcPeeringConnectionId());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(groupId, groupName, peeringStatus, userId, vpcId, vpcPeeringConnectionId);
@@ -108,23 +127,23 @@ public class EC2UserIdGroupPair {
 
     public static List<EC2UserIdGroupPair> fromSdk(List<UserIdGroupPair> userIdGroupPairs) {
         return Optional.ofNullable(userIdGroupPairs)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2UserIdGroupPair::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2UserIdGroupPair::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2UserIdGroupPair fromSdk(UserIdGroupPair userIdGroupPair) {
         return Optional.ofNullable(userIdGroupPair)
-                .map(v -> new EC2UserIdGroupPair(
-                                v.groupId(),
-                                v.groupName(),
-                                v.peeringStatus(),
-                                v.userId(),
-                                v.vpcId(),
-                                v.vpcPeeringConnectionId()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2UserIdGroupPair(
+                                       v.groupId(),
+                                       v.groupName(),
+                                       v.peeringStatus(),
+                                       v.userId(),
+                                       v.vpcId(),
+                                       v.vpcPeeringConnectionId()
+                               )
+                       )
+                       .orElse(null);
     }
 }

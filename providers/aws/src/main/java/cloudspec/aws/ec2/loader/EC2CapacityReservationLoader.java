@@ -27,62 +27,29 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2CapacityReservationResource;
-import software.amazon.awssdk.services.ec2.model.Region;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EC2CapacityReservationLoader extends EC2ResourceLoader<EC2CapacityReservationResource> {
-    private final IAWSClientsProvider clientsProvider;
-
     public EC2CapacityReservationLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2CapacityReservationResource> getById(String capacityReservationId) {
-        return getCapacityReservations(Collections.singletonList(capacityReservationId)).findFirst();
-    }
-
-    @Override
-    public List<EC2CapacityReservationResource> getAll() {
-        return getCapacityReservations().collect(Collectors.toList());
-    }
-
-    private Stream<EC2CapacityReservationResource> getCapacityReservations() {
-        return getCapacityReservations(Collections.emptyList());
-    }
-
-    private Stream<EC2CapacityReservationResource> getCapacityReservations(List<String> capacityReservationIds) {
-        try (var ec2Client = clientsProvider.getEc2Client()) {
-            return ec2Client.describeRegions()
-                            .regions()
-                            .stream()
-                            .map(Region::regionName)
-                            .flatMap(regionName -> getCapacityReservationsInRegion(regionName, capacityReservationIds));
-        }
-    }
-
-    private Stream<EC2CapacityReservationResource> getCapacityReservationsInRegion(String regionName,
-                                                                                   List<String> capacityReservationIds) {
-        try (var client = clientsProvider.getEc2ClientForRegion(regionName)) {
-            var response = capacityReservationIds != null && !capacityReservationIds.isEmpty() ?
-                           client.describeCapacityReservations(builder ->
-                                                                       builder.capacityReservationIds(
-                                                                               capacityReservationIds.toArray(new String[0])
-                                                                       )
-                           ) :
-                           client.describeCapacityReservations();
+    protected Stream<EC2CapacityReservationResource> getResourcesInRegion(String region,
+                                                                          List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeCapacityReservations.html
+            var response = client.describeCapacityReservations(builder ->
+                    builder.capacityReservationIds(
+                            ids.toArray(new String[0])
+                    )
+            );
 
             return response.capacityReservations()
                            .stream()
-                           .map(capacityReservation ->
-                                        EC2CapacityReservationResource.fromSdk(regionName,
-                                                                               capacityReservation)
-                           );
+                           .map(capacityReservation -> EC2CapacityReservationResource.fromSdk(region, capacityReservation));
         }
     }
 }

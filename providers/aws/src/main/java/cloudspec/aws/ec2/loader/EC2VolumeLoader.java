@@ -27,70 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2VolumeResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeVolumesResponse;
 import software.amazon.awssdk.services.ec2.model.Filter;
-import software.amazon.awssdk.utils.IoUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2VolumeLoader extends EC2ResourceLoader<EC2VolumeResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_VOLUME_ID = "volume-id";
 
     public EC2VolumeLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2VolumeResource> getById(String volumeId) {
-        return getVolumes(Collections.singletonList(volumeId)).findFirst();
-    }
-
-    @Override
-    public List<EC2VolumeResource> getAll() {
-        return getVolumes().collect(Collectors.toList());
-    }
-
-    private Stream<EC2VolumeResource> getVolumes() {
-        return getVolumes(Collections.emptyList());
-    }
-
-    private Stream<EC2VolumeResource> getVolumes(List<String> volumeIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getVolumesInRegion(region, volumeIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-
-    }
-
-    private Stream<EC2VolumeResource> getVolumesInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                         List<String> volumeIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeVolumesResponse response = volumeIds != null && !volumeIds.isEmpty() ?
-                    client.describeVolumes(builder -> builder.filters(
-                            Filter.builder()
-                                    .name("volume-id")
-                                    .values(volumeIds.toArray(new String[0])).build())
-                    ) :
-                    client.describeVolumes();
+    protected Stream<EC2VolumeResource> getResourcesInRegion(String region,
+                                                             List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+            var response = client.describeVolumes(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.volumes()
-                    .stream()
-                    .map(volume -> EC2VolumeResource.fromSdk(region.regionName(), volume));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(volume -> EC2VolumeResource.fromSdk(region, volume));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_VOLUME_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

@@ -55,11 +55,26 @@ public class EC2ProductCode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof ProductCode))) {
+            return false;
+        }
+
+        if (o instanceof ProductCode) {
+            return sdkEquals((ProductCode) o);
+        }
+
         EC2ProductCode that = (EC2ProductCode) o;
         return Objects.equals(productCodeId, that.productCodeId) &&
                 Objects.equals(productCodeType, that.productCodeType);
+    }
+
+    private boolean sdkEquals(ProductCode that) {
+        return Objects.equals(productCodeId, that.productCodeId()) &&
+                Objects.equals(productCodeType, that.productCodeTypeAsString());
     }
 
     @Override
@@ -69,19 +84,19 @@ public class EC2ProductCode {
 
     public static List<EC2ProductCode> fromSdk(List<ProductCode> productCodes) {
         return Optional.ofNullable(productCodes)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2ProductCode::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2ProductCode::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2ProductCode fromSdk(ProductCode productCode) {
         return Optional.ofNullable(productCode)
-                .map(v -> new EC2ProductCode(
-                                v.productCodeId(),
-                                v.productCodeTypeAsString()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2ProductCode(
+                                       v.productCodeId(),
+                                       v.productCodeTypeAsString()
+                               )
+                       )
+                       .orElse(null);
     }
 }

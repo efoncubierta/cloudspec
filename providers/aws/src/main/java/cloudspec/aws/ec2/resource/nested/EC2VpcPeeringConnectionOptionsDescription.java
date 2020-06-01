@@ -60,12 +60,28 @@ public class EC2VpcPeeringConnectionOptionsDescription {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof VpcPeeringConnectionOptionsDescription))) {
+            return false;
+        }
+
+        if (o instanceof VpcPeeringConnectionOptionsDescription) {
+            return sdkEquals((VpcPeeringConnectionOptionsDescription) o);
+        }
+
         EC2VpcPeeringConnectionOptionsDescription that = (EC2VpcPeeringConnectionOptionsDescription) o;
         return Objects.equals(allowDnsResolutionFromRemoteVpc, that.allowDnsResolutionFromRemoteVpc) &&
                 Objects.equals(allowEgressFromLocalClassicLinkToRemoteVpc, that.allowEgressFromLocalClassicLinkToRemoteVpc) &&
                 Objects.equals(allowEgressFromLocalVpcToRemoteClassicLink, that.allowEgressFromLocalVpcToRemoteClassicLink);
+    }
+
+    private boolean sdkEquals(VpcPeeringConnectionOptionsDescription that) {
+        return Objects.equals(allowDnsResolutionFromRemoteVpc, that.allowDnsResolutionFromRemoteVpc()) &&
+                Objects.equals(allowEgressFromLocalClassicLinkToRemoteVpc, that.allowEgressFromLocalClassicLinkToRemoteVpc()) &&
+                Objects.equals(allowEgressFromLocalVpcToRemoteClassicLink, that.allowEgressFromLocalVpcToRemoteClassicLink());
     }
 
     @Override
@@ -76,13 +92,13 @@ public class EC2VpcPeeringConnectionOptionsDescription {
 
     public static EC2VpcPeeringConnectionOptionsDescription fromSdk(VpcPeeringConnectionOptionsDescription vpcPeeringConnectionOptionsDescription) {
         return Optional.ofNullable(vpcPeeringConnectionOptionsDescription)
-                .map(v ->
-                        new EC2VpcPeeringConnectionOptionsDescription(
-                                v.allowDnsResolutionFromRemoteVpc(),
-                                v.allowEgressFromLocalClassicLinkToRemoteVpc(),
-                                v.allowEgressFromLocalVpcToRemoteClassicLink()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2VpcPeeringConnectionOptionsDescription(
+                                       v.allowDnsResolutionFromRemoteVpc(),
+                                       v.allowEgressFromLocalClassicLinkToRemoteVpc(),
+                                       v.allowEgressFromLocalVpcToRemoteClassicLink()
+                               )
+                       )
+                       .orElse(null);
     }
 }

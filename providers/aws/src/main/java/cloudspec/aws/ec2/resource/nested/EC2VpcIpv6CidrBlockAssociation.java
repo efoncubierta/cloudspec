@@ -75,13 +75,30 @@ public class EC2VpcIpv6CidrBlockAssociation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof VpcIpv6CidrBlockAssociation))) {
+            return false;
+        }
+
+        if (o instanceof VpcIpv6CidrBlockAssociation) {
+            return sdkEquals((VpcIpv6CidrBlockAssociation) o);
+        }
+
         EC2VpcIpv6CidrBlockAssociation that = (EC2VpcIpv6CidrBlockAssociation) o;
         return Objects.equals(ipv6CidrBlock, that.ipv6CidrBlock) &&
                 Objects.equals(ipv6CidrBlockState, that.ipv6CidrBlockState) &&
                 Objects.equals(networkBorderGroup, that.networkBorderGroup) &&
                 Objects.equals(ipv6Pool, that.ipv6Pool);
+    }
+
+    public boolean sdkEquals(VpcIpv6CidrBlockAssociation that) {
+        return Objects.equals(ipv6CidrBlock, that.ipv6CidrBlock()) &&
+                Objects.equals(ipv6CidrBlockState, ipv6CidrBlockStateFromSdk(that.ipv6CidrBlockState())) &&
+                Objects.equals(networkBorderGroup, that.networkBorderGroup()) &&
+                Objects.equals(ipv6Pool, that.ipv6Pool());
     }
 
     @Override
@@ -91,28 +108,28 @@ public class EC2VpcIpv6CidrBlockAssociation {
 
     public static List<EC2VpcIpv6CidrBlockAssociation> fromSdk(List<VpcIpv6CidrBlockAssociation> vpcIpv6CidrBlockAssociations) {
         return Optional.ofNullable(vpcIpv6CidrBlockAssociations)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2VpcIpv6CidrBlockAssociation::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2VpcIpv6CidrBlockAssociation::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2VpcIpv6CidrBlockAssociation fromSdk(VpcIpv6CidrBlockAssociation vpcIpv6CidrBlockAssociation) {
         return Optional.ofNullable(vpcIpv6CidrBlockAssociation)
-                .map(v ->
-                        new EC2VpcIpv6CidrBlockAssociation(
-                                v.ipv6CidrBlock(),
-                                ipv6CidrBlockStateFromSdk(v.ipv6CidrBlockState()),
-                                v.networkBorderGroup(),
-                                v.ipv6Pool()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2VpcIpv6CidrBlockAssociation(
+                                       v.ipv6CidrBlock(),
+                                       ipv6CidrBlockStateFromSdk(v.ipv6CidrBlockState()),
+                                       v.networkBorderGroup(),
+                                       v.ipv6Pool()
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static String ipv6CidrBlockStateFromSdk(VpcCidrBlockState vpcCidrBlockState) {
         return Optional.ofNullable(vpcCidrBlockState)
-                .map(VpcCidrBlockState::stateAsString)
-                .orElse(null);
+                       .map(VpcCidrBlockState::stateAsString)
+                       .orElse(null);
     }
 }

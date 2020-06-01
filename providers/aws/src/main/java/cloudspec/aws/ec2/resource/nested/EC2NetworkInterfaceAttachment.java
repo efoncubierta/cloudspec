@@ -84,14 +84,32 @@ public class EC2NetworkInterfaceAttachment {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NetworkInterfaceAttachment))) {
+            return false;
+        }
+
+        if (o instanceof NetworkInterfaceAttachment) {
+            return sdkEquals((NetworkInterfaceAttachment) o);
+        }
+
         EC2NetworkInterfaceAttachment that = (EC2NetworkInterfaceAttachment) o;
         return Objects.equals(attachTime, that.attachTime) &&
                 Objects.equals(deleteOnTermination, that.deleteOnTermination) &&
                 Objects.equals(instanceId, that.instanceId) &&
                 Objects.equals(instanceOwnerId, that.instanceOwnerId) &&
                 Objects.equals(status, that.status);
+    }
+
+    private boolean sdkEquals(NetworkInterfaceAttachment that) {
+        return Objects.equals(attachTime.toInstant(), that.attachTime()) &&
+                Objects.equals(deleteOnTermination, that.deleteOnTermination()) &&
+                Objects.equals(instanceId, that.instanceId()) &&
+                Objects.equals(instanceOwnerId, that.instanceOwnerId()) &&
+                Objects.equals(status, that.statusAsString());
     }
 
     @Override
@@ -101,14 +119,14 @@ public class EC2NetworkInterfaceAttachment {
 
     public static EC2NetworkInterfaceAttachment fromSdk(NetworkInterfaceAttachment networkInterfaceAttachment) {
         return Optional.ofNullable(networkInterfaceAttachment)
-                .map(v -> new EC2NetworkInterfaceAttachment(
-                                AWSResource.dateFromSdk(v.attachTime()),
-                                v.deleteOnTermination(),
-                                v.instanceId(),
-                                v.instanceOwnerId(),
-                                v.statusAsString()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2NetworkInterfaceAttachment(
+                                       AWSResource.dateFromSdk(v.attachTime()),
+                                       v.deleteOnTermination(),
+                                       v.instanceId(),
+                                       v.instanceOwnerId(),
+                                       v.statusAsString()
+                               )
+                       )
+                       .orElse(null);
     }
 }

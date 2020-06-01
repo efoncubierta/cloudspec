@@ -122,8 +122,18 @@ public class EC2RouteTableResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof RouteTable))) {
+            return false;
+        }
+
+        if (o instanceof RouteTable) {
+            return sdkEquals((RouteTable) o);
+        }
+
         EC2RouteTableResource that = (EC2RouteTableResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(associations, that.associations) &&
@@ -135,6 +145,16 @@ public class EC2RouteTableResource extends EC2Resource {
                 Objects.equals(ownerId, that.ownerId);
     }
 
+    private boolean sdkEquals(RouteTable that) {
+        return Objects.equals(associations, that.associations()) &&
+                Objects.equals(propagatingGatewayIds, propagatingGatewayIdsFromSdk(that.propagatingVgws())) &&
+                Objects.equals(routeTableId, that.routeTableId()) &&
+                Objects.equals(routes, that.routes()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(ownerId, that.ownerId());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, associations, propagatingGatewayIds, routeTableId, routes, tags, vpcId, ownerId);
@@ -142,24 +162,24 @@ public class EC2RouteTableResource extends EC2Resource {
 
     public static EC2RouteTableResource fromSdk(String regionName, RouteTable routeTable) {
         return Optional.ofNullable(routeTable)
-                .map(v -> new EC2RouteTableResource(
-                        regionName,
-                        EC2RouteTableAssociation.fromSdk(v.associations()),
-                        propagatingGatewayIdsFromSdk(v.propagatingVgws()),
-                        v.routeTableId(),
-                        EC2Route.fromSdk(v.routes()),
-                        tagsFromSdk(v.tags()),
-                        v.vpcId(),
-                        v.ownerId()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2RouteTableResource(
+                               regionName,
+                               EC2RouteTableAssociation.fromSdk(v.associations()),
+                               propagatingGatewayIdsFromSdk(v.propagatingVgws()),
+                               v.routeTableId(),
+                               EC2Route.fromSdk(v.routes()),
+                               tagsFromSdk(v.tags()),
+                               v.vpcId(),
+                               v.ownerId()
+                       ))
+                       .orElse(null);
     }
 
     public static List<String> propagatingGatewayIdsFromSdk(List<PropagatingVgw> propagatingVgws) {
         return Optional.ofNullable(propagatingVgws)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(PropagatingVgw::gatewayId)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(PropagatingVgw::gatewayId)
+                       .collect(Collectors.toList());
     }
 }

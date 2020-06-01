@@ -69,13 +69,30 @@ public class EC2NetworkInterfacePrivateIpAddress {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NetworkInterfacePrivateIpAddress))) {
+            return false;
+        }
+
+        if (o instanceof NetworkInterfacePrivateIpAddress) {
+            return sdkEquals((NetworkInterfacePrivateIpAddress) o);
+        }
+
         EC2NetworkInterfacePrivateIpAddress that = (EC2NetworkInterfacePrivateIpAddress) o;
         return Objects.equals(association, that.association) &&
                 Objects.equals(primary, that.primary) &&
                 Objects.equals(privateDnsName, that.privateDnsName) &&
                 Objects.equals(privateIpAddress, that.privateIpAddress);
+    }
+
+    private boolean sdkEquals(NetworkInterfacePrivateIpAddress that) {
+        return Objects.equals(association, that.association()) &&
+                Objects.equals(primary, that.primary()) &&
+                Objects.equals(privateDnsName, that.privateDnsName()) &&
+                Objects.equals(privateIpAddress, that.privateIpAddress());
     }
 
     @Override
@@ -85,21 +102,21 @@ public class EC2NetworkInterfacePrivateIpAddress {
 
     public static List<EC2NetworkInterfacePrivateIpAddress> fromSdk(List<NetworkInterfacePrivateIpAddress> networkInterfacePrivateIpAddresses) {
         return Optional.ofNullable(networkInterfacePrivateIpAddresses)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2NetworkInterfacePrivateIpAddress::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2NetworkInterfacePrivateIpAddress::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2NetworkInterfacePrivateIpAddress fromSdk(NetworkInterfacePrivateIpAddress networkInterfacePrivateIpAddress) {
         return Optional.ofNullable(networkInterfacePrivateIpAddress)
-                .map(v -> new EC2NetworkInterfacePrivateIpAddress(
-                                EC2NetworkInterfaceAssociation.fromSdk(v.association()),
-                                v.primary(),
-                                v.privateDnsName(),
-                                v.privateIpAddress()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2NetworkInterfacePrivateIpAddress(
+                                       EC2NetworkInterfaceAssociation.fromSdk(v.association()),
+                                       v.primary(),
+                                       v.privateDnsName(),
+                                       v.privateIpAddress()
+                               )
+                       )
+                       .orElse(null);
     }
 }

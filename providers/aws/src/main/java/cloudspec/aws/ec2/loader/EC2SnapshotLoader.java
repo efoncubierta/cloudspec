@@ -27,70 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2SnapshotResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeSnapshotsResponse;
 import software.amazon.awssdk.services.ec2.model.Filter;
-import software.amazon.awssdk.utils.IoUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2SnapshotLoader extends EC2ResourceLoader<EC2SnapshotResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_SNAPSHOT_ID = "snapshot-id";
 
     public EC2SnapshotLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2SnapshotResource> getById(String snapshotId) {
-        return getSnapshots(Collections.singletonList(snapshotId)).findFirst();
-    }
-
-    @Override
-    public List<EC2SnapshotResource> getAll() {
-        return getSnapshots().collect(Collectors.toList());
-    }
-
-    private Stream<EC2SnapshotResource> getSnapshots() {
-        return getSnapshots(Collections.emptyList());
-    }
-
-    private Stream<EC2SnapshotResource> getSnapshots(List<String> snapshotIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getSnapshotsInRegion(region, snapshotIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-
-    }
-
-    private Stream<EC2SnapshotResource> getSnapshotsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                             List<String> snapshotIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeSnapshotsResponse response = snapshotIds != null && !snapshotIds.isEmpty() ?
-                    client.describeSnapshots(builder -> builder.filters(
-                            Filter.builder()
-                                    .name("snapshot-id")
-                                    .values(snapshotIds.toArray(new String[0])).build())
-                    ) :
-                    client.describeSnapshots();
+    protected Stream<EC2SnapshotResource> getResourcesInRegion(String region,
+                                                                      List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSnapshots.html
+            var response = client.describeSnapshots(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.snapshots()
-                    .stream()
-                    .map(snapshot -> EC2SnapshotResource.fromSdk(region.regionName(), snapshot));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(snapshot -> EC2SnapshotResource.fromSdk(region, snapshot));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_SNAPSHOT_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

@@ -27,64 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2LocalGatewayResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeLocalGatewaysResponse;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Filter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2LocalGatewayLoader extends EC2ResourceLoader<EC2LocalGatewayResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_LOCAL_GATEWAY_ID = "local-gateway-id";
 
     public EC2LocalGatewayLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2LocalGatewayResource> getById(String localGatewayId) {
-        return getLocalGateways(Collections.singletonList(localGatewayId)).findFirst();
-    }
-
-    @Override
-    public List<EC2LocalGatewayResource> getAll() {
-        return getLocalGateways().collect(Collectors.toList());
-    }
-
-    private Stream<EC2LocalGatewayResource> getLocalGateways() {
-        return getLocalGateways(Collections.emptyList());
-    }
-
-    private Stream<EC2LocalGatewayResource> getLocalGateways(List<String> localGatewayIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getLocalGatewaysInRegion(region, localGatewayIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-    }
-
-    private Stream<EC2LocalGatewayResource> getLocalGatewaysInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                                     List<String> localGatewayIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeLocalGatewaysResponse response = localGatewayIds != null && !localGatewayIds.isEmpty() ?
-                    client.describeLocalGateways(builder -> builder.localGatewayIds(localGatewayIds.toArray(new String[0]))) :
-                    client.describeLocalGateways(builder -> builder.localGatewayIds());
+    protected Stream<EC2LocalGatewayResource> getResourcesInRegion(String region,
+                                                                   List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeLocalGateways.html
+            var response = client.describeLocalGateways(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.localGateways()
-                    .stream()
-                    .map(localGateway -> EC2LocalGatewayResource.fromSdk(region.regionName(), localGateway));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(localGateway -> EC2LocalGatewayResource.fromSdk(region, localGateway));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_LOCAL_GATEWAY_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

@@ -94,14 +94,31 @@ public class EC2InternetGatewayResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof InternetGateway))) {
+            return false;
+        }
+
+        if (o instanceof InternetGateway) {
+            return sdkEquals((InternetGateway) o);
+        }
+
         EC2InternetGatewayResource that = (EC2InternetGatewayResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(attachments, that.attachments) &&
                 Objects.equals(internetGatewayId, that.internetGatewayId) &&
                 Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(tags, that.tags);
+    }
+
+    private boolean sdkEquals(InternetGateway that) {
+        return Objects.equals(attachments, that.attachments()) &&
+                Objects.equals(internetGatewayId, that.internetGatewayId()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
     }
 
     @Override
@@ -111,15 +128,15 @@ public class EC2InternetGatewayResource extends EC2Resource {
 
     public static EC2InternetGatewayResource fromSdk(String regionName, InternetGateway internetGateway) {
         return Optional.ofNullable(internetGateway)
-                .map(v ->
-                        new EC2InternetGatewayResource(
-                                regionName,
-                                EC2InternetGatewayAttachment.fromSdk(v.attachments()),
-                                v.internetGatewayId(),
-                                v.ownerId(),
-                                tagsFromSdk(v.tags())
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2InternetGatewayResource(
+                                       regionName,
+                                       EC2InternetGatewayAttachment.fromSdk(v.attachments()),
+                                       v.internetGatewayId(),
+                                       v.ownerId(),
+                                       tagsFromSdk(v.tags())
+                               )
+                       )
+                       .orElse(null);
     }
 }

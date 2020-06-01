@@ -27,66 +27,27 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2ElasticGpuResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeElasticGpusResponse;
-import software.amazon.awssdk.utils.IoUtils;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EC2ElasticGpuLoader extends EC2ResourceLoader<EC2ElasticGpuResource> {
-    private final IAWSClientsProvider clientsProvider;
-
     public EC2ElasticGpuLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2ElasticGpuResource> getById(String elasticGpuId) {
-        return getElasticGpus(Collections.singletonList(elasticGpuId)).findFirst();
-    }
-
-    @Override
-    public List<EC2ElasticGpuResource> getAll() {
-        return getElasticGpus().collect(Collectors.toList());
-    }
-
-    private Stream<EC2ElasticGpuResource> getElasticGpus() {
-        return getElasticGpus(Collections.emptyList());
-    }
-
-    private Stream<EC2ElasticGpuResource> getElasticGpus(List<String> elasticGpuIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getElasticGpusInRegion(region, elasticGpuIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-
-    }
-
-    private Stream<EC2ElasticGpuResource> getElasticGpusInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                                 List<String> elasticGpuIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeElasticGpusResponse response = elasticGpuIds != null && !elasticGpuIds.isEmpty() ?
-                    client.describeElasticGpus(builder -> builder.elasticGpuIds(elasticGpuIds)
-                    ) :
-                    client.describeElasticGpus();
+    protected Stream<EC2ElasticGpuResource> getResourcesInRegion(String region,
+                                                                 List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeElasticGpus.html
+            var response = client.describeElasticGpus(builder ->
+                    builder.elasticGpuIds(ids.toArray(new String[0]))
+            );
 
             return response.elasticGpuSet()
-                    .stream()
-                    .map(elasticGpus -> EC2ElasticGpuResource.fromSdk(region.regionName(), elasticGpus));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(elasticGpu -> EC2ElasticGpuResource.fromSdk(region, elasticGpu));
         }
     }
 }

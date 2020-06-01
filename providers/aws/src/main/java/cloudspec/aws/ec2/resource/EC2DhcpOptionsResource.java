@@ -94,14 +94,31 @@ public class EC2DhcpOptionsResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof DhcpOptions))) {
+            return false;
+        }
+
+        if (o instanceof DhcpOptions) {
+            return sdkEquals((DhcpOptions) o);
+        }
+
         EC2DhcpOptionsResource that = (EC2DhcpOptionsResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(dhcpConfigurations, that.dhcpConfigurations) &&
                 Objects.equals(dhcpOptionsId, that.dhcpOptionsId) &&
                 Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(tags, that.tags);
+    }
+
+    private boolean sdkEquals(DhcpOptions that) {
+        return Objects.equals(dhcpConfigurations, that.dhcpConfigurations()) &&
+                Objects.equals(dhcpOptionsId, that.dhcpOptionsId()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
     }
 
     @Override
@@ -111,13 +128,13 @@ public class EC2DhcpOptionsResource extends EC2Resource {
 
     public static EC2DhcpOptionsResource fromSdk(String regionName, DhcpOptions dhcpOptions) {
         return Optional.ofNullable(dhcpOptions)
-                .map(v -> new EC2DhcpOptionsResource(
-                        regionName,
-                        EC2DhcpConfiguration.fromSdk(v.dhcpConfigurations()),
-                        v.dhcpOptionsId(),
-                        v.ownerId(),
-                        tagsFromSdk(v.tags())
-                ))
-                .orElse(null);
+                       .map(v -> new EC2DhcpOptionsResource(
+                               regionName,
+                               EC2DhcpConfiguration.fromSdk(v.dhcpConfigurations()),
+                               v.dhcpOptionsId(),
+                               v.ownerId(),
+                               tagsFromSdk(v.tags())
+                       ))
+                       .orElse(null);
     }
 }

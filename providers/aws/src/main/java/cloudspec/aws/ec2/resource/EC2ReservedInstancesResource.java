@@ -195,8 +195,18 @@ public class EC2ReservedInstancesResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof ReservedInstances))) {
+            return false;
+        }
+
+        if (o instanceof ReservedInstances) {
+            return sdkEquals((ReservedInstances) o);
+        }
+
         EC2ReservedInstancesResource that = (EC2ReservedInstancesResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(availabilityZone, that.availabilityZone) &&
@@ -218,6 +228,26 @@ public class EC2ReservedInstancesResource extends EC2Resource {
                 Objects.equals(tags, that.tags);
     }
 
+    private boolean sdkEquals(ReservedInstances that) {
+        return Objects.equals(availabilityZone, that.availabilityZone()) &&
+                Objects.equals(duration, that.duration()) &&
+                Objects.equals(end, dateFromSdk(that.end())) &&
+                Objects.equals(fixedPrice, that.fixedPrice().doubleValue()) &&
+                Objects.equals(instanceCount, that.instanceCount()) &&
+                Objects.equals(instanceType, that.instanceTypeAsString()) &&
+                Objects.equals(reservedInstancesId, that.reservedInstancesId()) &&
+                Objects.equals(start, dateFromSdk(that.start())) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(usagePrice, that.usagePrice().doubleValue()) &&
+                Objects.equals(currencyCode, that.currencyCodeAsString()) &&
+                Objects.equals(instanceTenancy, that.instanceTenancyAsString()) &&
+                Objects.equals(offeringClass, that.offeringClassAsString()) &&
+                Objects.equals(offeringType, that.offeringTypeAsString()) &&
+                Objects.equals(recurringCharges, that.recurringCharges()) &&
+                Objects.equals(scope, that.scopeAsString()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, availabilityZone, duration, end, fixedPrice, instanceCount, instanceType,
@@ -227,27 +257,27 @@ public class EC2ReservedInstancesResource extends EC2Resource {
 
     public static EC2ReservedInstancesResource fromSdk(String regionName, ReservedInstances reservedInstances) {
         return Optional.ofNullable(reservedInstances)
-                .map(v -> new EC2ReservedInstancesResource(
-                                regionName,
-                                v.availabilityZone(),
-                                v.duration(),
-                                dateFromSdk(v.end()),
-                                Double.valueOf(v.fixedPrice()),
-                                v.instanceCount(),
-                                v.instanceTypeAsString(),
-                                v.reservedInstancesId(),
-                                dateFromSdk(v.start()),
-                                v.stateAsString(),
-                                Double.valueOf(v.usagePrice()),
-                                v.currencyCodeAsString(),
-                                v.instanceTenancyAsString(),
-                                v.offeringClassAsString(),
-                                v.offeringTypeAsString(),
-                                EC2RecurringCharge.fromSdk(v.recurringCharges()),
-                                v.scopeAsString(),
-                                tagsFromSdk(v.tags())
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2ReservedInstancesResource(
+                                       regionName,
+                                       v.availabilityZone(),
+                                       v.duration(),
+                                       dateFromSdk(v.end()),
+                                       Double.valueOf(v.fixedPrice()),
+                                       v.instanceCount(),
+                                       v.instanceTypeAsString(),
+                                       v.reservedInstancesId(),
+                                       dateFromSdk(v.start()),
+                                       v.stateAsString(),
+                                       Double.valueOf(v.usagePrice()),
+                                       v.currencyCodeAsString(),
+                                       v.instanceTenancyAsString(),
+                                       v.offeringClassAsString(),
+                                       v.offeringTypeAsString(),
+                                       EC2RecurringCharge.fromSdk(v.recurringCharges()),
+                                       v.scopeAsString(),
+                                       tagsFromSdk(v.tags())
+                               )
+                       )
+                       .orElse(null);
     }
 }

@@ -58,11 +58,26 @@ public class EC2InternetGatewayAttachment {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof InternetGatewayAttachment))) {
+            return false;
+        }
+
+        if (o instanceof InternetGatewayAttachment) {
+            return sdkEquals((InternetGatewayAttachment) o);
+        }
+
         EC2InternetGatewayAttachment that = (EC2InternetGatewayAttachment) o;
         return Objects.equals(state, that.state) &&
                 Objects.equals(vpcId, that.vpcId);
+    }
+
+    private boolean sdkEquals(InternetGatewayAttachment that) {
+        return Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(vpcId, that.vpcId());
     }
 
     @Override

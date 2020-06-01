@@ -79,14 +79,32 @@ public class EC2Placement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Placement))) {
+            return false;
+        }
+
+        if (o instanceof Placement) {
+            return sdkEquals((Placement) o);
+        }
+
         EC2Placement that = (EC2Placement) o;
         return Objects.equals(availabilityZone, that.availabilityZone) &&
                 Objects.equals(affinity, that.affinity) &&
                 Objects.equals(groupName, that.groupName) &&
                 Objects.equals(partitionNumber, that.partitionNumber) &&
                 Objects.equals(tenancy, that.tenancy);
+    }
+
+    private boolean sdkEquals(Placement that) {
+        return Objects.equals(availabilityZone, that.availabilityZone()) &&
+                Objects.equals(affinity, that.affinity()) &&
+                Objects.equals(groupName, that.groupName()) &&
+                Objects.equals(partitionNumber, that.partitionNumber()) &&
+                Objects.equals(tenancy, that.tenancyAsString());
     }
 
     @Override

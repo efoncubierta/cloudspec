@@ -27,70 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2ImageResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeImagesResponse;
 import software.amazon.awssdk.services.ec2.model.Filter;
-import software.amazon.awssdk.utils.IoUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2ImageLoader extends EC2ResourceLoader<EC2ImageResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_IMAGE_ID = "image-id";
 
     public EC2ImageLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2ImageResource> getById(String imageId) {
-        return getImages(Collections.singletonList(imageId)).findFirst();
-    }
-
-    @Override
-    public List<EC2ImageResource> getAll() {
-        return getImages().collect(Collectors.toList());
-    }
-
-    private Stream<EC2ImageResource> getImages() {
-        return getImages(Collections.emptyList());
-    }
-
-    private Stream<EC2ImageResource> getImages(List<String> imageIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getImagesInRegion(region, imageIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-
-    }
-
-    private Stream<EC2ImageResource> getImagesInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                       List<String> imageIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeImagesResponse response = imageIds != null && !imageIds.isEmpty() ?
-                    client.describeImages(builder -> builder.filters(
-                            Filter.builder()
-                                    .name("image-id")
-                                    .values(imageIds.toArray(new String[0])).build())
-                    ) :
-                    client.describeImages();
+    protected Stream<EC2ImageResource> getResourcesInRegion(String region,
+                                                            List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeImages.html
+            var response = client.describeImages(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.images()
-                    .stream()
-                    .map(image -> EC2ImageResource.fromSdk(region.regionName(), image));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(image -> EC2ImageResource.fromSdk(region, image));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_IMAGE_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

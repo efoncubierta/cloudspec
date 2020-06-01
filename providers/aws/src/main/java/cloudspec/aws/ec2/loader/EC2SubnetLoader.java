@@ -27,64 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2SubnetResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeSubnetsResponse;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Filter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2SubnetLoader extends EC2ResourceLoader<EC2SubnetResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_SUBNET_ID = "subnet-id";
 
     public EC2SubnetLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2SubnetResource> getById(String subnetId) {
-        return getSubnets(Collections.singletonList(subnetId)).findFirst();
-    }
-
-    @Override
-    public List<EC2SubnetResource> getAll() {
-        return getSubnets().collect(Collectors.toList());
-    }
-
-    private Stream<EC2SubnetResource> getSubnets() {
-        return getSubnets(Collections.emptyList());
-    }
-
-    private Stream<EC2SubnetResource> getSubnets(List<String> subnetIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getSubnetsInRegion(region, subnetIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-    }
-
-    private Stream<EC2SubnetResource> getSubnetsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                         List<String> subnetIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeSubnetsResponse response = subnetIds != null && !subnetIds.isEmpty() ?
-                    client.describeSubnets(builder -> builder.subnetIds(subnetIds.toArray(new String[0]))) :
-                    client.describeSubnets();
+    protected Stream<EC2SubnetResource> getResourcesInRegion(String region,
+                                                             List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSubnets.html
+            var response = client.describeSubnets(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.subnets()
-                    .stream()
-                    .map(subnet -> EC2SubnetResource.fromSdk(region.regionName(), subnet));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(subnet -> EC2SubnetResource.fromSdk(region, subnet));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_SUBNET_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

@@ -141,8 +141,18 @@ public class EC2InstanceNetworkInterface {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof InstanceNetworkInterface))) {
+            return false;
+        }
+
+        if (o instanceof InstanceNetworkInterface) {
+            return sdkEquals((InstanceNetworkInterface) o);
+        }
+
         EC2InstanceNetworkInterface that = (EC2InstanceNetworkInterface) o;
         return Objects.equals(groupIds, that.groupIds) &&
                 Objects.equals(ipv6Addresses, that.ipv6Addresses) &&
@@ -158,6 +168,21 @@ public class EC2InstanceNetworkInterface {
                 Objects.equals(interfaceType, that.interfaceType);
     }
 
+    private boolean sdkEquals(InstanceNetworkInterface that) {
+        return Objects.equals(groupIds, securityGroupIdsFromSdk(that.groups())) &&
+                Objects.equals(ipv6Addresses, ipv6AddressesFromSdk(that.ipv6Addresses())) &&
+                Objects.equals(networkInterfaceId, that.networkInterfaceId()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(privateDnsName, that.privateDnsName()) &&
+                Objects.equals(privateIpAddress, that.privateIpAddress()) &&
+                Objects.equals(privateIpAddresses, that.privateIpAddresses()) &&
+                Objects.equals(sourceDestCheck, that.sourceDestCheck()) &&
+                Objects.equals(status, that.statusAsString()) &&
+                Objects.equals(subnetId, that.subnetId()) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(interfaceType, that.interfaceType());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(groupIds, ipv6Addresses, networkInterfaceId, ownerId, privateDnsName,
@@ -166,10 +191,10 @@ public class EC2InstanceNetworkInterface {
 
     public static List<EC2InstanceNetworkInterface> fromSdk(List<InstanceNetworkInterface> instanceNetworkInterfaces) {
         return Optional.ofNullable(instanceNetworkInterfaces)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2InstanceNetworkInterface::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2InstanceNetworkInterface::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2InstanceNetworkInterface fromSdk(InstanceNetworkInterface instanceNetworkInterface) {
@@ -191,18 +216,18 @@ public class EC2InstanceNetworkInterface {
 
     public static List<String> securityGroupIdsFromSdk(List<GroupIdentifier> groupIdentifiers) {
         return Optional.ofNullable(groupIdentifiers)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(GroupIdentifier::groupId)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(GroupIdentifier::groupId)
+                       .collect(Collectors.toList());
     }
 
     public static List<String> ipv6AddressesFromSdk(List<InstanceIpv6Address> instanceIpv6Addresses) {
         return Optional.ofNullable(instanceIpv6Addresses)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(InstanceIpv6Address::ipv6Address)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(InstanceIpv6Address::ipv6Address)
+                       .collect(Collectors.toList());
     }
 
 }

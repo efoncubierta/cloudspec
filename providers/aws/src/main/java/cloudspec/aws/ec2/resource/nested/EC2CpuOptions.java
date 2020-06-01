@@ -51,11 +51,26 @@ public class EC2CpuOptions {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof CpuOptions))) {
+            return false;
+        }
+
+        if (o instanceof CpuOptions) {
+            return sdkEquals((CpuOptions) o);
+        }
+
         EC2CpuOptions that = (EC2CpuOptions) o;
         return Objects.equals(coreCount, that.coreCount) &&
                 Objects.equals(threadsPerCore, that.threadsPerCore);
+    }
+
+    private boolean sdkEquals(CpuOptions that) {
+        return Objects.equals(coreCount, that.coreCount()) &&
+                Objects.equals(threadsPerCore, that.threadsPerCore());
     }
 
     @Override
@@ -65,11 +80,11 @@ public class EC2CpuOptions {
 
     public static EC2CpuOptions fromSdk(CpuOptions cpuOptions) {
         return Optional.ofNullable(cpuOptions)
-                .map(v -> new EC2CpuOptions(
-                                v.coreCount(),
-                                v.threadsPerCore()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2CpuOptions(
+                                       v.coreCount(),
+                                       v.threadsPerCore()
+                               )
+                       )
+                       .orElse(null);
     }
 }

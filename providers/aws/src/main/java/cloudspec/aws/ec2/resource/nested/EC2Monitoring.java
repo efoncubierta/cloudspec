@@ -44,10 +44,24 @@ public class EC2Monitoring {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Monitoring))) {
+            return false;
+        }
+
+        if (o instanceof Monitoring) {
+            return sdkEquals((Monitoring) o);
+        }
+
         EC2Monitoring that = (EC2Monitoring) o;
         return Objects.equals(state, that.state);
+    }
+
+    private boolean sdkEquals(Monitoring that) {
+        return Objects.equals(state, that.stateAsString());
     }
 
     @Override

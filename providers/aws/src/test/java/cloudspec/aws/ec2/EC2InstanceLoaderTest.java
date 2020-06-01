@@ -25,50 +25,68 @@
  */
 package cloudspec.aws.ec2;
 
-public class EC2InstanceLoaderTest {
-//    private static final IAWSClientsProvider TEST_CLIENTS_PROVIDER = mock(IAWSClientsProvider.class);
-//    private static final Ec2Client TEST_EC2_CLIENT = mock(Ec2Client.class);
-//
-//    private static final EC2InstanceResource TEST_EC2_INSTANCE = EC2InstanceUtil.randomEc2InstanceResource();
-//
-//    static {
-//        when(TEST_CLIENTS_PROVIDER.getEc2Client()).thenReturn(TEST_EC2_CLIENT);
-//        when(TEST_CLIENTS_PROVIDER.getEc2ClientForRegion(anyString())).thenReturn(TEST_EC2_CLIENT);
-//
-//        when(TEST_EC2_CLIENT.describeRegions()).thenReturn(DescribeRegionsResponse
-//                .builder()
-//                .regions(
-//                        software.amazon.awssdk.services.ec2.model.Region
-//                                .builder()
-//                                .regionName(TEST_EC2_INSTANCE.)
-//                                .build()
-//                )
-//                .build()
-//        );
-//
-//        when(TEST_EC2_CLIENT.describeInstances()).thenReturn(
-//                DescribeInstancesResponse
-//                        .builder()
-//                        .reservations(
-//                                Reservation
-//                                        .builder()
-//                                        .instances(
-//                                                EC2InstanceUtil.asInstance(TEST_EC2_INSTANCE)
-//                                        )
-//                                        .build()
-//                        )
-//                        .build()
-//        );
-//    }
-//
-//    @Test
-//    public void shouldLoadAllEc2Instances() {
-//        EC2InstanceLoader loader = new EC2InstanceLoader(TEST_CLIENTS_PROVIDER);
-//
-//        List<EC2InstanceResource> resources = loader.getAll();
-//
-//        assertNotNull(resources);
-//        assertEquals(1, resources.size());
-//        assertEquals(TEST_EC2_INSTANCE, resources.get(0));
-//    }
+import cloudspec.aws.ec2.loader.EC2InstanceLoader;
+import datagen.services.ec2.model.InstanceGenerator;
+import datagen.services.ec2.model.ReservationGenerator;
+import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
+import software.amazon.awssdk.services.ec2.model.Reservation;
+
+import java.util.function.Consumer;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
+
+public class EC2InstanceLoaderTest extends EC2LoaderTest {
+    private final EC2InstanceLoader loader = new EC2InstanceLoader(clientsProvider);
+
+    @Test
+    public void shouldLoadInstances() {
+        var reservation = ReservationGenerator.reservation();
+        when(ec2Client.describeInstances(any(Consumer.class))).thenReturn(
+                DescribeInstancesResponse
+                        .builder()
+                        .reservations(reservation)
+                        .build()
+        );
+
+        var resources = loader.getAll();
+
+        assertNotNull(resources);
+        assertEquals(reservation.instances().size(), resources.size());
+        assertTrue(reservation.instances().containsAll(resources));
+    }
+
+    @Test
+    public void shouldNotLoadInstanceByRandomId() {
+        when(ec2Client.describeInstances(any(Consumer.class))).thenReturn(
+                DescribeInstancesResponse
+                        .builder()
+                        .reservations(Reservation.builder().build())
+                        .build()
+        );
+
+        var resourceOpt = loader.getById(InstanceGenerator.instanceId());
+
+        assertNotNull(resourceOpt);
+        assertTrue(resourceOpt.isEmpty());
+    }
+
+    @Test
+    public void shouldLoadInstanceById() {
+        var reservation = ReservationGenerator.reservation(1);
+        when(ec2Client.describeInstances(any(Consumer.class))).thenReturn(
+                DescribeInstancesResponse
+                        .builder()
+                        .reservations(reservation)
+                        .build()
+        );
+
+        var instance = reservation.instances().get(0);
+        var resourceOpt = loader.getById(instance.instanceId());
+        assertNotNull(resourceOpt);
+        assertTrue(resourceOpt.isPresent());
+        assertEquals(resourceOpt.get(), instance);
+    }
 }

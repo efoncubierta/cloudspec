@@ -91,8 +91,18 @@ public class EC2IpPermission {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof IpPermission))) {
+            return false;
+        }
+
+        if (o instanceof IpPermission) {
+            return sdkEquals((IpPermission) o);
+        }
+
         EC2IpPermission that = (EC2IpPermission) o;
         return Objects.equals(fromPort, that.fromPort) &&
                 Objects.equals(ipProtocol, that.ipProtocol) &&
@@ -103,6 +113,16 @@ public class EC2IpPermission {
                 Objects.equals(userIdGroupPairs, that.userIdGroupPairs);
     }
 
+    private boolean sdkEquals(IpPermission that) {
+        return Objects.equals(fromPort, that.fromPort()) &&
+                Objects.equals(ipProtocol, that.ipProtocol()) &&
+                Objects.equals(ipRanges, that.ipRanges()) &&
+                Objects.equals(ipv6Ranges, that.ipv6Ranges()) &&
+                Objects.equals(prefixListIds, prefixListIdsFromSdk(that.prefixListIds())) &&
+                Objects.equals(toPort, that.toPort()) &&
+                Objects.equals(userIdGroupPairs, that.userIdGroupPairs());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(fromPort, ipProtocol, ipRanges, ipv6Ranges, prefixListIds, toPort, userIdGroupPairs);
@@ -110,32 +130,32 @@ public class EC2IpPermission {
 
     public static List<EC2IpPermission> fromSdk(List<IpPermission> ipPermissions) {
         return Optional.ofNullable(ipPermissions)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2IpPermission::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2IpPermission::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2IpPermission fromSdk(IpPermission ipPermission) {
         return Optional.ofNullable(ipPermission)
-                .map(v -> new EC2IpPermission(
-                                v.fromPort(),
-                                v.ipProtocol(),
-                                EC2IpRange.fromSdk(v.ipRanges()),
-                                EC2Ipv6Range.fromSdk(v.ipv6Ranges()),
-                                prefixListIdsFromSdk(v.prefixListIds()),
-                                v.toPort(),
-                                EC2UserIdGroupPair.fromSdk(v.userIdGroupPairs())
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2IpPermission(
+                                       v.fromPort(),
+                                       v.ipProtocol(),
+                                       EC2IpRange.fromSdk(v.ipRanges()),
+                                       EC2Ipv6Range.fromSdk(v.ipv6Ranges()),
+                                       prefixListIdsFromSdk(v.prefixListIds()),
+                                       v.toPort(),
+                                       EC2UserIdGroupPair.fromSdk(v.userIdGroupPairs())
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static List<String> prefixListIdsFromSdk(List<PrefixListId> prefixListIds) {
         return Optional.ofNullable(prefixListIds)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(PrefixListId::prefixListId)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(PrefixListId::prefixListId)
+                       .collect(Collectors.toList());
     }
 }

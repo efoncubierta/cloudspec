@@ -71,13 +71,30 @@ public class EC2NatGatewayAddress {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NatGatewayAddress))) {
+            return false;
+        }
+
+        if (o instanceof NatGatewayAddress) {
+            return sdkEquals((NatGatewayAddress) o);
+        }
+
         EC2NatGatewayAddress that = (EC2NatGatewayAddress) o;
         return Objects.equals(allocationId, that.allocationId) &&
                 Objects.equals(networkInterfaceId, that.networkInterfaceId) &&
                 Objects.equals(privateIp, that.privateIp) &&
                 Objects.equals(publicIp, that.publicIp);
+    }
+
+    private boolean sdkEquals(NatGatewayAddress that) {
+        return Objects.equals(allocationId, that.allocationId()) &&
+                Objects.equals(networkInterfaceId, that.networkInterfaceId()) &&
+                Objects.equals(privateIp, that.privateIp()) &&
+                Objects.equals(publicIp, that.publicIp());
     }
 
     @Override
@@ -87,20 +104,20 @@ public class EC2NatGatewayAddress {
 
     public static List<EC2NatGatewayAddress> fromSdk(List<NatGatewayAddress> natGatewayAddresses) {
         return Optional.ofNullable(natGatewayAddresses)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2NatGatewayAddress::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2NatGatewayAddress::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2NatGatewayAddress fromSdk(NatGatewayAddress natGatewayAddress) {
         return Optional.ofNullable(natGatewayAddress)
-                .map(v -> new EC2NatGatewayAddress(
-                        v.allocationId(),
-                        v.networkInterfaceId(),
-                        v.privateIp(),
-                        v.publicIp()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2NatGatewayAddress(
+                               v.allocationId(),
+                               v.networkInterfaceId(),
+                               v.privateIp(),
+                               v.publicIp()
+                       ))
+                       .orElse(null);
     }
 }

@@ -122,8 +122,18 @@ public class EC2NetworkAclResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NetworkAcl))) {
+            return false;
+        }
+
+        if (o instanceof NetworkAcl) {
+            return sdkEquals((NetworkAcl) o);
+        }
+
         EC2NetworkAclResource that = (EC2NetworkAclResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(subnetIds, that.subnetIds) &&
@@ -135,6 +145,16 @@ public class EC2NetworkAclResource extends EC2Resource {
                 Objects.equals(ownerId, that.ownerId);
     }
 
+    private boolean sdkEquals(NetworkAcl that) {
+        return Objects.equals(subnetIds, subnetIdsFromSdk(that.associations())) &&
+                Objects.equals(entries, that.entries()) &&
+                Objects.equals(isDefault, that.isDefault()) &&
+                Objects.equals(networkAclId, that.networkAclId()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(ownerId, that.ownerId());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, subnetIds, entries, isDefault, networkAclId, tags, vpcId, ownerId);
@@ -142,24 +162,24 @@ public class EC2NetworkAclResource extends EC2Resource {
 
     public static EC2NetworkAclResource fromSdk(String regionName, NetworkAcl networkAcl) {
         return Optional.ofNullable(networkAcl)
-                .map(v -> new EC2NetworkAclResource(
-                        regionName,
-                        subnetIdsFromSdk(v.associations()),
-                        EC2NetworkAclEntry.fromSdk(v.entries()),
-                        v.isDefault(),
-                        v.networkAclId(),
-                        tagsFromSdk(v.tags()),
-                        v.vpcId(),
-                        v.ownerId()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2NetworkAclResource(
+                               regionName,
+                               subnetIdsFromSdk(v.associations()),
+                               EC2NetworkAclEntry.fromSdk(v.entries()),
+                               v.isDefault(),
+                               v.networkAclId(),
+                               tagsFromSdk(v.tags()),
+                               v.vpcId(),
+                               v.ownerId()
+                       ))
+                       .orElse(null);
     }
 
     public static List<String> subnetIdsFromSdk(List<NetworkAclAssociation> networkAclAssociation) {
         return Optional.ofNullable(networkAclAssociation)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(NetworkAclAssociation::subnetId)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(NetworkAclAssociation::subnetId)
+                       .collect(Collectors.toList());
     }
 }

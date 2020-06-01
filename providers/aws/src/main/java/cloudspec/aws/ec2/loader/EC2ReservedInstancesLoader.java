@@ -27,67 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2ReservedInstancesResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeReservedInstancesResponse;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Filter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2ReservedInstancesLoader extends EC2ResourceLoader<EC2ReservedInstancesResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_RESERVED_INSTANCES_ID = "reserved-instances-id";
 
     public EC2ReservedInstancesLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2ReservedInstancesResource> getById(String reservedInstancesId) {
-        return getReservedInstances(Collections.singletonList(reservedInstancesId)).findFirst();
-    }
-
-    @Override
-    public List<EC2ReservedInstancesResource> getAll() {
-        return getReservedInstances().collect(Collectors.toList());
-    }
-
-    private Stream<EC2ReservedInstancesResource> getReservedInstances() {
-        return getReservedInstances(Collections.emptyList());
-    }
-
-    private Stream<EC2ReservedInstancesResource> getReservedInstances(List<String> reservedInstancesIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getReservedInstancesInRegion(region, reservedInstancesIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-
-    }
-
-    private Stream<EC2ReservedInstancesResource> getReservedInstancesInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                                              List<String> reservedInstanceIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeReservedInstancesResponse response = reservedInstanceIds != null && !reservedInstanceIds.isEmpty() ?
-                    client.describeReservedInstances(builder ->
-                            builder.reservedInstancesIds(reservedInstanceIds.toArray(new String[0]))
-                    ) :
-                    client.describeReservedInstances();
+    protected Stream<EC2ReservedInstancesResource> getResourcesInRegion(String region,
+                                                                        List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeReservedInstancess.html
+            var response = client.describeReservedInstances(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.reservedInstances()
-                    .stream()
-                    .map(reservedInstance -> EC2ReservedInstancesResource.fromSdk(region.regionName(), reservedInstance));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(reservedInstances -> EC2ReservedInstancesResource.fromSdk(region, reservedInstances));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_RESERVED_INSTANCES_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

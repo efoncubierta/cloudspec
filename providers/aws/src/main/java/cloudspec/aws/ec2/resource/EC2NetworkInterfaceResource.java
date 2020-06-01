@@ -208,8 +208,18 @@ public class EC2NetworkInterfaceResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NetworkInterface))) {
+            return false;
+        }
+
+        if (o instanceof NetworkInterface) {
+            return sdkEquals((NetworkInterface) o);
+        }
+
         EC2NetworkInterfaceResource that = (EC2NetworkInterfaceResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(association, that.association) &&
@@ -231,6 +241,26 @@ public class EC2NetworkInterfaceResource extends EC2Resource {
                 Objects.equals(vpcId, that.vpcId);
     }
 
+    private boolean sdkEquals(NetworkInterface that) {
+        return Objects.equals(association, that.association()) &&
+                Objects.equals(attachment, that.attachment()) &&
+                Objects.equals(availabilityZone, that.availabilityZone()) &&
+                Objects.equals(groupIds, securityGroupIdsFromSdk(that.groups())) &&
+                Objects.equals(interfaceType, that.interfaceTypeAsString()) &&
+                Objects.equals(ipv6Addresses, ipv6AddressesFromSdk(that.ipv6Addresses())) &&
+                Objects.equals(networkInterfaceId, that.networkInterfaceId()) &&
+                Objects.equals(outpostArn, that.outpostArn()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(privateDnsName, that.privateDnsName()) &&
+                Objects.equals(privateIpAddress, that.privateIpAddress()) &&
+                Objects.equals(privateIpAddresses, that.privateIpAddresses()) &&
+                Objects.equals(sourceDestCheck, that.sourceDestCheck()) &&
+                Objects.equals(status, that.statusAsString()) &&
+                Objects.equals(subnetId, that.subnetId()) &&
+                Objects.equals(tagSet, tagsFromSdk(that.tagSet())) &&
+                Objects.equals(vpcId, that.vpcId());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, association, attachment, availabilityZone, groupIds, interfaceType, ipv6Addresses,
@@ -240,43 +270,43 @@ public class EC2NetworkInterfaceResource extends EC2Resource {
 
     public static EC2NetworkInterfaceResource fromSdk(String regionName, NetworkInterface networkInterface) {
         return Optional.ofNullable(networkInterface)
-                .map(v -> new EC2NetworkInterfaceResource(
-                                regionName,
-                                EC2NetworkInterfaceAssociation.fromSdk(v.association()),
-                                EC2NetworkInterfaceAttachment.fromSdk(v.attachment()),
-                                v.availabilityZone(),
-                                securityGroupIdsFromSdk(v.groups()),
-                                v.interfaceTypeAsString(),
-                                ipv6AddressesFromSdk(v.ipv6Addresses()),
-                                v.networkInterfaceId(),
-                                v.outpostArn(),
-                                v.ownerId(),
-                                v.privateDnsName(),
-                                v.privateIpAddress(),
-                                EC2NetworkInterfacePrivateIpAddress.fromSdk(v.privateIpAddresses()),
-                                v.sourceDestCheck(),
-                                v.statusAsString(),
-                                v.subnetId(),
-                                tagsFromSdk(v.tagSet()),
-                                v.vpcId()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2NetworkInterfaceResource(
+                                       regionName,
+                                       EC2NetworkInterfaceAssociation.fromSdk(v.association()),
+                                       EC2NetworkInterfaceAttachment.fromSdk(v.attachment()),
+                                       v.availabilityZone(),
+                                       securityGroupIdsFromSdk(v.groups()),
+                                       v.interfaceTypeAsString(),
+                                       ipv6AddressesFromSdk(v.ipv6Addresses()),
+                                       v.networkInterfaceId(),
+                                       v.outpostArn(),
+                                       v.ownerId(),
+                                       v.privateDnsName(),
+                                       v.privateIpAddress(),
+                                       EC2NetworkInterfacePrivateIpAddress.fromSdk(v.privateIpAddresses()),
+                                       v.sourceDestCheck(),
+                                       v.statusAsString(),
+                                       v.subnetId(),
+                                       tagsFromSdk(v.tagSet()),
+                                       v.vpcId()
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static List<String> securityGroupIdsFromSdk(List<GroupIdentifier> groupIdentifiers) {
         return Optional.ofNullable(groupIdentifiers)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(GroupIdentifier::groupId)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(GroupIdentifier::groupId)
+                       .collect(Collectors.toList());
     }
 
     public static List<String> ipv6AddressesFromSdk(List<NetworkInterfaceIpv6Address> networkInterfaceIpv6Addresses) {
         return Optional.ofNullable(networkInterfaceIpv6Addresses)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(NetworkInterfaceIpv6Address::ipv6Address)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(NetworkInterfaceIpv6Address::ipv6Address)
+                       .collect(Collectors.toList());
     }
 }

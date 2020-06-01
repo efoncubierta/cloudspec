@@ -100,8 +100,18 @@ public class EC2LocalGatewayResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof LocalGateway))) {
+            return false;
+        }
+
+        if (o instanceof LocalGateway) {
+            return sdkEquals((LocalGateway) o);
+        }
+
         EC2LocalGatewayResource that = (EC2LocalGatewayResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(localGatewayId, that.localGatewayId) &&
@@ -111,6 +121,14 @@ public class EC2LocalGatewayResource extends EC2Resource {
                 Objects.equals(tags, that.tags);
     }
 
+    private boolean sdkEquals(LocalGateway that) {
+        return Objects.equals(localGatewayId, that.localGatewayId()) &&
+                Objects.equals(outpostArn, that.outpostArn()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(state, that.state()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(localGatewayId, outpostArn, ownerId, state, tags);
@@ -118,14 +136,14 @@ public class EC2LocalGatewayResource extends EC2Resource {
 
     public static EC2LocalGatewayResource fromSdk(String regionName, LocalGateway localGateway) {
         return Optional.ofNullable(localGateway)
-                .map(v -> new EC2LocalGatewayResource(
-                        regionName,
-                        v.localGatewayId(),
-                        v.outpostArn(),
-                        v.ownerId(),
-                        v.state(),
-                        tagsFromSdk(v.tags())
-                ))
-                .orElse(null);
+                       .map(v -> new EC2LocalGatewayResource(
+                               regionName,
+                               v.localGatewayId(),
+                               v.outpostArn(),
+                               v.ownerId(),
+                               v.state(),
+                               tagsFromSdk(v.tags())
+                       ))
+                       .orElse(null);
     }
 }

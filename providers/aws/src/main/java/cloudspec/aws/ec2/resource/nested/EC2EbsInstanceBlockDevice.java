@@ -71,13 +71,30 @@ public class EC2EbsInstanceBlockDevice {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof EbsInstanceBlockDevice))) {
+            return false;
+        }
+
+        if (o instanceof EbsInstanceBlockDevice) {
+            return sdkEquals((EbsInstanceBlockDevice) o);
+        }
+
         EC2EbsInstanceBlockDevice that = (EC2EbsInstanceBlockDevice) o;
         return Objects.equals(attachTime, that.attachTime) &&
                 Objects.equals(deleteOnTermination, that.deleteOnTermination) &&
                 Objects.equals(status, that.status) &&
                 Objects.equals(volumeId, that.volumeId);
+    }
+
+    private boolean sdkEquals(EbsInstanceBlockDevice that) {
+        return Objects.equals(attachTime.toInstant(), that.attachTime()) &&
+                Objects.equals(deleteOnTermination, that.deleteOnTermination()) &&
+                Objects.equals(status, that.statusAsString()) &&
+                Objects.equals(volumeId, that.volumeId());
     }
 
     @Override
@@ -87,13 +104,13 @@ public class EC2EbsInstanceBlockDevice {
 
     public static EC2EbsInstanceBlockDevice fromSdk(EbsInstanceBlockDevice ebsInstanceBlockDevice) {
         return Optional.ofNullable(ebsInstanceBlockDevice)
-                .map(v -> new EC2EbsInstanceBlockDevice(
-                                AWSResource.dateFromSdk(v.attachTime()),
-                                v.deleteOnTermination(),
-                                v.statusAsString(),
-                                v.volumeId()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2EbsInstanceBlockDevice(
+                                       AWSResource.dateFromSdk(v.attachTime()),
+                                       v.deleteOnTermination(),
+                                       v.statusAsString(),
+                                       v.volumeId()
+                               )
+                       )
+                       .orElse(null);
     }
 }

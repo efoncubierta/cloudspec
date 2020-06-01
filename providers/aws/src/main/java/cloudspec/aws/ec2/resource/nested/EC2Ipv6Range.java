@@ -47,10 +47,24 @@ public class EC2Ipv6Range {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Ipv6Range))) {
+            return false;
+        }
+
+        if (o instanceof Ipv6Range) {
+            return sdkEquals((Ipv6Range) o);
+        }
+
         EC2Ipv6Range that = (EC2Ipv6Range) o;
         return Objects.equals(cidrIpv6, that.cidrIpv6);
+    }
+
+    private boolean sdkEquals(Ipv6Range that) {
+        return Objects.equals(cidrIpv6, that.cidrIpv6());
     }
 
     @Override
@@ -60,18 +74,18 @@ public class EC2Ipv6Range {
 
     public static List<EC2Ipv6Range> fromSdk(List<Ipv6Range> ipv6Ranges) {
         return Optional.ofNullable(ipv6Ranges)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2Ipv6Range::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2Ipv6Range::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2Ipv6Range fromSdk(Ipv6Range ipRange) {
         return Optional.ofNullable(ipRange)
-                .map(v -> new EC2Ipv6Range(
-                                v.cidrIpv6()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2Ipv6Range(
+                                       v.cidrIpv6()
+                               )
+                       )
+                       .orElse(null);
     }
 }

@@ -61,11 +61,26 @@ public class EC2VpcCidrBlockAssociation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof VpcCidrBlockAssociation))) {
+            return false;
+        }
+
+        if (o instanceof VpcCidrBlockAssociation) {
+            return sdkEquals((VpcCidrBlockAssociation) o);
+        }
+
         EC2VpcCidrBlockAssociation that = (EC2VpcCidrBlockAssociation) o;
         return Objects.equals(cidrBlock, that.cidrBlock) &&
                 Objects.equals(cidrBlockState, that.cidrBlockState);
+    }
+
+    private boolean sdkEquals(VpcCidrBlockAssociation that) {
+        return Objects.equals(cidrBlock, that.cidrBlock()) &&
+                Objects.equals(cidrBlockState, ipCidrBlockStateFromSdk(that.cidrBlockState()));
     }
 
     @Override
@@ -75,26 +90,26 @@ public class EC2VpcCidrBlockAssociation {
 
     public static List<EC2VpcCidrBlockAssociation> fromSdk(List<VpcCidrBlockAssociation> vpcCidrBlockAssociations) {
         return Optional.ofNullable(vpcCidrBlockAssociations)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2VpcCidrBlockAssociation::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2VpcCidrBlockAssociation::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2VpcCidrBlockAssociation fromSdk(VpcCidrBlockAssociation vpcCidrBlockAssociation) {
         return Optional.ofNullable(vpcCidrBlockAssociation)
-                .map(v ->
-                        new EC2VpcCidrBlockAssociation(
-                                v.cidrBlock(),
-                                ipCidrBlockStateFromSdk(v.cidrBlockState())
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2VpcCidrBlockAssociation(
+                                       v.cidrBlock(),
+                                       ipCidrBlockStateFromSdk(v.cidrBlockState())
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static String ipCidrBlockStateFromSdk(VpcCidrBlockState vpcCidrBlockState) {
         return Optional.ofNullable(vpcCidrBlockState)
-                .map(VpcCidrBlockState::stateAsString)
-                .orElse(null);
+                       .map(VpcCidrBlockState::stateAsString)
+                       .orElse(null);
     }
 }

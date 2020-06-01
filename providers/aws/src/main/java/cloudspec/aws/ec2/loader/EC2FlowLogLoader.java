@@ -27,64 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2FlowLogResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeFlowLogsResponse;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Filter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2FlowLogLoader extends EC2ResourceLoader<EC2FlowLogResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_FLOW_LOG_ID = "flow-log-id";
 
     public EC2FlowLogLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2FlowLogResource> getById(String flowLogId) {
-        return getFlowLogs(Collections.singletonList(flowLogId)).findFirst();
-    }
-
-    @Override
-    public List<EC2FlowLogResource> getAll() {
-        return getFlowLogs().collect(Collectors.toList());
-    }
-
-    private Stream<EC2FlowLogResource> getFlowLogs() {
-        return getFlowLogs(Collections.emptyList());
-    }
-
-    private Stream<EC2FlowLogResource> getFlowLogs(List<String> flowLogIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getFlowLogsInRegion(region, flowLogIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-    }
-
-    private Stream<EC2FlowLogResource> getFlowLogsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                           List<String> flowLogIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeFlowLogsResponse response = flowLogIds != null && !flowLogIds.isEmpty() ?
-                    client.describeFlowLogs(builder -> builder.flowLogIds(flowLogIds.toArray(new String[0]))) :
-                    client.describeFlowLogs();
+    protected Stream<EC2FlowLogResource> getResourcesInRegion(String region,
+                                                              List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeFlowLogs.html
+            var response = client.describeFlowLogs(builder ->
+                    builder.filter(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.flowLogs()
-                    .stream()
-                    .map(flowLog -> EC2FlowLogResource.fromSdk(region.regionName(), flowLog));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(flowLog -> EC2FlowLogResource.fromSdk(region, flowLog));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_FLOW_LOG_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

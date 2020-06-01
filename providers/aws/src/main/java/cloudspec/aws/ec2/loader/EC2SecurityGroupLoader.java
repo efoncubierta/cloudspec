@@ -27,70 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2SecurityGroupResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeSecurityGroupsResponse;
 import software.amazon.awssdk.services.ec2.model.Filter;
-import software.amazon.awssdk.utils.IoUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2SecurityGroupLoader extends EC2ResourceLoader<EC2SecurityGroupResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_SECURITY_GROUP_ID = "security-group-id";
 
     public EC2SecurityGroupLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2SecurityGroupResource> getById(String securityGroupId) {
-        return getSecurityGroups(Collections.singletonList(securityGroupId)).findFirst();
-    }
-
-    @Override
-    public List<EC2SecurityGroupResource> getAll() {
-        return getSecurityGroups().collect(Collectors.toList());
-    }
-
-    private Stream<EC2SecurityGroupResource> getSecurityGroups() {
-        return getSecurityGroups(Collections.emptyList());
-    }
-
-    private Stream<EC2SecurityGroupResource> getSecurityGroups(List<String> securityGroupIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getSecurityGroupsInRegion(region, securityGroupIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-
-    }
-
-    private Stream<EC2SecurityGroupResource> getSecurityGroupsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                                       List<String> securityGroupIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeSecurityGroupsResponse response = securityGroupIds != null && !securityGroupIds.isEmpty() ?
-                    client.describeSecurityGroups(builder -> builder.filters(
-                            Filter.builder()
-                                    .name("security-group-id")
-                                    .values(securityGroupIds.toArray(new String[0])).build())
-                    ) :
-                    client.describeSecurityGroups();
+    protected Stream<EC2SecurityGroupResource> getResourcesInRegion(String region,
+                                                                    List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSecurityGroups.html
+            var response = client.describeSecurityGroups(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.securityGroups()
-                    .stream()
-                    .map(securityGroup -> EC2SecurityGroupResource.fromSdk(region.regionName(), securityGroup));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(securityGroup -> EC2SecurityGroupResource.fromSdk(region, securityGroup));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_SECURITY_GROUP_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

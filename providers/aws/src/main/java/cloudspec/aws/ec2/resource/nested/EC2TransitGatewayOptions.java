@@ -100,8 +100,18 @@ public class EC2TransitGatewayOptions {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof TransitGatewayOptions))) {
+            return false;
+        }
+
+        if (o instanceof TransitGatewayOptions) {
+            return sdkEquals((TransitGatewayOptions) o);
+        }
+
         EC2TransitGatewayOptions that = (EC2TransitGatewayOptions) o;
         return Objects.equals(autoAcceptSharedAttachments, that.autoAcceptSharedAttachments) &&
                 Objects.equals(defaultRouteTableAssociation, that.defaultRouteTableAssociation) &&
@@ -113,6 +123,17 @@ public class EC2TransitGatewayOptions {
                 Objects.equals(multicastSupport, that.multicastSupport);
     }
 
+    private boolean sdkEquals(TransitGatewayOptions that) {
+        return Objects.equals(autoAcceptSharedAttachments, that.autoAcceptSharedAttachments().equals(AutoAcceptSharedAttachmentsValue.ENABLE)) &&
+                Objects.equals(defaultRouteTableAssociation, that.defaultRouteTableAssociation().equals(DefaultRouteTableAssociationValue.ENABLE)) &&
+                Objects.equals(associationDefaultRouteTableId, that.associationDefaultRouteTableId()) &&
+                Objects.equals(defaultRouteTablePropagation, that.defaultRouteTablePropagation().equals(DefaultRouteTablePropagationValue.ENABLE)) &&
+                Objects.equals(propagationDefaultRouteTableId, that.propagationDefaultRouteTableId()) &&
+                Objects.equals(vpnEcmpSupport, that.vpnEcmpSupport().equals(VpnEcmpSupportValue.ENABLE)) &&
+                Objects.equals(dnsSupport, that.dnsSupport().equals(DnsSupportValue.ENABLE)) &&
+                Objects.equals(multicastSupport, that.multicastSupport().equals(MulticastSupportValue.ENABLE));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(autoAcceptSharedAttachments, defaultRouteTableAssociation, associationDefaultRouteTableId, defaultRouteTablePropagation, propagationDefaultRouteTableId, vpnEcmpSupport, dnsSupport, multicastSupport);
@@ -120,16 +141,16 @@ public class EC2TransitGatewayOptions {
 
     public static EC2TransitGatewayOptions fromSdk(TransitGatewayOptions transitGatewayOptions) {
         return Optional.ofNullable(transitGatewayOptions)
-                .map(v -> new EC2TransitGatewayOptions(
-                        v.autoAcceptSharedAttachments().equals(AutoAcceptSharedAttachmentsValue.ENABLE),
-                        v.defaultRouteTableAssociation().equals(DefaultRouteTableAssociationValue.ENABLE),
-                        v.associationDefaultRouteTableId(),
-                        v.defaultRouteTablePropagation().equals(DefaultRouteTablePropagationValue.ENABLE),
-                        v.propagationDefaultRouteTableId(),
-                        v.vpnEcmpSupport().equals(VpnEcmpSupportValue.ENABLE),
-                        v.dnsSupport().equals(DnsSupportValue.ENABLE),
-                        v.multicastSupport().equals(MulticastSupportValue.ENABLE)
-                ))
-                .orElse(null);
+                       .map(v -> new EC2TransitGatewayOptions(
+                               v.autoAcceptSharedAttachments().equals(AutoAcceptSharedAttachmentsValue.ENABLE),
+                               v.defaultRouteTableAssociation().equals(DefaultRouteTableAssociationValue.ENABLE),
+                               v.associationDefaultRouteTableId(),
+                               v.defaultRouteTablePropagation().equals(DefaultRouteTablePropagationValue.ENABLE),
+                               v.propagationDefaultRouteTableId(),
+                               v.vpnEcmpSupport().equals(VpnEcmpSupportValue.ENABLE),
+                               v.dnsSupport().equals(DnsSupportValue.ENABLE),
+                               v.multicastSupport().equals(MulticastSupportValue.ENABLE)
+                       ))
+                       .orElse(null);
     }
 }

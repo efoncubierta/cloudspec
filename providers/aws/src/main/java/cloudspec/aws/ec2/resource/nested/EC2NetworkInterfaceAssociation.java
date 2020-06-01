@@ -71,12 +71,28 @@ public class EC2NetworkInterfaceAssociation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NetworkInterfaceAssociation))) {
+            return false;
+        }
+
+        if (o instanceof NetworkInterfaceAssociation) {
+            return sdkEquals((NetworkInterfaceAssociation) o);
+        }
+
         EC2NetworkInterfaceAssociation that = (EC2NetworkInterfaceAssociation) o;
         return Objects.equals(ipOwnerId, that.ipOwnerId) &&
                 Objects.equals(publicDnsName, that.publicDnsName) &&
                 Objects.equals(publicIp, that.publicIp);
+    }
+
+    private boolean sdkEquals(NetworkInterfaceAssociation that) {
+        return Objects.equals(ipOwnerId, that.ipOwnerId()) &&
+                Objects.equals(publicDnsName, that.publicDnsName()) &&
+                Objects.equals(publicIp, that.publicIp());
     }
 
     @Override
@@ -86,12 +102,12 @@ public class EC2NetworkInterfaceAssociation {
 
     public static EC2NetworkInterfaceAssociation fromSdk(NetworkInterfaceAssociation networkInterfaceAssociation) {
         return Optional.ofNullable(networkInterfaceAssociation)
-                .map(v -> new EC2NetworkInterfaceAssociation(
-                                v.ipOwnerId(),
-                                v.publicDnsName(),
-                                v.publicIp()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2NetworkInterfaceAssociation(
+                                       v.ipOwnerId(),
+                                       v.publicDnsName(),
+                                       v.publicIp()
+                               )
+                       )
+                       .orElse(null);
     }
 }

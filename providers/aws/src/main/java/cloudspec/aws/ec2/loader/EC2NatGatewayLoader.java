@@ -27,64 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2NatGatewayResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysResponse;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Filter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2NatGatewayLoader extends EC2ResourceLoader<EC2NatGatewayResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_NAT_GATEWAY_ID = "nat-gateway-id";
 
     public EC2NatGatewayLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2NatGatewayResource> getById(String natGatewayId) {
-        return getNatGateways(Collections.singletonList(natGatewayId)).findFirst();
-    }
-
-    @Override
-    public List<EC2NatGatewayResource> getAll() {
-        return getNatGateways().collect(Collectors.toList());
-    }
-
-    private Stream<EC2NatGatewayResource> getNatGateways() {
-        return getNatGateways(Collections.emptyList());
-    }
-
-    private Stream<EC2NatGatewayResource> getNatGateways(List<String> natGatewayIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getNatGatewaysInRegion(region, natGatewayIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-    }
-
-    private Stream<EC2NatGatewayResource> getNatGatewaysInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                                 List<String> natGatewayIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeNatGatewaysResponse response = natGatewayIds != null && !natGatewayIds.isEmpty() ?
-                    client.describeNatGateways(builder -> builder.natGatewayIds(natGatewayIds.toArray(new String[0]))) :
-                    client.describeNatGateways();
+    protected Stream<EC2NatGatewayResource> getResourcesInRegion(String region,
+                                                                 List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNatGateways.html
+            var response = client.describeNatGateways(builder ->
+                    builder.filter(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.natGateways()
-                    .stream()
-                    .map(natGateway -> EC2NatGatewayResource.fromSdk(region.regionName(), natGateway));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(natGateway -> EC2NatGatewayResource.fromSdk(region, natGateway));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_NAT_GATEWAY_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

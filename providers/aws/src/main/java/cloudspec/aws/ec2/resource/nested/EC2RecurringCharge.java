@@ -55,11 +55,26 @@ public class EC2RecurringCharge {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof RecurringCharge))) {
+            return false;
+        }
+
+        if (o instanceof RecurringCharge) {
+            return sdkEquals((RecurringCharge) o);
+        }
+
         EC2RecurringCharge that = (EC2RecurringCharge) o;
         return Objects.equals(amount, that.amount) &&
                 Objects.equals(frequency, that.frequency);
+    }
+
+    private boolean sdkEquals(RecurringCharge that) {
+        return Objects.equals(amount, that.amount()) &&
+                Objects.equals(frequency, that.frequencyAsString());
     }
 
     @Override
@@ -69,20 +84,20 @@ public class EC2RecurringCharge {
 
     public static List<EC2RecurringCharge> fromSdk(List<RecurringCharge> recurringCharges) {
         return Optional.ofNullable(recurringCharges)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2RecurringCharge::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2RecurringCharge::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2RecurringCharge fromSdk(RecurringCharge recurringCharge) {
         return Optional.ofNullable(recurringCharge)
-                .map(v ->
-                        new EC2RecurringCharge(
-                                v.amount(),
-                                v.frequencyAsString()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2RecurringCharge(
+                                       v.amount(),
+                                       v.frequencyAsString()
+                               )
+                       )
+                       .orElse(null);
     }
 }

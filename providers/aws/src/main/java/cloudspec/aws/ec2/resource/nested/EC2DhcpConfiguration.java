@@ -55,11 +55,26 @@ public class EC2DhcpConfiguration {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof DhcpConfiguration))) {
+            return false;
+        }
+
+        if (o instanceof DhcpConfiguration) {
+            return sdkEquals((DhcpConfiguration) o);
+        }
+
         EC2DhcpConfiguration that = (EC2DhcpConfiguration) o;
         return Objects.equals(key, that.key) &&
                 Objects.equals(values, that.values);
+    }
+
+    private boolean sdkEquals(DhcpConfiguration that) {
+        return Objects.equals(key, that.key()) &&
+                Objects.equals(values, valuesFromSdk(that.values()));
     }
 
     @Override
@@ -69,27 +84,27 @@ public class EC2DhcpConfiguration {
 
     public static List<EC2DhcpConfiguration> fromSdk(List<DhcpConfiguration> dhcpConfigurations) {
         return Optional.ofNullable(dhcpConfigurations)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2DhcpConfiguration::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2DhcpConfiguration::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2DhcpConfiguration fromSdk(DhcpConfiguration dhcpConfiguration) {
         return Optional.ofNullable(dhcpConfiguration)
-                .map(v -> new EC2DhcpConfiguration(
-                                v.key(),
-                                EC2DhcpConfiguration.valuesFromSdk(v.values())
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2DhcpConfiguration(
+                                       v.key(),
+                                       EC2DhcpConfiguration.valuesFromSdk(v.values())
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static List<String> valuesFromSdk(List<AttributeValue> attributeValues) {
         return Optional.ofNullable(attributeValues)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(AttributeValue::value)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(AttributeValue::value)
+                       .collect(Collectors.toList());
     }
 }

@@ -26,7 +26,50 @@
 package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.AWSResourceLoader;
+import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2Resource;
+import software.amazon.awssdk.services.ec2.model.Region;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class EC2ResourceLoader<T extends EC2Resource> implements AWSResourceLoader<T> {
+    protected final IAWSClientsProvider clientsProvider;
+
+    public EC2ResourceLoader(IAWSClientsProvider clientsProvider) {
+        this.clientsProvider = clientsProvider;
+    }
+
+    @Override
+    public Optional<T> getById(String id) {
+        return getResources(Collections.singletonList(id)).findFirst();
+    }
+
+    @Override
+    public List<T> getAll() {
+        return getResources().collect(Collectors.toList());
+    }
+
+    private Stream<T> getResources() {
+        return getResources(Collections.emptyList());
+    }
+
+    private Stream<T> getResources(List<String> ids) {
+        return getRegionNamesStream()
+                .flatMap(region -> getResourcesInRegion(region, ids));
+    }
+
+    abstract Stream<T> getResourcesInRegion(String region, List<String> ids);
+
+    protected Stream<String> getRegionNamesStream() {
+        try (var ec2Client = clientsProvider.getEc2Client()) {
+            return ec2Client.describeRegions()
+                            .regions()
+                            .stream()
+                            .map(Region::regionName);
+        }
+    }
 }

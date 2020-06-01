@@ -112,8 +112,18 @@ public class EC2VpcPeeringConnectionResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof VpcPeeringConnection))) {
+            return false;
+        }
+
+        if (o instanceof VpcPeeringConnection) {
+            return sdkEquals((VpcPeeringConnection) o);
+        }
+
         EC2VpcPeeringConnectionResource that = (EC2VpcPeeringConnectionResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(accepterVpcInfo, that.accepterVpcInfo) &&
@@ -124,6 +134,15 @@ public class EC2VpcPeeringConnectionResource extends EC2Resource {
                 Objects.equals(vpcPeeringConnectionId, that.vpcPeeringConnectionId);
     }
 
+    private boolean sdkEquals(VpcPeeringConnection that) {
+        return Objects.equals(accepterVpcInfo, that.accepterVpcInfo()) &&
+                Objects.equals(expirationTime, dateFromSdk(that.expirationTime())) &&
+                Objects.equals(requesterVpcInfo, that.requesterVpcInfo()) &&
+                Objects.equals(status, statusFromSdk(that.status())) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(vpcPeeringConnectionId, that.vpcPeeringConnectionId());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, accepterVpcInfo, expirationTime, requesterVpcInfo, status,
@@ -132,23 +151,23 @@ public class EC2VpcPeeringConnectionResource extends EC2Resource {
 
     public static EC2VpcPeeringConnectionResource fromSdk(String regionName, VpcPeeringConnection vpcPeeringConnection) {
         return Optional.ofNullable(vpcPeeringConnection)
-                .map(v ->
-                        new EC2VpcPeeringConnectionResource(
-                                regionName,
-                                EC2VpcPeeringConnectionVpcInfo.fromSdk(v.accepterVpcInfo()),
-                                dateFromSdk(v.expirationTime()),
-                                EC2VpcPeeringConnectionVpcInfo.fromSdk(v.requesterVpcInfo()),
-                                statusFromSdk(v.status()),
-                                tagsFromSdk(v.tags()),
-                                v.vpcPeeringConnectionId()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2VpcPeeringConnectionResource(
+                                       regionName,
+                                       EC2VpcPeeringConnectionVpcInfo.fromSdk(v.accepterVpcInfo()),
+                                       dateFromSdk(v.expirationTime()),
+                                       EC2VpcPeeringConnectionVpcInfo.fromSdk(v.requesterVpcInfo()),
+                                       statusFromSdk(v.status()),
+                                       tagsFromSdk(v.tags()),
+                                       v.vpcPeeringConnectionId()
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static String statusFromSdk(VpcPeeringConnectionStateReason vpcPeeringConnectionStateReason) {
         return Optional.ofNullable(vpcPeeringConnectionStateReason)
-                .map(VpcPeeringConnectionStateReason::codeAsString)
-                .orElse(null);
+                       .map(VpcPeeringConnectionStateReason::codeAsString)
+                       .orElse(null);
     }
 }

@@ -116,8 +116,18 @@ public class EC2TransitGatewayResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof TransitGateway))) {
+            return false;
+        }
+
+        if (o instanceof TransitGateway) {
+            return sdkEquals((TransitGateway) o);
+        }
+
         EC2TransitGatewayResource that = (EC2TransitGatewayResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(transitGatewayId, that.transitGatewayId) &&
@@ -129,6 +139,16 @@ public class EC2TransitGatewayResource extends EC2Resource {
                 Objects.equals(tags, that.tags);
     }
 
+    private boolean sdkEquals(TransitGateway that) {
+        return Objects.equals(transitGatewayId, that.transitGatewayId()) &&
+                Objects.equals(transitGatewayArn, that.transitGatewayArn()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(creationTime, dateFromSdk(that.creationTime())) &&
+                Objects.equals(options, that.options()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, transitGatewayId, transitGatewayArn, state, ownerId, creationTime, options, tags);
@@ -136,16 +156,16 @@ public class EC2TransitGatewayResource extends EC2Resource {
 
     public static EC2TransitGatewayResource fromSdk(String regionName, TransitGateway transitGateway) {
         return Optional.ofNullable(transitGateway)
-                .map(v -> new EC2TransitGatewayResource(
-                        regionName,
-                        v.transitGatewayId(),
-                        v.transitGatewayArn(),
-                        v.stateAsString(),
-                        v.ownerId(),
-                        dateFromSdk(v.creationTime()),
-                        EC2TransitGatewayOptions.fromSdk(v.options()),
-                        tagsFromSdk(v.tags())
-                ))
-                .orElse(null);
+                       .map(v -> new EC2TransitGatewayResource(
+                               regionName,
+                               v.transitGatewayId(),
+                               v.transitGatewayArn(),
+                               v.stateAsString(),
+                               v.ownerId(),
+                               dateFromSdk(v.creationTime()),
+                               EC2TransitGatewayOptions.fromSdk(v.options()),
+                               tagsFromSdk(v.tags())
+                       ))
+                       .orElse(null);
     }
 }

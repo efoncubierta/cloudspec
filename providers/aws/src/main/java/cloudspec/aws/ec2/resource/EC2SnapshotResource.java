@@ -135,8 +135,18 @@ public class EC2SnapshotResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Snapshot))) {
+            return false;
+        }
+
+        if (o instanceof Snapshot) {
+            return sdkEquals((Snapshot) o);
+        }
+
         EC2SnapshotResource that = (EC2SnapshotResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(encrypted, that.encrypted) &&
@@ -150,6 +160,18 @@ public class EC2SnapshotResource extends EC2Resource {
                 Objects.equals(tags, that.tags);
     }
 
+    private boolean sdkEquals(Snapshot that) {
+        return Objects.equals(encrypted, that.encrypted()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(progress, that.progress()) &&
+                Objects.equals(snapshotId, that.snapshotId()) &&
+                Objects.equals(startTime, dateFromSdk(that.startTime())) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(volumeId, that.volumeId()) &&
+                Objects.equals(volumeSize, that.volumeSize()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, encrypted, ownerId, progress, snapshotId,
@@ -158,19 +180,19 @@ public class EC2SnapshotResource extends EC2Resource {
 
     public static EC2SnapshotResource fromSdk(String regionName, Snapshot snapshot) {
         return Optional.ofNullable(snapshot)
-                .map(v -> new EC2SnapshotResource(
-                                regionName,
-                                v.encrypted(),
-                                v.ownerId(),
-                                v.progress(),
-                                v.snapshotId(),
-                                dateFromSdk(v.startTime()),
-                                v.stateAsString(),
-                                v.volumeId(),
-                                v.volumeSize(),
-                                tagsFromSdk(v.tags())
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2SnapshotResource(
+                                       regionName,
+                                       v.encrypted(),
+                                       v.ownerId(),
+                                       v.progress(),
+                                       v.snapshotId(),
+                                       dateFromSdk(v.startTime()),
+                                       v.stateAsString(),
+                                       v.volumeId(),
+                                       v.volumeSize(),
+                                       tagsFromSdk(v.tags())
+                               )
+                       )
+                       .orElse(null);
     }
 }

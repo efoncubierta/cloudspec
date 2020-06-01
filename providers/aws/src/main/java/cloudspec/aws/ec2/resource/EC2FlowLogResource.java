@@ -31,6 +31,7 @@ import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.AWSProvider;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
+import software.amazon.awssdk.services.ec2.model.ElasticGpus;
 import software.amazon.awssdk.services.ec2.model.FlowLog;
 
 import java.util.Date;
@@ -173,8 +174,18 @@ public class EC2FlowLogResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof FlowLog))) {
+            return false;
+        }
+
+        if (o instanceof FlowLog) {
+            return sdkEquals((FlowLog) o);
+        }
+
         EC2FlowLogResource that = (EC2FlowLogResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(creationTime, that.creationTime) &&
@@ -193,6 +204,23 @@ public class EC2FlowLogResource extends EC2Resource {
                 Objects.equals(maxAggregationInterval, that.maxAggregationInterval);
     }
 
+    private boolean sdkEquals(FlowLog that) {
+        return Objects.equals(creationTime, dateFromSdk(that.creationTime())) &&
+                Objects.equals(deliverLogsErrorMessage, that.deliverLogsErrorMessage()) &&
+                Objects.equals(deliverLogsPermissionArn, that.deliverLogsPermissionArn()) &&
+                Objects.equals(deliverLogsStatus, that.deliverLogsStatus()) &&
+                Objects.equals(flowLogId, that.flowLogId()) &&
+                Objects.equals(flowLogStatus, that.flowLogStatus()) &&
+                Objects.equals(logGroupName, that.logGroupName()) &&
+                Objects.equals(resourceId, that.resourceId()) &&
+                Objects.equals(trafficType, that.trafficTypeAsString()) &&
+                Objects.equals(logDestinationType, that.logDestinationTypeAsString()) &&
+                Objects.equals(logDestination, that.logDestination()) &&
+                Objects.equals(logFormat, that.logFormat()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(maxAggregationInterval, that.maxAggregationInterval());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, creationTime, deliverLogsErrorMessage, deliverLogsPermissionArn, deliverLogsStatus,
@@ -202,23 +230,23 @@ public class EC2FlowLogResource extends EC2Resource {
 
     public static EC2FlowLogResource fromSdk(String regionName, FlowLog flowLog) {
         return Optional.ofNullable(flowLog)
-                .map(v -> new EC2FlowLogResource(
-                        regionName,
-                        dateFromSdk(v.creationTime()),
-                        v.deliverLogsErrorMessage(),
-                        v.deliverLogsPermissionArn(),
-                        v.deliverLogsStatus(),
-                        v.flowLogId(),
-                        v.flowLogStatus(),
-                        v.logGroupName(),
-                        v.resourceId(),
-                        v.trafficTypeAsString(),
-                        v.logDestinationTypeAsString(),
-                        v.logDestination(),
-                        v.logFormat(),
-                        tagsFromSdk(v.tags()),
-                        v.maxAggregationInterval()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2FlowLogResource(
+                               regionName,
+                               dateFromSdk(v.creationTime()),
+                               v.deliverLogsErrorMessage(),
+                               v.deliverLogsPermissionArn(),
+                               v.deliverLogsStatus(),
+                               v.flowLogId(),
+                               v.flowLogStatus(),
+                               v.logGroupName(),
+                               v.resourceId(),
+                               v.trafficTypeAsString(),
+                               v.logDestinationTypeAsString(),
+                               v.logDestination(),
+                               v.logFormat(),
+                               tagsFromSdk(v.tags()),
+                               v.maxAggregationInterval()
+                       ))
+                       .orElse(null);
     }
 }

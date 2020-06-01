@@ -96,8 +96,18 @@ public class EC2VpcPeeringConnectionVpcInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof VpcPeeringConnectionVpcInfo))) {
+            return false;
+        }
+
+        if (o instanceof VpcPeeringConnectionVpcInfo) {
+            return sdkEquals((VpcPeeringConnectionVpcInfo) o);
+        }
+
         EC2VpcPeeringConnectionVpcInfo that = (EC2VpcPeeringConnectionVpcInfo) o;
         return Objects.equals(cidrBlock, that.cidrBlock) &&
                 Objects.equals(ipv6CidrBlocks, that.ipv6CidrBlocks) &&
@@ -108,6 +118,16 @@ public class EC2VpcPeeringConnectionVpcInfo {
                 Objects.equals(region, that.region);
     }
 
+    private boolean sdkEquals(VpcPeeringConnectionVpcInfo that) {
+        return Objects.equals(cidrBlock, that.cidrBlock()) &&
+                Objects.equals(ipv6CidrBlocks, ipv6CidrBlocksFromSdk(that.ipv6CidrBlockSet())) &&
+                Objects.equals(cidrBlocks, cidrBlocksFromSdk(that.cidrBlockSet())) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(peeringOptions, that.peeringOptions()) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(region, that.region());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(cidrBlock, ipv6CidrBlocks, cidrBlocks, ownerId, peeringOptions, vpcId, region);
@@ -115,33 +135,33 @@ public class EC2VpcPeeringConnectionVpcInfo {
 
     public static EC2VpcPeeringConnectionVpcInfo fromSdk(VpcPeeringConnectionVpcInfo vpcPeeringConnectionVpcInfo) {
         return Optional.ofNullable(vpcPeeringConnectionVpcInfo)
-                .map(v ->
-                        new EC2VpcPeeringConnectionVpcInfo(
-                                v.cidrBlock(),
-                                ipv6CidrBlocksFromSdk(v.ipv6CidrBlockSet()),
-                                cidrBlocksFromSdk(v.cidrBlockSet()),
-                                v.ownerId(),
-                                EC2VpcPeeringConnectionOptionsDescription.fromSdk(v.peeringOptions()),
-                                v.vpcId(),
-                                v.region()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2VpcPeeringConnectionVpcInfo(
+                                       v.cidrBlock(),
+                                       ipv6CidrBlocksFromSdk(v.ipv6CidrBlockSet()),
+                                       cidrBlocksFromSdk(v.cidrBlockSet()),
+                                       v.ownerId(),
+                                       EC2VpcPeeringConnectionOptionsDescription.fromSdk(v.peeringOptions()),
+                                       v.vpcId(),
+                                       v.region()
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static List<String> ipv6CidrBlocksFromSdk(List<Ipv6CidrBlock> ipv6CidrBlocks) {
         return Optional.ofNullable(ipv6CidrBlocks)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(Ipv6CidrBlock::ipv6CidrBlock)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(Ipv6CidrBlock::ipv6CidrBlock)
+                       .collect(Collectors.toList());
     }
 
     public static List<String> cidrBlocksFromSdk(List<CidrBlock> cidrBlocks) {
         return Optional.ofNullable(cidrBlocks)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(CidrBlock::cidrBlock)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(CidrBlock::cidrBlock)
+                       .collect(Collectors.toList());
     }
 }

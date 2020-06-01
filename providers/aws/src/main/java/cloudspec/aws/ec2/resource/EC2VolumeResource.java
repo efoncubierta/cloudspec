@@ -178,8 +178,18 @@ public class EC2VolumeResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Volume))) {
+            return false;
+        }
+
+        if (o instanceof Volume) {
+            return sdkEquals((Volume) o);
+        }
+
         EC2VolumeResource that = (EC2VolumeResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(attachments, that.attachments) &&
@@ -199,6 +209,24 @@ public class EC2VolumeResource extends EC2Resource {
                 Objects.equals(multiAttachEnabled, that.multiAttachEnabled);
     }
 
+    private boolean sdkEquals(Volume that) {
+        return Objects.equals(attachments, that.attachments()) &&
+                Objects.equals(availabilityZone, that.availabilityZone()) &&
+                Objects.equals(createTime, dateFromSdk(that.createTime())) &&
+                Objects.equals(encrypted, that.encrypted()) &&
+                Objects.equals(kmsKeyId, that.kmsKeyId()) &&
+                Objects.equals(outpostArn, that.outpostArn()) &&
+                Objects.equals(size, that.size()) &&
+                Objects.equals(snapshotId, that.snapshotId()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(volumeId, that.volumeId()) &&
+                Objects.equals(iops, that.iops()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(volumeType, that.volumeTypeAsString()) &&
+                Objects.equals(fastRestored, that.fastRestored()) &&
+                Objects.equals(multiAttachEnabled, that.multiAttachEnabled());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, attachments, availabilityZone, createTime, encrypted, kmsKeyId, outpostArn, size,
@@ -207,26 +235,26 @@ public class EC2VolumeResource extends EC2Resource {
 
     public static EC2VolumeResource fromSdk(String regionName, Volume volume) {
         return Optional.ofNullable(volume)
-                .map(v ->
-                        new EC2VolumeResource(
-                                regionName,
-                                EC2VolumeAttachment.fromSdk(v.attachments()),
-                                v.availabilityZone(),
-                                dateFromSdk(v.createTime()),
-                                v.encrypted(),
-                                v.kmsKeyId(),
-                                v.outpostArn(),
-                                v.size(),
-                                v.snapshotId(),
-                                v.stateAsString(),
-                                v.volumeId(),
-                                v.iops(),
-                                tagsFromSdk(v.tags()),
-                                v.volumeTypeAsString(),
-                                v.fastRestored(),
-                                v.multiAttachEnabled()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2VolumeResource(
+                                       regionName,
+                                       EC2VolumeAttachment.fromSdk(v.attachments()),
+                                       v.availabilityZone(),
+                                       dateFromSdk(v.createTime()),
+                                       v.encrypted(),
+                                       v.kmsKeyId(),
+                                       v.outpostArn(),
+                                       v.size(),
+                                       v.snapshotId(),
+                                       v.stateAsString(),
+                                       v.volumeId(),
+                                       v.iops(),
+                                       tagsFromSdk(v.tags()),
+                                       v.volumeTypeAsString(),
+                                       v.fastRestored(),
+                                       v.multiAttachEnabled()
+                               )
+                       )
+                       .orElse(null);
     }
 }

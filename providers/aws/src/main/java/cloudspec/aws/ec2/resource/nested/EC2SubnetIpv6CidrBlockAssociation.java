@@ -62,11 +62,26 @@ public class EC2SubnetIpv6CidrBlockAssociation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof SubnetIpv6CidrBlockAssociation))) {
+            return false;
+        }
+
+        if (o instanceof SubnetIpv6CidrBlockAssociation) {
+            return sdkEquals((SubnetIpv6CidrBlockAssociation) o);
+        }
+
         EC2SubnetIpv6CidrBlockAssociation that = (EC2SubnetIpv6CidrBlockAssociation) o;
         return Objects.equals(ipv6CidrBlock, that.ipv6CidrBlock) &&
                 Objects.equals(ipv6CidrBlockState, that.ipv6CidrBlockState);
+    }
+
+    private boolean sdkEquals(SubnetIpv6CidrBlockAssociation that) {
+        return Objects.equals(ipv6CidrBlock, that.ipv6CidrBlock()) &&
+                Objects.equals(ipv6CidrBlockState, ipv6CidrBlockStateFromSdk(that.ipv6CidrBlockState()));
     }
 
     @Override
@@ -76,26 +91,26 @@ public class EC2SubnetIpv6CidrBlockAssociation {
 
     public static List<EC2SubnetIpv6CidrBlockAssociation> fromSdk(List<SubnetIpv6CidrBlockAssociation> subnetIpv6CidrBlockAssociations) {
         return Optional.ofNullable(subnetIpv6CidrBlockAssociations)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2SubnetIpv6CidrBlockAssociation::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2SubnetIpv6CidrBlockAssociation::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2SubnetIpv6CidrBlockAssociation fromSdk(SubnetIpv6CidrBlockAssociation subnetIpv6CidrBlockAssociation) {
         return Optional.ofNullable(subnetIpv6CidrBlockAssociation)
-                .map(v ->
-                        new EC2SubnetIpv6CidrBlockAssociation(
-                                v.ipv6CidrBlock(),
-                                ipv6CidrBlockStateFromSdk(v.ipv6CidrBlockState())
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2SubnetIpv6CidrBlockAssociation(
+                                       v.ipv6CidrBlock(),
+                                       ipv6CidrBlockStateFromSdk(v.ipv6CidrBlockState())
+                               )
+                       )
+                       .orElse(null);
     }
 
     public static String ipv6CidrBlockStateFromSdk(SubnetCidrBlockState subnetCidrBlockState) {
         return Optional.ofNullable(subnetCidrBlockState)
-                .map(SubnetCidrBlockState::stateAsString)
-                .orElse(null);
+                       .map(SubnetCidrBlockState::stateAsString)
+                       .orElse(null);
     }
 }

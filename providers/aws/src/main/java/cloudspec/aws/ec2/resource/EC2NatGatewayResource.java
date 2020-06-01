@@ -135,8 +135,18 @@ public class EC2NatGatewayResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NatGateway))) {
+            return false;
+        }
+
+        if (o instanceof NatGateway) {
+            return sdkEquals((NatGateway) o);
+        }
+
         EC2NatGatewayResource that = (EC2NatGatewayResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(createTime, that.createTime) &&
@@ -150,6 +160,18 @@ public class EC2NatGatewayResource extends EC2Resource {
                 Objects.equals(tags, that.tags);
     }
 
+    private boolean sdkEquals(NatGateway that) {
+        return Objects.equals(createTime, dateFromSdk(that.createTime())) &&
+                Objects.equals(deleteTime, dateFromSdk(that.deleteTime())) &&
+                Objects.equals(failureCode, that.failureCode()) &&
+                Objects.equals(natGatewayAddresses, that.natGatewayAddresses()) &&
+                Objects.equals(natGatewayId, that.natGatewayId()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(subnetId, that.subnetId()) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, createTime, deleteTime, failureCode, natGatewayAddresses,
@@ -158,18 +180,18 @@ public class EC2NatGatewayResource extends EC2Resource {
 
     public static EC2NatGatewayResource fromSdk(String regionName, NatGateway natGateway) {
         return Optional.ofNullable(natGateway)
-                .map(v -> new EC2NatGatewayResource(
-                        regionName,
-                        dateFromSdk(v.createTime()),
-                        dateFromSdk(v.deleteTime()),
-                        v.failureCode(),
-                        EC2NatGatewayAddress.fromSdk(v.natGatewayAddresses()),
-                        v.natGatewayId(),
-                        v.stateAsString(),
-                        v.subnetId(),
-                        v.vpcId(),
-                        tagsFromSdk(v.tags())
-                ))
-                .orElse(null);
+                       .map(v -> new EC2NatGatewayResource(
+                               regionName,
+                               dateFromSdk(v.createTime()),
+                               dateFromSdk(v.deleteTime()),
+                               v.failureCode(),
+                               EC2NatGatewayAddress.fromSdk(v.natGatewayAddresses()),
+                               v.natGatewayId(),
+                               v.stateAsString(),
+                               v.subnetId(),
+                               v.vpcId(),
+                               tagsFromSdk(v.tags())
+                       ))
+                       .orElse(null);
     }
 }

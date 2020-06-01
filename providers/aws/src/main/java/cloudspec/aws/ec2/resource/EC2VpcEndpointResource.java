@@ -196,8 +196,18 @@ public class EC2VpcEndpointResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof VpcEndpoint))) {
+            return false;
+        }
+
+        if (o instanceof VpcEndpoint) {
+            return sdkEquals((VpcEndpoint) o);
+        }
+
         EC2VpcEndpointResource that = (EC2VpcEndpointResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(vpcEndpointId, that.vpcEndpointId) &&
@@ -217,6 +227,24 @@ public class EC2VpcEndpointResource extends EC2Resource {
                 Objects.equals(lastError, that.lastError);
     }
 
+    private boolean sdkEquals(VpcEndpoint that) {
+        return Objects.equals(vpcEndpointId, that.vpcEndpointId()) &&
+                Objects.equals(vpcEndpointType, that.vpcEndpointTypeAsString()) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(serviceName, that.serviceName()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(routeTableIds, that.routeTableIds()) &&
+                Objects.equals(subnetIds, that.subnetIds()) &&
+                Objects.equals(groups, securityGroupIdsFromSdk(that.groups())) &&
+                Objects.equals(privateDnsEnabled, that.privateDnsEnabled()) &&
+                Objects.equals(requesterManaged, that.requesterManaged()) &&
+                Objects.equals(networkInterfaceIds, that.networkInterfaceIds()) &&
+                Objects.equals(creationTimestamp, dateFromSdk(that.creationTimestamp())) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(lastError, lastErrorCodeFromSdk(that.lastError()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, vpcEndpointId, vpcEndpointType, vpcId, serviceName, state, routeTableIds,
@@ -226,38 +254,38 @@ public class EC2VpcEndpointResource extends EC2Resource {
 
     public static EC2VpcEndpointResource fromSdk(String regionName, VpcEndpoint vpcEndpoint) {
         return Optional.ofNullable(vpcEndpoint)
-                .map(v -> new EC2VpcEndpointResource(
-                        regionName,
-                        v.vpcEndpointId(),
-                        v.vpcEndpointTypeAsString(),
-                        v.vpcId(),
-                        v.serviceName(),
-                        v.stateAsString(),
-                        v.routeTableIds(),
-                        v.subnetIds(),
-                        securityGroupIdsFromSdk(v.groups()),
-                        v.privateDnsEnabled(),
-                        v.requesterManaged(),
-                        v.networkInterfaceIds(),
-                        dateFromSdk(v.creationTimestamp()),
-                        tagsFromSdk(v.tags()),
-                        v.ownerId(),
-                        lastErrorCodeFromSdk(v.lastError())
-                ))
-                .orElse(null);
+                       .map(v -> new EC2VpcEndpointResource(
+                               regionName,
+                               v.vpcEndpointId(),
+                               v.vpcEndpointTypeAsString(),
+                               v.vpcId(),
+                               v.serviceName(),
+                               v.stateAsString(),
+                               v.routeTableIds(),
+                               v.subnetIds(),
+                               securityGroupIdsFromSdk(v.groups()),
+                               v.privateDnsEnabled(),
+                               v.requesterManaged(),
+                               v.networkInterfaceIds(),
+                               dateFromSdk(v.creationTimestamp()),
+                               tagsFromSdk(v.tags()),
+                               v.ownerId(),
+                               lastErrorCodeFromSdk(v.lastError())
+                       ))
+                       .orElse(null);
     }
 
     public static List<String> securityGroupIdsFromSdk(List<SecurityGroupIdentifier> securityGroupIdentifiers) {
         return Optional.ofNullable(securityGroupIdentifiers)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(SecurityGroupIdentifier::groupId)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(SecurityGroupIdentifier::groupId)
+                       .collect(Collectors.toList());
     }
 
     public static String lastErrorCodeFromSdk(LastError lastError) {
         return Optional.ofNullable(lastError)
-                .map(LastError::code)
-                .orElse(null);
+                       .map(LastError::code)
+                       .orElse(null);
     }
 }

@@ -27,64 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2VpcResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeVpcsResponse;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.services.ec2.model.Filter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2VpcLoader extends EC2ResourceLoader<EC2VpcResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_VPC_ID = "vpc-id";
 
     public EC2VpcLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2VpcResource> getById(String vpcId) {
-        return getVpcs(Collections.singletonList(vpcId)).findFirst();
-    }
-
-    @Override
-    public List<EC2VpcResource> getAll() {
-        return getVpcs().collect(Collectors.toList());
-    }
-
-    private Stream<EC2VpcResource> getVpcs() {
-        return getVpcs(Collections.emptyList());
-    }
-
-    private Stream<EC2VpcResource> getVpcs(List<String> vpcIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getVpcsInRegion(region, vpcIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-    }
-
-    private Stream<EC2VpcResource> getVpcsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                   List<String> vpcIds) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeVpcsResponse response = vpcIds != null && !vpcIds.isEmpty() ?
-                    client.describeVpcs(builder -> builder.vpcIds(vpcIds.toArray(new String[0]))) :
-                    client.describeVpcs();
+    protected Stream<EC2VpcResource> getResourcesInRegion(String region,
+                                                          List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcs.html
+            var response = client.describeVpcs(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.vpcs()
-                    .stream()
-                    .map(vpc -> EC2VpcResource.fromSdk(region.regionName(), vpc));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(vpc -> EC2VpcResource.fromSdk(region, vpc));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_VPC_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

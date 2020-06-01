@@ -154,8 +154,18 @@ public class EC2Route {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Route))) {
+            return false;
+        }
+
+        if (o instanceof Route) {
+            return sdkEquals((Route) o);
+        }
+
         EC2Route ec2Route = (EC2Route) o;
         return Objects.equals(destinationCidrBlock, ec2Route.destinationCidrBlock) &&
                 Objects.equals(destinationIpv6CidrBlock, ec2Route.destinationIpv6CidrBlock) &&
@@ -173,6 +183,23 @@ public class EC2Route {
                 Objects.equals(vpcPeeringConnectionId, ec2Route.vpcPeeringConnectionId);
     }
 
+    private boolean sdkEquals(Route that) {
+        return Objects.equals(destinationCidrBlock, that.destinationCidrBlock()) &&
+                Objects.equals(destinationIpv6CidrBlock, that.destinationIpv6CidrBlock()) &&
+                Objects.equals(destinationPrefixListId, that.destinationPrefixListId()) &&
+                Objects.equals(egressOnlyInternetGatewayId, that.egressOnlyInternetGatewayId()) &&
+                Objects.equals(gatewayId, that.gatewayId()) &&
+                Objects.equals(instanceId, that.instanceId()) &&
+                Objects.equals(instanceOwnerId, that.instanceOwnerId()) &&
+                Objects.equals(natGatewayId, that.natGatewayId()) &&
+                Objects.equals(transitGatewayId, that.transitGatewayId()) &&
+                Objects.equals(localGatewayId, that.localGatewayId()) &&
+                Objects.equals(networkInterfaceId, that.networkInterfaceId()) &&
+                Objects.equals(origin, that.originAsString()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(vpcPeeringConnectionId, that.vpcPeeringConnectionId());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(destinationCidrBlock, destinationIpv6CidrBlock, destinationPrefixListId,
@@ -182,30 +209,30 @@ public class EC2Route {
 
     public static List<EC2Route> fromSdk(List<Route> routes) {
         return Optional.ofNullable(routes)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2Route::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2Route::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2Route fromSdk(Route route) {
         return Optional.ofNullable(route)
-                .map(v -> new EC2Route(
-                        v.destinationCidrBlock(),
-                        v.destinationIpv6CidrBlock(),
-                        v.destinationPrefixListId(),
-                        v.egressOnlyInternetGatewayId(),
-                        v.gatewayId(),
-                        v.instanceId(),
-                        v.instanceOwnerId(),
-                        v.natGatewayId(),
-                        v.transitGatewayId(),
-                        v.localGatewayId(),
-                        v.networkInterfaceId(),
-                        v.originAsString(),
-                        v.stateAsString(),
-                        v.vpcPeeringConnectionId()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2Route(
+                               v.destinationCidrBlock(),
+                               v.destinationIpv6CidrBlock(),
+                               v.destinationPrefixListId(),
+                               v.egressOnlyInternetGatewayId(),
+                               v.gatewayId(),
+                               v.instanceId(),
+                               v.instanceOwnerId(),
+                               v.natGatewayId(),
+                               v.transitGatewayId(),
+                               v.localGatewayId(),
+                               v.networkInterfaceId(),
+                               v.originAsString(),
+                               v.stateAsString(),
+                               v.vpcPeeringConnectionId()
+                       ))
+                       .orElse(null);
     }
 }

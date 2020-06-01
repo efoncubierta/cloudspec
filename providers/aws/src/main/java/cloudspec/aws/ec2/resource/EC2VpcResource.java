@@ -103,13 +103,13 @@ public class EC2VpcResource extends EC2Resource {
             name = "ipv6_cidr_block_associations",
             description = "Information about the IPv6 CIDR blocks associated with the VPC"
     )
-    private final List<EC2VpcIpv6CidrBlockAssociation> ipv6CidrBlockAssociationSet;
+    private final List<EC2VpcIpv6CidrBlockAssociation> ipv6CidrBlockAssociations;
 
     @PropertyDefinition(
             name = "cidr_block_associations",
             description = "Information about the IPv4 CIDR blocks associated with the VPC"
     )
-    private final List<EC2VpcCidrBlockAssociation> cidrBlockAssociationSet;
+    private final List<EC2VpcCidrBlockAssociation> cidrBlockAssociations;
 
     @PropertyDefinition(
             name = "is_default",
@@ -125,8 +125,8 @@ public class EC2VpcResource extends EC2Resource {
 
     public EC2VpcResource(String region, String cidrBlock, String dhcpOptionsId, String state,
                           String vpcId, String ownerId, String instanceTenancy,
-                          List<EC2VpcIpv6CidrBlockAssociation> ipv6CidrBlockAssociationSet,
-                          List<EC2VpcCidrBlockAssociation> cidrBlockAssociationSet,
+                          List<EC2VpcIpv6CidrBlockAssociation> ipv6CidrBlockAssociations,
+                          List<EC2VpcCidrBlockAssociation> cidrBlockAssociations,
                           Boolean isDefault, List<KeyValue> tags) {
         this.region = region;
         this.cidrBlock = cidrBlock;
@@ -135,16 +135,26 @@ public class EC2VpcResource extends EC2Resource {
         this.vpcId = vpcId;
         this.ownerId = ownerId;
         this.instanceTenancy = instanceTenancy;
-        this.ipv6CidrBlockAssociationSet = ipv6CidrBlockAssociationSet;
-        this.cidrBlockAssociationSet = cidrBlockAssociationSet;
+        this.ipv6CidrBlockAssociations = ipv6CidrBlockAssociations;
+        this.cidrBlockAssociations = cidrBlockAssociations;
         this.isDefault = isDefault;
         this.tags = tags;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Vpc))) {
+            return false;
+        }
+
+        if (o instanceof Vpc) {
+            return sdkEquals((Vpc) o);
+        }
+
         EC2VpcResource that = (EC2VpcResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(cidrBlock, that.cidrBlock) &&
@@ -153,35 +163,48 @@ public class EC2VpcResource extends EC2Resource {
                 Objects.equals(vpcId, that.vpcId) &&
                 Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(instanceTenancy, that.instanceTenancy) &&
-                Objects.equals(ipv6CidrBlockAssociationSet, that.ipv6CidrBlockAssociationSet) &&
-                Objects.equals(cidrBlockAssociationSet, that.cidrBlockAssociationSet) &&
+                Objects.equals(ipv6CidrBlockAssociations, that.ipv6CidrBlockAssociations) &&
+                Objects.equals(cidrBlockAssociations, that.cidrBlockAssociations) &&
                 Objects.equals(isDefault, that.isDefault) &&
                 Objects.equals(tags, that.tags);
+    }
+
+    private boolean sdkEquals(Vpc that) {
+        return Objects.equals(cidrBlock, that.cidrBlock()) &&
+                Objects.equals(dhcpOptionsId, that.dhcpOptionsId()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(instanceTenancy, that.instanceTenancyAsString()) &&
+                Objects.equals(ipv6CidrBlockAssociations, that.ipv6CidrBlockAssociationSet()) &&
+                Objects.equals(cidrBlockAssociations, that.cidrBlockAssociationSet()) &&
+                Objects.equals(isDefault, that.isDefault()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags()));
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(region, cidrBlock, dhcpOptionsId, state, vpcId, ownerId, instanceTenancy,
-                ipv6CidrBlockAssociationSet, cidrBlockAssociationSet, isDefault, tags);
+                ipv6CidrBlockAssociations, cidrBlockAssociations, isDefault, tags);
     }
 
     public static EC2VpcResource fromSdk(String regionName, Vpc vpc) {
         return Optional.ofNullable(vpc)
-                .map(v ->
-                        new EC2VpcResource(
-                                regionName,
-                                v.cidrBlock(),
-                                v.dhcpOptionsId(),
-                                v.stateAsString(),
-                                v.vpcId(),
-                                v.ownerId(),
-                                v.instanceTenancyAsString(),
-                                EC2VpcIpv6CidrBlockAssociation.fromSdk(v.ipv6CidrBlockAssociationSet()),
-                                EC2VpcCidrBlockAssociation.fromSdk(v.cidrBlockAssociationSet()),
-                                v.isDefault(),
-                                tagsFromSdk(v.tags())
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2VpcResource(
+                                       regionName,
+                                       v.cidrBlock(),
+                                       v.dhcpOptionsId(),
+                                       v.stateAsString(),
+                                       v.vpcId(),
+                                       v.ownerId(),
+                                       v.instanceTenancyAsString(),
+                                       EC2VpcIpv6CidrBlockAssociation.fromSdk(v.ipv6CidrBlockAssociationSet()),
+                                       EC2VpcCidrBlockAssociation.fromSdk(v.cidrBlockAssociationSet()),
+                                       v.isDefault(),
+                                       tagsFromSdk(v.tags())
+                               )
+                       )
+                       .orElse(null);
     }
 }

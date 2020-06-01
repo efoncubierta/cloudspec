@@ -65,39 +65,39 @@ public class EC2ImageResource extends EC2Resource {
             description = "The architecture of the image",
             exampleValues = "i386 | x86_64 | arm64"
     )
-    private String architecture;
+    private final String architecture;
 
     @PropertyDefinition(
             name = "creation_date",
             description = "The date and time the image was created"
     )
-    private Date creationDate;
+    private final Date creationDate;
 
     @IdDefinition
     @PropertyDefinition(
             name = "image_id",
             description = "The ID of the AMI"
     )
-    private String imageId;
+    private final String imageId;
 
     @PropertyDefinition(
             name = "image_location",
             description = "The location of the AMI"
     )
-    private String imageLocation;
+    private final String imageLocation;
 
     @PropertyDefinition(
             name = "type",
             description = "The type of image",
             exampleValues = "machine | kernel | ramdisk"
     )
-    private String imageType;
+    private final String imageType;
 
     @PropertyDefinition(
             name = "kernel_id",
             description = "The kernel associated with the image, if any. Only applicable for machine images"
     )
-    private String kernelId;
+    private final String kernelId;
 
     @PropertyDefinition(
             name = "owner_id",
@@ -110,80 +110,80 @@ public class EC2ImageResource extends EC2Resource {
             description = "This value is set to 'windows' for Windows AMIs; otherwise, it is blank",
             exampleValues = "windows"
     )
-    private String platform;
+    private final String platform;
 
     @PropertyDefinition(
             name = "product_codes",
             description = "Any product codes associated with the AMI"
     )
-    private List<EC2ProductCode> productCodes;
+    private final List<EC2ProductCode> productCodes;
 
     @PropertyDefinition(
             name = "state",
             description = "State of the image"
     )
-    private String state;
+    private final String state;
 
     @PropertyDefinition(
             name = "block_device_mappings",
             description = "Any block device mapping entries"
     )
-    private List<EC2BlockDeviceMapping> blockDeviceMappings;
+    private final List<EC2BlockDeviceMapping> blockDeviceMappings;
 
     @PropertyDefinition(
             name = "ena_support",
             description = "Flag indicating ENA support"
     )
-    private Boolean enaSupport;
+    private final Boolean enaSupport;
 
     @PropertyDefinition(
             name = "hypervisor",
             description = "The hypervisor type of the image"
     )
-    private String hypervisor;
+    private final String hypervisor;
 
     @PropertyDefinition(
             name = "name",
             description = "The name of the AMI that was provided during image creation"
     )
-    private String name;
+    private final String name;
 
     @PropertyDefinition(
             name = "root_device_name",
             description = "The device name of the root device volume"
     )
-    private String rootDeviceName;
+    private final String rootDeviceName;
 
     @PropertyDefinition(
             name = "root_device_type",
             description = "The type of root device used by the AMI",
             exampleValues = "/dev/sda1"
     )
-    private String rootDeviceType;
+    private final String rootDeviceType;
 
     @PropertyDefinition(
             name = "sriov_net_support",
             description = "Specifies whether enhanced networking with the Intel 82599 Virtual Function interface is enabled"
     )
-    private String sriovNetSupport;
+    private final String sriovNetSupport;
 
     @PropertyDefinition(
             name = "tags",
             description = "Any tags assigned to the image"
     )
-    private List<KeyValue> tags;
+    private final List<KeyValue> tags;
 
     @PropertyDefinition(
             name = "virtualization_type",
             description = "The type of virtualization of the AMI"
     )
-    private String virtualizationType;
+    private final String virtualizationType;
 
     @PropertyDefinition(
             name = "public_launch_permissions",
             description = "Indicates whether the image has public launch permissions"
     )
-    private Boolean publicLaunchPermissions;
+    private final Boolean publicLaunchPermissions;
 
     public EC2ImageResource(String region, String architecture, Date creationDate, String imageId,
                             String imageLocation, String imageType, String kernelId, String ownerId, String platform,
@@ -216,8 +216,18 @@ public class EC2ImageResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Image))) {
+            return false;
+        }
+
+        if (o instanceof Image) {
+            return sdkEquals((Image) o);
+        }
+
         EC2ImageResource that = (EC2ImageResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(architecture, that.architecture) &&
@@ -242,6 +252,29 @@ public class EC2ImageResource extends EC2Resource {
                 Objects.equals(publicLaunchPermissions, that.publicLaunchPermissions);
     }
 
+    private boolean sdkEquals(Image that) {
+        return Objects.equals(architecture, that.architectureAsString()) &&
+                Objects.equals(creationDate, dateFromSdk(that.creationDate())) &&
+                Objects.equals(imageId, that.imageId()) &&
+                Objects.equals(imageLocation, that.imageLocation()) &&
+                Objects.equals(imageType, that.imageTypeAsString()) &&
+                Objects.equals(kernelId, that.kernelId()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(platform, that.platformAsString()) &&
+                Objects.equals(productCodes, that.productCodes()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(blockDeviceMappings, that.blockDeviceMappings()) &&
+                Objects.equals(enaSupport, that.enaSupport()) &&
+                Objects.equals(hypervisor, that.hypervisorAsString()) &&
+                Objects.equals(name, that.name()) &&
+                Objects.equals(rootDeviceName, that.rootDeviceName()) &&
+                Objects.equals(rootDeviceType, that.rootDeviceTypeAsString()) &&
+                Objects.equals(sriovNetSupport, that.sriovNetSupport()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(virtualizationType, that.virtualizationTypeAsString()) &&
+                Objects.equals(publicLaunchPermissions, that.publicLaunchPermissions());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(region, architecture, creationDate, imageId, imageLocation, imageType, kernelId,
@@ -251,29 +284,29 @@ public class EC2ImageResource extends EC2Resource {
 
     public static EC2ImageResource fromSdk(String regionName, Image image) {
         return Optional.ofNullable(image)
-                .map(v -> new EC2ImageResource(
-                        regionName,
-                        v.architectureAsString(),
-                        dateFromSdk(v.creationDate()),
-                        v.imageId(),
-                        v.imageLocation(),
-                        v.imageTypeAsString(),
-                        v.kernelId(),
-                        v.ownerId(),
-                        v.platformAsString(),
-                        EC2ProductCode.fromSdk(v.productCodes()),
-                        v.stateAsString(),
-                        EC2BlockDeviceMapping.fromSdk(v.blockDeviceMappings()),
-                        v.enaSupport(),
-                        v.hypervisorAsString(),
-                        v.name(),
-                        v.rootDeviceName(),
-                        v.rootDeviceTypeAsString(),
-                        v.sriovNetSupport(),
-                        tagsFromSdk(v.tags()),
-                        v.virtualizationTypeAsString(),
-                        v.publicLaunchPermissions()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2ImageResource(
+                               regionName,
+                               v.architectureAsString(),
+                               dateFromSdk(v.creationDate()),
+                               v.imageId(),
+                               v.imageLocation(),
+                               v.imageTypeAsString(),
+                               v.kernelId(),
+                               v.ownerId(),
+                               v.platformAsString(),
+                               EC2ProductCode.fromSdk(v.productCodes()),
+                               v.stateAsString(),
+                               EC2BlockDeviceMapping.fromSdk(v.blockDeviceMappings()),
+                               v.enaSupport(),
+                               v.hypervisorAsString(),
+                               v.name(),
+                               v.rootDeviceName(),
+                               v.rootDeviceTypeAsString(),
+                               v.sriovNetSupport(),
+                               tagsFromSdk(v.tags()),
+                               v.virtualizationTypeAsString(),
+                               v.publicLaunchPermissions()
+                       ))
+                       .orElse(null);
     }
 }

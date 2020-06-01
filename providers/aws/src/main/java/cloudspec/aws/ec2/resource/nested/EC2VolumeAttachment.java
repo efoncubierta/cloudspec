@@ -87,8 +87,18 @@ public class EC2VolumeAttachment {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof VolumeAttachment))) {
+            return false;
+        }
+
+        if (o instanceof VolumeAttachment) {
+            return sdkEquals((VolumeAttachment) o);
+        }
+
         EC2VolumeAttachment that = (EC2VolumeAttachment) o;
         return Objects.equals(attachTime, that.attachTime) &&
                 Objects.equals(device, that.device) &&
@@ -98,6 +108,15 @@ public class EC2VolumeAttachment {
                 Objects.equals(deleteOnTermination, that.deleteOnTermination);
     }
 
+    private boolean sdkEquals(VolumeAttachment that) {
+        return Objects.equals(attachTime.toInstant(), that.attachTime()) &&
+                Objects.equals(device, that.device()) &&
+                Objects.equals(instanceId, that.instanceId()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(volumeId, that.volumeId()) &&
+                Objects.equals(deleteOnTermination, that.deleteOnTermination());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(attachTime, device, instanceId, state, volumeId, deleteOnTermination);
@@ -105,23 +124,23 @@ public class EC2VolumeAttachment {
 
     public static List<EC2VolumeAttachment> fromSdk(List<VolumeAttachment> volumeAttachments) {
         return Optional.ofNullable(volumeAttachments)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2VolumeAttachment::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2VolumeAttachment::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2VolumeAttachment fromSdk(VolumeAttachment volumeAttachment) {
         return Optional.ofNullable(volumeAttachment)
-                .map(v ->
-                        new EC2VolumeAttachment(
-                                AWSResource.dateFromSdk(v.attachTime()),
-                                v.device(),
-                                v.instanceId(),
-                                v.stateAsString(),
-                                v.volumeId(),
-                                v.deleteOnTermination()
-                        )
-                ).orElse(null);
+                       .map(v ->
+                               new EC2VolumeAttachment(
+                                       AWSResource.dateFromSdk(v.attachTime()),
+                                       v.device(),
+                                       v.instanceId(),
+                                       v.stateAsString(),
+                                       v.volumeId(),
+                                       v.deleteOnTermination()
+                               )
+                       ).orElse(null);
     }
 }

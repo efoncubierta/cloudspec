@@ -47,10 +47,24 @@ public class EC2IpRange {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof IpRange))) {
+            return false;
+        }
+
+        if (o instanceof IpRange) {
+            return sdkEquals((IpRange) o);
+        }
+
         EC2IpRange that = (EC2IpRange) o;
         return Objects.equals(cidrIp, that.cidrIp);
+    }
+
+    private boolean sdkEquals(IpRange that) {
+        return Objects.equals(cidrIp, that.cidrIp());
     }
 
     @Override
@@ -60,18 +74,18 @@ public class EC2IpRange {
 
     public static List<EC2IpRange> fromSdk(List<IpRange> ipRanges) {
         return Optional.ofNullable(ipRanges)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2IpRange::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2IpRange::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2IpRange fromSdk(IpRange ipRange) {
         return Optional.ofNullable(ipRange)
-                .map(v -> new EC2IpRange(
-                                v.cidrIp()
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2IpRange(
+                                       v.cidrIp()
+                               )
+                       )
+                       .orElse(null);
     }
 }

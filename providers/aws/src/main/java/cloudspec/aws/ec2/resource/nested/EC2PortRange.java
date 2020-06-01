@@ -51,11 +51,26 @@ public class EC2PortRange {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof PortRange))) {
+            return false;
+        }
+
+        if (o instanceof PortRange) {
+            return sdkEquals((PortRange) o);
+        }
+
         EC2PortRange that = (EC2PortRange) o;
         return Objects.equals(from, that.from) &&
                 Objects.equals(to, that.to);
+    }
+
+    private boolean sdkEquals(PortRange that) {
+        return Objects.equals(from, that.from()) &&
+                Objects.equals(to, that.to());
     }
 
     @Override
@@ -65,10 +80,10 @@ public class EC2PortRange {
 
     public static EC2PortRange fromSdk(PortRange portRange) {
         return Optional.ofNullable(portRange)
-                .map(v -> new EC2PortRange(
-                        v.from(),
-                        v.to()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2PortRange(
+                               v.from(),
+                               v.to()
+                       ))
+                       .orElse(null);
     }
 }

@@ -27,70 +27,49 @@ package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
 import cloudspec.aws.ec2.resource.EC2DhcpOptionsResource;
-import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeDhcpOptionsResponse;
 import software.amazon.awssdk.services.ec2.model.Filter;
-import software.amazon.awssdk.utils.IoUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class EC2DhcpOptionsLoader extends EC2ResourceLoader<EC2DhcpOptionsResource> {
-    private final IAWSClientsProvider clientsProvider;
+    private static final String FILTER_DHCP_OPTIONS_ID = "dhcp-options-id";
 
     public EC2DhcpOptionsLoader(IAWSClientsProvider clientsProvider) {
-        this.clientsProvider = clientsProvider;
+        super(clientsProvider);
     }
 
     @Override
-    public Optional<EC2DhcpOptionsResource> getById(String dhcpOptionsId) {
-        return getDhcpOptions(Collections.singletonList(dhcpOptionsId)).findFirst();
-    }
-
-    @Override
-    public List<EC2DhcpOptionsResource> getAll() {
-        return getDhcpOptions().collect(Collectors.toList());
-    }
-
-    private Stream<EC2DhcpOptionsResource> getDhcpOptions() {
-        return getDhcpOptions(Collections.emptyList());
-    }
-
-    private Stream<EC2DhcpOptionsResource> getDhcpOptions(List<String> dhcpOptionsIds) {
-        Ec2Client ec2Client = clientsProvider.getEc2Client();
-
-        try {
-            return ec2Client.describeRegions()
-                    .regions()
-                    .stream()
-                    .flatMap(region -> getDhcpOptionsInRegion(region, dhcpOptionsIds));
-        } finally {
-            IoUtils.closeQuietly(ec2Client, null);
-        }
-
-    }
-
-    private Stream<EC2DhcpOptionsResource> getDhcpOptionsInRegion(software.amazon.awssdk.services.ec2.model.Region region,
-                                                                  List<String> dhcpOptionsId) {
-        Ec2Client client = clientsProvider.getEc2ClientForRegion(region.regionName());
-
-        try {
-            DescribeDhcpOptionsResponse response = dhcpOptionsId != null && !dhcpOptionsId.isEmpty() ?
-                    client.describeDhcpOptions(builder -> builder.filters(
-                            Filter.builder()
-                                    .name("dhcp-options-id")
-                                    .values(dhcpOptionsId.toArray(new String[0])).build())
-                    ) :
-                    client.describeDhcpOptions();
+    protected Stream<EC2DhcpOptionsResource> getResourcesInRegion(String region,
+                                                                  List<String> ids) {
+        try (var client = clientsProvider.getEc2ClientForRegion(region)) {
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeDhcpOptionss.html
+            var response = client.describeDhcpOptions(builder ->
+                    builder.filters(
+                            buildFilters(ids).toArray(new Filter[0])
+                    )
+            );
 
             return response.dhcpOptions()
-                    .stream()
-                    .map(dhcpOptions -> EC2DhcpOptionsResource.fromSdk(region.regionName(), dhcpOptions));
-        } finally {
-            IoUtils.closeQuietly(client, null);
+                           .stream()
+                           .map(dhcpOptions -> EC2DhcpOptionsResource.fromSdk(region, dhcpOptions));
         }
+    }
+
+    private List<Filter> buildFilters(List<String> ids) {
+        var filters = new ArrayList<Filter>();
+
+        // filter by ids
+        if (!Objects.isNull(ids) && !ids.isEmpty()) {
+            filters.add(
+                    Filter.builder()
+                          .name(FILTER_DHCP_OPTIONS_ID)
+                          .values(ids.toArray(new String[0]))
+                          .build()
+            );
+        }
+        return filters;
     }
 }

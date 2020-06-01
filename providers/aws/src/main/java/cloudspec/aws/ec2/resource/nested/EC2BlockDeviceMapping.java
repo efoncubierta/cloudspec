@@ -62,12 +62,28 @@ public class EC2BlockDeviceMapping {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof BlockDeviceMapping))) {
+            return false;
+        }
+
+        if (o instanceof BlockDeviceMapping) {
+            return sdkEquals((BlockDeviceMapping) o);
+        }
+
         EC2BlockDeviceMapping that = (EC2BlockDeviceMapping) o;
         return Objects.equals(deviceName, that.deviceName) &&
                 Objects.equals(virtualName, that.virtualName) &&
                 Objects.equals(ebs, that.ebs);
+    }
+
+    private boolean sdkEquals(BlockDeviceMapping that) {
+        return Objects.equals(deviceName, that.deviceName()) &&
+                Objects.equals(virtualName, that.virtualName()) &&
+                Objects.equals(ebs, that.ebs());
     }
 
     @Override
@@ -77,20 +93,20 @@ public class EC2BlockDeviceMapping {
 
     public static List<EC2BlockDeviceMapping> fromSdk(List<BlockDeviceMapping> blockDeviceMappings) {
         return Optional.ofNullable(blockDeviceMappings)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2BlockDeviceMapping::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2BlockDeviceMapping::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2BlockDeviceMapping fromSdk(BlockDeviceMapping blockDeviceMapping) {
         return Optional.ofNullable(blockDeviceMapping)
-                .map(v -> new EC2BlockDeviceMapping(
-                                v.deviceName(),
-                                v.virtualName(),
-                                EC2EbsBlockDevice.fromSdk(v.ebs())
-                        )
-                )
-                .orElse(null);
+                       .map(v -> new EC2BlockDeviceMapping(
+                                       v.deviceName(),
+                                       v.virtualName(),
+                                       EC2EbsBlockDevice.fromSdk(v.ebs())
+                               )
+                       )
+                       .orElse(null);
     }
 }

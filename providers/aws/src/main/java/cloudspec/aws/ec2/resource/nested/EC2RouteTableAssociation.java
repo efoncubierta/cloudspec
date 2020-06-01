@@ -95,8 +95,18 @@ public class EC2RouteTableAssociation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof RouteTableAssociation))) {
+            return false;
+        }
+
+        if (o instanceof RouteTableAssociation) {
+            return sdkEquals((RouteTableAssociation) o);
+        }
+
         EC2RouteTableAssociation that = (EC2RouteTableAssociation) o;
         return Objects.equals(main, that.main) &&
                 Objects.equals(routeTableAssociationId, that.routeTableAssociationId) &&
@@ -106,6 +116,15 @@ public class EC2RouteTableAssociation {
                 Objects.equals(associationState, that.associationState);
     }
 
+    private boolean sdkEquals(RouteTableAssociation that) {
+        return Objects.equals(main, that.main()) &&
+                Objects.equals(routeTableAssociationId, that.routeTableAssociationId()) &&
+                Objects.equals(routeTableId, that.routeTableId()) &&
+                Objects.equals(subnetId, that.subnetId()) &&
+                Objects.equals(gatewayId, that.gatewayId()) &&
+                Objects.equals(associationState, associationStateFromSdk(that.associationState()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(main, routeTableAssociationId, routeTableId, subnetId, gatewayId, associationState);
@@ -113,28 +132,28 @@ public class EC2RouteTableAssociation {
 
     public static List<EC2RouteTableAssociation> fromSdk(List<RouteTableAssociation> routeTableAssociations) {
         return Optional.ofNullable(routeTableAssociations)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2RouteTableAssociation::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2RouteTableAssociation::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2RouteTableAssociation fromSdk(RouteTableAssociation routeTableAssociation) {
         return Optional.ofNullable(routeTableAssociation)
-                .map(v -> new EC2RouteTableAssociation(
-                        v.main(),
-                        v.routeTableAssociationId(),
-                        v.routeTableId(),
-                        v.subnetId(),
-                        v.gatewayId(),
-                        associationStateFromSdk(v.associationState())
-                ))
-                .orElse(null);
+                       .map(v -> new EC2RouteTableAssociation(
+                               v.main(),
+                               v.routeTableAssociationId(),
+                               v.routeTableId(),
+                               v.subnetId(),
+                               v.gatewayId(),
+                               associationStateFromSdk(v.associationState())
+                       ))
+                       .orElse(null);
     }
 
     public static String associationStateFromSdk(RouteTableAssociationState routeTableAssociationState) {
         return Optional.ofNullable(routeTableAssociationState)
-                .map(RouteTableAssociationState::stateAsString)
-                .orElse(null);
+                       .map(RouteTableAssociationState::stateAsString)
+                       .orElse(null);
     }
 }

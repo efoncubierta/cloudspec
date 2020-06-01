@@ -126,7 +126,7 @@ public class EC2SubnetResource extends EC2Resource {
             name = "ipv6_cidr_block_associations",
             description = "Information about the IPv6 CIDR blocks associated with the subnet"
     )
-    private final List<EC2SubnetIpv6CidrBlockAssociation> ipv6CidrBlockAssociationSet;
+    private final List<EC2SubnetIpv6CidrBlockAssociation> ipv6CidrBlockAssociations;
 
     @PropertyDefinition(
             name = "tags",
@@ -149,7 +149,7 @@ public class EC2SubnetResource extends EC2Resource {
     public EC2SubnetResource(String region, String availabilityZone, Integer availableIpAddressCount,
                              String cidrBlock, Boolean defaultForAz, Boolean mapPublicIpOnLaunch, String state,
                              String subnetId, String vpcId, String ownerId, Boolean assignIpv6AddressOnCreation,
-                             List<EC2SubnetIpv6CidrBlockAssociation> ipv6CidrBlockAssociationSet, List<KeyValue> tags,
+                             List<EC2SubnetIpv6CidrBlockAssociation> ipv6CidrBlockAssociations, List<KeyValue> tags,
                              String subnetArn, String outpostArn) {
         this.region = region;
         this.availabilityZone = availabilityZone;
@@ -162,7 +162,7 @@ public class EC2SubnetResource extends EC2Resource {
         this.vpcId = vpcId;
         this.ownerId = ownerId;
         this.assignIpv6AddressOnCreation = assignIpv6AddressOnCreation;
-        this.ipv6CidrBlockAssociationSet = ipv6CidrBlockAssociationSet;
+        this.ipv6CidrBlockAssociations = ipv6CidrBlockAssociations;
         this.tags = tags;
         this.subnetArn = subnetArn;
         this.outpostArn = outpostArn;
@@ -170,8 +170,18 @@ public class EC2SubnetResource extends EC2Resource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof Subnet))) {
+            return false;
+        }
+
+        if (o instanceof Subnet) {
+            return sdkEquals((Subnet) o);
+        }
+
         EC2SubnetResource that = (EC2SubnetResource) o;
         return Objects.equals(region, that.region) &&
                 Objects.equals(availabilityZone, that.availabilityZone) &&
@@ -184,40 +194,57 @@ public class EC2SubnetResource extends EC2Resource {
                 Objects.equals(vpcId, that.vpcId) &&
                 Objects.equals(ownerId, that.ownerId) &&
                 Objects.equals(assignIpv6AddressOnCreation, that.assignIpv6AddressOnCreation) &&
-                Objects.equals(ipv6CidrBlockAssociationSet, that.ipv6CidrBlockAssociationSet) &&
+                Objects.equals(ipv6CidrBlockAssociations, that.ipv6CidrBlockAssociations) &&
                 Objects.equals(tags, that.tags) &&
                 Objects.equals(subnetArn, that.subnetArn) &&
                 Objects.equals(outpostArn, that.outpostArn);
+    }
+
+    private boolean sdkEquals(Subnet that) {
+        return Objects.equals(availabilityZone, that.availabilityZone()) &&
+                Objects.equals(availableIpAddressCount, that.availableIpAddressCount()) &&
+                Objects.equals(cidrBlock, that.cidrBlock()) &&
+                Objects.equals(defaultForAz, that.defaultForAz()) &&
+                Objects.equals(mapPublicIpOnLaunch, that.mapPublicIpOnLaunch()) &&
+                Objects.equals(state, that.stateAsString()) &&
+                Objects.equals(subnetId, that.subnetId()) &&
+                Objects.equals(vpcId, that.vpcId()) &&
+                Objects.equals(ownerId, that.ownerId()) &&
+                Objects.equals(assignIpv6AddressOnCreation, that.assignIpv6AddressOnCreation()) &&
+                Objects.equals(ipv6CidrBlockAssociations, that.ipv6CidrBlockAssociationSet()) &&
+                Objects.equals(tags, tagsFromSdk(that.tags())) &&
+                Objects.equals(subnetArn, that.subnetArn()) &&
+                Objects.equals(outpostArn, that.outpostArn());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(region, availabilityZone, availableIpAddressCount, cidrBlock, defaultForAz,
                 mapPublicIpOnLaunch, state, subnetId, vpcId, ownerId, assignIpv6AddressOnCreation,
-                ipv6CidrBlockAssociationSet, tags, subnetArn, outpostArn);
+                ipv6CidrBlockAssociations, tags, subnetArn, outpostArn);
     }
 
     public static EC2SubnetResource fromSdk(String regionName, Subnet subnet) {
         return Optional.ofNullable(subnet)
-                .map(v ->
-                        new EC2SubnetResource(
-                                regionName,
-                                v.availabilityZone(),
-                                v.availableIpAddressCount(),
-                                v.cidrBlock(),
-                                v.defaultForAz(),
-                                v.mapPublicIpOnLaunch(),
-                                v.stateAsString(),
-                                v.subnetId(),
-                                v.vpcId(),
-                                v.ownerId(),
-                                v.assignIpv6AddressOnCreation(),
-                                EC2SubnetIpv6CidrBlockAssociation.fromSdk(v.ipv6CidrBlockAssociationSet()),
-                                tagsFromSdk(v.tags()),
-                                v.subnetArn(),
-                                v.outpostArn()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2SubnetResource(
+                                       regionName,
+                                       v.availabilityZone(),
+                                       v.availableIpAddressCount(),
+                                       v.cidrBlock(),
+                                       v.defaultForAz(),
+                                       v.mapPublicIpOnLaunch(),
+                                       v.stateAsString(),
+                                       v.subnetId(),
+                                       v.vpcId(),
+                                       v.ownerId(),
+                                       v.assignIpv6AddressOnCreation(),
+                                       EC2SubnetIpv6CidrBlockAssociation.fromSdk(v.ipv6CidrBlockAssociationSet()),
+                                       tagsFromSdk(v.tags()),
+                                       v.subnetArn(),
+                                       v.outpostArn()
+                               )
+                       )
+                       .orElse(null);
     }
 }

@@ -92,8 +92,18 @@ public class EC2NetworkAclEntry {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || (getClass() != o.getClass() && !(o instanceof NetworkAclEntry))) {
+            return false;
+        }
+
+        if (o instanceof NetworkAclEntry) {
+            return sdkEquals((NetworkAclEntry) o);
+        }
+
         EC2NetworkAclEntry that = (EC2NetworkAclEntry) o;
         return Objects.equals(cidrBlock, that.cidrBlock) &&
                 Objects.equals(egress, that.egress) &&
@@ -104,6 +114,16 @@ public class EC2NetworkAclEntry {
                 Objects.equals(ruleAction, that.ruleAction);
     }
 
+    private boolean sdkEquals(NetworkAclEntry that) {
+        return Objects.equals(cidrBlock, that.cidrBlock()) &&
+                Objects.equals(egress, that.egress()) &&
+                Objects.equals(icmpTypeCode, icmpTypeCodeFromSdk(that.icmpTypeCode())) &&
+                Objects.equals(ipv6CidrBlock, that.ipv6CidrBlock()) &&
+                Objects.equals(portRange, that.portRange()) &&
+                Objects.equals(protocol, that.protocol()) &&
+                Objects.equals(ruleAction, that.ruleActionAsString());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(cidrBlock, egress, icmpTypeCode, ipv6CidrBlock, portRange, protocol, ruleAction);
@@ -111,29 +131,29 @@ public class EC2NetworkAclEntry {
 
     public static List<EC2NetworkAclEntry> fromSdk(List<NetworkAclEntry> networkAclEntries) {
         return Optional.ofNullable(networkAclEntries)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2NetworkAclEntry::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2NetworkAclEntry::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2NetworkAclEntry fromSdk(NetworkAclEntry networkAclEntry) {
         return Optional.ofNullable(networkAclEntry)
-                .map(v -> new EC2NetworkAclEntry(
-                        v.cidrBlock(),
-                        v.egress(),
-                        icmpTypeCodeFromSdk(v.icmpTypeCode()),
-                        v.ipv6CidrBlock(),
-                        EC2PortRange.fromSdk(v.portRange()),
-                        v.protocol(),
-                        v.ruleActionAsString()
-                ))
-                .orElse(null);
+                       .map(v -> new EC2NetworkAclEntry(
+                               v.cidrBlock(),
+                               v.egress(),
+                               icmpTypeCodeFromSdk(v.icmpTypeCode()),
+                               v.ipv6CidrBlock(),
+                               EC2PortRange.fromSdk(v.portRange()),
+                               v.protocol(),
+                               v.ruleActionAsString()
+                       ))
+                       .orElse(null);
     }
 
     public static Integer icmpTypeCodeFromSdk(IcmpTypeCode icmpTypeCode) {
         return Optional.ofNullable(icmpTypeCode)
-                .map(IcmpTypeCode::code)
-                .orElse(null);
+                       .map(IcmpTypeCode::code)
+                       .orElse(null);
     }
 }
