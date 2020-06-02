@@ -26,7 +26,7 @@
 package cloudspec.aws.ec2.loader;
 
 import cloudspec.aws.IAWSClientsProvider;
-import cloudspec.aws.ec2.resource.EC2SnapshotResource;
+import cloudspec.aws.ec2.resource.EC2VpcEndpointResource;
 import software.amazon.awssdk.services.ec2.model.Filter;
 
 import java.util.ArrayList;
@@ -34,27 +34,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class EC2SnapshotLoader extends EC2ResourceLoader<EC2SnapshotResource> {
-    private static final String FILTER_SNAPSHOT_ID = "snapshot-id";
+public class EC2VpcEndpointLoader extends EC2ResourceLoader<EC2VpcEndpointResource> {
+    private static final String FILTER_VPC_ENDPOINT_ID = "vpc-endpoint-id";
 
-    public EC2SnapshotLoader(IAWSClientsProvider clientsProvider) {
+    public EC2VpcEndpointLoader(IAWSClientsProvider clientsProvider) {
         super(clientsProvider);
     }
 
     @Override
-    protected Stream<EC2SnapshotResource> getResourcesInRegion(String region,
-                                                               List<String> ids) {
+    protected Stream<EC2VpcEndpointResource> getResourcesInRegion(String region,
+                                                                  List<String> ids) {
         try (var client = clientsProvider.getEc2ClientForRegion(region)) {
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSnapshots.html
-            var response = client.describeSnapshots(builder ->
+            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcEndpoints.html
+            var response = client.describeVpcEndpoints(builder ->
                     builder.filters(
                             buildFilters(ids).toArray(new Filter[0])
                     )
             );
 
-            return response.snapshots()
+            return response.vpcEndpoints()
                            .stream()
-                           .map(snapshot -> EC2SnapshotResource.fromSdk(region, snapshot));
+                           .map(vpcEndpoint -> EC2VpcEndpointResource.fromSdk(region, vpcEndpoint));
         }
     }
 
@@ -65,7 +65,7 @@ public class EC2SnapshotLoader extends EC2ResourceLoader<EC2SnapshotResource> {
         if (!Objects.isNull(ids) && !ids.isEmpty()) {
             filters.add(
                     Filter.builder()
-                          .name(FILTER_SNAPSHOT_ID)
+                          .name(FILTER_VPC_ENDPOINT_ID)
                           .values(ids.toArray(new String[0]))
                           .build()
             );

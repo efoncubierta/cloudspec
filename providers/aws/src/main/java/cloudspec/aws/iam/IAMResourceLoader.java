@@ -35,9 +35,9 @@ import java.util.stream.Collectors;
 public abstract class IAMResourceLoader<T extends IAMResource> implements AWSResourceLoader<T> {
     protected List<KeyValue> toTags(List<Tag> tags) {
         return tags.stream()
-                .map(tag -> new KeyValue(
-                        tag.key(), tag.value())
-                )
-                .collect(Collectors.toList());
+                   .map(tag -> new KeyValue(
+                           tag.key(), tag.value())
+                   )
+                   .collect(Collectors.toList());
     }
 }

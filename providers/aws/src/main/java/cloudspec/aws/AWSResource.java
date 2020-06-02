@@ -40,16 +40,16 @@ public abstract class AWSResource {
 
     public static Date dateFromSdk(String iso8601Date) {
         return Optional.ofNullable(iso8601Date)
-                .map(v -> {
-                    try {
-                        return DateUtils.parseDate(
-                                iso8601Date,
-                                DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.getPattern()
-                        );
-                    } catch (ParseException e) {
-                        return null;
-                    }
-                })
-                .orElse(null);
+                       .map(v -> {
+                           try {
+                               return DateUtils.parseDate(
+                                       iso8601Date,
+                                       DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.getPattern()
+                               );
+                           } catch (ParseException e) {
+                               return null;
+                           }
+                       })
+                       .orElse(null);
     }
 }

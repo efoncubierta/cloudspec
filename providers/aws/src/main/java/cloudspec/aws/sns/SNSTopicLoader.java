@@ -61,11 +61,12 @@ public class SNSTopicLoader implements SNSResourceLoader<SNSTopicResource> {
             Stream<String> topicArnsStream;
             if (topicArns != null && topicArns.size() > 0) {
                 topicArnsStream = topicArns.stream();
-            } else {
+            }
+            else {
                 topicArnsStream = snsClient.listTopics()
-                        .topics()
-                        .stream()
-                        .map(Topic::topicArn);
+                                           .topics()
+                                           .stream()
+                                           .map(Topic::topicArn);
             }
 
             return topicArnsStream

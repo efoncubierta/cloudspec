@@ -37,43 +37,43 @@ public class AWSClientsProvider implements IAWSClientsProvider {
     @Override
     public IamClient getIamClient() {
         return IamClient.builder()
-                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
-                .build();
+                        .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                        .build();
     }
 
     @Override
     public Ec2Client getEc2Client() {
         return Ec2Client.builder()
-                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
-                .build();
+                        .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                        .build();
     }
 
     @Override
     public Ec2Client getEc2ClientForRegion(String region) {
         return Ec2Client.builder()
-                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
-                .region(Region.of(region))
-                .build();
+                        .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                        .region(Region.of(region))
+                        .build();
     }
 
     @Override
     public S3Client getS3Client() {
         return S3Client.builder()
-                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
-                .build();
+                       .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                       .build();
     }
 
     @Override
     public SqsClient getSqsClient() {
         return SqsClient.builder()
-                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
-                .build();
+                        .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                        .build();
     }
 
     @Override
     public SnsClient getSnsClient() {
         return SnsClient.builder()
-                .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
-                .build();
+                        .overrideConfiguration(builder -> builder.retryPolicy(RetryMode.STANDARD))
+                        .build();
     }
 }

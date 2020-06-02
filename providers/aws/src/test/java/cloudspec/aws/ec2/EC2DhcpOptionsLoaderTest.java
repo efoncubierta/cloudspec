@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2DhcpOptionsLoader;
 import datagen.services.ec2.model.DhcpOptionsGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeDhcpOptionsRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeDhcpOptionsResponse;
 import software.amazon.awssdk.services.ec2.model.DhcpOptions;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2DhcpOptionsLoaderTest extends EC2LoaderTest {
     private final EC2DhcpOptionsLoader loader = new EC2DhcpOptionsLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2DhcpOptionsLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadDhcpOptions() {
         var dhcpOptionsList = DhcpOptionsGenerator.dhcpOptionsList();
-        when(ec2Client.describeDhcpOptions(any(Consumer.class))).thenReturn(
-                DescribeDhcpOptionsResponse.builder()
-                                           .dhcpOptions(dhcpOptionsList.toArray(new DhcpOptions[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeDhcpOptionsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeDhcpOptionsRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeDhcpOptionsResponse.builder()
+                                              .dhcpOptions(dhcpOptionsList.toArray(new DhcpOptions[0]))
+                                              .build();
+        }).when(ec2Client).describeDhcpOptions(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2DhcpOptionsLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadDhcpOptionsByRandomId() {
-        when(ec2Client.describeDhcpOptions(any(Consumer.class))).thenReturn(
-                DescribeDhcpOptionsResponse.builder()
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeDhcpOptionsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeDhcpOptionsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeDhcpOptionsResponse.builder()
+                                              .build();
+        }).when(ec2Client).describeDhcpOptions(any(Consumer.class));
 
         var resourceOpt = loader.getById(DhcpOptionsGenerator.dhcpOptionsId());
 
@@ -72,11 +81,15 @@ public class EC2DhcpOptionsLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadDhcpOptionsById() {
         var dhcpOptionsList = DhcpOptionsGenerator.dhcpOptionsList(1);
-        when(ec2Client.describeDhcpOptions(any(Consumer.class))).thenReturn(
-                DescribeDhcpOptionsResponse.builder()
-                                           .dhcpOptions(dhcpOptionsList.toArray(new DhcpOptions[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeDhcpOptionsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeDhcpOptionsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeDhcpOptionsResponse.builder()
+                                              .dhcpOptions(dhcpOptionsList.toArray(new DhcpOptions[0]))
+                                              .build();
+        }).when(ec2Client).describeDhcpOptions(any(Consumer.class));
 
         var dhcpOptions = dhcpOptionsList.get(0);
         var resourceOpt = loader.getById(dhcpOptions.dhcpOptionsId());

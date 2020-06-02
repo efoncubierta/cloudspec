@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2ImageLoader;
 import datagen.services.ec2.model.ImageGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeImagesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeImagesResponse;
 import software.amazon.awssdk.services.ec2.model.Image;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2ImageLoaderTest extends EC2LoaderTest {
     private final EC2ImageLoader loader = new EC2ImageLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2ImageLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadImages() {
         var images = ImageGenerator.images();
-        when(ec2Client.describeImages(any(Consumer.class))).thenReturn(
-                DescribeImagesResponse.builder()
-                                      .images(images.toArray(new Image[0]))
-                                      .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeImagesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeImagesRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeImagesResponse.builder()
+                                         .images(images.toArray(new Image[0]))
+                                         .build();
+        }).when(ec2Client).describeImages(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2ImageLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadImageByRandomId() {
-        when(ec2Client.describeImages(any(Consumer.class))).thenReturn(
-                DescribeImagesResponse.builder()
-                                      .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeImagesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeImagesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeImagesResponse.builder()
+                                         .build();
+        }).when(ec2Client).describeImages(any(Consumer.class));
 
         var resourceOpt = loader.getById(ImageGenerator.imageId());
 
@@ -72,11 +81,15 @@ public class EC2ImageLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadImageById() {
         var images = ImageGenerator.images(1);
-        when(ec2Client.describeImages(any(Consumer.class))).thenReturn(
-                DescribeImagesResponse.builder()
-                                      .images(images.toArray(new Image[0]))
-                                      .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeImagesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeImagesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeImagesResponse.builder()
+                                         .images(images.toArray(new Image[0]))
+                                         .build();
+        }).when(ec2Client).describeImages(any(Consumer.class));
 
         var image = images.get(0);
         var resourceOpt = loader.getById(image.imageId());

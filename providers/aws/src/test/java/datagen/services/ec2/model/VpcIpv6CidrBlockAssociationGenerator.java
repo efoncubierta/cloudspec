@@ -26,25 +26,20 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
-import software.amazon.awssdk.services.ec2.model.ElasticGpuAssociation;
+import software.amazon.awssdk.services.ec2.model.VpcIpv6CidrBlockAssociation;
 
-import java.util.List;
-import java.util.UUID;
-
-public class ElasticGpuAssociationGenerator extends BaseGenerator {
-    public static String elasticGpuAssociationId() {
-        return UUID.randomUUID().toString();
+public class VpcIpv6CidrBlockAssociationGenerator extends BaseGenerator {
+    public static String associationId() {
+        return String.format("vpc-cidr-assoc-%s", faker.random().hex(30));
     }
 
-    public static List<ElasticGpuAssociation> elasticGpuAssociations(Integer n) {
-        return listGenerator(n, ElasticGpuAssociationGenerator::elasticGpuAssociation);
-    }
-
-    public static ElasticGpuAssociation elasticGpuAssociation() {
-        return ElasticGpuAssociation.builder()
-                                    .elasticGpuAssociationId(elasticGpuAssociationId())
-                                    .elasticGpuAssociationTime(pastDate().toString())
-                                    .elasticGpuAssociationState(faker.lorem().word())
-                                    .build();
+    public static VpcIpv6CidrBlockAssociation vpcIpv6CidrBlockAssociation() {
+        return VpcIpv6CidrBlockAssociation.builder()
+                                          .associationId(associationId())
+                                          .ipv6CidrBlock(faker.internet().ipV6Cidr())
+                                          .ipv6CidrBlockState(VpcCidrBlockStateGenerator.vpcCidrBlockState())
+                                          .networkBorderGroup(faker.lorem().word()) // TODO realistic value
+                                          .ipv6Pool(faker.lorem().word()) // TODO realistic value
+                                          .build();
     }
 }

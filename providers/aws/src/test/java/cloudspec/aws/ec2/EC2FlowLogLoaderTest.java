@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2FlowLogLoader;
 import datagen.services.ec2.model.FlowLogGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeFlowLogsRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeFlowLogsResponse;
 import software.amazon.awssdk.services.ec2.model.FlowLog;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2FlowLogLoaderTest extends EC2LoaderTest {
     private final EC2FlowLogLoader loader = new EC2FlowLogLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2FlowLogLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadFlowLogs() {
         var flowlogs = FlowLogGenerator.flowLogs();
-        when(ec2Client.describeFlowLogs(any(Consumer.class))).thenReturn(
-                DescribeFlowLogsResponse.builder()
-                                        .flowLogs(flowlogs.toArray(new FlowLog[0]))
-                                        .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeFlowLogsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeFlowLogsRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filter().isEmpty());
+            return DescribeFlowLogsResponse.builder()
+                                           .flowLogs(flowlogs.toArray(new FlowLog[0]))
+                                           .build();
+        }).when(ec2Client).describeFlowLogs(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2FlowLogLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadFlowLogByRandomId() {
-        when(ec2Client.describeFlowLogs(any(Consumer.class))).thenReturn(
-                DescribeFlowLogsResponse.builder()
-                                        .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeFlowLogsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeFlowLogsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filter().isEmpty());
+            return DescribeFlowLogsResponse.builder()
+                                           .build();
+        }).when(ec2Client).describeFlowLogs(any(Consumer.class));
 
         var resourceOpt = loader.getById(FlowLogGenerator.flowLogId());
 
@@ -72,11 +81,15 @@ public class EC2FlowLogLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadFlowLogById() {
         var flowlogs = FlowLogGenerator.flowLogs(1);
-        when(ec2Client.describeFlowLogs(any(Consumer.class))).thenReturn(
-                DescribeFlowLogsResponse.builder()
-                                        .flowLogs(flowlogs.toArray(new FlowLog[0]))
-                                        .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeFlowLogsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeFlowLogsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filter().isEmpty());
+            return DescribeFlowLogsResponse.builder()
+                                           .flowLogs(flowlogs.toArray(new FlowLog[0]))
+                                           .build();
+        }).when(ec2Client).describeFlowLogs(any(Consumer.class));
 
         var flowlog = flowlogs.get(0);
         var resourceOpt = loader.getById(flowlog.flowLogId());

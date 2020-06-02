@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2NetworkAclLoader;
 import datagen.services.ec2.model.NetworkAclGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeNetworkAclsRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeNetworkAclsResponse;
 import software.amazon.awssdk.services.ec2.model.NetworkAcl;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2NetworkAclLoaderTest extends EC2LoaderTest {
     private final EC2NetworkAclLoader loader = new EC2NetworkAclLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2NetworkAclLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadNetworkAcls() {
         var networkAcls = NetworkAclGenerator.networkAcls();
-        when(ec2Client.describeNetworkAcls(any(Consumer.class))).thenReturn(
-                DescribeNetworkAclsResponse.builder()
-                                           .networkAcls(networkAcls.toArray(new NetworkAcl[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNetworkAclsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNetworkAclsRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeNetworkAclsResponse.builder()
+                                              .networkAcls(networkAcls.toArray(new NetworkAcl[0]))
+                                              .build();
+        }).when(ec2Client).describeNetworkAcls(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2NetworkAclLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadNetworkAclByRandomId() {
-        when(ec2Client.describeNetworkAcls(any(Consumer.class))).thenReturn(
-                DescribeNetworkAclsResponse.builder()
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNetworkAclsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNetworkAclsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeNetworkAclsResponse.builder()
+                                              .build();
+        }).when(ec2Client).describeNetworkAcls(any(Consumer.class));
 
         var resourceOpt = loader.getById(NetworkAclGenerator.networkAclId());
 
@@ -72,11 +81,15 @@ public class EC2NetworkAclLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadNetworkAclById() {
         var networkAcls = NetworkAclGenerator.networkAcls(1);
-        when(ec2Client.describeNetworkAcls(any(Consumer.class))).thenReturn(
-                DescribeNetworkAclsResponse.builder()
-                                           .networkAcls(networkAcls.toArray(new NetworkAcl[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNetworkAclsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNetworkAclsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeNetworkAclsResponse.builder()
+                                              .networkAcls(networkAcls.toArray(new NetworkAcl[0]))
+                                              .build();
+        }).when(ec2Client).describeNetworkAcls(any(Consumer.class));
 
         var networkAcl = networkAcls.get(0);
         var resourceOpt = loader.getById(networkAcl.networkAclId());

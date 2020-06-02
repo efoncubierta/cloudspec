@@ -31,7 +31,6 @@ import cloudspec.annotation.ResourceDefinition;
 import cloudspec.aws.AWSProvider;
 import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
-import software.amazon.awssdk.services.ec2.model.ElasticGpus;
 import software.amazon.awssdk.services.ec2.model.FlowLog;
 
 import java.util.Date;

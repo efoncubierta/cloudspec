@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2ElasticGpuLoader;
 import datagen.services.ec2.model.ElasticGpusGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeElasticGpusRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeElasticGpusResponse;
 import software.amazon.awssdk.services.ec2.model.ElasticGpus;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2ElasticGpusLoaderTest extends EC2LoaderTest {
     private final EC2ElasticGpuLoader loader = new EC2ElasticGpuLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2ElasticGpusLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadElasticGpus() {
         var elasticGpusList = ElasticGpusGenerator.elasticGpusList();
-        when(ec2Client.describeElasticGpus(any(Consumer.class))).thenReturn(
-                DescribeElasticGpusResponse.builder()
-                                           .elasticGpuSet(elasticGpusList.toArray(new ElasticGpus[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeElasticGpusRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeElasticGpusRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().elasticGpuIds().isEmpty());
+            return DescribeElasticGpusResponse.builder()
+                                              .elasticGpuSet(elasticGpusList.toArray(new ElasticGpus[0]))
+                                              .build();
+        }).when(ec2Client).describeElasticGpus(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2ElasticGpusLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadElasticGpusByRandomId() {
-        when(ec2Client.describeElasticGpus(any(Consumer.class))).thenReturn(
-                DescribeElasticGpusResponse.builder()
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeElasticGpusRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeElasticGpusRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().elasticGpuIds().isEmpty());
+            return DescribeElasticGpusResponse.builder()
+                                              .build();
+        }).when(ec2Client).describeElasticGpus(any(Consumer.class));
 
         var resourceOpt = loader.getById(ElasticGpusGenerator.elasticGpuId());
 
@@ -72,11 +81,15 @@ public class EC2ElasticGpusLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadElasticGpusById() {
         var elasticGpusList = ElasticGpusGenerator.elasticGpusList(1);
-        when(ec2Client.describeElasticGpus(any(Consumer.class))).thenReturn(
-                DescribeElasticGpusResponse.builder()
-                                           .elasticGpuSet(elasticGpusList.toArray(new ElasticGpus[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeElasticGpusRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeElasticGpusRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().elasticGpuIds().isEmpty());
+            return DescribeElasticGpusResponse.builder()
+                                              .elasticGpuSet(elasticGpusList.toArray(new ElasticGpus[0]))
+                                              .build();
+        }).when(ec2Client).describeElasticGpus(any(Consumer.class));
 
         var elasticGpus = elasticGpusList.get(0);
         var resourceOpt = loader.getById(elasticGpus.elasticGpuId());

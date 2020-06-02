@@ -37,6 +37,10 @@ import java.util.stream.IntStream;
 public abstract class BaseGenerator {
     protected static final Faker faker = new Faker();
 
+    protected static <T> List<T> listGenerator(Supplier<T> f) {
+        return listGenerator(faker.random().nextInt(1, 10), f);
+    }
+
     protected static <T> List<T> listGenerator(Integer n, Supplier<T> f) {
         return IntStream.range(0, n)
                         .mapToObj(i -> f.get())

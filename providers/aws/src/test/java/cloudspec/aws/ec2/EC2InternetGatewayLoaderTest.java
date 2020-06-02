@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2InternetGatewayLoader;
 import datagen.services.ec2.model.InternetGatewayGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeInternetGatewaysRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeInternetGatewaysResponse;
 import software.amazon.awssdk.services.ec2.model.InternetGateway;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2InternetGatewayLoaderTest extends EC2LoaderTest {
     private final EC2InternetGatewayLoader loader = new EC2InternetGatewayLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2InternetGatewayLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadInternetGateways() {
         var internetGateways = InternetGatewayGenerator.internetGateways();
-        when(ec2Client.describeInternetGateways(any(Consumer.class))).thenReturn(
-                DescribeInternetGatewaysResponse.builder()
-                                                .internetGateways(internetGateways.toArray(new InternetGateway[0]))
-                                                .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeInternetGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeInternetGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeInternetGatewaysResponse.builder()
+                                                   .internetGateways(internetGateways.toArray(new InternetGateway[0]))
+                                                   .build();
+        }).when(ec2Client).describeInternetGateways(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2InternetGatewayLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadInternetGatewayByRandomId() {
-        when(ec2Client.describeInternetGateways(any(Consumer.class))).thenReturn(
-                DescribeInternetGatewaysResponse.builder()
-                                                .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeInternetGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeInternetGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeInternetGatewaysResponse.builder()
+                                                   .build();
+        }).when(ec2Client).describeInternetGateways(any(Consumer.class));
 
         var resourceOpt = loader.getById(InternetGatewayGenerator.internetGatewayId());
 
@@ -72,11 +81,15 @@ public class EC2InternetGatewayLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadInternetGatewayById() {
         var internetGateways = InternetGatewayGenerator.internetGateways(1);
-        when(ec2Client.describeInternetGateways(any(Consumer.class))).thenReturn(
-                DescribeInternetGatewaysResponse.builder()
-                                                .internetGateways(internetGateways.toArray(new InternetGateway[0]))
-                                                .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeInternetGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeInternetGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeInternetGatewaysResponse.builder()
+                                                   .internetGateways(internetGateways.toArray(new InternetGateway[0]))
+                                                   .build();
+        }).when(ec2Client).describeInternetGateways(any(Consumer.class));
 
         var internetGateway = internetGateways.get(0);
         var resourceOpt = loader.getById(internetGateway.internetGatewayId());

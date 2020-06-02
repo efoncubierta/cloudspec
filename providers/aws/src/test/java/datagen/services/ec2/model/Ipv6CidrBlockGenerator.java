@@ -26,25 +26,12 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
-import software.amazon.awssdk.services.ec2.model.ElasticGpuAssociation;
+import software.amazon.awssdk.services.ec2.model.Ipv6CidrBlock;
 
-import java.util.List;
-import java.util.UUID;
-
-public class ElasticGpuAssociationGenerator extends BaseGenerator {
-    public static String elasticGpuAssociationId() {
-        return UUID.randomUUID().toString();
-    }
-
-    public static List<ElasticGpuAssociation> elasticGpuAssociations(Integer n) {
-        return listGenerator(n, ElasticGpuAssociationGenerator::elasticGpuAssociation);
-    }
-
-    public static ElasticGpuAssociation elasticGpuAssociation() {
-        return ElasticGpuAssociation.builder()
-                                    .elasticGpuAssociationId(elasticGpuAssociationId())
-                                    .elasticGpuAssociationTime(pastDate().toString())
-                                    .elasticGpuAssociationState(faker.lorem().word())
-                                    .build();
+public class Ipv6CidrBlockGenerator extends BaseGenerator {
+    public static Ipv6CidrBlock ipv6CidrBlock() {
+        return Ipv6CidrBlock.builder()
+                            .ipv6CidrBlock(faker.internet().ipV6Cidr())
+                            .build();
     }
 }

@@ -62,13 +62,14 @@ public class SQSQueueLoader implements SQSResourceLoader<SQSQueueResource> {
             Stream<String> queueUrlsStream;
             if (queueArns != null && queueArns.size() > 0) {
                 queueUrlsStream = queueArns.stream()
-                        .map(queueArn -> queueArn.substring(queueArn.lastIndexOf(":")))
-                        .map(queueName -> sqsClient.getQueueUrl(builder -> builder.queueName(queueName)))
-                        .map(GetQueueUrlResponse::queueUrl);
-            } else {
+                                           .map(queueArn -> queueArn.substring(queueArn.lastIndexOf(":")))
+                                           .map(queueName -> sqsClient.getQueueUrl(builder -> builder.queueName(queueName)))
+                                           .map(GetQueueUrlResponse::queueUrl);
+            }
+            else {
                 queueUrlsStream = sqsClient.listQueues()
-                        .queueUrls()
-                        .stream();
+                                           .queueUrls()
+                                           .stream();
             }
 
             return queueUrlsStream

@@ -26,9 +26,45 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
+import datagen.CommonGenerator;
+import software.amazon.awssdk.services.ec2.model.Snapshot;
+import software.amazon.awssdk.services.ec2.model.SnapshotState;
+
+import java.util.List;
 
 public class SnapshotGenerator extends BaseGenerator {
     public static String snapshotId() {
         return String.format("snap-%s", faker.lorem().characters(10));
+    }
+
+    public static SnapshotState snapshotState() {
+        return fromArray(SnapshotState.values());
+    }
+
+    public static List<Snapshot> snapshots() {
+        return snapshots(faker.random().nextInt(1, 10));
+    }
+
+    public static List<Snapshot> snapshots(Integer n) {
+        return listGenerator(n, SnapshotGenerator::snapshot);
+    }
+
+    public static Snapshot snapshot() {
+        return Snapshot.builder()
+                       .dataEncryptionKeyId(faker.lorem().word()) // TODO realistic value
+                       .description(faker.lorem().sentence())
+                       .encrypted(faker.random().nextBoolean())
+                       .kmsKeyId(faker.lorem().word()) // TODO realistic value
+                       .ownerId(CommonGenerator.accountId())
+                       .progress(faker.random().nextInt(0, 100).toString())
+                       .snapshotId(snapshotId())
+                       .startTime(pastDate().toInstant())
+                       .state(snapshotState())
+                       .stateMessage(faker.lorem().sentence()) // TODO realistic value
+                       .volumeId(VolumeGenerator.volumeId())
+                       .volumeSize(faker.random().nextInt(1, 1000))
+                       .ownerAlias(faker.lorem().word())
+                       .tags(TagGenerator.tags())
+                       .build();
     }
 }

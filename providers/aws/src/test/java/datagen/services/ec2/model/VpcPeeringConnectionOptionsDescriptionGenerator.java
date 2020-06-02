@@ -26,25 +26,14 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
-import software.amazon.awssdk.services.ec2.model.ElasticGpuAssociation;
+import software.amazon.awssdk.services.ec2.model.VpcPeeringConnectionOptionsDescription;
 
-import java.util.List;
-import java.util.UUID;
-
-public class ElasticGpuAssociationGenerator extends BaseGenerator {
-    public static String elasticGpuAssociationId() {
-        return UUID.randomUUID().toString();
-    }
-
-    public static List<ElasticGpuAssociation> elasticGpuAssociations(Integer n) {
-        return listGenerator(n, ElasticGpuAssociationGenerator::elasticGpuAssociation);
-    }
-
-    public static ElasticGpuAssociation elasticGpuAssociation() {
-        return ElasticGpuAssociation.builder()
-                                    .elasticGpuAssociationId(elasticGpuAssociationId())
-                                    .elasticGpuAssociationTime(pastDate().toString())
-                                    .elasticGpuAssociationState(faker.lorem().word())
-                                    .build();
+public class VpcPeeringConnectionOptionsDescriptionGenerator extends BaseGenerator {
+    public static VpcPeeringConnectionOptionsDescription vpcPeeringConnectionOptionsDescription() {
+        return VpcPeeringConnectionOptionsDescription.builder()
+                                                     .allowDnsResolutionFromRemoteVpc(faker.random().nextBoolean())
+                                                     .allowEgressFromLocalClassicLinkToRemoteVpc(faker.random().nextBoolean())
+                                                     .allowEgressFromLocalVpcToRemoteClassicLink(faker.random().nextBoolean())
+                                                     .build();
     }
 }

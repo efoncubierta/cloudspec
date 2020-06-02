@@ -26,25 +26,28 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
-import software.amazon.awssdk.services.ec2.model.ElasticGpuAssociation;
+import software.amazon.awssdk.services.ec2.model.VolumeAttachment;
+import software.amazon.awssdk.services.ec2.model.VolumeAttachmentState;
 
 import java.util.List;
-import java.util.UUID;
 
-public class ElasticGpuAssociationGenerator extends BaseGenerator {
-    public static String elasticGpuAssociationId() {
-        return UUID.randomUUID().toString();
+public class VolumeAttachmentGenerator extends BaseGenerator {
+    public static List<VolumeAttachment> volumeAttachments() {
+        return volumeAttachments(faker.random().nextInt(1, 10));
     }
 
-    public static List<ElasticGpuAssociation> elasticGpuAssociations(Integer n) {
-        return listGenerator(n, ElasticGpuAssociationGenerator::elasticGpuAssociation);
+    public static List<VolumeAttachment> volumeAttachments(Integer n) {
+        return listGenerator(n, VolumeAttachmentGenerator::volumeAttachment);
     }
 
-    public static ElasticGpuAssociation elasticGpuAssociation() {
-        return ElasticGpuAssociation.builder()
-                                    .elasticGpuAssociationId(elasticGpuAssociationId())
-                                    .elasticGpuAssociationTime(pastDate().toString())
-                                    .elasticGpuAssociationState(faker.lorem().word())
-                                    .build();
+    public static VolumeAttachment volumeAttachment() {
+        return VolumeAttachment.builder()
+                               .attachTime(pastDate().toInstant())
+                               .device(DeviceGenerator.deviceName())
+                               .instanceId(InstanceGenerator.instanceId())
+                               .state(fromArray(VolumeAttachmentState.values()))
+                               .volumeId(VolumeGenerator.volumeId())
+                               .deleteOnTermination(faker.random().nextBoolean())
+                               .build();
     }
 }

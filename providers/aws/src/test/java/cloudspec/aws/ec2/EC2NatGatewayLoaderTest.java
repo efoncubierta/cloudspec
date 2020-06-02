@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2NatGatewayLoader;
 import datagen.services.ec2.model.NatGatewayGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysResponse;
 import software.amazon.awssdk.services.ec2.model.NatGateway;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2NatGatewayLoaderTest extends EC2LoaderTest {
     private final EC2NatGatewayLoader loader = new EC2NatGatewayLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2NatGatewayLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadNatGateways() {
         var natGateways = NatGatewayGenerator.natGateways();
-        when(ec2Client.describeNatGateways(any(Consumer.class))).thenReturn(
-                DescribeNatGatewaysResponse.builder()
-                                           .natGateways(natGateways.toArray(new NatGateway[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNatGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNatGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filter().isEmpty());
+            return DescribeNatGatewaysResponse.builder()
+                                              .natGateways(natGateways.toArray(new NatGateway[0]))
+                                              .build();
+        }).when(ec2Client).describeNatGateways(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2NatGatewayLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadNatGatewayByRandomId() {
-        when(ec2Client.describeNatGateways(any(Consumer.class))).thenReturn(
-                DescribeNatGatewaysResponse.builder()
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNatGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNatGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filter().isEmpty());
+            return DescribeNatGatewaysResponse.builder()
+                                              .build();
+        }).when(ec2Client).describeNatGateways(any(Consumer.class));
 
         var resourceOpt = loader.getById(NatGatewayGenerator.natGatewayId());
 
@@ -72,11 +81,15 @@ public class EC2NatGatewayLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadNatGatewayById() {
         var natGateways = NatGatewayGenerator.natGateways(1);
-        when(ec2Client.describeNatGateways(any(Consumer.class))).thenReturn(
-                DescribeNatGatewaysResponse.builder()
-                                           .natGateways(natGateways.toArray(new NatGateway[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNatGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNatGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filter().isEmpty());
+            return DescribeNatGatewaysResponse.builder()
+                                              .natGateways(natGateways.toArray(new NatGateway[0]))
+                                              .build();
+        }).when(ec2Client).describeNatGateways(any(Consumer.class));
 
         var natGateway = natGateways.get(0);
         var resourceOpt = loader.getById(natGateway.natGatewayId());

@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2SecurityGroupLoader;
 import datagen.services.ec2.model.SecurityGroupGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeSecurityGroupsRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeSecurityGroupsResponse;
 import software.amazon.awssdk.services.ec2.model.SecurityGroup;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2SecurityGroupLoaderTest extends EC2LoaderTest {
     private final EC2SecurityGroupLoader loader = new EC2SecurityGroupLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2SecurityGroupLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadSecurityGroups() {
         var securityGroups = SecurityGroupGenerator.securityGroups();
-        when(ec2Client.describeSecurityGroups(any(Consumer.class))).thenReturn(
-                DescribeSecurityGroupsResponse.builder()
-                                              .securityGroups(securityGroups.toArray(new SecurityGroup[0]))
-                                              .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeSecurityGroupsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeSecurityGroupsRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeSecurityGroupsResponse.builder()
+                                                 .securityGroups(securityGroups.toArray(new SecurityGroup[0]))
+                                                 .build();
+        }).when(ec2Client).describeSecurityGroups(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2SecurityGroupLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadSecurityGroupByRandomId() {
-        when(ec2Client.describeSecurityGroups(any(Consumer.class))).thenReturn(
-                DescribeSecurityGroupsResponse.builder()
-                                              .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeSecurityGroupsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeSecurityGroupsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeSecurityGroupsResponse.builder()
+                                                 .build();
+        }).when(ec2Client).describeSecurityGroups(any(Consumer.class));
 
         var resourceOpt = loader.getById(SecurityGroupGenerator.securityGroupId());
 
@@ -72,11 +81,15 @@ public class EC2SecurityGroupLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadSecurityGroupById() {
         var securityGroups = SecurityGroupGenerator.securityGroups(1);
-        when(ec2Client.describeSecurityGroups(any(Consumer.class))).thenReturn(
-                DescribeSecurityGroupsResponse.builder()
-                                              .securityGroups(securityGroups.toArray(new SecurityGroup[0]))
-                                              .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeSecurityGroupsRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeSecurityGroupsRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeSecurityGroupsResponse.builder()
+                                                 .securityGroups(securityGroups.toArray(new SecurityGroup[0]))
+                                                 .build();
+        }).when(ec2Client).describeSecurityGroups(any(Consumer.class));
 
         var securityGroup = securityGroups.get(0);
         var resourceOpt = loader.getById(securityGroup.groupId());

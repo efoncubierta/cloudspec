@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2RouteTableLoader;
 import datagen.services.ec2.model.RouteTableGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeRouteTablesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeRouteTablesResponse;
 import software.amazon.awssdk.services.ec2.model.RouteTable;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2RouteTableLoaderTest extends EC2LoaderTest {
     private final EC2RouteTableLoader loader = new EC2RouteTableLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2RouteTableLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadRouteTables() {
         var routeTables = RouteTableGenerator.routeTables();
-        when(ec2Client.describeRouteTables(any(Consumer.class))).thenReturn(
-                DescribeRouteTablesResponse.builder()
-                                           .routeTables(routeTables.toArray(new RouteTable[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeRouteTablesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeRouteTablesRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeRouteTablesResponse.builder()
+                                              .routeTables(routeTables.toArray(new RouteTable[0]))
+                                              .build();
+        }).when(ec2Client).describeRouteTables(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2RouteTableLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadRouteTableByRandomId() {
-        when(ec2Client.describeRouteTables(any(Consumer.class))).thenReturn(
-                DescribeRouteTablesResponse.builder()
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeRouteTablesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeRouteTablesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeRouteTablesResponse.builder()
+                                              .build();
+        }).when(ec2Client).describeRouteTables(any(Consumer.class));
 
         var resourceOpt = loader.getById(RouteTableGenerator.routeTableId());
 
@@ -72,11 +81,15 @@ public class EC2RouteTableLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadRouteTableById() {
         var routeTables = RouteTableGenerator.routeTables(1);
-        when(ec2Client.describeRouteTables(any(Consumer.class))).thenReturn(
-                DescribeRouteTablesResponse.builder()
-                                           .routeTables(routeTables.toArray(new RouteTable[0]))
-                                           .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeRouteTablesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeRouteTablesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeRouteTablesResponse.builder()
+                                              .routeTables(routeTables.toArray(new RouteTable[0]))
+                                              .build();
+        }).when(ec2Client).describeRouteTables(any(Consumer.class));
 
         var routeTable = routeTables.get(0);
         var resourceOpt = loader.getById(routeTable.routeTableId());

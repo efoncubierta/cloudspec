@@ -26,7 +26,12 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
+import datagen.CommonGenerator;
+import software.amazon.awssdk.services.ec2.model.Volume;
+import software.amazon.awssdk.services.ec2.model.VolumeState;
 import software.amazon.awssdk.services.ec2.model.VolumeType;
+
+import java.util.List;
 
 public class VolumeGenerator extends BaseGenerator {
     public static String volumeId() {
@@ -35,5 +40,33 @@ public class VolumeGenerator extends BaseGenerator {
 
     public static VolumeType volumeType() {
         return fromArray(VolumeType.values());
+    }
+
+    public static List<Volume> volumes() {
+        return volumes(faker.random().nextInt(1, 10));
+    }
+
+    public static List<Volume> volumes(Integer n) {
+        return listGenerator(n, VolumeGenerator::volume);
+    }
+
+    public static Volume volume() {
+        return Volume.builder()
+                     .attachments(VolumeAttachmentGenerator.volumeAttachments())
+                     .availabilityZone(CommonGenerator.availabilityZone())
+                     .createTime(pastDate().toInstant())
+                     .encrypted(faker.random().nextBoolean())
+                     .kmsKeyId(faker.lorem().word()) // TODO realistic value
+                     .outpostArn(OutpostGenerator.outpostArn().toString())
+                     .size(faker.random().nextInt(1, 1024))
+                     .snapshotId(SnapshotGenerator.snapshotId())
+                     .state(fromArray(VolumeState.values()))
+                     .volumeId(volumeId())
+                     .iops(faker.random().nextInt(100, 3000))
+                     .tags(TagGenerator.tags())
+                     .volumeType(fromArray(VolumeType.values()))
+                     .fastRestored(faker.random().nextBoolean())
+                     .multiAttachEnabled(faker.random().nextBoolean())
+                     .build();
     }
 }

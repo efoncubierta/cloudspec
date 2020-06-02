@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2ReservedInstancesLoader;
 import datagen.services.ec2.model.ReservedInstancesGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeReservedInstancesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeReservedInstancesResponse;
 import software.amazon.awssdk.services.ec2.model.ReservedInstances;
 
@@ -35,33 +36,41 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
-public class EC2ReservedInstanesLoaderTest extends EC2LoaderTest {
+public class EC2ReservedInstancesLoaderTest extends EC2LoaderTest {
     private final EC2ReservedInstancesLoader loader = new EC2ReservedInstancesLoader(clientsProvider);
 
     @Test
-    public void shouldLoadReservedInstancess() {
-        var reservedInstances = ReservedInstancesGenerator.reservedInstancesList();
-        when(ec2Client.describeReservedInstances(any(Consumer.class))).thenReturn(
-                DescribeReservedInstancesResponse.builder()
-                                                 .reservedInstances(reservedInstances.toArray(new ReservedInstances[0]))
-                                                 .build()
-        );
+    public void shouldLoadReservedInstances() {
+        var reservedInstancesList = ReservedInstancesGenerator.reservedInstancesList();
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeReservedInstancesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeReservedInstancesRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeReservedInstancesResponse.builder()
+                                                    .reservedInstances(reservedInstancesList.toArray(new ReservedInstances[0]))
+                                                    .build();
+        }).when(ec2Client).describeReservedInstances(any(Consumer.class));
 
         var resources = loader.getAll();
 
         assertNotNull(resources);
-        assertEquals(reservedInstances.size(), resources.size());
-        assertTrue(reservedInstances.containsAll(resources));
+        assertEquals(reservedInstancesList.size(), resources.size());
+        assertTrue(reservedInstancesList.containsAll(resources));
     }
 
     @Test
     public void shouldNotLoadReservedInstancesByRandomId() {
-        when(ec2Client.describeReservedInstances(any(Consumer.class))).thenReturn(
-                DescribeReservedInstancesResponse.builder()
-                                                 .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeReservedInstancesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeReservedInstancesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeReservedInstancesResponse.builder()
+                                                    .build();
+        }).when(ec2Client).describeReservedInstances(any(Consumer.class));
 
         var resourceOpt = loader.getById(ReservedInstancesGenerator.reservedInstancesId());
 
@@ -72,11 +81,15 @@ public class EC2ReservedInstanesLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadReservedInstancesById() {
         var reservedInstancesList = ReservedInstancesGenerator.reservedInstancesList(1);
-        when(ec2Client.describeReservedInstances(any(Consumer.class))).thenReturn(
-                DescribeReservedInstancesResponse.builder()
-                                                 .reservedInstances(reservedInstancesList.toArray(new ReservedInstances[0]))
-                                                 .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeReservedInstancesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeReservedInstancesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeReservedInstancesResponse.builder()
+                                                    .reservedInstances(reservedInstancesList.toArray(new ReservedInstances[0]))
+                                                    .build();
+        }).when(ec2Client).describeReservedInstances(any(Consumer.class));
 
         var reservedInstances = reservedInstancesList.get(0);
         var resourceOpt = loader.getById(reservedInstances.reservedInstancesId());

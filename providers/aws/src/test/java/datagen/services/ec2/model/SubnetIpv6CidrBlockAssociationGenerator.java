@@ -26,25 +26,30 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
-import software.amazon.awssdk.services.ec2.model.ElasticGpuAssociation;
+import software.amazon.awssdk.services.ec2.model.SubnetIpv6CidrBlockAssociation;
 
 import java.util.List;
 import java.util.UUID;
 
-public class ElasticGpuAssociationGenerator extends BaseGenerator {
-    public static String elasticGpuAssociationId() {
+public class SubnetIpv6CidrBlockAssociationGenerator extends BaseGenerator {
+    public static String associationId() {
+        // TODO realistic value
         return UUID.randomUUID().toString();
     }
 
-    public static List<ElasticGpuAssociation> elasticGpuAssociations(Integer n) {
-        return listGenerator(n, ElasticGpuAssociationGenerator::elasticGpuAssociation);
+    public static List<SubnetIpv6CidrBlockAssociation> subnetIpv6CidrBlockAssociations() {
+        return subnetIpv6CidrBlockAssociations(faker.random().nextInt(1, 10));
     }
 
-    public static ElasticGpuAssociation elasticGpuAssociation() {
-        return ElasticGpuAssociation.builder()
-                                    .elasticGpuAssociationId(elasticGpuAssociationId())
-                                    .elasticGpuAssociationTime(pastDate().toString())
-                                    .elasticGpuAssociationState(faker.lorem().word())
-                                    .build();
+    public static List<SubnetIpv6CidrBlockAssociation> subnetIpv6CidrBlockAssociations(Integer n) {
+        return listGenerator(n, SubnetIpv6CidrBlockAssociationGenerator::subnetIpv6CidrBlockAssociation);
+    }
+
+    public static SubnetIpv6CidrBlockAssociation subnetIpv6CidrBlockAssociation() {
+        return SubnetIpv6CidrBlockAssociation.builder()
+                                             .associationId(associationId())
+                                             .ipv6CidrBlock(faker.internet().ipV6Cidr())
+                                             .ipv6CidrBlockState(SubnetCidrBlockStateGenerator.subnetCidrBlockState())
+                                             .build();
     }
 }

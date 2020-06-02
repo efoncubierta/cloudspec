@@ -26,9 +26,46 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
+import datagen.CommonGenerator;
+import software.amazon.awssdk.services.ec2.model.Tenancy;
+import software.amazon.awssdk.services.ec2.model.Vpc;
+import software.amazon.awssdk.services.ec2.model.VpcState;
+
+import java.util.List;
 
 public class VpcGenerator extends BaseGenerator {
     public static String vpcId() {
-        return String.format("vpc-%s", faker.lorem().characters(10));
+        return String.format("vpc-%s", faker.random().hex(30));
+    }
+
+    public static List<Vpc> vpcs() {
+        return vpcs(faker.random().nextInt(1, 10));
+    }
+
+    public static List<Vpc> vpcs(Integer n) {
+        return listGenerator(n, VpcGenerator::vpc);
+    }
+
+    public static Vpc vpc() {
+        return Vpc.builder()
+                  .cidrBlock(faker.internet().ipV4Cidr())
+                  .dhcpOptionsId(DhcpOptionsGenerator.dhcpOptionsId())
+                  .state(
+                          fromArray(VpcState.values())
+                  )
+                  .vpcId(vpcId())
+                  .ownerId(CommonGenerator.accountId())
+                  .instanceTenancy(
+                          fromArray(Tenancy.values())
+                  )
+                  .ipv6CidrBlockAssociationSet(
+                          listGenerator(VpcIpv6CidrBlockAssociationGenerator::vpcIpv6CidrBlockAssociation)
+                  )
+                  .cidrBlockAssociationSet(
+                          listGenerator(VpcCidrBlockAssociationGenerator::vpcCidrBlockAssociation)
+                  )
+                  .isDefault(faker.random().nextBoolean())
+                  .tags(TagGenerator.tags())
+                  .build();
     }
 }

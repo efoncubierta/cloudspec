@@ -26,9 +26,30 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
+import software.amazon.awssdk.services.ec2.model.VpcPeeringConnection;
+
+import java.util.List;
 
 public class VpcPeeringConnectionGenerator extends BaseGenerator {
     public static String vpcPeeringConnectionId() {
-        return "";
+        return String.format("pcx-%s", faker.random().hex(30));
+    }
+
+    public static List<VpcPeeringConnection> vpcPeeringConnections() {
+        return vpcPeeringConnections(faker.random().nextInt(1, 10));
+    }
+
+    public static List<VpcPeeringConnection> vpcPeeringConnections(Integer n) {
+        return listGenerator(n, VpcPeeringConnectionGenerator::vpcPeeringConnection);
+    }
+
+    public static VpcPeeringConnection vpcPeeringConnection() {
+        return VpcPeeringConnection.builder()
+                                   .accepterVpcInfo(VpcPeeringConnectionVpcInfoGenerator.vpcPeeringConnectionVpcInfo())
+                                   .expirationTime(futureDate().toInstant())
+                                   .requesterVpcInfo(VpcPeeringConnectionVpcInfoGenerator.vpcPeeringConnectionVpcInfo())
+                                   .status(VpcPeeringConnectionStateReasonGenerator.vpcPeeringConnectionStateReason())
+                                   .vpcPeeringConnectionId(vpcPeeringConnectionId())
+                                   .build();
     }
 }

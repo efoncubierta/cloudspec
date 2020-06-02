@@ -39,18 +39,18 @@ public abstract class EC2Resource extends AWSResource {
 
     protected static List<KeyValue> tagsFromSdk(List<Tag> tags) {
         return Optional.ofNullable(tags)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2Resource::tagFromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2Resource::tagFromSdk)
+                       .collect(Collectors.toList());
     }
 
     protected static KeyValue tagFromSdk(Tag tag) {
         return Optional.ofNullable(tag)
-                .map(v -> new KeyValue(
-                        v.key(),
-                        v.value()
-                ))
-                .orElse(null);
+                       .map(v -> new KeyValue(
+                               v.key(),
+                               v.value()
+                       ))
+                       .orElse(null);
     }
 }

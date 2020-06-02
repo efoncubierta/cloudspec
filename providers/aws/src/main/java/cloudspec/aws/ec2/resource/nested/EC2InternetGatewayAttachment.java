@@ -87,20 +87,20 @@ public class EC2InternetGatewayAttachment {
 
     public static List<EC2InternetGatewayAttachment> fromSdk(List<InternetGatewayAttachment> internetGatewayAttachments) {
         return Optional.ofNullable(internetGatewayAttachments)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(EC2InternetGatewayAttachment::fromSdk)
-                .collect(Collectors.toList());
+                       .orElse(Collections.emptyList())
+                       .stream()
+                       .map(EC2InternetGatewayAttachment::fromSdk)
+                       .collect(Collectors.toList());
     }
 
     public static EC2InternetGatewayAttachment fromSdk(InternetGatewayAttachment internetGatewayAttachment) {
         return Optional.ofNullable(internetGatewayAttachment)
-                .map(v ->
-                        new EC2InternetGatewayAttachment(
-                                v.stateAsString(),
-                                v.vpcId()
-                        )
-                )
-                .orElse(null);
+                       .map(v ->
+                               new EC2InternetGatewayAttachment(
+                                       v.stateAsString(),
+                                       v.vpcId()
+                               )
+                       )
+                       .orElse(null);
     }
 }

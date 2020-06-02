@@ -25,7 +25,6 @@
  */
 package datagen.services.ec2.model;
 
-import com.github.javafaker.Faker;
 import datagen.BaseGenerator;
 import datagen.CommonGenerator;
 import software.amazon.awssdk.services.ec2.model.ElasticGpuHealth;

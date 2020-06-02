@@ -26,9 +26,50 @@
 package datagen.services.ec2.model;
 
 import datagen.BaseGenerator;
+import datagen.CommonGenerator;
+import software.amazon.awssdk.arns.Arn;
+import software.amazon.awssdk.services.ec2.model.TransitGateway;
+import software.amazon.awssdk.services.ec2.model.TransitGatewayState;
+
+import java.util.List;
 
 public class TransitGatewayGenerator extends BaseGenerator {
     public static String transitGatewayId() {
-        return "";
+        return String.format("tgw-%s", faker.random().hex(30));
+    }
+
+    public static Arn transitGatewayArn() {
+        return Arn.builder()
+                  .service("ec2")
+                  .region(CommonGenerator.region().id())
+                  .accountId(CommonGenerator.accountId())
+                  .partition("transit-gateway")
+                  .resource(transitGatewayId())
+                  .build();
+    }
+
+    public static TransitGatewayState transitGatewayState() {
+        return fromArray(TransitGatewayState.values());
+    }
+
+    public static List<TransitGateway> transitGateways() {
+        return transitGateways(faker.random().nextInt(1, 10));
+    }
+
+    public static List<TransitGateway> transitGateways(Integer n) {
+        return listGenerator(n, TransitGatewayGenerator::transitGateway);
+    }
+
+    public static TransitGateway transitGateway() {
+        return TransitGateway.builder()
+                             .transitGatewayId(transitGatewayId())
+                             .transitGatewayArn(transitGatewayArn().toString())
+                             .state(transitGatewayState())
+                             .ownerId(CommonGenerator.accountId())
+                             .description(faker.lorem().sentence())
+                             .creationTime(pastDate().toInstant())
+                             .options(TransitGatewayOptionsGenerator.transitGatewayOptions())
+                             .tags(TagGenerator.tags())
+                             .build();
     }
 }

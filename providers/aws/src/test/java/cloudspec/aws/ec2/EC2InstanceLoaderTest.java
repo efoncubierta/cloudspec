@@ -29,6 +29,7 @@ import cloudspec.aws.ec2.loader.EC2InstanceLoader;
 import datagen.services.ec2.model.InstanceGenerator;
 import datagen.services.ec2.model.ReservationGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
 import software.amazon.awssdk.services.ec2.model.Reservation;
 
@@ -36,7 +37,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2InstanceLoaderTest extends EC2LoaderTest {
     private final EC2InstanceLoader loader = new EC2InstanceLoader(clientsProvider);
@@ -44,12 +45,14 @@ public class EC2InstanceLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadInstances() {
         var reservation = ReservationGenerator.reservation();
-        when(ec2Client.describeInstances(any(Consumer.class))).thenReturn(
-                DescribeInstancesResponse
-                        .builder()
-                        .reservations(reservation)
-                        .build()
-        );
+        doAnswer(answer -> {
+            var builder = (Consumer<DescribeInstancesRequest.Builder>) answer.getArguments()[0];
+            builder.accept(DescribeInstancesRequest.builder());
+            return DescribeInstancesResponse
+                    .builder()
+                    .reservations(reservation)
+                    .build();
+        }).when(ec2Client).describeInstances(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -60,12 +63,14 @@ public class EC2InstanceLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadInstanceByRandomId() {
-        when(ec2Client.describeInstances(any(Consumer.class))).thenReturn(
-                DescribeInstancesResponse
-                        .builder()
-                        .reservations(Reservation.builder().build())
-                        .build()
-        );
+        doAnswer(answer -> {
+            var builder = (Consumer<DescribeInstancesRequest.Builder>) answer.getArguments()[0];
+            builder.accept(DescribeInstancesRequest.builder());
+            return DescribeInstancesResponse
+                    .builder()
+                    .reservations(Reservation.builder().build())
+                    .build();
+        }).when(ec2Client).describeInstances(any(Consumer.class));
 
         var resourceOpt = loader.getById(InstanceGenerator.instanceId());
 
@@ -76,12 +81,15 @@ public class EC2InstanceLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadInstanceById() {
         var reservation = ReservationGenerator.reservation(1);
-        when(ec2Client.describeInstances(any(Consumer.class))).thenReturn(
-                DescribeInstancesResponse
-                        .builder()
-                        .reservations(reservation)
-                        .build()
-        );
+
+        doAnswer(answer -> {
+            var builder = (Consumer<DescribeInstancesRequest.Builder>) answer.getArguments()[0];
+            builder.accept(DescribeInstancesRequest.builder());
+            return DescribeInstancesResponse
+                    .builder()
+                    .reservations(reservation)
+                    .build();
+        }).when(ec2Client).describeInstances(any(Consumer.class));
 
         var instance = reservation.instances().get(0);
         var resourceOpt = loader.getById(instance.instanceId());

@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2LocalGatewayLoader;
 import datagen.services.ec2.model.LocalGatewayGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeLocalGatewaysRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeLocalGatewaysResponse;
 import software.amazon.awssdk.services.ec2.model.LocalGateway;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2LocalGatewayLoaderTest extends EC2LoaderTest {
     private final EC2LocalGatewayLoader loader = new EC2LocalGatewayLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2LocalGatewayLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadLocalGateways() {
         var localGateways = LocalGatewayGenerator.localGateways();
-        when(ec2Client.describeLocalGateways(any(Consumer.class))).thenReturn(
-                DescribeLocalGatewaysResponse.builder()
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeLocalGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeLocalGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeLocalGatewaysResponse.builder()
                                                 .localGateways(localGateways.toArray(new LocalGateway[0]))
-                                                .build()
-        );
+                                                .build();
+        }).when(ec2Client).describeLocalGateways(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2LocalGatewayLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadLocalGatewayByRandomId() {
-        when(ec2Client.describeLocalGateways(any(Consumer.class))).thenReturn(
-                DescribeLocalGatewaysResponse.builder()
-                                                .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeLocalGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeLocalGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeLocalGatewaysResponse.builder()
+                                                .build();
+        }).when(ec2Client).describeLocalGateways(any(Consumer.class));
 
         var resourceOpt = loader.getById(LocalGatewayGenerator.localGatewayId());
 
@@ -72,11 +81,15 @@ public class EC2LocalGatewayLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadLocalGatewayById() {
         var localGateways = LocalGatewayGenerator.localGateways(1);
-        when(ec2Client.describeLocalGateways(any(Consumer.class))).thenReturn(
-                DescribeLocalGatewaysResponse.builder()
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeLocalGatewaysRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeLocalGatewaysRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeLocalGatewaysResponse.builder()
                                                 .localGateways(localGateways.toArray(new LocalGateway[0]))
-                                                .build()
-        );
+                                                .build();
+        }).when(ec2Client).describeLocalGateways(any(Consumer.class));
 
         var localGateway = localGateways.get(0);
         var resourceOpt = loader.getById(localGateway.localGatewayId());

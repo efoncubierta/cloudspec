@@ -62,11 +62,12 @@ public class S3BucketLoader implements S3ResourceLoader<S3BucketResource> {
             Stream<String> bucketNamesStream;
             if (bucketNames != null && bucketNames.size() > 0) {
                 bucketNamesStream = bucketNames.stream();
-            } else {
+            }
+            else {
                 bucketNamesStream = s3Client.listBuckets()
-                        .buckets()
-                        .stream()
-                        .map(Bucket::name);
+                                            .buckets()
+                                            .stream()
+                                            .map(Bucket::name);
             }
 
             return bucketNamesStream

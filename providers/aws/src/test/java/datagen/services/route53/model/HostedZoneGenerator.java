@@ -23,28 +23,12 @@
  * THE SOFTWARE.
  * #L%
  */
-package datagen.services.ec2.model;
+package datagen.services.route53.model;
 
 import datagen.BaseGenerator;
-import software.amazon.awssdk.services.ec2.model.ElasticGpuAssociation;
 
-import java.util.List;
-import java.util.UUID;
-
-public class ElasticGpuAssociationGenerator extends BaseGenerator {
-    public static String elasticGpuAssociationId() {
-        return UUID.randomUUID().toString();
-    }
-
-    public static List<ElasticGpuAssociation> elasticGpuAssociations(Integer n) {
-        return listGenerator(n, ElasticGpuAssociationGenerator::elasticGpuAssociation);
-    }
-
-    public static ElasticGpuAssociation elasticGpuAssociation() {
-        return ElasticGpuAssociation.builder()
-                                    .elasticGpuAssociationId(elasticGpuAssociationId())
-                                    .elasticGpuAssociationTime(pastDate().toString())
-                                    .elasticGpuAssociationState(faker.lorem().word())
-                                    .build();
+public class HostedZoneGenerator extends BaseGenerator {
+    public static String hostedZoneId() {
+        return faker.random().hex(20);
     }
 }

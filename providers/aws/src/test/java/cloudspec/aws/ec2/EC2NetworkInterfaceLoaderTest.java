@@ -28,6 +28,7 @@ package cloudspec.aws.ec2;
 import cloudspec.aws.ec2.loader.EC2NetworkInterfaceLoader;
 import datagen.services.ec2.model.NetworkInterfaceGenerator;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.DescribeNetworkInterfacesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeNetworkInterfacesResponse;
 import software.amazon.awssdk.services.ec2.model.NetworkInterface;
 
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 public class EC2NetworkInterfaceLoaderTest extends EC2LoaderTest {
     private final EC2NetworkInterfaceLoader loader = new EC2NetworkInterfaceLoader(clientsProvider);
@@ -43,11 +44,15 @@ public class EC2NetworkInterfaceLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadNetworkInterfaces() {
         var networkInterfaces = NetworkInterfaceGenerator.networkInterfaces();
-        when(ec2Client.describeNetworkInterfaces(any(Consumer.class))).thenReturn(
-                DescribeNetworkInterfacesResponse.builder()
-                                                 .networkInterfaces(networkInterfaces.toArray(new NetworkInterface[0]))
-                                                 .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNetworkInterfacesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNetworkInterfacesRequest.builder();
+            builderLambda.accept(builder);
+            assertTrue(builder.build().filters().isEmpty());
+            return DescribeNetworkInterfacesResponse.builder()
+                                                    .networkInterfaces(networkInterfaces.toArray(new NetworkInterface[0]))
+                                                    .build();
+        }).when(ec2Client).describeNetworkInterfaces(any(Consumer.class));
 
         var resources = loader.getAll();
 
@@ -58,10 +63,14 @@ public class EC2NetworkInterfaceLoaderTest extends EC2LoaderTest {
 
     @Test
     public void shouldNotLoadNetworkInterfaceByRandomId() {
-        when(ec2Client.describeNetworkInterfaces(any(Consumer.class))).thenReturn(
-                DescribeNetworkInterfacesResponse.builder()
-                                                 .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNetworkInterfacesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNetworkInterfacesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeNetworkInterfacesResponse.builder()
+                                                    .build();
+        }).when(ec2Client).describeNetworkInterfaces(any(Consumer.class));
 
         var resourceOpt = loader.getById(NetworkInterfaceGenerator.networkInterfaceId());
 
@@ -72,11 +81,15 @@ public class EC2NetworkInterfaceLoaderTest extends EC2LoaderTest {
     @Test
     public void shouldLoadNetworkInterfaceById() {
         var networkInterfaces = NetworkInterfaceGenerator.networkInterfaces(1);
-        when(ec2Client.describeNetworkInterfaces(any(Consumer.class))).thenReturn(
-                DescribeNetworkInterfacesResponse.builder()
-                                                 .networkInterfaces(networkInterfaces.toArray(new NetworkInterface[0]))
-                                                 .build()
-        );
+        doAnswer(answer -> {
+            var builderLambda = (Consumer<DescribeNetworkInterfacesRequest.Builder>) answer.getArguments()[0];
+            var builder = DescribeNetworkInterfacesRequest.builder();
+            builderLambda.accept(builder);
+            assertFalse(builder.build().filters().isEmpty());
+            return DescribeNetworkInterfacesResponse.builder()
+                                                    .networkInterfaces(networkInterfaces.toArray(new NetworkInterface[0]))
+                                                    .build();
+        }).when(ec2Client).describeNetworkInterfaces(any(Consumer.class));
 
         var networkInterface = networkInterfaces.get(0);
         var resourceOpt = loader.getById(networkInterface.networkInterfaceId());
