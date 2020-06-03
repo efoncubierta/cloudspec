@@ -177,7 +177,7 @@ public class GraphResourceValidatorTest {
                         ModelTestUtils.RESOURCE_DEF_REF,
                         Arrays.asList(
                                 new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE)),
-                                new PropertyStatement(ModelTestUtils.PROP_INTEGER_NAME, P.eq(ModelTestUtils.PROP_INTEGER_VALUE))
+                                new PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
                         )
                 )
         );
@@ -190,7 +190,7 @@ public class GraphResourceValidatorTest {
                         ModelTestUtils.RESOURCE_DEF_REF,
                         Arrays.asList(
                                 new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE)),
-                                new PropertyStatement(ModelTestUtils.PROP_INTEGER_NAME, P.eq(100))
+                                new PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(100))
                         )
                 )
         );
@@ -206,7 +206,7 @@ public class GraphResourceValidatorTest {
                                         ModelTestUtils.ASSOC_NAME,
                                         Arrays.asList(
                                                 new PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE)),
-                                                new PropertyStatement(ModelTestUtils.PROP_INTEGER_NAME, P.eq(ModelTestUtils.PROP_INTEGER_VALUE))
+                                                new PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
                                         ))
                         )
                 )
@@ -513,7 +513,7 @@ public class GraphResourceValidatorTest {
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID,
                 Collections.singletonList(
-                        new PropertyStatement(ModelTestUtils.PROP_INTEGER_NAME, P.eq(ModelTestUtils.PROP_INTEGER_VALUE))
+                        new PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
                 ),
                 Collections.singletonList(
                         new NestedStatement(
@@ -549,7 +549,7 @@ public class GraphResourceValidatorTest {
         List<ResourceValidationResult> results = validator.validateAll(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 Collections.singletonList(
-                        new PropertyStatement(ModelTestUtils.PROP_INTEGER_NAME, P.eq(ModelTestUtils.PROP_INTEGER_VALUE))
+                        new PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
                 ),
                 Collections.singletonList(
                         new NestedStatement(
@@ -585,7 +585,7 @@ public class GraphResourceValidatorTest {
         List<ResourceValidationResult> results = validator.validateAll(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 Collections.singletonList(
-                        new PropertyStatement(ModelTestUtils.PROP_INTEGER_NAME, P.eq(ModelTestUtils.PROP_INTEGER_VALUE))
+                        new PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
                 ),
                 Collections.singletonList(
                         new AssociationStatement(

@@ -41,7 +41,7 @@ public class NetworkInterfaceAttachmentGenerator extends BaseGenerator {
 
     public static NetworkInterfaceAttachment networkInterfaceAttachment() {
         return NetworkInterfaceAttachment.builder()
-                                         .attachTime(pastDate().toInstant())
+                                         .attachTime(pastInstant())
                                          .attachmentId(networkInterfaceAttachmentId())
                                          .deleteOnTermination(faker.random().nextBoolean())
                                          .deviceIndex(faker.random().nextInt(1, 10))

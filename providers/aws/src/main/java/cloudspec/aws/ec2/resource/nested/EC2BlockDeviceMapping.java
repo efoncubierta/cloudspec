@@ -40,19 +40,19 @@ public class EC2BlockDeviceMapping {
             description = "The device name",
             exampleValues = "/dev/sdh"
     )
-    private String deviceName;
+    private final String deviceName;
 
     @PropertyDefinition(
             name = "virtual_name",
             description = "The virtual device name"
     )
-    private String virtualName;
+    private final String virtualName;
 
     @PropertyDefinition(
             name = "ebs",
             description = "Parameters used to automatically set up EBS volumes when the instance is launched"
     )
-    private EC2EbsBlockDevice ebs;
+    private final EC2EbsBlockDevice ebs;
 
     public EC2BlockDeviceMapping(String deviceName, String virtualName, EC2EbsBlockDevice ebs) {
         this.deviceName = deviceName;

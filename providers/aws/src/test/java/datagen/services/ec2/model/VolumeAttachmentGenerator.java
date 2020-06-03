@@ -42,7 +42,7 @@ public class VolumeAttachmentGenerator extends BaseGenerator {
 
     public static VolumeAttachment volumeAttachment() {
         return VolumeAttachment.builder()
-                               .attachTime(pastDate().toInstant())
+                               .attachTime(pastInstant())
                                .device(DeviceGenerator.deviceName())
                                .instanceId(InstanceGenerator.instanceId())
                                .state(fromArray(VolumeAttachmentState.values()))

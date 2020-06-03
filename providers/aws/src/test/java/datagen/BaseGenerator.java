@@ -27,7 +27,7 @@ package datagen;
 
 import com.github.javafaker.Faker;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -55,11 +55,11 @@ public abstract class BaseGenerator {
         return l.get(faker.random().nextInt(0, l.size() - 1));
     }
 
-    protected static Date pastDate() {
-        return faker.date().past(100, TimeUnit.DAYS);
+    protected static Instant pastInstant() {
+        return faker.date().past(100, TimeUnit.DAYS).toInstant();
     }
 
-    protected static Date futureDate() {
-        return faker.date().future(100, TimeUnit.DAYS);
+    protected static Instant futureInstant() {
+        return faker.date().future(100, TimeUnit.DAYS).toInstant();
     }
 }

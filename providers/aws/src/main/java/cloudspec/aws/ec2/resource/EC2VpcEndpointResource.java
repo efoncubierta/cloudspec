@@ -36,7 +36,11 @@ import software.amazon.awssdk.services.ec2.model.LastError;
 import software.amazon.awssdk.services.ec2.model.SecurityGroupIdentifier;
 import software.amazon.awssdk.services.ec2.model.VpcEndpoint;
 
-import java.util.*;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
@@ -151,7 +155,7 @@ public class EC2VpcEndpointResource extends EC2Resource {
             name = "creation_timestamp",
             description = "The date and time that the VPC endpoint was created"
     )
-    private final Date creationTimestamp;
+    private final Instant creationTimestamp;
 
     @PropertyDefinition(
             name = "tags",
@@ -174,7 +178,7 @@ public class EC2VpcEndpointResource extends EC2Resource {
     public EC2VpcEndpointResource(String region, String vpcEndpointId, String vpcEndpointType, String vpcId,
                                   String serviceName, String state, List<String> routeTableIds, List<String> subnetIds,
                                   List<String> groups, Boolean privateDnsEnabled, Boolean requesterManaged,
-                                  List<String> networkInterfaceIds, Date creationTimestamp, List<KeyValue> tags,
+                                  List<String> networkInterfaceIds, Instant creationTimestamp, List<KeyValue> tags,
                                   String ownerId, String lastError) {
         this.region = region;
         this.vpcEndpointId = vpcEndpointId;
@@ -239,7 +243,7 @@ public class EC2VpcEndpointResource extends EC2Resource {
                 Objects.equals(privateDnsEnabled, that.privateDnsEnabled()) &&
                 Objects.equals(requesterManaged, that.requesterManaged()) &&
                 Objects.equals(networkInterfaceIds, that.networkInterfaceIds()) &&
-                Objects.equals(creationTimestamp, dateFromSdk(that.creationTimestamp())) &&
+                Objects.equals(creationTimestamp, that.creationTimestamp()) &&
                 Objects.equals(tags, tagsFromSdk(that.tags())) &&
                 Objects.equals(ownerId, that.ownerId()) &&
                 Objects.equals(lastError, lastErrorCodeFromSdk(that.lastError()));
@@ -267,7 +271,7 @@ public class EC2VpcEndpointResource extends EC2Resource {
                                v.privateDnsEnabled(),
                                v.requesterManaged(),
                                v.networkInterfaceIds(),
-                               dateFromSdk(v.creationTimestamp()),
+                               v.creationTimestamp(),
                                tagsFromSdk(v.tags()),
                                v.ownerId(),
                                lastErrorCodeFromSdk(v.lastError())

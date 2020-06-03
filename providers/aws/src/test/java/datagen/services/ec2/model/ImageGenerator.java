@@ -62,7 +62,7 @@ public class ImageGenerator extends BaseGenerator {
     public static Image image() {
         return Image.builder()
                     .architecture(InstanceGenerator.architectureValue())
-                    .creationDate(futureDate().toString())
+                    .creationDate(futureInstant().toString())
                     .imageId(imageId())
                     .imageLocation(faker.lorem().word()) // TODO use real value
                     .imageType(imageTypeValue())

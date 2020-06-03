@@ -61,7 +61,7 @@ public class FlowLogGenerator extends BaseGenerator {
 
     public static FlowLog flowLog() {
         return FlowLog.builder()
-                      .creationTime(pastDate().toInstant())
+                      .creationTime(pastInstant())
                       .deliverLogsErrorMessage(faker.lorem().sentence())
                       .deliverLogsPermissionArn(RoleGenerator.roleArn().toString())
                       .flowLogId(flowLogId())

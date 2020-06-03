@@ -32,7 +32,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.TransitGateway;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -87,7 +87,7 @@ public class EC2TransitGatewayResource extends EC2Resource {
             name = "creation_time",
             description = "The creation time"
     )
-    private final Date creationTime;
+    private final Instant creationTime;
 
     @PropertyDefinition(
             name = "options",
@@ -102,7 +102,7 @@ public class EC2TransitGatewayResource extends EC2Resource {
     private final List<KeyValue> tags;
 
     public EC2TransitGatewayResource(String region, String transitGatewayId, String transitGatewayArn, String state,
-                                     String ownerId, Date creationTime, EC2TransitGatewayOptions options,
+                                     String ownerId, Instant creationTime, EC2TransitGatewayOptions options,
                                      List<KeyValue> tags) {
         this.region = region;
         this.transitGatewayId = transitGatewayId;
@@ -144,7 +144,7 @@ public class EC2TransitGatewayResource extends EC2Resource {
                 Objects.equals(transitGatewayArn, that.transitGatewayArn()) &&
                 Objects.equals(state, that.stateAsString()) &&
                 Objects.equals(ownerId, that.ownerId()) &&
-                Objects.equals(creationTime, dateFromSdk(that.creationTime())) &&
+                Objects.equals(creationTime, that.creationTime()) &&
                 Objects.equals(options, that.options()) &&
                 Objects.equals(tags, tagsFromSdk(that.tags()));
     }
@@ -162,7 +162,7 @@ public class EC2TransitGatewayResource extends EC2Resource {
                                v.transitGatewayArn(),
                                v.stateAsString(),
                                v.ownerId(),
-                               dateFromSdk(v.creationTime()),
+                               v.creationTime(),
                                EC2TransitGatewayOptions.fromSdk(v.options()),
                                tagsFromSdk(v.tags())
                        ))

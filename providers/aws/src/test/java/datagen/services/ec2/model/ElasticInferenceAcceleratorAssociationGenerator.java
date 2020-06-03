@@ -55,7 +55,7 @@ public class ElasticInferenceAcceleratorAssociationGenerator extends BaseGenerat
         return ElasticInferenceAcceleratorAssociation.builder()
                                                      .elasticInferenceAcceleratorAssociationId(elasticInferenceAcceleratorAssociationId())
                                                      .elasticInferenceAcceleratorArn(elasticInferenceAcceleratorAssociationArn().toString())
-                                                     .elasticInferenceAcceleratorAssociationTime(pastDate().toInstant())
+                                                     .elasticInferenceAcceleratorAssociationTime(pastInstant())
                                                      .elasticInferenceAcceleratorAssociationState(faker.lorem().word())
                                                      .build();
     }

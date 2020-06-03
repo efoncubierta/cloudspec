@@ -40,13 +40,13 @@ public class EC2DhcpConfiguration {
             name = "key",
             description = "The name of a DHCP option"
     )
-    public String key;
+    public final String key;
 
     @PropertyDefinition(
             name = "values",
             description = "One or more values for the DHCP option"
     )
-    public List<String> values;
+    public final List<String> values;
 
     public EC2DhcpConfiguration(String key, List<String> values) {
         this.key = key;

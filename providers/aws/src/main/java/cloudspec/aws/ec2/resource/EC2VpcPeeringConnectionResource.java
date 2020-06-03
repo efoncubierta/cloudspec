@@ -34,7 +34,7 @@ import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.VpcPeeringConnection;
 import software.amazon.awssdk.services.ec2.model.VpcPeeringConnectionStateReason;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public class EC2VpcPeeringConnectionResource extends EC2Resource {
             name = "expiration_time",
             description = "The time that an unaccepted VPC peering connection will expire"
     )
-    private final Date expirationTime;
+    private final Instant expirationTime;
 
     @PropertyDefinition(
             name = "requester_vpc_info",
@@ -99,7 +99,7 @@ public class EC2VpcPeeringConnectionResource extends EC2Resource {
     private final String vpcPeeringConnectionId;
 
     public EC2VpcPeeringConnectionResource(String region, EC2VpcPeeringConnectionVpcInfo accepterVpcInfo,
-                                           Date expirationTime, EC2VpcPeeringConnectionVpcInfo requesterVpcInfo,
+                                           Instant expirationTime, EC2VpcPeeringConnectionVpcInfo requesterVpcInfo,
                                            String status, List<KeyValue> tags, String vpcPeeringConnectionId) {
         this.region = region;
         this.accepterVpcInfo = accepterVpcInfo;
@@ -136,7 +136,7 @@ public class EC2VpcPeeringConnectionResource extends EC2Resource {
 
     private boolean sdkEquals(VpcPeeringConnection that) {
         return Objects.equals(accepterVpcInfo, that.accepterVpcInfo()) &&
-                Objects.equals(expirationTime, dateFromSdk(that.expirationTime())) &&
+                Objects.equals(expirationTime, that.expirationTime()) &&
                 Objects.equals(requesterVpcInfo, that.requesterVpcInfo()) &&
                 Objects.equals(status, statusFromSdk(that.status())) &&
                 Objects.equals(tags, tagsFromSdk(that.tags())) &&
@@ -155,7 +155,7 @@ public class EC2VpcPeeringConnectionResource extends EC2Resource {
                                new EC2VpcPeeringConnectionResource(
                                        regionName,
                                        EC2VpcPeeringConnectionVpcInfo.fromSdk(v.accepterVpcInfo()),
-                                       dateFromSdk(v.expirationTime()),
+                                       v.expirationTime(),
                                        EC2VpcPeeringConnectionVpcInfo.fromSdk(v.requesterVpcInfo()),
                                        statusFromSdk(v.status()),
                                        tagsFromSdk(v.tags()),

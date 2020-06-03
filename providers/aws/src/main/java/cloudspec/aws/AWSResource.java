@@ -30,22 +30,17 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
 
 public abstract class AWSResource {
-    public static Date dateFromSdk(Instant instant) {
-        return Date.from(instant);
-    }
-
-    public static Date dateFromSdk(String iso8601Date) {
+    public static Instant dateFromSdk(String iso8601Date) {
         return Optional.ofNullable(iso8601Date)
                        .map(v -> {
                            try {
                                return DateUtils.parseDate(
                                        iso8601Date,
                                        DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.getPattern()
-                               );
+                               ).toInstant();
                            } catch (ParseException e) {
                                return null;
                            }

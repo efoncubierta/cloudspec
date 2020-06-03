@@ -34,7 +34,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.NatGateway;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,13 +64,13 @@ public class EC2NatGatewayResource extends EC2Resource {
             name = "create_time",
             description = "The date and time the NAT gateway was created"
     )
-    private final Date createTime;
+    private final Instant createTime;
 
     @PropertyDefinition(
             name = "delete_time",
             description = "The date and time the NAT gateway was deleted, if applicable"
     )
-    private final Date deleteTime;
+    private final Instant deleteTime;
 
     @PropertyDefinition(
             name = "failure_code",
@@ -118,7 +118,7 @@ public class EC2NatGatewayResource extends EC2Resource {
     )
     private final List<KeyValue> tags;
 
-    public EC2NatGatewayResource(String region, Date createTime, Date deleteTime, String failureCode,
+    public EC2NatGatewayResource(String region, Instant createTime, Instant deleteTime, String failureCode,
                                  List<EC2NatGatewayAddress> natGatewayAddresses, String natGatewayId, String state,
                                  String subnetId, String vpcId, List<KeyValue> tags) {
         this.region = region;
@@ -161,8 +161,8 @@ public class EC2NatGatewayResource extends EC2Resource {
     }
 
     private boolean sdkEquals(NatGateway that) {
-        return Objects.equals(createTime, dateFromSdk(that.createTime())) &&
-                Objects.equals(deleteTime, dateFromSdk(that.deleteTime())) &&
+        return Objects.equals(createTime, that.createTime()) &&
+                Objects.equals(deleteTime, that.deleteTime()) &&
                 Objects.equals(failureCode, that.failureCode()) &&
                 Objects.equals(natGatewayAddresses, that.natGatewayAddresses()) &&
                 Objects.equals(natGatewayId, that.natGatewayId()) &&
@@ -182,8 +182,8 @@ public class EC2NatGatewayResource extends EC2Resource {
         return Optional.ofNullable(natGateway)
                        .map(v -> new EC2NatGatewayResource(
                                regionName,
-                               dateFromSdk(v.createTime()),
-                               dateFromSdk(v.deleteTime()),
+                               v.createTime(),
+                               v.deleteTime(),
                                v.failureCode(),
                                EC2NatGatewayAddress.fromSdk(v.natGatewayAddresses()),
                                v.natGatewayId(),

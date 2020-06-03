@@ -35,7 +35,11 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.*;
 
-import java.util.*;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cloudspec.aws.AWSProvider.PROVIDER_NAME;
@@ -95,7 +99,7 @@ public class EC2InstanceResource extends EC2Resource {
             name = "launch_time",
             description = "The time the instance was launched"
     )
-    private final Date launchTime;
+    private final Instant launchTime;
 
     @PropertyDefinition(
             name = "monitoring",
@@ -305,7 +309,7 @@ public class EC2InstanceResource extends EC2Resource {
     private final List<String> licenseConfigurationArns;
 
     public EC2InstanceResource(String region, String imageId, String instanceId, String instanceType,
-                               String kernelId, String keyName, Date launchTime, EC2Monitoring monitoring,
+                               String kernelId, String keyName, Instant launchTime, EC2Monitoring monitoring,
                                EC2Placement placement, String platform, String privateDnsName, String privateIpAddress,
                                List<EC2ProductCode> productCodes, String publicDnsName, String publicIpAddress,
                                String state, String subnetId, String vpcId, String architecture,
@@ -421,7 +425,7 @@ public class EC2InstanceResource extends EC2Resource {
                 Objects.equals(instanceType, instance.instanceTypeAsString()) &&
                 Objects.equals(kernelId, instance.kernelId()) &&
                 Objects.equals(keyName, instance.keyName()) &&
-                Objects.equals(launchTime.toInstant(), instance.launchTime()) &&
+                Objects.equals(launchTime, instance.launchTime()) &&
                 Objects.equals(monitoring, instance.monitoring()) &&
                 Objects.equals(placement, instance.placement()) &&
                 Objects.equals(platform, instance.platformAsString()) &&
@@ -477,7 +481,7 @@ public class EC2InstanceResource extends EC2Resource {
                                        v.instanceTypeAsString(),
                                        v.kernelId(),
                                        v.keyName(),
-                                       dateFromSdk(v.launchTime()),
+                                       v.launchTime(),
                                        EC2Monitoring.fromSdk(v.monitoring()),
                                        EC2Placement.fromSdk(v.placement()),
                                        v.platformAsString(),

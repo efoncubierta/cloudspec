@@ -92,7 +92,7 @@ public class InstanceGenerator extends BaseGenerator {
                 .instanceType(instanceType())
                 .kernelId(faker.lorem().word())
                 .keyName(faker.lorem().word())
-                .launchTime(faker.date().past(100, TimeUnit.DAYS).toInstant())
+                .launchTime(pastInstant())
                 .monitoring(MonitoringGenerator.monitoring())
                 .placement(PlacementGenerator.placement())
                 .platform(platformValue())

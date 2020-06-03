@@ -27,11 +27,10 @@ package cloudspec.aws.ec2.resource.nested;
 
 import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.PropertyDefinition;
-import cloudspec.aws.AWSResource;
 import cloudspec.aws.ec2.resource.EC2VolumeResource;
 import software.amazon.awssdk.services.ec2.model.EbsInstanceBlockDevice;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public class EC2EbsInstanceBlockDevice {
             name = "attach_time",
             description = "The time stamp when the attachment initiated"
     )
-    private final Date attachTime;
+    private final Instant attachTime;
 
     @PropertyDefinition(
             name = "delete_on_termination",
@@ -62,7 +61,7 @@ public class EC2EbsInstanceBlockDevice {
     )
     private final String volumeId;
 
-    public EC2EbsInstanceBlockDevice(Date attachTime, Boolean deleteOnTermination, String status, String volumeId) {
+    public EC2EbsInstanceBlockDevice(Instant attachTime, Boolean deleteOnTermination, String status, String volumeId) {
         this.attachTime = attachTime;
         this.deleteOnTermination = deleteOnTermination;
         this.status = status;
@@ -91,7 +90,7 @@ public class EC2EbsInstanceBlockDevice {
     }
 
     private boolean sdkEquals(EbsInstanceBlockDevice that) {
-        return Objects.equals(attachTime.toInstant(), that.attachTime()) &&
+        return Objects.equals(attachTime, that.attachTime()) &&
                 Objects.equals(deleteOnTermination, that.deleteOnTermination()) &&
                 Objects.equals(status, that.statusAsString()) &&
                 Objects.equals(volumeId, that.volumeId());
@@ -105,7 +104,7 @@ public class EC2EbsInstanceBlockDevice {
     public static EC2EbsInstanceBlockDevice fromSdk(EbsInstanceBlockDevice ebsInstanceBlockDevice) {
         return Optional.ofNullable(ebsInstanceBlockDevice)
                        .map(v -> new EC2EbsInstanceBlockDevice(
-                                       AWSResource.dateFromSdk(v.attachTime()),
+                                       v.attachTime(),
                                        v.deleteOnTermination(),
                                        v.statusAsString(),
                                        v.volumeId()

@@ -29,6 +29,7 @@ import cloudspec.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -49,13 +50,13 @@ public class ResourceReflectionUtil {
      */
     public static Optional<Resource> toResource(Object obj) {
         return ResourceDefReflectionUtil.toResourceDefRef(obj.getClass())
-                .flatMap(resourceDefRef -> toResourceId(obj)
-                        .map(resourceId -> new Resource(
-                                resourceDefRef,
-                                resourceId,
-                                ResourceReflectionUtil.toProperties(obj),
-                                ResourceReflectionUtil.toAssociations(obj)
-                        )));
+                                        .flatMap(resourceDefRef -> toResourceId(obj)
+                                                .map(resourceId -> new Resource(
+                                                        resourceDefRef,
+                                                        resourceId,
+                                                        ResourceReflectionUtil.toProperties(obj),
+                                                        ResourceReflectionUtil.toAssociations(obj)
+                                                )));
     }
 
     /**
@@ -66,42 +67,42 @@ public class ResourceReflectionUtil {
      */
     public static Optional<String> toResourceId(Object obj) {
         return Stream.of(obj.getClass().getDeclaredFields())
-                .peek(field -> {
-                    if (!field.isAnnotationPresent(IdDefinition.class)) {
-                        LOGGER.debug(
-                                "Cannot produce a resource id from field '{}' of object of class '{}' " +
-                                        "because it does not have a field annotated with @IdDefinition",
-                                field.getName(),
-                                obj.getClass().getCanonicalName()
-                        );
-                    }
-                })
-                .filter(field -> field.isAnnotationPresent(IdDefinition.class))
-                .filter(field -> field.getType().isAssignableFrom(String.class))
-                .map(field -> {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Found @IdDefinition annotation in field '{}' of object of class '{}'",
-                                field.getName(),
-                                obj.getClass().getCanonicalName()
-                        );
-                    }
+                     .peek(field -> {
+                         if (!field.isAnnotationPresent(IdDefinition.class)) {
+                             LOGGER.debug(
+                                     "Cannot produce a resource id from field '{}' of object of class '{}' " +
+                                             "because it does not have a field annotated with @IdDefinition",
+                                     field.getName(),
+                                     obj.getClass().getCanonicalName()
+                             );
+                         }
+                     })
+                     .filter(field -> field.isAnnotationPresent(IdDefinition.class))
+                     .filter(field -> field.getType().isAssignableFrom(String.class))
+                     .map(field -> {
+                         if (LOGGER.isDebugEnabled()) {
+                             LOGGER.debug("Found @IdDefinition annotation in field '{}' of object of class '{}'",
+                                     field.getName(),
+                                     obj.getClass().getCanonicalName()
+                             );
+                         }
 
-                    try {
-                        field.setAccessible(true);
-                        String id = (String) field.get(obj);
-                        field.setAccessible(true);
+                         try {
+                             field.setAccessible(true);
+                             String id = (String) field.get(obj);
+                             field.setAccessible(true);
 
-                        return id;
-                    } catch (IllegalAccessException exception) {
-                        throw new RuntimeException(
-                                String.format(
-                                        "Could not obtain ID from field '%s' in class '%s'",
-                                        field.getName(),
-                                        obj.getClass().getCanonicalName()
-                                )
-                        );
-                    }
-                }).findFirst();
+                             return id;
+                         } catch (IllegalAccessException exception) {
+                             throw new RuntimeException(
+                                     String.format(
+                                             "Could not obtain ID from field '%s' in class '%s'",
+                                             field.getName(),
+                                             obj.getClass().getCanonicalName()
+                                     )
+                             );
+                         }
+                     }).findFirst();
 
     }
 
@@ -114,94 +115,98 @@ public class ResourceReflectionUtil {
     public static Properties toProperties(Object obj) {
         return new Properties(
                 Stream.of(obj.getClass().getDeclaredFields())
-                        .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
-                        .flatMap(field -> {
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("Found @PropertyDefinition annotation in field '{}' of class '{}'",
-                                        field.getName(),
-                                        field.getType().getCanonicalName()
-                                );
-                            }
+                      .filter(field -> field.isAnnotationPresent(PropertyDefinition.class))
+                      .flatMap(field -> {
+                          if (LOGGER.isDebugEnabled()) {
+                              LOGGER.debug("Found @PropertyDefinition annotation in field '{}' of class '{}'",
+                                      field.getName(),
+                                      field.getType().getCanonicalName()
+                              );
+                          }
 
-                            PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
+                          PropertyDefinition propertyDefAnnotation = field.getAnnotation(PropertyDefinition.class);
 
-                            try {
-                                field.setAccessible(true);
-                                Object value = field.get(obj);
-                                Boolean multiValued = ResourceDefReflectionUtil.guessMultiValued(field);
-                                field.setAccessible(true);
+                          try {
+                              field.setAccessible(true);
+                              Object value = field.get(obj);
+                              Boolean multiValued = ResourceDefReflectionUtil.guessMultiValued(field);
+                              field.setAccessible(true);
 
-                                Stream<?> valueStream;
-                                if (multiValued) {
-                                    valueStream = ((List<?>) value).stream();
-                                } else {
-                                    valueStream = Stream.of(value);
-                                }
+                              Stream<?> valueStream;
+                              if (multiValued) {
+                                  valueStream = ((List<?>) value).stream();
+                              }
+                              else {
+                                  valueStream = Stream.of(value);
+                              }
 
-                                return valueStream
-                                        .map(item -> {
-                                            switch (ResourceDefReflectionUtil.guessPropertyType(field)) {
-                                                case INTEGER:
-                                                    return new IntegerProperty(
-                                                            propertyDefAnnotation.name(),
-                                                            (Integer) item
-                                                    );
-                                                case DOUBLE:
-                                                    return new DoubleProperty(
-                                                            propertyDefAnnotation.name(),
-                                                            (Double) item
-                                                    );
-                                                case STRING:
-                                                    return new StringProperty(
-                                                            propertyDefAnnotation.name(),
-                                                            (String) item
-                                                    );
-                                                case BOOLEAN:
-                                                    return new BooleanProperty(
-                                                            propertyDefAnnotation.name(),
-                                                            (Boolean) item
-                                                    );
-                                                case DATE:
-                                                    return new DateProperty(
-                                                            propertyDefAnnotation.name(),
-                                                            (Date) item
-                                                    );
-                                                case KEY_VALUE:
-                                                    return new KeyValueProperty(
-                                                            propertyDefAnnotation.name(),
-                                                            (KeyValue) item
-                                                    );
-                                                case NESTED:
-                                                default:
-                                                    Properties properties = toProperties(item);
-                                                    Associations associations = toAssociations(item);
-                                                    if (properties.size() > 0 || associations.size() > 0) {
-                                                        return new NestedProperty(
-                                                                propertyDefAnnotation.name(),
-                                                                new NestedPropertyValue(properties, associations)
-                                                        );
-                                                    }
+                              return valueStream
+                                      .map(item -> {
+                                          switch (ResourceDefReflectionUtil.guessPropertyType(field)) {
+                                              case NUMBER:
+                                                  return new NumberProperty(
+                                                          propertyDefAnnotation.name(),
+                                                          (Number) item
+                                                  );
+                                              case STRING:
+                                                  return new StringProperty(
+                                                          propertyDefAnnotation.name(),
+                                                          (String) item
+                                                  );
+                                              case BOOLEAN:
+                                                  return new BooleanProperty(
+                                                          propertyDefAnnotation.name(),
+                                                          (Boolean) item
+                                                  );
+                                              case DATE:
+                                                  if (item.getClass().isAssignableFrom(Date.class)) {
+                                                      return new DateProperty(
+                                                              propertyDefAnnotation.name(),
+                                                              (Date) item
+                                                      );
+                                                  }
+                                                  else {
+                                                      return new DateProperty(
+                                                              propertyDefAnnotation.name(),
+                                                              (Instant) item
+                                                      );
+                                                  }
+                                              case KEY_VALUE:
+                                                  return new KeyValueProperty(
+                                                          propertyDefAnnotation.name(),
+                                                          (KeyValue) item
+                                                  );
+                                              case NESTED:
+                                              default:
+                                                  Properties properties = toProperties(item);
+                                                  Associations associations = toAssociations(item);
+                                                  if (properties.size() > 0 || associations.size() > 0) {
+                                                      return new NestedProperty(
+                                                              propertyDefAnnotation.name(),
+                                                              new NestedPropertyValue(properties, associations)
+                                                      );
+                                                  }
 
-                                                    Class<?> realClazz = ResourceDefReflectionUtil.getContainedClass(field);
-                                                    LOGGER.warn("Type {} of property '{}' in class {} is not supported",
-                                                            realClazz.getCanonicalName(),
-                                                            field.getName(),
-                                                            obj.getClass().getCanonicalName()
-                                                    );
-                                                    return null;
-                                            }
-                                        })
-                                        .filter(Objects::nonNull);
-                            } catch (IllegalAccessException exception) {
-                                throw new RuntimeException(
-                                        String.format(
-                                                "Could not obtain value from property %s in class %s",
-                                                field.getName(),
-                                                obj.getClass().getCanonicalName()
-                                        )
-                                );
-                            }
-                        })
+                                                  Class<?> realClazz = ResourceDefReflectionUtil.getContainedClass(field);
+                                                  LOGGER.warn("Type {} of property '{}' in class {} is not supported",
+                                                          realClazz.getCanonicalName(),
+                                                          field.getName(),
+                                                          obj.getClass().getCanonicalName()
+                                                  );
+                                                  return null;
+                                          }
+                                      })
+                                      .filter(Objects::nonNull);
+                          } catch (IllegalAccessException exception) {
+                              throw new RuntimeException(
+                                      String.format(
+                                              "Could not obtain value from property %s in class %s",
+                                              field.getName(),
+                                              obj.getClass().getCanonicalName()
+                                      )
+                              );
+                          }
+                      })
         );
     }
 
@@ -214,60 +219,61 @@ public class ResourceReflectionUtil {
     public static Associations toAssociations(Object obj) {
         return new Associations(
                 Stream.of(obj.getClass().getDeclaredFields())
-                        .filter(field -> field.isAnnotationPresent(AssociationDefinition.class))
-                        .flatMap(field -> {
-                            Class<?> realClazz = ResourceDefReflectionUtil.getContainedClass(field);
+                      .filter(field -> field.isAnnotationPresent(AssociationDefinition.class))
+                      .flatMap(field -> {
+                          Class<?> realClazz = ResourceDefReflectionUtil.getContainedClass(field);
 
-                            // validate field is a string
-                            if (!realClazz.isAssignableFrom(String.class)) {
-                                LOGGER.warn("Type {} of association '{}' in class {} is not supported",
-                                        realClazz.getCanonicalName(),
-                                        field.getName(),
-                                        obj.getClass().getCanonicalName()
-                                );
-                                return Stream.empty();
-                            }
+                          // validate field is a string
+                          if (!realClazz.isAssignableFrom(String.class)) {
+                              LOGGER.warn("Type {} of association '{}' in class {} is not supported",
+                                      realClazz.getCanonicalName(),
+                                      field.getName(),
+                                      obj.getClass().getCanonicalName()
+                              );
+                              return Stream.empty();
+                          }
 
-                            AssociationDefinition associationDefinitionAnnotation = field.getAnnotation(AssociationDefinition.class);
+                          AssociationDefinition associationDefinitionAnnotation = field.getAnnotation(AssociationDefinition.class);
 
-                            String associationName = associationDefinitionAnnotation.name();
-                            Optional<ResourceDefRef> resourceDefRefOptional = ResourceDefReflectionUtil.toResourceDefRef(associationDefinitionAnnotation.targetClass());
+                          String associationName = associationDefinitionAnnotation.name();
+                          Optional<ResourceDefRef> resourceDefRefOptional = ResourceDefReflectionUtil.toResourceDefRef(associationDefinitionAnnotation.targetClass());
 
-                            // TODO add validation for association name and resourceDefRef
-                            if (resourceDefRefOptional.isEmpty()) {
-                                return Stream.empty();
-                            }
+                          // TODO add validation for association name and resourceDefRef
+                          if (resourceDefRefOptional.isEmpty()) {
+                              return Stream.empty();
+                          }
 
-                            try {
-                                field.setAccessible(true);
-                                Boolean multiValued = ResourceDefReflectionUtil.guessMultiValued(field);
-                                Object id = field.get(obj);
-                                field.setAccessible(true);
+                          try {
+                              field.setAccessible(true);
+                              Boolean multiValued = ResourceDefReflectionUtil.guessMultiValued(field);
+                              Object id = field.get(obj);
+                              field.setAccessible(true);
 
-                                if (multiValued) {
-                                    return ((List<String>) id).stream().map(resourceId ->
-                                            new Association(
-                                                    associationName,
-                                                    resourceDefRefOptional.get(),
-                                                    resourceId)
-                                    );
-                                } else {
-                                    return Stream.of(new Association(
-                                            associationName,
-                                            resourceDefRefOptional.get(),
-                                            (String) id)
-                                    );
-                                }
-                            } catch (IllegalAccessException exception) {
-                                throw new RuntimeException(
-                                        String.format(
-                                                "Could not obtain value from property %s in class %s",
-                                                field.getName(),
-                                                obj.getClass().getCanonicalName()
-                                        )
-                                );
-                            }
-                        })
+                              if (multiValued) {
+                                  return ((List<String>) id).stream().map(resourceId ->
+                                          new Association(
+                                                  associationName,
+                                                  resourceDefRefOptional.get(),
+                                                  resourceId)
+                                  );
+                              }
+                              else {
+                                  return Stream.of(new Association(
+                                          associationName,
+                                          resourceDefRefOptional.get(),
+                                          (String) id)
+                                  );
+                              }
+                          } catch (IllegalAccessException exception) {
+                              throw new RuntimeException(
+                                      String.format(
+                                              "Could not obtain value from property %s in class %s",
+                                              field.getName(),
+                                              obj.getClass().getCanonicalName()
+                                      )
+                              );
+                          }
+                      })
         );
     }
 }

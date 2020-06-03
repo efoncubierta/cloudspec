@@ -46,44 +46,44 @@ public class CloudSpecGenerator {
 
     public static CloudSpec fullSpec() {
         return CloudSpec.builder()
-                .setName(faker.lorem().sentence())
-                .addGroups(fullGroup())
-                .build();
+                        .setName(faker.lorem().sentence())
+                        .addGroups(fullGroup())
+                        .build();
     }
 
     public static GroupExpr fullGroup() {
         return GroupExpr.builder()
-                .setName(faker.lorem().sentence())
-                .addRules(fullRule())
-                .build();
+                        .setName(faker.lorem().sentence())
+                        .addRules(fullRule())
+                        .build();
     }
 
     public static RuleExpr fullRule() {
         return RuleExpr.builder()
-                .setName(faker.lorem().sentence())
-                .setResourceDefRef(
-                        String.format(
-                                "%s:%s:%s",
-                                faker.lorem().word(),
-                                faker.lorem().word(),
-                                faker.lorem().word()
-                        )
-                )
-                .setWithExpr(fullWith())
-                .setAssertExp(fullAssert())
-                .build();
+                       .setName(faker.lorem().sentence())
+                       .setResourceDefRef(
+                               String.format(
+                                       "%s:%s:%s",
+                                       faker.lorem().word(),
+                                       faker.lorem().word(),
+                                       faker.lorem().word()
+                               )
+                       )
+                       .setWithExpr(fullWith())
+                       .setAssertExp(fullAssert())
+                       .build();
     }
 
     public static WithExpr fullWith() {
         return WithExpr.builder()
-                .setStatements(fullStatements(true, true))
-                .build();
+                       .setStatements(fullStatements(true, true))
+                       .build();
     }
 
     public static AssertExpr fullAssert() {
         return AssertExpr.builder()
-                .setStatement(fullStatements(true, true))
-                .build();
+                         .setStatement(fullStatements(true, true))
+                         .build();
     }
 
     public static List<Statement> fullStatements(Boolean includeNested, Boolean includeAssociation) {
@@ -280,42 +280,42 @@ public class CloudSpecGenerator {
     public static PropertyStatement randomIpAddressEqualPredicateStatement() {
         return new PropertyStatement(
                 faker.lorem().word(),
-                IPAddressP.eq(randomIpv4Address())
+                IPAddressP.eq(randomIpAddress())
         );
     }
 
     public static PropertyStatement randomIpAddressNotEqualPredicateStatement() {
         return new PropertyStatement(
                 faker.lorem().word(),
-                IPAddressP.neq(randomIpv4Address())
+                IPAddressP.neq(randomIpAddress())
         );
     }
 
     public static PropertyStatement randomIpAddressLessThanPredicateStatement() {
         return new PropertyStatement(
                 faker.lorem().word(),
-                IPAddressP.lt(randomIpv4Address())
+                IPAddressP.lt(randomIpAddress())
         );
     }
 
     public static PropertyStatement randomIpAddressLessThanEqualPredicateStatement() {
         return new PropertyStatement(
                 faker.lorem().word(),
-                IPAddressP.lte(randomIpv4Address())
+                IPAddressP.lte(randomIpAddress())
         );
     }
 
     public static PropertyStatement randomIpAddressGreaterThanPredicateStatement() {
         return new PropertyStatement(
                 faker.lorem().word(),
-                IPAddressP.gt(randomIpv4Address())
+                IPAddressP.gt(randomIpAddress())
         );
     }
 
     public static PropertyStatement randomIpAddressGreaterThanEqualPredicateStatement() {
         return new PropertyStatement(
                 faker.lorem().word(),
-                IPAddressP.gte(randomIpv4Address())
+                IPAddressP.gte(randomIpAddress())
         );
     }
 
@@ -433,11 +433,10 @@ public class CloudSpecGenerator {
 
     public static PropertyType randomPropertyType() {
         return Arrays.asList(
-                PropertyType.INTEGER,
-                PropertyType.DOUBLE,
+                PropertyType.NUMBER,
                 PropertyType.STRING,
                 PropertyType.BOOLEAN
-        ).get(faker.random().nextInt(0, 3));
+        ).get(faker.random().nextInt(0, 2));
     }
 
     public static Object randomValue() {
@@ -446,6 +445,12 @@ public class CloudSpecGenerator {
 
     public static String randomString() {
         return faker.lorem().word();
+    }
+
+    public static String randomIpAddress() {
+        return faker.random().nextBoolean() ?
+                randomIpv4Address() :
+                randomIpv6Address();
     }
 
     public static String randomIpv4Address() {
@@ -461,20 +466,15 @@ public class CloudSpecGenerator {
     }
 
     public static Object randomNumber() {
-        return randomValue(
-                Arrays.asList(
-                        PropertyType.INTEGER,
-                        PropertyType.DOUBLE
-                ).get(faker.random().nextInt(0, 1))
-        );
+        return randomValue(PropertyType.NUMBER);
     }
 
     public static Object randomValue(PropertyType propertyType) {
         switch (propertyType) {
-            case INTEGER:
-                return faker.random().nextInt(0, 1000);
-            case DOUBLE:
-                return faker.random().nextDouble();
+            case NUMBER:
+                return faker.random().nextBoolean() ?
+                        faker.random().nextInt(0, 1000) :
+                        faker.random().nextDouble();
             case BOOLEAN:
                 return faker.random().nextBoolean();
             case DATE:
@@ -492,8 +492,8 @@ public class CloudSpecGenerator {
 
     public static List<Object> randomValues(PropertyType propertyType) {
         return IntStream.range(0, 5)
-                .mapToObj(i -> randomValue(propertyType))
-                .collect(Collectors.toList());
+                        .mapToObj(i -> randomValue(propertyType))
+                        .collect(Collectors.toList());
     }
 
     public static Date randomDate() {

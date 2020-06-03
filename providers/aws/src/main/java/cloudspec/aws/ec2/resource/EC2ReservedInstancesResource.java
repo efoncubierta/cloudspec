@@ -33,7 +33,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.ReservedInstances;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,13 +75,13 @@ public class EC2ReservedInstancesResource extends EC2Resource {
             name = "end",
             description = "The time when the Reserved Instance expires"
     )
-    private final Date end;
+    private final Instant end;
 
     @PropertyDefinition(
             name = "fixed_price",
             description = "The purchase price of the Reserved Instance"
     )
-    private final Double fixedPrice;
+    private final Float fixedPrice;
 
     @PropertyDefinition(
             name = "instance_count",
@@ -106,7 +106,7 @@ public class EC2ReservedInstancesResource extends EC2Resource {
             name = "start",
             description = "The date and time the Reserved Instance started"
     )
-    private final Date start;
+    private final Instant start;
 
     @PropertyDefinition(
             name = "state",
@@ -119,7 +119,7 @@ public class EC2ReservedInstancesResource extends EC2Resource {
             name = "usage_price",
             description = "The usage price of the Reserved Instance, per hour"
     )
-    private final Double usagePrice;
+    private final Float usagePrice;
 
     @PropertyDefinition(
             name = "currency_code",
@@ -167,9 +167,9 @@ public class EC2ReservedInstancesResource extends EC2Resource {
     )
     private final List<KeyValue> tags;
 
-    public EC2ReservedInstancesResource(String region, String availabilityZone, Long duration, Date end,
-                                        Double fixedPrice, Integer instanceCount, String instanceType,
-                                        String reservedInstancesId, Date start, String state, Double usagePrice,
+    public EC2ReservedInstancesResource(String region, String availabilityZone, Long duration, Instant end,
+                                        Float fixedPrice, Integer instanceCount, String instanceType,
+                                        String reservedInstancesId, Instant start, String state, Float usagePrice,
                                         String currencyCode, String instanceTenancy, String offeringClass,
                                         String offeringType, List<EC2RecurringCharge> recurringCharges, String scope,
                                         List<KeyValue> tags) {
@@ -231,14 +231,14 @@ public class EC2ReservedInstancesResource extends EC2Resource {
     private boolean sdkEquals(ReservedInstances that) {
         return Objects.equals(availabilityZone, that.availabilityZone()) &&
                 Objects.equals(duration, that.duration()) &&
-                Objects.equals(end, dateFromSdk(that.end())) &&
-                Objects.equals(fixedPrice, that.fixedPrice().doubleValue()) &&
+                Objects.equals(end, that.end()) &&
+                Objects.equals(fixedPrice, that.fixedPrice()) &&
                 Objects.equals(instanceCount, that.instanceCount()) &&
                 Objects.equals(instanceType, that.instanceTypeAsString()) &&
                 Objects.equals(reservedInstancesId, that.reservedInstancesId()) &&
-                Objects.equals(start, dateFromSdk(that.start())) &&
+                Objects.equals(start, that.start()) &&
                 Objects.equals(state, that.stateAsString()) &&
-                Objects.equals(usagePrice, that.usagePrice().doubleValue()) &&
+                Objects.equals(usagePrice, that.usagePrice()) &&
                 Objects.equals(currencyCode, that.currencyCodeAsString()) &&
                 Objects.equals(instanceTenancy, that.instanceTenancyAsString()) &&
                 Objects.equals(offeringClass, that.offeringClassAsString()) &&
@@ -261,14 +261,14 @@ public class EC2ReservedInstancesResource extends EC2Resource {
                                        regionName,
                                        v.availabilityZone(),
                                        v.duration(),
-                                       dateFromSdk(v.end()),
-                                       Double.valueOf(v.fixedPrice()),
+                                       v.end(),
+                                       v.fixedPrice(),
                                        v.instanceCount(),
                                        v.instanceTypeAsString(),
                                        v.reservedInstancesId(),
-                                       dateFromSdk(v.start()),
+                                       v.start(),
                                        v.stateAsString(),
-                                       Double.valueOf(v.usagePrice()),
+                                       v.usagePrice(),
                                        v.currencyCodeAsString(),
                                        v.instanceTenancyAsString(),
                                        v.offeringClassAsString(),

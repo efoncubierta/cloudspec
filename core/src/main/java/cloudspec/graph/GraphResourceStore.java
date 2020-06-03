@@ -36,6 +36,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -266,15 +267,15 @@ public class GraphResourceStore implements ResourceStore {
 
     private Optional<Vertex> getResourceVertexById(ResourceDefRef resourceDefRef, String resourceId) {
         return graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, resourceId)
-                .tryNext();
+                             .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                             .has(PROPERTY_RESOURCE_ID, resourceId)
+                             .tryNext();
     }
 
     private Stream<Vertex> getResourceVerticesByDefinition(ResourceDefRef resourceDefRef) {
         return graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .toStream();
+                             .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                             .toStream();
     }
 
     @SuppressWarnings("unchecked")
@@ -283,17 +284,17 @@ public class GraphResourceStore implements ResourceStore {
                 resourceDefRef, resourceId);
 
         Vertex resourceV = graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                .has(PROPERTY_RESOURCE_ID, resourceId)
-                .fold()
-                // check whether the resource vertex exist, or create it otherwise
-                .coalesce(
-                        __.unfold(),
-                        __.addV(LABEL_RESOURCE)
-                                .property(PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
-                                .property(PROPERTY_RESOURCE_ID, resourceId)
-                )
-                .next();
+                                         .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                                         .has(PROPERTY_RESOURCE_ID, resourceId)
+                                         .fold()
+                                         // check whether the resource vertex exist, or create it otherwise
+                                         .coalesce(
+                                                 __.unfold(),
+                                                 __.addV(LABEL_RESOURCE)
+                                                   .property(PROPERTY_RESOURCE_DEF_REF, resourceDefRef)
+                                                   .property(PROPERTY_RESOURCE_ID, resourceId)
+                                         )
+                                         .next();
 
         // new resource vertex must have an edge to its resource definition vertex
         if (!resourceV.edges(Direction.OUT, LABEL_IS_RESOURCE_DEF).hasNext()) {
@@ -323,10 +324,10 @@ public class GraphResourceStore implements ResourceStore {
 
             // create edge between resource and resource definition edges
             graphTraversal.V()
-                    .addE(LABEL_IS_RESOURCE_DEF)
-                    .from(resourceV)
-                    .to(resourceDefVOpt.get())
-                    .next();
+                          .addE(LABEL_IS_RESOURCE_DEF)
+                          .from(resourceV)
+                          .to(resourceDefVOpt.get())
+                          .next();
         }
 
         return resourceV;
@@ -339,9 +340,9 @@ public class GraphResourceStore implements ResourceStore {
         // source vertex can be a resource or a property value
         // get property vertex by its name
         Optional<Vertex> propertyVOpt = graphTraversal.V(sourceV.id())
-                .out(LABEL_HAS_PROPERTY)
-                .has(PROPERTY_NAME, property.getName())
-                .tryNext();
+                                                      .out(LABEL_HAS_PROPERTY)
+                                                      .has(PROPERTY_NAME, property.getName())
+                                                      .tryNext();
 
         // return if exists
         if (propertyVOpt.isPresent()) {
@@ -433,8 +434,8 @@ public class GraphResourceStore implements ResourceStore {
     private void saveNestedPropertyValueFromVertex(Vertex propertyV, NestedPropertyValue nestedProperty) {
         // nested property values are empty, but with edges to properties and associations
         Vertex propertyValueV = graphTraversal.V(propertyV.id())
-                .addV(LABEL_PROPERTY_VALUE)
-                .next();
+                                              .addV(LABEL_PROPERTY_VALUE)
+                                              .next();
 
         // add edge between property and property value edges
         graphTraversal
@@ -453,9 +454,9 @@ public class GraphResourceStore implements ResourceStore {
     private void saveAtomicPropertyValueFromVertex(Vertex propertyV, Object obj) {
         // atomic property values hold a value
         Vertex propertyValueV = graphTraversal.V(propertyV.id())
-                .addV(LABEL_PROPERTY_VALUE)
-                .property(PROPERTY_VALUE, obj)
-                .next();
+                                              .addV(LABEL_PROPERTY_VALUE)
+                                              .property(PROPERTY_VALUE, obj)
+                                              .next();
 
         // create edge between property and property value edges
         graphTraversal
@@ -468,10 +469,10 @@ public class GraphResourceStore implements ResourceStore {
     private void saveKeyValuePropertyValueFromVertex(Vertex propertyV, KeyValue keyValue) {
         // key value property values hold a key and a value properties
         Vertex propertyValueV = graphTraversal.V(propertyV.id())
-                .addV(LABEL_PROPERTY_VALUE)
-                .property(PROPERTY_KEY, keyValue.getKey())
-                .property(PROPERTY_VALUE, keyValue.getValue())
-                .next();
+                                              .addV(LABEL_PROPERTY_VALUE)
+                                              .property(PROPERTY_KEY, keyValue.getKey())
+                                              .property(PROPERTY_VALUE, keyValue.getValue())
+                                              .next();
 
         // create edge between property and property value edges
         graphTraversal
@@ -508,16 +509,16 @@ public class GraphResourceStore implements ResourceStore {
                 // check whether the association already exists, or create it otherwise
                 .coalesce(
                         __.unfold()
-                                .outE(LABEL_HAS_ASSOCIATION)
-                                .has(PROPERTY_NAME, association.getName())
-                                .inV()
-                                .has(PROPERTY_RESOURCE_DEF_REF, association.getResourceDefRef())
-                                .has(PROPERTY_RESOURCE_ID, association.getResourceId()),
+                          .outE(LABEL_HAS_ASSOCIATION)
+                          .has(PROPERTY_NAME, association.getName())
+                          .inV()
+                          .has(PROPERTY_RESOURCE_DEF_REF, association.getResourceDefRef())
+                          .has(PROPERTY_RESOURCE_ID, association.getResourceId()),
                         __.addE(LABEL_HAS_ASSOCIATION)
-                                .property(PROPERTY_NAME, association.getName())
-                                .from(sourceV)
-                                .to(targetV)
-                                .inV()
+                          .property(PROPERTY_NAME, association.getName())
+                          .from(sourceV)
+                          .to(targetV)
+                          .inV()
                 ).next();
     }
 
@@ -595,13 +596,9 @@ public class GraphResourceStore implements ResourceStore {
 
     private Optional<Property<?>> toProperty(String propertyName, PropertyType type, Vertex propertyValueV) {
         switch (type) {
-            case INTEGER:
+            case NUMBER:
                 return Optional.of(
-                        new IntegerProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
-                );
-            case DOUBLE:
-                return Optional.of(
-                        new DoubleProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
+                        new NumberProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
                 );
             case STRING:
                 return Optional.of(
@@ -613,7 +610,7 @@ public class GraphResourceStore implements ResourceStore {
                 );
             case DATE:
                 return Optional.of(
-                        new DateProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
+                        new DateProperty(propertyName, (Instant) propertyValueV.value(PROPERTY_VALUE))
                 );
             case KEY_VALUE:
                 return Optional.of(
@@ -689,20 +686,22 @@ public class GraphResourceStore implements ResourceStore {
     private String toMemberPath(Vertex sourceV, String memberName) {
         if (sourceV.label().equals(LABEL_RESOURCE)) {
             return memberName;
-        } else if (sourceV.label().equals(LABEL_PROPERTY_VALUE)) {
+        }
+        else if (sourceV.label().equals(LABEL_PROPERTY_VALUE)) {
             return toMemberPath(
                     graphTraversal
                             .V(sourceV.id())
                             .in(LABEL_HAS_PROPERTY_VALUE)
                             .next(),
                     memberName);
-        } else {
+        }
+        else {
             return String.format(
                     "%s.%s",
                     toMemberPath(
                             graphTraversal.V(sourceV.id())
-                                    .in(LABEL_HAS_PROPERTY)
-                                    .next(),
+                                          .in(LABEL_HAS_PROPERTY)
+                                          .next(),
                             sourceV.value(PROPERTY_NAME)
                     ),
                     memberName

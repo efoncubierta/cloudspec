@@ -71,7 +71,7 @@ public class VpcEndpointGenerator extends BaseGenerator {
                           .dnsEntries(
                                   listGenerator(faker.random().nextInt(1, 5), DnsEntryGenerator::dnsEntry)
                           )
-                          .creationTimestamp(pastDate().toInstant())
+                          .creationTimestamp(pastInstant())
                           .tags(TagGenerator.tags())
                           .ownerId(CommonGenerator.accountId())
                           .lastError(LastErrorGenerator.lastError())

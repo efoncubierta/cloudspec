@@ -88,25 +88,28 @@ public class CloudSpecPreflight {
 
         // preflight withs and asserts
         rule.getWithExpr()
-                .getStatements()
-                .forEach(statement ->
-                        preflightStatement(resourceDef, statement, new ArrayList<>())
-                );
+            .getStatements()
+            .forEach(statement ->
+                    preflightStatement(resourceDef, statement, new ArrayList<>())
+            );
         rule.getAssertExpr()
-                .getStatements()
-                .forEach(statement ->
-                        preflightStatement(resourceDef, statement, new ArrayList<>())
-                );
+            .getStatements()
+            .forEach(statement ->
+                    preflightStatement(resourceDef, statement, new ArrayList<>())
+            );
     }
 
     private void preflightStatement(ResourceDef resourceDef, Statement statement, List<String> path) {
         if (statement instanceof NestedStatement) {
             preflightNestedStatement(resourceDef, ((NestedStatement) statement), path);
-        } else if (statement instanceof KeyValueStatement) {
+        }
+        else if (statement instanceof KeyValueStatement) {
             preflightKeyValueStatement(resourceDef, (KeyValueStatement) statement, path);
-        } else if (statement instanceof PropertyStatement) {
+        }
+        else if (statement instanceof PropertyStatement) {
             preflightPropertyStatement(resourceDef, (PropertyStatement) statement, path);
-        } else if (statement instanceof AssociationStatement) {
+        }
+        else if (statement instanceof AssociationStatement) {
             preflightAssociationStatement(resourceDef, (AssociationStatement) statement, path);
         }
     }
@@ -125,7 +128,7 @@ public class CloudSpecPreflight {
         }
 
         statement.getStatements()
-                .forEach(stmt -> preflightStatement(resourceDef, stmt, nestedPath));
+                 .forEach(stmt -> preflightStatement(resourceDef, stmt, nestedPath));
     }
 
     private void preflightAssociationStatement(ResourceDef resourceDef, AssociationStatement statement, List<String> path) {
@@ -156,9 +159,9 @@ public class CloudSpecPreflight {
 
         var associatedResourceDef = associatedResourceDefOpt.get();
         statement.getStatements()
-                .forEach(stmt ->
-                        preflightStatement(associatedResourceDef, stmt, new ArrayList<>())
-                );
+                 .forEach(stmt ->
+                         preflightStatement(associatedResourceDef, stmt, new ArrayList<>())
+                 );
     }
 
     private void preflightPropertyStatement(ResourceDef resourceDef, PropertyStatement statement, List<String> path) {
@@ -237,11 +240,10 @@ public class CloudSpecPreflight {
     }
 
     private Boolean isNumberProperty(PropertyDef propertyDef) {
-        return (propertyDef.getPropertyType().equals(PropertyType.INTEGER) &&
-                propertyDef.getPropertyType().equals(PropertyType.DOUBLE));
+        return propertyDef.getPropertyType().equals(PropertyType.NUMBER);
     }
 
     private Boolean isStringProperty(PropertyDef propertyDef) {
-        return (propertyDef.getPropertyType().equals(PropertyType.STRING));
+        return propertyDef.getPropertyType().equals(PropertyType.STRING);
     }
 }

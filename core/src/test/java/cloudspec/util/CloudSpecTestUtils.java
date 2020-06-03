@@ -39,8 +39,8 @@ public class CloudSpecTestUtils {
     public static final WithExpr TEST_WITH_EXPR = new WithExpr(
             Arrays.asList(
                     new PropertyStatement(
-                            ModelTestUtils.PROP_INTEGER_NAME,
-                            P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                            ModelTestUtils.PROP_NUMBER_NAME,
+                            P.eq(ModelTestUtils.PROP_NUMBER_VALUE)
                     ),
                     new PropertyStatement(
                             ModelTestUtils.PROP_STRING_NAME,
@@ -59,8 +59,8 @@ public class CloudSpecTestUtils {
                             ModelTestUtils.PROP_NESTED_NAME,
                             Collections.singletonList(
                                     new PropertyStatement(
-                                            ModelTestUtils.PROP_INTEGER_NAME,
-                                            P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                                            ModelTestUtils.PROP_NUMBER_NAME,
+                                            P.eq(ModelTestUtils.PROP_NUMBER_VALUE)
                                     )
                             )
                     ),
@@ -111,8 +111,8 @@ public class CloudSpecTestUtils {
     public static final AssertExpr TEST_ASSERT_EXPR = new AssertExpr(
             Arrays.asList(
                     new PropertyStatement(
-                            ModelTestUtils.PROP_INTEGER_NAME,
-                            P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                            ModelTestUtils.PROP_NUMBER_NAME,
+                            P.eq(ModelTestUtils.PROP_NUMBER_VALUE)
                     ),
                     new PropertyStatement(
                             ModelTestUtils.PROP_STRING_NAME,
@@ -131,8 +131,8 @@ public class CloudSpecTestUtils {
                             ModelTestUtils.PROP_NESTED_NAME,
                             Collections.singletonList(
                                     new PropertyStatement(
-                                            ModelTestUtils.PROP_INTEGER_NAME,
-                                            P.eq(ModelTestUtils.PROP_INTEGER_VALUE)
+                                            ModelTestUtils.PROP_NUMBER_NAME,
+                                            P.eq(ModelTestUtils.PROP_NUMBER_VALUE)
                                     )
                             )
                     ),

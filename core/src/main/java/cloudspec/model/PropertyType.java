@@ -31,8 +31,7 @@ package cloudspec.model;
 public enum PropertyType {
     STRING("string"),
     BOOLEAN("boolean"),
-    INTEGER("integer"),
-    DOUBLE("double"),
+    NUMBER("number"),
     DATE("date"),
     KEY_VALUE("key_value"),
     NESTED("nested");

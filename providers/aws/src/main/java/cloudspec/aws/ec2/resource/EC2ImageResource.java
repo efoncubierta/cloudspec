@@ -34,7 +34,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.Image;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,7 +71,7 @@ public class EC2ImageResource extends EC2Resource {
             name = "creation_date",
             description = "The date and time the image was created"
     )
-    private final Date creationDate;
+    private final Instant creationDate;
 
     @IdDefinition
     @PropertyDefinition(
@@ -185,7 +185,7 @@ public class EC2ImageResource extends EC2Resource {
     )
     private final Boolean publicLaunchPermissions;
 
-    public EC2ImageResource(String region, String architecture, Date creationDate, String imageId,
+    public EC2ImageResource(String region, String architecture, Instant creationDate, String imageId,
                             String imageLocation, String imageType, String kernelId, String ownerId, String platform,
                             List<EC2ProductCode> productCodes, String state, List<EC2BlockDeviceMapping> blockDeviceMappings,
                             Boolean enaSupport, String hypervisor, String name, String rootDeviceName,

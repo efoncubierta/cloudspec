@@ -48,7 +48,7 @@ public class InstanceBlockDeviceMappingGenerator extends BaseGenerator {
                                                                     .deleteOnTermination(faker.random().nextBoolean())
                                                                     .volumeId(VolumeGenerator.volumeId())
                                                                     .status(attachmentStatus())
-                                                                    .attachTime(pastDate().toInstant())
+                                                                    .attachTime(pastInstant())
                                                                     .build())
                                          .build();
     }

@@ -67,7 +67,7 @@ public class TransitGatewayGenerator extends BaseGenerator {
                              .state(transitGatewayState())
                              .ownerId(CommonGenerator.accountId())
                              .description(faker.lorem().sentence())
-                             .creationTime(pastDate().toInstant())
+                             .creationTime(pastInstant())
                              .options(TransitGatewayOptionsGenerator.transitGatewayOptions())
                              .tags(TagGenerator.tags())
                              .build();

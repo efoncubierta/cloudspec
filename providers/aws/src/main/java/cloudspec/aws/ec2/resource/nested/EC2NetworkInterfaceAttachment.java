@@ -27,11 +27,10 @@ package cloudspec.aws.ec2.resource.nested;
 
 import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.PropertyDefinition;
-import cloudspec.aws.AWSResource;
 import cloudspec.aws.ec2.resource.EC2InstanceResource;
 import software.amazon.awssdk.services.ec2.model.NetworkInterfaceAttachment;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public class EC2NetworkInterfaceAttachment {
             name = "attach_time",
             description = "The timestamp indicating when the attachment initiated"
     )
-    private final Date attachTime;
+    private final Instant attachTime;
 
 //    @AssociationDefinition(
 //            name = "attachment_id",
@@ -73,7 +72,7 @@ public class EC2NetworkInterfaceAttachment {
     )
     private final String status;
 
-    public EC2NetworkInterfaceAttachment(Date attachTime, Boolean deleteOnTermination, String instanceId,
+    public EC2NetworkInterfaceAttachment(Instant attachTime, Boolean deleteOnTermination, String instanceId,
                                          String instanceOwnerId, String status) {
         this.attachTime = attachTime;
         this.deleteOnTermination = deleteOnTermination;
@@ -105,7 +104,7 @@ public class EC2NetworkInterfaceAttachment {
     }
 
     private boolean sdkEquals(NetworkInterfaceAttachment that) {
-        return Objects.equals(attachTime.toInstant(), that.attachTime()) &&
+        return Objects.equals(attachTime, that.attachTime()) &&
                 Objects.equals(deleteOnTermination, that.deleteOnTermination()) &&
                 Objects.equals(instanceId, that.instanceId()) &&
                 Objects.equals(instanceOwnerId, that.instanceOwnerId()) &&
@@ -120,7 +119,7 @@ public class EC2NetworkInterfaceAttachment {
     public static EC2NetworkInterfaceAttachment fromSdk(NetworkInterfaceAttachment networkInterfaceAttachment) {
         return Optional.ofNullable(networkInterfaceAttachment)
                        .map(v -> new EC2NetworkInterfaceAttachment(
-                                       AWSResource.dateFromSdk(v.attachTime()),
+                                       v.attachTime(),
                                        v.deleteOnTermination(),
                                        v.instanceId(),
                                        v.instanceOwnerId(),

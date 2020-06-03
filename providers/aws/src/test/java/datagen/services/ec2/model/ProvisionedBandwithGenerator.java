@@ -31,9 +31,9 @@ import software.amazon.awssdk.services.ec2.model.ProvisionedBandwidth;
 public class ProvisionedBandwithGenerator extends BaseGenerator {
     public static ProvisionedBandwidth provisionedBandwidth() {
         return ProvisionedBandwidth.builder()
-                                   .provisionTime(pastDate().toInstant())
+                                   .provisionTime(pastInstant())
                                    .provisioned(faker.lorem().word())
-                                   .requestTime(pastDate().toInstant())
+                                   .requestTime(pastInstant())
                                    .requested(faker.lorem().word())
                                    .status(faker.lorem().word())
                                    .build();

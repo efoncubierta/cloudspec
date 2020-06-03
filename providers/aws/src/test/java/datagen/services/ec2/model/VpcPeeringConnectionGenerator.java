@@ -46,7 +46,7 @@ public class VpcPeeringConnectionGenerator extends BaseGenerator {
     public static VpcPeeringConnection vpcPeeringConnection() {
         return VpcPeeringConnection.builder()
                                    .accepterVpcInfo(VpcPeeringConnectionVpcInfoGenerator.vpcPeeringConnectionVpcInfo())
-                                   .expirationTime(futureDate().toInstant())
+                                   .expirationTime(futureInstant())
                                    .requesterVpcInfo(VpcPeeringConnectionVpcInfoGenerator.vpcPeeringConnectionVpcInfo())
                                    .status(VpcPeeringConnectionStateReasonGenerator.vpcPeeringConnectionStateReason())
                                    .vpcPeeringConnectionId(vpcPeeringConnectionId())

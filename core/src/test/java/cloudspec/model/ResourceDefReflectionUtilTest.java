@@ -99,8 +99,8 @@ public class ResourceDefReflectionUtilTest {
     @Test
     public void shouldProduceResourceDef() {
         Optional<ResourceDef> resourceDefOpt = ResourceDefReflectionUtil.toResourceDef(TestResource.class);
-        assertNotNull(resourceDefOpt);
-        assertTrue(resourceDefOpt.isPresent());
+        System.out.println(ModelTestUtils.RESOURCE_DEF);
+        System.out.println(resourceDefOpt.get());
         assertEquals(ModelTestUtils.RESOURCE_DEF, resourceDefOpt.get());
     }
 

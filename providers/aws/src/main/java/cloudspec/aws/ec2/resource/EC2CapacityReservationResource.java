@@ -32,7 +32,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.CapacityReservation;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -137,7 +137,7 @@ public class EC2CapacityReservationResource extends EC2Resource {
             name = "end_date",
             description = "The date and time at which the Capacity Reservation expires"
     )
-    private final Date endDate;
+    private final Instant endDate;
 
     @PropertyDefinition(
             name = "end_date_type",
@@ -157,7 +157,7 @@ public class EC2CapacityReservationResource extends EC2Resource {
             name = "create_date",
             description = "The date and time at which the Capacity Reservation was created"
     )
-    private final Date createDate;
+    private final Instant createDate;
 
     @PropertyDefinition(
             name = "tags",
@@ -169,8 +169,8 @@ public class EC2CapacityReservationResource extends EC2Resource {
                                           String capacityReservationArn, String instanceType, String instancePlatform,
                                           String availabilityZone, String tenancy, Integer totalInstanceCount,
                                           Integer availableInstanceCount, Boolean ebsOptimized, Boolean ephemeralStorage,
-                                          String state, Date endDate, String endDateType, String instanceMatchCriteria,
-                                          Date createDate, List<KeyValue> tags) {
+                                          String state, Instant endDate, String endDateType, String instanceMatchCriteria,
+                                          Instant createDate, List<KeyValue> tags) {
         this.region = region;
         this.capacityReservationId = capacityReservationId;
         this.ownerId = ownerId;
@@ -239,10 +239,10 @@ public class EC2CapacityReservationResource extends EC2Resource {
                 Objects.equals(ebsOptimized, that.ebsOptimized()) &&
                 Objects.equals(ephemeralStorage, that.ephemeralStorage()) &&
                 Objects.equals(state, that.stateAsString()) &&
-                Objects.equals(endDate.toInstant(), that.endDate()) &&
+                Objects.equals(endDate, that.endDate()) &&
                 Objects.equals(endDateType, that.endDateTypeAsString()) &&
                 Objects.equals(instanceMatchCriteria, that.instanceMatchCriteriaAsString()) &&
-                Objects.equals(createDate.toInstant(), that.createDate()) &&
+                Objects.equals(createDate, that.createDate()) &&
                 Objects.equals(tags, tagsFromSdk(that.tags()));
     }
 
@@ -269,10 +269,10 @@ public class EC2CapacityReservationResource extends EC2Resource {
                                v.ebsOptimized(),
                                v.ephemeralStorage(),
                                v.stateAsString(),
-                               dateFromSdk(v.endDate()),
+                               v.endDate(),
                                v.endDateTypeAsString(),
                                v.instanceMatchCriteriaAsString(),
-                               dateFromSdk(v.createDate()),
+                               v.createDate(),
                                tagsFromSdk(v.tags())
                        ))
                        .orElse(null);

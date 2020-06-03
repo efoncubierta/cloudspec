@@ -54,7 +54,7 @@ public class VolumeGenerator extends BaseGenerator {
         return Volume.builder()
                      .attachments(VolumeAttachmentGenerator.volumeAttachments())
                      .availabilityZone(CommonGenerator.availabilityZone())
-                     .createTime(pastDate().toInstant())
+                     .createTime(pastInstant())
                      .encrypted(faker.random().nextBoolean())
                      .kmsKeyId(faker.lorem().word()) // TODO realistic value
                      .outpostArn(OutpostGenerator.outpostArn().toString())

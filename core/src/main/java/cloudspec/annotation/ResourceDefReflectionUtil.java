@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -145,8 +146,7 @@ public class ResourceDefReflectionUtil {
 
         switch (propertyType) {
             case KEY_VALUE:
-            case INTEGER:
-            case DOUBLE:
+            case NUMBER:
             case STRING:
             case BOOLEAN:
             case DATE:
@@ -269,15 +269,13 @@ public class ResourceDefReflectionUtil {
             clazz = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
         }
 
-        if (clazz.isAssignableFrom(Integer.class)) {
-            return PropertyType.INTEGER;
-        } else if (clazz.isAssignableFrom(Double.class)) {
-            return PropertyType.DOUBLE;
+        if (Number.class.isAssignableFrom(clazz)) {
+            return PropertyType.NUMBER;
         } else if (clazz.isAssignableFrom(String.class)) {
             return PropertyType.STRING;
         } else if (clazz.isAssignableFrom(Boolean.class)) {
             return PropertyType.BOOLEAN;
-        } else if (clazz.isAssignableFrom(Date.class)) {
+        } else if (clazz.isAssignableFrom(Date.class) || clazz.isAssignableFrom(Instant.class)) {
             return PropertyType.DATE;
         } else if (clazz.isAssignableFrom(KeyValue.class)) {
             return PropertyType.KEY_VALUE;

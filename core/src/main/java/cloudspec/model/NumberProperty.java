@@ -25,8 +25,8 @@
  */
 package cloudspec.model;
 
-public class IntegerProperty extends Property<Integer> {
-    public IntegerProperty(String name, Integer value) {
+public class NumberProperty extends Property<Number> {
+    public NumberProperty(String name, Number value) {
         super(name, value);
     }
 }

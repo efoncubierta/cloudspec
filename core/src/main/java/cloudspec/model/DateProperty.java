@@ -25,10 +25,15 @@
  */
 package cloudspec.model;
 
+import java.time.Instant;
 import java.util.Date;
 
-public class DateProperty extends Property<Date> {
+public class DateProperty extends Property<Instant> {
     public DateProperty(String name, Date value) {
+        super(name, value.toInstant());
+    }
+
+    public DateProperty(String name, Instant value) {
         super(name, value);
     }
 }

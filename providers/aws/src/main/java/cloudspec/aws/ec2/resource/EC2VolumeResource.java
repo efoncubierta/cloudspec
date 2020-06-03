@@ -34,7 +34,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.Volume;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,7 +76,7 @@ public class EC2VolumeResource extends EC2Resource {
             name = "create_time",
             description = "The time stamp when volume creation was initiated"
     )
-    private final Date createTime;
+    private final Instant createTime;
 
     @PropertyDefinition(
             name = "encrypted",
@@ -155,7 +155,7 @@ public class EC2VolumeResource extends EC2Resource {
     private final Boolean multiAttachEnabled;
 
     public EC2VolumeResource(String region, List<EC2VolumeAttachment> attachments, String availabilityZone,
-                             Date createTime, Boolean encrypted, String kmsKeyId, String outpostArn, Integer size,
+                             Instant createTime, Boolean encrypted, String kmsKeyId, String outpostArn, Integer size,
                              String snapshotId, String state, String volumeId, Integer iops, List<KeyValue> tags,
                              String volumeType, Boolean fastRestored, Boolean multiAttachEnabled) {
         this.region = region;
@@ -212,7 +212,7 @@ public class EC2VolumeResource extends EC2Resource {
     private boolean sdkEquals(Volume that) {
         return Objects.equals(attachments, that.attachments()) &&
                 Objects.equals(availabilityZone, that.availabilityZone()) &&
-                Objects.equals(createTime, dateFromSdk(that.createTime())) &&
+                Objects.equals(createTime, that.createTime()) &&
                 Objects.equals(encrypted, that.encrypted()) &&
                 Objects.equals(kmsKeyId, that.kmsKeyId()) &&
                 Objects.equals(outpostArn, that.outpostArn()) &&
@@ -240,7 +240,7 @@ public class EC2VolumeResource extends EC2Resource {
                                        regionName,
                                        EC2VolumeAttachment.fromSdk(v.attachments()),
                                        v.availabilityZone(),
-                                       dateFromSdk(v.createTime()),
+                                       v.createTime(),
                                        v.encrypted(),
                                        v.kmsKeyId(),
                                        v.outpostArn(),

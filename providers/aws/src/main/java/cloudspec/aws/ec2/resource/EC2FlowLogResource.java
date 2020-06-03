@@ -33,7 +33,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.FlowLog;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,7 +63,7 @@ public class EC2FlowLogResource extends EC2Resource {
             name = "creation_time",
             description = "The date and time the flow log was created"
     )
-    private final Date creationTime;
+    private final Instant creationTime;
 
     @PropertyDefinition(
             name = "deliver_logs_error_message",
@@ -149,7 +149,7 @@ public class EC2FlowLogResource extends EC2Resource {
     )
     private final Integer maxAggregationInterval;
 
-    public EC2FlowLogResource(String region, Date creationTime, String deliverLogsErrorMessage,
+    public EC2FlowLogResource(String region, Instant creationTime, String deliverLogsErrorMessage,
                               String deliverLogsPermissionArn, String deliverLogsStatus, String flowLogId,
                               String flowLogStatus, String logGroupName, String resourceId, String trafficType,
                               String logDestinationType, String logDestination, String logFormat,
@@ -204,7 +204,7 @@ public class EC2FlowLogResource extends EC2Resource {
     }
 
     private boolean sdkEquals(FlowLog that) {
-        return Objects.equals(creationTime, dateFromSdk(that.creationTime())) &&
+        return Objects.equals(creationTime, that.creationTime()) &&
                 Objects.equals(deliverLogsErrorMessage, that.deliverLogsErrorMessage()) &&
                 Objects.equals(deliverLogsPermissionArn, that.deliverLogsPermissionArn()) &&
                 Objects.equals(deliverLogsStatus, that.deliverLogsStatus()) &&
@@ -231,7 +231,7 @@ public class EC2FlowLogResource extends EC2Resource {
         return Optional.ofNullable(flowLog)
                        .map(v -> new EC2FlowLogResource(
                                regionName,
-                               dateFromSdk(v.creationTime()),
+                               v.creationTime(),
                                v.deliverLogsErrorMessage(),
                                v.deliverLogsPermissionArn(),
                                v.deliverLogsStatus(),

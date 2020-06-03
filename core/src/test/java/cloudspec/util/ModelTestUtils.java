@@ -72,61 +72,33 @@ public class ModelTestUtils {
     );
     public static final StringProperty PROP_ID = new StringProperty(PROP_ID_NAME, RESOURCE_ID);
 
-    public static final String PROP_INTEGER_NAME = "integer_property";
-    public static final String PROP_INTEGER_DESCRIPTION = "Integer property";
-    public static final String PROP_INTEGER_EXAMPLE_VALUES = "The integer property";
-    public static final PropertyType PROP_INTEGER_TYPE = PropertyType.INTEGER;
-    public static final Integer PROP_INTEGER_VALUE = 1;
-    public static final PropertyDef PROP_INTEGER_DEF = new PropertyDef(
-            PROP_INTEGER_NAME,
-            PROP_INTEGER_DESCRIPTION,
-            PROP_INTEGER_TYPE,
+    public static final String PROP_NUMBER_NAME = "number_property";
+    public static final String PROP_NUMBER_DESCRIPTION = "Number property";
+    public static final String PROP_NUMBER_EXAMPLE_VALUES = "The number property";
+    public static final PropertyType PROP_NUMBER_TYPE = PropertyType.NUMBER;
+    public static final Integer PROP_NUMBER_VALUE = 1;
+    public static final PropertyDef PROP_NUMBER_DEF = new PropertyDef(
+            PROP_NUMBER_NAME,
+            PROP_NUMBER_DESCRIPTION,
+            PROP_NUMBER_TYPE,
             Boolean.FALSE,
-            PROP_INTEGER_EXAMPLE_VALUES
+            PROP_NUMBER_EXAMPLE_VALUES
     );
-    public static final IntegerProperty PROP_INTEGER = new IntegerProperty(PROP_INTEGER_NAME, PROP_INTEGER_VALUE);
+    public static final NumberProperty PROP_NUMBER = new NumberProperty(PROP_NUMBER_NAME, PROP_NUMBER_VALUE);
 
-    public static final String PROP_INTEGER_LIST_NAME = "integer_list_property";
-    public static final String PROP_INTEGER_LIST_DESCRIPTION = "Integer list property";
-    public static final String PROP_INTEGER_LIST_EXAMPLE_VALUES = "The list of integer property";
-    public static final PropertyType PROP_INTEGER_LIST_TYPE = PropertyType.INTEGER;
-    public static final List<Integer> PROP_INTEGER_LIST_VALUE = Arrays.asList(PROP_INTEGER_VALUE, PROP_INTEGER_VALUE);
-    public static final PropertyDef PROP_INTEGER_LIST_DEF = new PropertyDef(
-            PROP_INTEGER_LIST_NAME,
-            PROP_INTEGER_LIST_DESCRIPTION,
-            PROP_INTEGER_LIST_TYPE,
+    public static final String PROP_NUMBER_LIST_NAME = "integer_list_property";
+    public static final String PROP_NUMBER_LIST_DESCRIPTION = "Integer list property";
+    public static final String PROP_NUMBER_LIST_EXAMPLE_VALUES = "The list of integer property";
+    public static final PropertyType PROP_NUMBER_LIST_TYPE = PropertyType.NUMBER;
+    public static final List<Integer> PROP_NUMBER_LIST_VALUE = Arrays.asList(PROP_NUMBER_VALUE, PROP_NUMBER_VALUE);
+    public static final PropertyDef PROP_NUMBER_LIST_DEF = new PropertyDef(
+            PROP_NUMBER_LIST_NAME,
+            PROP_NUMBER_LIST_DESCRIPTION,
+            PROP_NUMBER_LIST_TYPE,
             Boolean.TRUE,
-            PROP_INTEGER_LIST_EXAMPLE_VALUES
+            PROP_NUMBER_LIST_EXAMPLE_VALUES
     );
-    public static final IntegerProperty PROP_INTEGER_LIST = new IntegerProperty(PROP_INTEGER_LIST_NAME, PROP_INTEGER_VALUE);
-
-    public static final String PROP_DOUBLE_NAME = "double_property";
-    public static final String PROP_DOUBLE_DESCRIPTION = "Double property";
-    public static final String PROP_DOUBLE_EXAMPLE_VALUES = "The double property";
-    public static final PropertyType PROP_DOUBLE_TYPE = PropertyType.DOUBLE;
-    public static final Double PROP_DOUBLE_VALUE = 1.2;
-    public static final PropertyDef PROP_DOUBLE_DEF = new PropertyDef(
-            PROP_DOUBLE_NAME,
-            PROP_DOUBLE_DESCRIPTION,
-            PROP_DOUBLE_TYPE,
-            Boolean.FALSE,
-            PROP_DOUBLE_EXAMPLE_VALUES
-    );
-    public static final DoubleProperty PROP_DOUBLE = new DoubleProperty(PROP_DOUBLE_NAME, PROP_DOUBLE_VALUE);
-
-    public static final String PROP_DOUBLE_LIST_NAME = "double_list_property";
-    public static final String PROP_DOUBLE_LIST_DESCRIPTION = "Double list property";
-    public static final String PROP_DOUBLE_LIST_EXAMPLE_VALUES = "The list of doubles property";
-    public static final PropertyType PROP_DOUBLE_LIST_TYPE = PropertyType.DOUBLE;
-    public static final List<Double> PROP_DOUBLE_LIST_VALUE = Arrays.asList(PROP_DOUBLE_VALUE, PROP_DOUBLE_VALUE);
-    public static final PropertyDef PROP_DOUBLE_LIST_DEF = new PropertyDef(
-            PROP_DOUBLE_LIST_NAME,
-            PROP_DOUBLE_LIST_DESCRIPTION,
-            PROP_DOUBLE_LIST_TYPE,
-            Boolean.TRUE,
-            PROP_DOUBLE_LIST_EXAMPLE_VALUES
-    );
-    public static final DoubleProperty PROP_DOUBLE_LIST = new DoubleProperty(PROP_DOUBLE_LIST_NAME, PROP_DOUBLE_VALUE);
+    public static final NumberProperty PROP_NUMBER_LIST = new NumberProperty(PROP_NUMBER_LIST_NAME, PROP_NUMBER_VALUE);
 
     public static final String PROP_STRING_NAME = "string_property";
     public static final String PROP_STRING_DESCRIPTION = "String property";
@@ -246,8 +218,7 @@ public class ModelTestUtils {
     public static final PropertyType PROP_NESTED_TYPE = PropertyType.NESTED;
     public static final NestedPropertyValue PROP_NESTED_VALUE = new NestedPropertyValue(
             new Properties(
-                    PROP_INTEGER, PROP_INTEGER_LIST, PROP_INTEGER_LIST,
-                    PROP_DOUBLE, PROP_DOUBLE_LIST, PROP_DOUBLE_LIST,
+                    PROP_NUMBER, PROP_NUMBER_LIST, PROP_NUMBER_LIST,
                     PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
                     PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
                     PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
@@ -264,8 +235,7 @@ public class ModelTestUtils {
             Boolean.FALSE,
             PROP_NESTED_EXAMPLE_VALUES,
             Arrays.asList(
-                    PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
-                    PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
+                    PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
                     PROP_DATE_DEF, PROP_DATE_LIST_DEF,
@@ -287,8 +257,7 @@ public class ModelTestUtils {
             Boolean.TRUE,
             PROP_NESTED_LIST_EXAMPLE_VALUES,
             Arrays.asList(
-                    PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
-                    PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
+                    PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
                     PROP_DATE_DEF, PROP_DATE_LIST_DEF,
@@ -300,8 +269,7 @@ public class ModelTestUtils {
 
     public static final Properties PROPERTIES = new Properties(
             PROP_ID,
-            PROP_INTEGER, PROP_INTEGER_LIST, PROP_INTEGER_LIST,
-            PROP_DOUBLE, PROP_DOUBLE_LIST, PROP_DOUBLE_LIST,
+            PROP_NUMBER, PROP_NUMBER_LIST, PROP_NUMBER_LIST,
             PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
             PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
             PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
@@ -310,8 +278,7 @@ public class ModelTestUtils {
     );
     public static final Properties TARGET_PROPERTIES = new Properties(
             PROP_ID,
-            PROP_INTEGER, PROP_INTEGER_LIST, PROP_INTEGER_LIST,
-            PROP_DOUBLE, PROP_DOUBLE_LIST, PROP_DOUBLE_LIST,
+            PROP_NUMBER, PROP_NUMBER_LIST, PROP_NUMBER_LIST,
             PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
             PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
             PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
@@ -319,8 +286,7 @@ public class ModelTestUtils {
     );
     public static final List<PropertyDef> PROPERTY_DEFS = Arrays.asList(
             PROP_ID_DEF,
-            PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
-            PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
+            PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF,
             PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
             PROP_DATE_DEF, PROP_DATE_LIST_DEF,
@@ -329,8 +295,7 @@ public class ModelTestUtils {
     );
     public static final List<PropertyDef> TARGET_PROPERTY_DEFS = Arrays.asList(
             PROP_ID_DEF,
-            PROP_INTEGER_DEF, PROP_INTEGER_LIST_DEF,
-            PROP_DOUBLE_DEF, PROP_DOUBLE_LIST_DEF,
+            PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF,
             PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
             PROP_DATE_DEF, PROP_DATE_LIST_DEF,
@@ -366,10 +331,8 @@ public class ModelTestUtils {
     public static final Provider TEST_PROVIDER = new TestProvider();
     public static final TestResource TEST_RESOURCE = new TestResource(
             RESOURCE_ID,
-            PROP_INTEGER_VALUE,
-            PROP_INTEGER_LIST_VALUE,
-            PROP_DOUBLE_VALUE,
-            PROP_DOUBLE_LIST_VALUE,
+            PROP_NUMBER_VALUE,
+            PROP_NUMBER_LIST_VALUE,
             PROP_STRING_VALUE,
             PROP_STRING_LIST_VALUE,
             PROP_BOOLEAN_VALUE,
@@ -379,10 +342,8 @@ public class ModelTestUtils {
             PROP_KEY_VALUE_VALUE,
             PROP_KEY_VALUE_LIST_VALUE,
             new TestNestedProperty(
-                    PROP_INTEGER_VALUE,
-                    PROP_INTEGER_LIST_VALUE,
-                    PROP_DOUBLE_VALUE,
-                    PROP_DOUBLE_LIST_VALUE,
+                    PROP_NUMBER_VALUE,
+                    PROP_NUMBER_LIST_VALUE,
                     PROP_STRING_VALUE,
                     PROP_STRING_LIST_VALUE,
                     PROP_BOOLEAN_VALUE,
@@ -395,10 +356,8 @@ public class ModelTestUtils {
             ),
             Collections.singletonList(
                     new TestNestedProperty(
-                            PROP_INTEGER_VALUE,
-                            PROP_INTEGER_LIST_VALUE,
-                            PROP_DOUBLE_VALUE,
-                            PROP_DOUBLE_LIST_VALUE,
+                            PROP_NUMBER_VALUE,
+                            PROP_NUMBER_LIST_VALUE,
                             PROP_STRING_VALUE,
                             PROP_STRING_LIST_VALUE,
                             PROP_BOOLEAN_VALUE,

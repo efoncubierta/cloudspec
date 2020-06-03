@@ -33,7 +33,7 @@ import cloudspec.model.KeyValue;
 import cloudspec.model.ResourceDefRef;
 import software.amazon.awssdk.services.ec2.model.Snapshot;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -92,7 +92,7 @@ public class EC2SnapshotResource extends EC2Resource {
             name = "start_time",
             description = "The time stamp when the snapshot was initiated"
     )
-    private final Date startTime;
+    private final Instant startTime;
 
     @PropertyDefinition(
             name = "state",
@@ -120,7 +120,7 @@ public class EC2SnapshotResource extends EC2Resource {
     private final List<KeyValue> tags;
 
     public EC2SnapshotResource(String region, Boolean encrypted, String ownerId, String progress, String snapshotId,
-                               Date startTime, String state, String volumeId, Integer volumeSize, List<KeyValue> tags) {
+                               Instant startTime, String state, String volumeId, Integer volumeSize, List<KeyValue> tags) {
         this.region = region;
         this.encrypted = encrypted;
         this.ownerId = ownerId;
@@ -165,7 +165,7 @@ public class EC2SnapshotResource extends EC2Resource {
                 Objects.equals(ownerId, that.ownerId()) &&
                 Objects.equals(progress, that.progress()) &&
                 Objects.equals(snapshotId, that.snapshotId()) &&
-                Objects.equals(startTime, dateFromSdk(that.startTime())) &&
+                Objects.equals(startTime, that.startTime()) &&
                 Objects.equals(state, that.stateAsString()) &&
                 Objects.equals(volumeId, that.volumeId()) &&
                 Objects.equals(volumeSize, that.volumeSize()) &&
@@ -186,7 +186,7 @@ public class EC2SnapshotResource extends EC2Resource {
                                        v.ownerId(),
                                        v.progress(),
                                        v.snapshotId(),
-                                       dateFromSdk(v.startTime()),
+                                       v.startTime(),
                                        v.stateAsString(),
                                        v.volumeId(),
                                        v.volumeSize(),

@@ -50,32 +50,18 @@ public class TestResource {
     private final String id;
 
     @PropertyDefinition(
-            name = ModelTestUtils.PROP_INTEGER_NAME,
-            description = ModelTestUtils.PROP_INTEGER_DESCRIPTION,
-            exampleValues = ModelTestUtils.PROP_INTEGER_EXAMPLE_VALUES
+            name = ModelTestUtils.PROP_NUMBER_NAME,
+            description = ModelTestUtils.PROP_NUMBER_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_NUMBER_EXAMPLE_VALUES
     )
     private final Integer integerProperty;
 
     @PropertyDefinition(
-            name = ModelTestUtils.PROP_INTEGER_LIST_NAME,
-            description = ModelTestUtils.PROP_INTEGER_LIST_DESCRIPTION,
-            exampleValues = ModelTestUtils.PROP_INTEGER_LIST_EXAMPLE_VALUES
+            name = ModelTestUtils.PROP_NUMBER_LIST_NAME,
+            description = ModelTestUtils.PROP_NUMBER_LIST_DESCRIPTION,
+            exampleValues = ModelTestUtils.PROP_NUMBER_LIST_EXAMPLE_VALUES
     )
     private final List<Integer> integerListProperty;
-
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_DOUBLE_NAME,
-            description = ModelTestUtils.PROP_DOUBLE_DESCRIPTION,
-            exampleValues = ModelTestUtils.PROP_DOUBLE_EXAMPLE_VALUES
-    )
-    private final Double doubleProperty;
-
-    @PropertyDefinition(
-            name = ModelTestUtils.PROP_DOUBLE_LIST_NAME,
-            description = ModelTestUtils.PROP_DOUBLE_LIST_DESCRIPTION,
-            exampleValues = ModelTestUtils.PROP_DOUBLE_LIST_EXAMPLE_VALUES
-    )
-    private final List<Double> doubleListProperty;
 
     @PropertyDefinition(
             name = ModelTestUtils.PROP_STRING_NAME,
@@ -156,7 +142,6 @@ public class TestResource {
 
     public TestResource(String id,
                         Integer integerProperty, List<Integer> integerListProperty,
-                        Double doubleProperty, List<Double> doubleListProperty,
                         String stringProperty, List<String> stringListProperty,
                         Boolean booleanProperty, List<Boolean> booleanListProperty,
                         Date dateProperty, List<Date> dateListProperty,
@@ -166,8 +151,6 @@ public class TestResource {
         this.id = id;
         this.integerProperty = integerProperty;
         this.integerListProperty = integerListProperty;
-        this.doubleProperty = doubleProperty;
-        this.doubleListProperty = doubleListProperty;
         this.stringProperty = stringProperty;
         this.stringListProperty = stringListProperty;
         this.booleanProperty = booleanProperty;

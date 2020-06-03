@@ -50,8 +50,8 @@ public class NatGatewayGenerator extends BaseGenerator {
 
     public static NatGateway natGateway() {
         return NatGateway.builder()
-                         .createTime(pastDate().toInstant())
-                         .deleteTime(pastDate().toInstant())
+                         .createTime(pastInstant())
+                         .deleteTime(pastInstant())
                          .failureCode(faker.lorem().word()) // TODO use real value
                          .failureMessage(faker.lorem().sentence()) // TODO use real value
                          .natGatewayAddresses(NatGatewayAddressGenerator.natGatewayAddresses())

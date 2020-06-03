@@ -44,14 +44,13 @@ public class ModelGenerator {
 
     public static PropertyType randomPropertyType(Boolean excludeNested) {
         return Arrays.asList(
-                PropertyType.INTEGER,
-                PropertyType.DOUBLE,
+                PropertyType.NUMBER,
                 PropertyType.STRING,
                 PropertyType.BOOLEAN,
                 PropertyType.DATE,
                 PropertyType.KEY_VALUE,
                 PropertyType.NESTED
-        ).get(faker.random().nextInt(0, excludeNested ? 5 : 6));
+        ).get(faker.random().nextInt(0, excludeNested ? 4 : 5));
     }
 
     public static List<PropertyDef> randomPropertyDefs(Integer n) {
@@ -60,8 +59,8 @@ public class ModelGenerator {
 
     public static List<PropertyDef> randomPropertyDefs(Integer n, Boolean excludeNested) {
         return IntStream.range(0, n)
-                .mapToObj(i -> randomPropertyDef(excludeNested))
-                .collect(Collectors.toList());
+                        .mapToObj(i -> randomPropertyDef(excludeNested))
+                        .collect(Collectors.toList());
     }
 
     public static PropertyDef randomPropertyDef() {
@@ -108,14 +107,14 @@ public class ModelGenerator {
 
     public static List<Object> randomPropertyValues(Integer n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> randomPropertyValue())
-                .collect(Collectors.toList());
+                        .mapToObj(i -> randomPropertyValue())
+                        .collect(Collectors.toList());
     }
 
     public static List<Object> randomPropertyValues(Integer n, PropertyDef propertyDef) {
         return IntStream.range(0, n)
-                .mapToObj(i -> randomPropertyValue(propertyDef))
-                .collect(Collectors.toList());
+                        .mapToObj(i -> randomPropertyValue(propertyDef))
+                        .collect(Collectors.toList());
     }
 
     public static Object randomPropertyValue() {
@@ -128,17 +127,17 @@ public class ModelGenerator {
                 return new NestedPropertyValue(
                         new Properties(
                                 propertyDef.getProperties()
-                                        .stream()
-                                        .map(ModelGenerator::randomProperty)
+                                           .stream()
+                                           .map(ModelGenerator::randomProperty)
                         ),
                         new Associations()
                 );
             case KEY_VALUE:
                 return new KeyValue(faker.lorem().word(), faker.lorem().word());
-            case INTEGER:
-                return faker.random().nextInt(Integer.MAX_VALUE);
-            case DOUBLE:
-                return faker.random().nextDouble();
+            case NUMBER:
+                return faker.random().nextBoolean() ?
+                        faker.random().nextInt(Integer.MAX_VALUE) :
+                        faker.random().nextDouble();
             case BOOLEAN:
                 return faker.random().nextBoolean();
             case DATE:
@@ -156,7 +155,7 @@ public class ModelGenerator {
     public static Properties randomProperties(List<PropertyDef> propertyDefs) {
         return new Properties(
                 propertyDefs.stream()
-                        .map(ModelGenerator::randomProperty)
+                            .map(ModelGenerator::randomProperty)
         );
     }
 
@@ -166,17 +165,11 @@ public class ModelGenerator {
 
     public static Property<?> randomProperty(PropertyDef propertyDef) {
         switch (propertyDef.getPropertyType()) {
-            case INTEGER:
-                return new IntegerProperty(
+            case NUMBER:
+                return new NumberProperty(
                         propertyDef.getName(),
-                        (Integer) randomPropertyValue(propertyDef)
+                        (Number) randomPropertyValue(propertyDef)
                 );
-            case DOUBLE:
-                return new DoubleProperty(
-                        propertyDef.getName(),
-                        (Double) randomPropertyValue(propertyDef)
-                );
-
             case BOOLEAN:
                 return new BooleanProperty(
                         propertyDef.getName(),
@@ -221,8 +214,8 @@ public class ModelGenerator {
 
     public static List<AssociationDef> randomAssociationDefs(Integer n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> randomAssociationDef())
-                .collect(Collectors.toList());
+                        .mapToObj(i -> randomAssociationDef())
+                        .collect(Collectors.toList());
     }
 
     public static Association randomAssociation(AssociationDef associationDef) {

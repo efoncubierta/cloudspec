@@ -58,7 +58,7 @@ public class SnapshotGenerator extends BaseGenerator {
                        .ownerId(CommonGenerator.accountId())
                        .progress(faker.random().nextInt(0, 100).toString())
                        .snapshotId(snapshotId())
-                       .startTime(pastDate().toInstant())
+                       .startTime(pastInstant())
                        .state(snapshotState())
                        .stateMessage(faker.lorem().sentence()) // TODO realistic value
                        .volumeId(VolumeGenerator.volumeId())

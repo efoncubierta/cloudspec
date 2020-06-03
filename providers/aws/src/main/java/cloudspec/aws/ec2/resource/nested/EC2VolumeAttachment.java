@@ -27,12 +27,15 @@ package cloudspec.aws.ec2.resource.nested;
 
 import cloudspec.annotation.AssociationDefinition;
 import cloudspec.annotation.PropertyDefinition;
-import cloudspec.aws.AWSResource;
 import cloudspec.aws.ec2.resource.EC2InstanceResource;
 import cloudspec.aws.ec2.resource.EC2VolumeResource;
 import software.amazon.awssdk.services.ec2.model.VolumeAttachment;
 
-import java.util.*;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EC2VolumeAttachment {
@@ -40,7 +43,7 @@ public class EC2VolumeAttachment {
             name = "attach_time",
             description = "The time stamp when the attachment initiated"
     )
-    private final Date attachTime;
+    private final Instant attachTime;
 
     @PropertyDefinition(
             name = "device",
@@ -75,7 +78,7 @@ public class EC2VolumeAttachment {
     )
     private final Boolean deleteOnTermination;
 
-    public EC2VolumeAttachment(Date attachTime, String device, String instanceId, String state, String volumeId,
+    public EC2VolumeAttachment(Instant attachTime, String device, String instanceId, String state, String volumeId,
                                Boolean deleteOnTermination) {
         this.attachTime = attachTime;
         this.device = device;
@@ -109,7 +112,7 @@ public class EC2VolumeAttachment {
     }
 
     private boolean sdkEquals(VolumeAttachment that) {
-        return Objects.equals(attachTime.toInstant(), that.attachTime()) &&
+        return Objects.equals(attachTime, that.attachTime()) &&
                 Objects.equals(device, that.device()) &&
                 Objects.equals(instanceId, that.instanceId()) &&
                 Objects.equals(state, that.stateAsString()) &&
@@ -134,7 +137,7 @@ public class EC2VolumeAttachment {
         return Optional.ofNullable(volumeAttachment)
                        .map(v ->
                                new EC2VolumeAttachment(
-                                       AWSResource.dateFromSdk(v.attachTime()),
+                                       v.attachTime(),
                                        v.device(),
                                        v.instanceId(),
                                        v.stateAsString(),

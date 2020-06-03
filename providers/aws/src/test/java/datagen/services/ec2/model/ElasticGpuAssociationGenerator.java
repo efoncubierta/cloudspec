@@ -43,7 +43,7 @@ public class ElasticGpuAssociationGenerator extends BaseGenerator {
     public static ElasticGpuAssociation elasticGpuAssociation() {
         return ElasticGpuAssociation.builder()
                                     .elasticGpuAssociationId(elasticGpuAssociationId())
-                                    .elasticGpuAssociationTime(pastDate().toString())
+                                    .elasticGpuAssociationTime(pastInstant().toString())
                                     .elasticGpuAssociationState(faker.lorem().word())
                                     .build();
     }

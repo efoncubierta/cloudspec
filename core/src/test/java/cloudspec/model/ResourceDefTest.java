@@ -47,11 +47,11 @@ public class ResourceDefTest {
 
     @Test
     public void shouldGetPropertyByPath() {
-        List<String> path = Arrays.asList(ModelTestUtils.PROP_NESTED_NAME, ModelTestUtils.PROP_INTEGER_NAME);
+        List<String> path = Arrays.asList(ModelTestUtils.PROP_NESTED_NAME, ModelTestUtils.PROP_NUMBER_NAME);
 
         Optional<PropertyDef> propertyDefOpt = ModelTestUtils.RESOURCE_DEF.getPropertyByPath(path);
         assertNotNull(propertyDefOpt);
         assertTrue(propertyDefOpt.isPresent());
-        assertEquals(ModelTestUtils.PROP_INTEGER_DEF, propertyDefOpt.get());
+        assertEquals(ModelTestUtils.PROP_NUMBER_DEF, propertyDefOpt.get());
     }
 }
