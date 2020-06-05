@@ -28,14 +28,17 @@
         <picocli.version>4.3.2</picocli.version>
         <jcdp.version>4.0.1</jcdp.version>
         <antlr4.version>4.8-1</antlr4.version>
+
         <log4j.version>2.13.2</log4j.version>
         <junit.version>4.13</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <mockk.version>1.10.0</mockk.version>
         <javafaker.version>1.0.2</javafaker.version>
+
         <license.plugin.version>2.0.0</license.plugin.version>
         <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
         <build.helper.plugin.version>3.1.0</build.helper.plugin.version>
+        <maven.assembly.plugin.version>3.3.0</maven.assembly.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -151,7 +154,7 @@
                             </goals>
                             <phase>process-sources</phase>
                             <configuration>
-                                <licenseName>mit</licenseName>
+                                <licenseName>apache_v2</licenseName>
                                 <roots>
                                     <root>src/main/java</root>
                                     <root>src/main/kotlin</root>
