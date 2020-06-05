@@ -31,7 +31,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2SubnetIpv6CidrBlockAssociation
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.Subnet
 
 @ResourceDefinition(
         provider = "aws",
@@ -133,10 +132,4 @@ data class EC2Subnet(
                 description = "The Amazon Resource Name (ARN) of the Outpost"
         )
         val outpostArn: String?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, subnet: Subnet): EC2Subnet {
-            return subnet.toEC2Subnet(region)
-        }
-    }
-}
+) : EC2Resource(region)

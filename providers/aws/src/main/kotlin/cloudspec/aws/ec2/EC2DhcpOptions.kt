@@ -30,7 +30,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2DhcpConfiguration
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.DhcpOptions
 
 @ResourceDefinition(
         provider = "aws",
@@ -70,10 +69,4 @@ data class EC2DhcpOptions(
                 description = "Any tags assigned to the DHCP options set"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, dhcpOptions: DhcpOptions): EC2DhcpOptions {
-            return dhcpOptions.toEC2DhcpOptions(region)
-        }
-    }
-}
+) : EC2Resource(region)

@@ -32,7 +32,7 @@ import cloudspec.aws.ec2.EC2SecurityGroup
 import cloudspec.aws.ec2.EC2Subnet
 import cloudspec.aws.ec2.EC2Vpc
 
-class EC2InstanceNetworkInterface(
+data class EC2InstanceNetworkInterface(
         @AssociationDefinition(
                 name = "groups",
                 description = "One or more security groups",

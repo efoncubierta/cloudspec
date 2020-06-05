@@ -31,7 +31,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2NetworkAclEntry
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.NetworkAcl
 
 @ResourceDefinition(
         provider = "aws",
@@ -91,10 +90,4 @@ data class EC2NetworkAcl(
                 description = "The ID of the AWS account that owns the network ACL"
         )
         val ownerId: String?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, networkAcl: NetworkAcl): EC2NetworkAcl {
-            return networkAcl.toEC2NetworkAcl(region)
-        }
-    }
-}
+) : EC2Resource(region)

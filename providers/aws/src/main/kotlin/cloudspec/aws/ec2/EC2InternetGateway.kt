@@ -30,7 +30,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2InternetGatewayAttachment
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.InternetGateway
 
 @ResourceDefinition(
         provider = "aws",
@@ -70,10 +69,4 @@ data class EC2InternetGateway(
                 description = "Any tags assigned to the internet gateway"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, internetGateway: InternetGateway): EC2InternetGateway {
-            return internetGateway.toEC2InternetGateway(region)
-        }
-    }
-}
+) : EC2Resource(region)

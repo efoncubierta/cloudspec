@@ -78,5 +78,5 @@ data class EC2TransitGatewayOptions(
                 name = "multicast_support",
                 description = "Indicates whether multicast is enabled on the transit gateway"
         )
-        val multicastSupport: Boolean
+        val multicastSupport: Boolean?
 )

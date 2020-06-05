@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2ReservedInstancesLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2ReservedInstances>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2ReservedInstancesLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2ReservedInstances> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeReservedInstancess.html
-            val response = client.describeReservedInstances { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.reservedInstances()
-                    .map { reservedInstances ->
-                        reservedInstances.toEC2ReservedInstances(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_RESERVED_INSTANCES_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_RESERVED_INSTANCES_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeReservedInstancess.html
+                    .describeReservedInstances { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .reservedInstances()
+                    .map { reservedInstances -> reservedInstances.toEC2ReservedInstances(region) }
         }
-        return filters
     }
 
     companion object {

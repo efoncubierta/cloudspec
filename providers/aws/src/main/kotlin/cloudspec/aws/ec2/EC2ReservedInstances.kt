@@ -30,7 +30,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2RecurringCharge
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.ReservedInstances
 import java.time.Instant
 
 @ResourceDefinition(
@@ -154,10 +153,4 @@ data class EC2ReservedInstances(
                 description = "Any tags assigned to the resource"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, reservedInstances: ReservedInstances): EC2ReservedInstances {
-            return reservedInstances.toEC2ReservedInstances(region)
-        }
-    }
-}
+) : EC2Resource(region)

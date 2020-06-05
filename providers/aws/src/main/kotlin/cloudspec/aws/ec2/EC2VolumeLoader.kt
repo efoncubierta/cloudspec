@@ -26,41 +26,31 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2VolumeLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2Volume>(clientsProvider) {
+
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2Volume> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
-            val response = client.describeVolumes { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.volumes()
-                    .map { volume ->
-                        volume.toEC2Volume(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_VOLUME_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_VOLUME_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+                    .describeVolumes { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .volumes()
+                    .map { volume -> volume.toEC2Volume(region) }
         }
-        return filters
     }
+
 
     companion object {
         private const val FILTER_VOLUME_ID = "volume-id"

@@ -32,7 +32,6 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2VpcCidrBlockAssociation
 import cloudspec.aws.ec2.nested.EC2VpcIpv6CidrBlockAssociation
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.Vpc
 
 @ResourceDefinition(
         provider = "aws",
@@ -110,10 +109,4 @@ data class EC2Vpc(
                 description = "Any tags assigned to the VPC"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, vpc: Vpc): EC2Vpc {
-            return vpc.toEC2Vpc(region)
-        }
-    }
-}
+) : EC2Resource(region)

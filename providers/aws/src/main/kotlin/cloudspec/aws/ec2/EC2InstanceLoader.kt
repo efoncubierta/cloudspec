@@ -26,43 +26,30 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2InstanceLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2Instance>(clientsProvider) {
+
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2Instance> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
-            val response = client.describeInstances { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.reservations()
-                    .flatMap { reservation ->
-                        reservation.instances()
-                    }
-                    .map { instance ->
-                        instance.toResource(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_INSTANCE_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_INSTANCE_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
+                    .describeInstances { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .reservations()
+                    .flatMap { reservation -> reservation.instances() }
+                    .map { instance -> instance.toEC2Instance(region) }
         }
-        return filters
     }
 
     companion object {

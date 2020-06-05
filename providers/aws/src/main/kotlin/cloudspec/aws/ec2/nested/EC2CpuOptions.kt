@@ -26,7 +26,6 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
-import software.amazon.awssdk.services.ec2.model.CpuOptions
 
 data class EC2CpuOptions(
         @PropertyDefinition(

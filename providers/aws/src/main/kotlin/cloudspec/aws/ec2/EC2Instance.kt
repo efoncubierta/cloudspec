@@ -32,7 +32,6 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.Instance
 import java.time.Instant
 
 @ResourceDefinition(
@@ -293,10 +292,4 @@ data class EC2Instance constructor(
                 description = "The license configurations"
         )
         val licenseConfigurationArns: List<String>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(regionName: String, instance: Instance): EC2Instance {
-            return instance.toResource(regionName)
-        }
-    }
-}
+) : EC2Resource(region)

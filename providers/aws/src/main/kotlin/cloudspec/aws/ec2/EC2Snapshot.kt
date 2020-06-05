@@ -30,7 +30,6 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.Snapshot
 import java.time.Instant
 
 @ResourceDefinition(
@@ -106,10 +105,4 @@ data class EC2Snapshot(
                 description = "Any tags assigned to the snapshot"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, snapshot: Snapshot): EC2Snapshot {
-            return snapshot.toEC2Snapshot(region)
-        }
-    }
-}
+) : EC2Resource(region)

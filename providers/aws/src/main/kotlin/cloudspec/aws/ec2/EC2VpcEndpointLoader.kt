@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2VpcEndpointLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2VpcEndpoint>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2VpcEndpointLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2VpcEndpoint> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcEndpoints.html
-            val response = client.describeVpcEndpoints { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.vpcEndpoints()
-                    .map { vpcEndpoint ->
-                        vpcEndpoint.toEC2VpcEndpoint(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_VPC_ENDPOINT_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_VPC_ENDPOINT_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcEndpoints.html
+                    .describeVpcEndpoints { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .vpcEndpoints()
+                    .map { vpcEndpoint -> vpcEndpoint.toEC2VpcEndpoint(region) }
         }
-        return filters
     }
 
     companion object {

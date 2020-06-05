@@ -30,7 +30,6 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.VpcEndpoint
 import java.time.Instant
 
 @ResourceDefinition(
@@ -155,10 +154,4 @@ data class EC2VpcEndpoint(
                 description = "The last error that occurred for VPC endpoint"
         )
         val lastError: String?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, vpcEndpoint: VpcEndpoint): EC2VpcEndpoint {
-            return vpcEndpoint.toEC2VpcEndpoint(region)
-        }
-    }
-}
+) : EC2Resource(region)

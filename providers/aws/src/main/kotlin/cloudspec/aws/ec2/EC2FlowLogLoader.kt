@@ -26,40 +26,29 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2FlowLogLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2FlowLog>(clientsProvider) {
+
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2FlowLog> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeFlowLogs.html
-            val response = client.describeFlowLogs { builder ->
-                builder.filter(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.flowLogs()
-                    .map { flowLog ->
-                        flowLog.toEC2FlowLog(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_FLOW_LOG_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_FLOW_LOG_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeFlowLogs.html
+                    .describeFlowLogs { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filter(filters)
+                        }
+                    }
+                    .flowLogs()
+                    .map { flowLog -> flowLog.toEC2FlowLog(region) }
         }
-        return filters
     }
 
     companion object {

@@ -33,16 +33,15 @@ class EC2CapacityReservationLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2CapacityReservation> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeCapacityReservations.html
-            val response = client.describeCapacityReservations { builder ->
-                builder.capacityReservationIds(
-                        *ids.toTypedArray()
-                )
-            }
-            return response.capacityReservations()
-                    .map { capacityReservation ->
-                        capacityReservation.toEC2CapacityReservation(region)
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeCapacityReservations.html
+                    .describeCapacityReservations { builder ->
+                        if (ids.isNotEmpty()) {
+                            builder.capacityReservationIds(ids)
+                        }
                     }
+                    .capacityReservations()
+                    .map { capacityReservation -> capacityReservation.toEC2CapacityReservation(region) }
         }
     }
 }

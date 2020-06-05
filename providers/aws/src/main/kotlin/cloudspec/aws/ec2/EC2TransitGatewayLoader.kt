@@ -26,40 +26,29 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2TransitGatewayLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2TransitGateway>(clientsProvider) {
+
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2TransitGateway> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeTransitGateways.html
-            val response = client.describeTransitGateways { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.transitGateways()
-                    .map { transitGateway ->
-                        transitGateway.toEC2TransitGateway(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_TRANSIT_GATEWAY_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_TRANSIT_GATEWAY_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeTransitGateways.html
+                    .describeTransitGateways { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .transitGateways()
+                    .map { transitGateway -> transitGateway.toEC2TransitGateway(region) }
         }
-        return filters
     }
 
     companion object {

@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2RouteTableLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2RouteTable>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2RouteTableLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2RouteTable> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeRouteTables.html
-            val response = client.describeRouteTables { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.routeTables()
-                    .map { routeTable ->
-                        routeTable.toEC2RouteTable(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_ROUTE_TABLE_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_ROUTE_TABLE_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeRouteTables.html
+                    .describeRouteTables { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .routeTables()
+                    .map { routeTable -> routeTable.toEC2RouteTable(region) }
         }
-        return filters
     }
 
     companion object {

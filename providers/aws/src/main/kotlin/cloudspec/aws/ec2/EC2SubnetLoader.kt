@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2SubnetLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2Subnet>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2SubnetLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2Subnet> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSubnets.html
-            val response = client.describeSubnets { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.subnets()
-                    .map { subnet ->
-                        subnet.toEC2Subnet(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_SUBNET_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            EC2SubnetLoader.FILTER_SUBNET_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSubnets.html
+                    .describeSubnets { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .subnets()
+                    .map { subnet -> subnet.toEC2Subnet(region) }
         }
-        return filters
     }
 
     companion object {

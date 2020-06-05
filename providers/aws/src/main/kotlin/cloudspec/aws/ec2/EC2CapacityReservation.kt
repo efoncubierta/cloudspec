@@ -29,7 +29,6 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.CapacityReservation
 import java.time.Instant
 
 @ResourceDefinition(
@@ -63,12 +62,14 @@ data class EC2CapacityReservation(
                 name = "capacity_reservation_arn",
                 description = "The Amazon Resource Name (ARN) of the Capacity Reservation"
         )
-        val capacityReservationArn: String,
+        val capacityReservationArn: String?,
+
         @PropertyDefinition(
                 name = "instance_type",
                 description = "The type of instance for which the Capacity Reservation reserves capacity"
         )
-        val instanceType: String,
+        val instanceType: String?,
+
         @PropertyDefinition(
                 name = "instance_platform",
                 description = "The type of operating system for which the Capacity Reservation reserves capacity"
@@ -79,13 +80,15 @@ data class EC2CapacityReservation(
                 name = "availability_zone",
                 description = "The Availability Zone in which the capacity is reserved"
         )
-        val availabilityZone: String,
+        val availabilityZone: String?,
+
         @PropertyDefinition(
                 name = "tenancy",
                 description = "Indicates the tenancy of the Capacity Reservation",
                 exampleValues = "default | dedicated"
         )
-        val tenancy: String,
+        val tenancy: String?,
+
         @PropertyDefinition(
                 name = "total_instance_count",
                 description = "The total number of instances for which the Capacity Reservation reserves capacity"
@@ -96,12 +99,14 @@ data class EC2CapacityReservation(
                 name = "available_instance_count",
                 description = "The remaining capacity. Indicates the number of instances that can be launched in the Capacity Reservation"
         )
-        val availableInstanceCount: Int,
+        val availableInstanceCount: Int?,
+
         @PropertyDefinition(
                 name = "ebs_optimized",
                 description = "Indicates whether the Capacity Reservation supports EBS-optimized instances"
         )
-        val ebsOptimized: Boolean,
+        val ebsOptimized: Boolean?,
+
         @PropertyDefinition(
                 name = "ephemeral_storage",
                 description = "Indicates whether the Capacity Reservation supports instances with temporary, block-level storage."
@@ -113,18 +118,21 @@ data class EC2CapacityReservation(
                 description = "The current state of the Capacity Reservation",
                 exampleValues = "active | expired | cancelled | pending | failed"
         )
-        val state: String,
+        val state: String?,
+
         @PropertyDefinition(
                 name = "end_date",
                 description = "The date and time at which the Capacity Reservation expires"
         )
-        val endDate: Instant,
+        val endDate: Instant?,
+
         @PropertyDefinition(
                 name = "end_date_type",
                 description = "Indicates the way in which the Capacity Reservation ends",
                 exampleValues = "unlimited | limited"
         )
-        val endDateType: String,
+        val endDateType: String?,
+
         @PropertyDefinition(
                 name = "instance_match_criteria",
                 description = "Indicates the type of instance launches that the Capacity Reservation accepts",
@@ -136,16 +144,11 @@ data class EC2CapacityReservation(
                 name = "create_date",
                 description = "The date and time at which the Capacity Reservation was created"
         )
-        val createDate: Instant,
+        val createDate: Instant?,
+
         @PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the Capacity Reservation"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, capacityReservation: CapacityReservation): EC2CapacityReservation {
-            return capacityReservation.toEC2CapacityReservation(region)
-        }
-    }
-}
+) : EC2Resource(region)

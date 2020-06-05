@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2NetworkInterfaceLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2NetworkInterface>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2NetworkInterfaceLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2NetworkInterface> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkInterfaces.html
-            val response = client.describeNetworkInterfaces { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.networkInterfaces()
-                    .map { networkInterface ->
-                        networkInterface.toEC2NetworkInterface(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (!ids.isEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_NETWORK_INTERFACE_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_NETWORK_INTERFACE_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkInterfaces.html
+                    .describeNetworkInterfaces { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .networkInterfaces()
+                    .map { networkInterface -> networkInterface.toEC2NetworkInterface(region) }
         }
-        return filters
     }
 
     companion object {

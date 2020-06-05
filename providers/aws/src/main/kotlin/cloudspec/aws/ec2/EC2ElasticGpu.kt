@@ -30,7 +30,6 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.ElasticGpus
 
 @ResourceDefinition(
         provider = "aws",
@@ -91,10 +90,4 @@ data class EC2ElasticGpu(
                 description = "The tags assigned to the Elastic Graphics accelerator"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, elasticGpus: ElasticGpus): EC2ElasticGpu {
-            return elasticGpus.toEC2ElasticGpu(region)
-        }
-    }
-}
+) : EC2Resource(region)

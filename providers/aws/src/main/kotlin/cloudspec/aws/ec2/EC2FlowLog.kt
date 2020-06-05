@@ -29,7 +29,6 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.FlowLog
 import java.time.Instant
 
 @ResourceDefinition(
@@ -135,10 +134,4 @@ data class EC2FlowLog(
                 description = "The maximum interval of time, in seconds, during which a flow of packets is captured and aggregated into a flow log record"
         )
         val maxAggregationInterval: Int?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, flowLog: FlowLog): EC2FlowLog {
-            return flowLog.toEC2FlowLog(region)
-        }
-    }
-}
+) : EC2Resource(region)

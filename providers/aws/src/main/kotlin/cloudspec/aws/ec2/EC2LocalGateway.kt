@@ -29,7 +29,6 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.LocalGateway
 
 @ResourceDefinition(
         provider = "aws",
@@ -75,10 +74,4 @@ data class EC2LocalGateway(
                 description = "The tags assigned to the local gateway"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, localGateway: LocalGateway): EC2LocalGateway {
-            return localGateway.toEC2LocalGateway(region)
-        }
-    }
-}
+) : EC2Resource(region)

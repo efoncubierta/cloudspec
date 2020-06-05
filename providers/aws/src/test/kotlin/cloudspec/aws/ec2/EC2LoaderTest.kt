@@ -27,30 +27,30 @@ package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
 import datagen.services.ec2.model.RegionGenerator
+import io.mockk.clearMocks
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Before
-import org.mockito.Matchers
-import org.mockito.Mockito
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.DescribeRegionsResponse
 
 abstract class EC2LoaderTest {
-    protected val clientsProvider = Mockito.mock(IAWSClientsProvider::class.java)
-    protected val ec2Client = Mockito.mock(Ec2Client::class.java)
+    protected val clientsProvider = mockk<IAWSClientsProvider>()
+    protected val ec2Client = mockk<Ec2Client>()
 
     @Before
     fun doBefore() {
         // restore clients provider
-        Mockito.reset(clientsProvider)
-        Mockito.`when`(clientsProvider.ec2Client).thenReturn(ec2Client)
-        Mockito.`when`(clientsProvider.ec2ClientForRegion(Matchers.anyString())).thenReturn(ec2Client)
+        clearMocks(clientsProvider)
+        every { clientsProvider.ec2Client } returns ec2Client
+        every { clientsProvider.ec2ClientForRegion(any()) } returns ec2Client
 
         // restore ec2 client
-        Mockito.reset(ec2Client)
-        Mockito.`when`(ec2Client.describeRegions()).thenReturn(
-                DescribeRegionsResponse
-                        .builder()
-                        .regions(RegionGenerator.region())
-                        .build()
-        )
+        clearMocks(ec2Client)
+        every { ec2Client.describeRegions() } returns DescribeRegionsResponse
+                .builder()
+                .regions(RegionGenerator.region())
+                .build()
+        every { ec2Client.close() } returns Unit
     }
 }

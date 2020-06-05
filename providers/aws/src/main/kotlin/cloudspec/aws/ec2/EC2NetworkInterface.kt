@@ -33,7 +33,6 @@ import cloudspec.aws.ec2.nested.EC2NetworkInterfaceAssociation
 import cloudspec.aws.ec2.nested.EC2NetworkInterfaceAttachment
 import cloudspec.aws.ec2.nested.EC2NetworkInterfacePrivateIpAddress
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.NetworkInterface
 
 @ResourceDefinition(
         provider = "aws",
@@ -162,10 +161,4 @@ data class EC2NetworkInterface(
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, networkInterface: NetworkInterface): EC2NetworkInterface {
-            return networkInterface.toEC2NetworkInterface(region)
-        }
-    }
-}
+) : EC2Resource(region)

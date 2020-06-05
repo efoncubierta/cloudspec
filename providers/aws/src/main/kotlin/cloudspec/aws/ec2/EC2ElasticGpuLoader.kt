@@ -32,14 +32,15 @@ class EC2ElasticGpuLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2ElasticGpu> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeElasticGpus.html
-            val response = client.describeElasticGpus { builder ->
-                builder.elasticGpuIds(*ids.toTypedArray())
-            }
-            return response.elasticGpuSet()
-                    .map { elasticGpu ->
-                        elasticGpu.toEC2ElasticGpu(region)
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeElasticGpus.html
+                    .describeElasticGpus { builder ->
+                        if (ids.isNotEmpty()) {
+                            builder.elasticGpuIds(ids)
+                        }
                     }
+                    .elasticGpuSet()
+                    .map { elasticGpu -> elasticGpu.toEC2ElasticGpu(region) }
         }
     }
 }

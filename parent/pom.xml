@@ -31,9 +31,11 @@
         <log4j.version>2.13.2</log4j.version>
         <junit.version>4.13</junit.version>
         <mockito.version>1.10.19</mockito.version>
+        <mockk.version>1.10.0</mockk.version>
         <javafaker.version>1.0.2</javafaker.version>
         <license.plugin.version>2.0.0</license.plugin.version>
         <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
+        <build.helper.plugin.version>3.1.0</build.helper.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -99,6 +101,13 @@
             </dependency>
 
             <dependency>
+                <groupId>io.mockk</groupId>
+                <artifactId>mockk</artifactId>
+                <version>${mockk.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>com.github.javafaker</groupId>
                 <artifactId>javafaker</artifactId>
                 <version>${javafaker.version}</version>
@@ -149,6 +158,38 @@
                                     <root>src/test/java</root>
                                     <root>src/test/kotlin</root>
                                 </roots>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build.helper.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>add-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/main/kotlin</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-test-source</id>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/test/kotlin</source>
+                                </sources>
                             </configuration>
                         </execution>
                     </executions>

@@ -29,7 +29,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2TransitGatewayOptions
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.TransitGateway
 import java.time.Instant
 
 @ResourceDefinition(
@@ -88,10 +87,4 @@ data class EC2TransitGateway(
                 description = "The tags for the transit gateway"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, transitGateway: TransitGateway): EC2TransitGateway {
-            return transitGateway.toEC2TransitGateway(region)
-        }
-    }
-}
+) : EC2Resource(region)

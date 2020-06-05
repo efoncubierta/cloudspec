@@ -32,7 +32,6 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2Route
 import cloudspec.aws.ec2.nested.EC2RouteTableAssociation
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.RouteTable
 
 @ResourceDefinition(
         provider = "aws",
@@ -91,10 +90,4 @@ data class EC2RouteTable(
                 description = "The ID of the AWS account that owns the route table"
         )
         val ownerId: String?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, routeTable: RouteTable): EC2RouteTable {
-            return routeTable.toEC2RouteTable(region)
-        }
-    }
-}
+) : EC2Resource(region)

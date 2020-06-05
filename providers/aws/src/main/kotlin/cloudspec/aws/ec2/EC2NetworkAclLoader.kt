@@ -26,40 +26,29 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2NetworkAclLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2NetworkAcl>(clientsProvider) {
+
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2NetworkAcl> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkAcls.html
-            val response = client.describeNetworkAcls { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.networkAcls()
-                    .map { networkAcl ->
-                        networkAcl.toEC2NetworkAcl(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (!ids.isEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_NETWORK_ACL_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_NETWORK_ACL_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkAcls.html
+                    .describeNetworkAcls { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .networkAcls()
+                    .map { networkAcl -> networkAcl.toEC2NetworkAcl(region) }
         }
-        return filters
     }
 
     companion object {

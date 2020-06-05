@@ -29,7 +29,7 @@ import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Snapshot
 
-class EC2EbsBlockDevice(
+data class EC2EbsBlockDevice(
         @PropertyDefinition(
                 name = "delete_on_termination",
                 description = "Indicates whether the EBS volume is deleted on instance termination"
@@ -66,5 +66,5 @@ class EC2EbsBlockDevice(
                 name = "encrypted",
                 description = "Indicates whether the encryption state of an EBS volume is changed while being restored from a backing snapshot"
         )
-        val encrypted: Boolean
+        val encrypted: Boolean?
 )

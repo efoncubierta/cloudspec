@@ -27,6 +27,7 @@ package cloudspec.aws.ec2
 
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
+import software.amazon.awssdk.services.ec2.model.Filter
 import software.amazon.awssdk.services.ec2.model.Region
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
@@ -59,4 +60,16 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
                         .map { obj: Region -> obj.regionName() }
             }
         }
+
+    protected fun buildFilters(filterValues: Map<String, List<String>>): List<Filter> {
+        return filterValues.keys
+                .filter { key ->
+                    !filterValues[key].isNullOrEmpty()
+                }.map { key ->
+                    Filter.builder()
+                            .name(key)
+                            .values(filterValues[key])
+                            .build()
+                }
+    }
 }

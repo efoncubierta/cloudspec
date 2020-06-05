@@ -26,40 +26,29 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2InternetGatewayLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2InternetGateway>(clientsProvider) {
+
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2InternetGateway> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInternetGateways.html
-            val response = client.describeInternetGateways { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.internetGateways()
-                    .map { internetGateway ->
-                        internetGateway.toEC2InternetGateway(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_INTERNET_GATEWAY_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_INTERNET_GATEWAY_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInternetGateways.html
+                    .describeInternetGateways { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .internetGateways()
+                    .map { internetGateway -> internetGateway.toEC2InternetGateway(region) }
         }
-        return filters
     }
 
     companion object {

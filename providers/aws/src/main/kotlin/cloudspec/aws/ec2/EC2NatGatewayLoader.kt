@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2NatGatewayLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2NatGateway>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2NatGatewayLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2NatGateway> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNatGateways.html
-            val response = client.describeNatGateways { builder ->
-                builder.filter(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.natGateways()
-                    .map { natGateway ->
-                        natGateway.toEC2NatGateway(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_NAT_GATEWAY_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_NAT_GATEWAY_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNatGateways.html
+                    .describeNatGateways { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filter(filters)
+                        }
+                    }
+                    .natGateways()
+                    .map { natGateway -> natGateway.toEC2NatGateway(region) }
         }
-        return filters
     }
 
     companion object {

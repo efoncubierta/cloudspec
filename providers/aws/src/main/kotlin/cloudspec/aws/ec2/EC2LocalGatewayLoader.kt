@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2LocalGatewayLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2LocalGateway>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2LocalGatewayLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2LocalGateway> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeLocalGateways.html
-            val response = client.describeLocalGateways { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.localGateways()
-                    .map { localGateway ->
-                        localGateway.toEC2LocalGateway(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_LOCAL_GATEWAY_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_LOCAL_GATEWAY_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeLocalGateways.html
+                    .describeLocalGateways { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .localGateways()
+                    .map { localGateway -> localGateway.toEC2LocalGateway(region) }
         }
-        return filters
     }
 
     companion object {

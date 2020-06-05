@@ -28,8 +28,8 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2SecurityGroup
-import cloudspec.aws.ec2.EC2VpcPeeringConnection
 import cloudspec.aws.ec2.EC2Vpc
+import cloudspec.aws.ec2.EC2VpcPeeringConnection
 
 data class EC2UserIdGroupPair(
         @AssociationDefinition(

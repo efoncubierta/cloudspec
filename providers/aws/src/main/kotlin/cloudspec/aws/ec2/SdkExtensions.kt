@@ -121,7 +121,7 @@ fun Image.toEC2Image(regionName: String?): EC2Image {
     )
 }
 
-fun Instance.toResource(region: String): EC2Instance {
+fun Instance.toEC2Instance(region: String): EC2Instance {
     return EC2Instance(
             region,
             imageId(),

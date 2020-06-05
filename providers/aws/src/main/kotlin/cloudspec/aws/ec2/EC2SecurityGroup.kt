@@ -31,7 +31,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2IpPermission
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.SecurityGroup
 
 @ResourceDefinition(
         provider = "aws",
@@ -90,10 +89,4 @@ data class EC2SecurityGroup(
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, securityGroup: SecurityGroup): EC2SecurityGroup {
-            return securityGroup.toEC2SecurityGroup(region)
-        }
-    }
-}
+) : EC2Resource(region)

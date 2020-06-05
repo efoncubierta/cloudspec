@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2DhcpOptionsLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2DhcpOptions>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2DhcpOptionsLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2DhcpOptions> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeDhcpOptionss.html
-            val response = client.describeDhcpOptions { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.dhcpOptions()
-                    .map { dhcpOptions ->
-                        dhcpOptions.toEC2DhcpOptions(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_DHCP_OPTIONS_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_DHCP_OPTIONS_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeDhcpOptionss.html
+                    .describeDhcpOptions { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .dhcpOptions()
+                    .map { dhcpOptions -> dhcpOptions.toEC2DhcpOptions(region) }
         }
-        return filters
     }
 
     companion object {

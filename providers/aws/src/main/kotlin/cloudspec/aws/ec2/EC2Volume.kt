@@ -31,7 +31,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2VolumeAttachment
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.Volume
 import java.time.Instant
 
 @ResourceDefinition(
@@ -141,10 +140,4 @@ data class EC2Volume(
                 description = "Indicates whether Amazon EBS Multi-Attach is enabled"
         )
         val multiAttachEnabled: Boolean?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, volume: Volume): EC2Volume {
-            return volume.toEC2Volume(region)
-        }
-    }
-}
+) : EC2Resource(region)

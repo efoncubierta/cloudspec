@@ -30,7 +30,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2VpcPeeringConnectionVpcInfo
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.VpcPeeringConnection
 import java.time.Instant
 
 @ResourceDefinition(
@@ -84,10 +83,4 @@ data class EC2VpcPeeringConnection(
                 description = "The ID of the VPC peering connection"
         )
         val vpcPeeringConnectionId: String?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, vpcPeeringConnection: VpcPeeringConnection): EC2VpcPeeringConnection {
-            return vpcPeeringConnection.toEC2VpcPeeringConnection(region)
-        }
-    }
-}
+) : EC2Resource(region)

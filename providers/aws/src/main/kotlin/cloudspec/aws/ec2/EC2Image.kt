@@ -31,7 +31,6 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2BlockDeviceMapping
 import cloudspec.aws.ec2.nested.EC2ProductCode
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.Image
 import java.time.Instant
 
 @ResourceDefinition(
@@ -172,10 +171,4 @@ data class EC2Image(
                 description = "Indicates whether the image has public launch permissions"
         )
         val publicLaunchPermissions: Boolean?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, image: Image): EC2Image {
-            return image.toEC2Image(region)
-        }
-    }
-}
+) : EC2Resource(region)

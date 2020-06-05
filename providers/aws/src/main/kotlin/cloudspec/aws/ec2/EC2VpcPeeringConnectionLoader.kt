@@ -26,8 +26,6 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import software.amazon.awssdk.services.ec2.model.Filter
-import java.util.*
 
 class EC2VpcPeeringConnectionLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2VpcPeeringConnection>(clientsProvider) {
@@ -35,32 +33,22 @@ class EC2VpcPeeringConnectionLoader(clientsProvider: IAWSClientsProvider) :
     override fun getResourcesInRegion(region: String,
                                       ids: List<String>): List<EC2VpcPeeringConnection> {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcPeeringConnections.html
-            val response = client.describeVpcPeeringConnections { builder ->
-                builder.filters(
-                        *buildFilters(ids).toTypedArray()
-                )
-            }
-            return response.vpcPeeringConnections()
-                    .map { vpcPeeringConnection ->
-                        vpcPeeringConnection.toEC2VpcPeeringConnection(region)
-                    }
-        }
-    }
-
-    private fun buildFilters(ids: List<String>): List<Filter> {
-        val filters = ArrayList<Filter>()
-
-        // filter by ids
-        if (ids.isNotEmpty()) {
-            filters.add(
-                    Filter.builder()
-                            .name(FILTER_VPC_PEERING_CONNECTION_ID)
-                            .values(*ids.toTypedArray())
-                            .build()
+            val filters = buildFilters(
+                    mapOf(
+                            FILTER_VPC_PEERING_CONNECTION_ID to ids
+                    )
             )
+
+            return client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcPeeringConnections.html
+                    .describeVpcPeeringConnections { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
+                    }
+                    .vpcPeeringConnections()
+                    .map { vpcPeeringConnection -> vpcPeeringConnection.toEC2VpcPeeringConnection(region) }
         }
-        return filters
     }
 
     companion object {

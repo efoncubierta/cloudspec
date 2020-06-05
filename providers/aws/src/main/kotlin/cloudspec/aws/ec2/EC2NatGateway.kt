@@ -31,7 +31,6 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2NatGatewayAddress
 import cloudspec.model.KeyValue
-import software.amazon.awssdk.services.ec2.model.NatGateway
 import java.time.Instant
 
 @ResourceDefinition(
@@ -105,10 +104,4 @@ data class EC2NatGateway(
                 description = "The tags for the NAT gateway"
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region) {
-    companion object {
-        fun fromSdk(region: String, natGateway: NatGateway): EC2NatGateway {
-            return natGateway.toEC2NatGateway(region)
-        }
-    }
-}
+) : EC2Resource(region)
