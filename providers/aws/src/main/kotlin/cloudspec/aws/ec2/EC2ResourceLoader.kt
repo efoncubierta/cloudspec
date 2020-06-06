@@ -22,7 +22,6 @@ package cloudspec.aws.ec2
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
 import software.amazon.awssdk.services.ec2.model.Filter
-import software.amazon.awssdk.services.ec2.model.Region
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
     override fun byId(id: String): T? {
@@ -31,17 +30,13 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
 
     override val all: List<T>
         get() {
-            return getResources(emptyList())
+            return getResources()
         }
 
-    private fun getResources(ids: List<String>): List<T> {
-        return availableRegions
-                .flatMap { region ->
-                    getResourcesInRegion(
-                            region,
-                            ids
-                    )
-                }
+    private fun getResources(ids: List<String> = emptyList()): List<T> {
+        return availableRegions.flatMap { region ->
+            getResourcesInRegion(region, ids)
+        }
     }
 
     abstract fun getResourcesInRegion(region: String, ids: List<String>): List<T>
@@ -51,7 +46,7 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
             clientsProvider.ec2Client.use { ec2Client ->
                 return ec2Client.describeRegions()
                         .regions()
-                        .map { obj: Region -> obj.regionName() }
+                        .map { region -> region.regionName() }
             }
         }
 
