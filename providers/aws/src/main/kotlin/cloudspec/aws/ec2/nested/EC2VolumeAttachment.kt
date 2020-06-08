@@ -26,40 +26,40 @@ import cloudspec.aws.ec2.EC2Volume
 import java.time.Instant
 
 data class EC2VolumeAttachment(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "attach_time",
                 description = "The time stamp when the attachment initiated"
         )
         val attachTime: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "device",
                 description = "The device name"
         )
         val device: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "instance",
                 description = "The instance",
                 targetClass = EC2Instance::class
         )
         val instanceId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The attachment state of the volume",
                 exampleValues = "attaching | attached | detaching | detached | busy"
         )
         val state: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "volume",
                 description = "The volume",
                 targetClass = EC2Volume::class
         )
         val volumeId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "delete_on_termination",
                 description = "Indicates whether the EBS volume is deleted on instance termination"
         )

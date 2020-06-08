@@ -31,39 +31,39 @@ import cloudspec.model.KeyValue
         description = "Transit Gateway"
 )
 data class EC2LocalGateway(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "local_gateway_id",
                 description = "The ID of the local gateway"
         )
         val localGatewayId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "outpost_arn",
                 description = "The Amazon Resource Name (ARN) of the Outpost"
         )
         val outpostArn: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account ID that owns the local gateway"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the local gateway"
         )
         val state: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "The tags assigned to the local gateway"
         )

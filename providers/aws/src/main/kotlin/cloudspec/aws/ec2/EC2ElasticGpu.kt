@@ -32,54 +32,54 @@ import cloudspec.model.KeyValue
         description = "Elastic Graphics Accelerator"
 )
 data class EC2ElasticGpu(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "elastic_gpu_id",
                 description = "The ID of the Elastic Graphics accelerator"
         )
         val elasticGpuId: String,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "availability_zone",
                 description = "The Availability Zone in the which the Elastic Graphics accelerator resides"
         )
         val availabilityZone: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "elastic_gpu_type",
                 description = "The type of Elastic Graphics accelerator"
         )
         val elasticGpuType: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "elastic_gpu_health",
                 description = "The status of the Elastic Graphics accelerator",
                 exampleValues = "OK | IMPAIRED"
         )
         val elasticGpuHealth: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "elastic_gpu_state",
                 description = "The state of the Elastic Graphics accelerator",
                 exampleValues = "ATTACHED"
         )
         val elasticGpuState: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "instance",
                 description = "The instance to which the Elastic Graphics accelerator is attached",
                 targetClass = EC2Instance::class
         )
         val instanceId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "The tags assigned to the Elastic Graphics accelerator"
         )

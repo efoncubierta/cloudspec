@@ -22,7 +22,7 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2Monitoring(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "Indicates whether detailed monitoring is enabled. Otherwise, basic monitoring is enabled",
                 exampleValues = "disabled | disabling | enabled | pending"

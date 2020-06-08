@@ -33,51 +33,51 @@ import cloudspec.model.KeyValue
         description = "Security Group"
 )
 data class EC2SecurityGroup(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "group_name",
                 description = "The name of the security group"
         )
         val groupName: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ip_permissions",
                 description = "The inbound rules associated with the security group"
         )
         val ipPermissions: List<EC2IpPermission>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The AWS account ID of the owner of the security group"
         )
         val ownerId: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "group_id",
                 description = "The ID of the security group"
         )
         val groupId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ip_permissions_egress",
                 description = "[VPC only] The outbound rules associated with the security group"
         )
         val ipPermissionsEgress: List<EC2IpPermission>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the security group"
         )
         val tags: List<KeyValue>?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "[VPC only] The VPC for the security group",
                 targetClass = EC2Vpc::class

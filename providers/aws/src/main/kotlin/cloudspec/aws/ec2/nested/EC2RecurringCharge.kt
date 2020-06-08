@@ -22,13 +22,13 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2RecurringCharge(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "amount",
                 description = "The amount of the recurring charge"
         )
         val amount: Double?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "frequency",
                 description = "The frequency of the recurring charge",
                 exampleValues = "Hourly"

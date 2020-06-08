@@ -32,33 +32,33 @@ import cloudspec.model.KeyValue
         description = "Internet Gateway"
 )
 data class EC2InternetGateway(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "attachments",
                 description = "Any VPCs attached to the internet gateway"
         )
         val attachments: List<EC2InternetGatewayAttachment>?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "internet_gateway_id",
                 description = "The ID of the internet gateway"
         )
         val internetGatewayId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the internet gateway"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the internet gateway"
         )

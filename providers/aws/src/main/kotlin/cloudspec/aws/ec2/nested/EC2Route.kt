@@ -24,94 +24,94 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.*
 
 data class EC2Route(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "destination_cidr_block",
                 description = "The IPv4 CIDR block used for the destination match"
         )
         val destinationCidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "destination_ipv6_cidr_block",
                 description = "The IPv6 CIDR block used for the destination match"
         )
         val destinationIpv6CidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "destination_prefix_list_id",
                 description = "The prefix of the AWS service"
         )
         val destinationPrefixListId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "egress_only_internet_gateway",
                 description = "The egress-only internet gateway",
                 targetClass = EC2InternetGateway::class
         )
         val egressOnlyInternetGatewayId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "gateway",
                 description = "The gateway attached to your VPC",
                 targetClass = EC2InternetGateway::class
         )
         val gatewayId: String?, // TODO support vpwg
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "instance",
                 description = "The ID of a NAT instance in your VPC",
                 targetClass = EC2Instance::class
         )
         val instanceId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_owner-Id",
                 description = "The AWS account ID of the owner of the instance"
         )
         val instanceOwnerId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "nat_gateway",
                 description = "The NAT gateway",
                 targetClass = EC2NatGateway::class
         )
         val natGatewayId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "transit_gateway",
                 description = "The transit gateway",
                 targetClass = EC2TransitGateway::class
         )
         val transitGatewayId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "local_gateway",
                 description = "The local gateway",
                 targetClass = EC2LocalGateway::class
         )
         val localGatewayId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "network_interface",
                 description = "The network interface",
                 targetClass = EC2NetworkInterface::class
         )
         val networkInterfaceId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "origin",
                 description = "Describes how the route was created",
                 exampleValues = "CreateRouteTable | CreateRoute | EnableVgwRoutePropagation"
         )
         val origin: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the route",
                 exampleValues = "active | blackhole"
         )
         val state: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc_peering_connection",
                 description = "The VPC peering connection",
                 targetClass = EC2VpcPeeringConnection::class

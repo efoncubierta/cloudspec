@@ -32,115 +32,115 @@ import java.time.Instant
         description = "Capacity Reservation"
 )
 data class EC2CapacityReservation(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "capacity_reservation_id",
                 description = "The ID of the Capacity Reservation"
         )
         val capacityReservationId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the DHCP options set"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "capacity_reservation_arn",
                 description = "The Amazon Resource Name (ARN) of the Capacity Reservation"
         )
         val capacityReservationArn: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_type",
                 description = "The type of instance for which the Capacity Reservation reserves capacity"
         )
         val instanceType: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_platform",
                 description = "The type of operating system for which the Capacity Reservation reserves capacity"
         )
         val instancePlatform: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "availability_zone",
                 description = "The Availability Zone in which the capacity is reserved"
         )
         val availabilityZone: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tenancy",
                 description = "Indicates the tenancy of the Capacity Reservation",
                 exampleValues = "default | dedicated"
         )
         val tenancy: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "total_instance_count",
                 description = "The total number of instances for which the Capacity Reservation reserves capacity"
         )
         val totalInstanceCount: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "available_instance_count",
                 description = "The remaining capacity. Indicates the number of instances that can be launched in the Capacity Reservation"
         )
         val availableInstanceCount: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ebs_optimized",
                 description = "Indicates whether the Capacity Reservation supports EBS-optimized instances"
         )
         val ebsOptimized: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ephemeral_storage",
                 description = "Indicates whether the Capacity Reservation supports instances with temporary, block-level storage."
         )
         val ephemeralStorage: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The current state of the Capacity Reservation",
                 exampleValues = "active | expired | cancelled | pending | failed"
         )
         val state: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "end_date",
                 description = "The date and time at which the Capacity Reservation expires"
         )
         val endDate: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "end_date_type",
                 description = "Indicates the way in which the Capacity Reservation ends",
                 exampleValues = "unlimited | limited"
         )
         val endDateType: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_match_criteria",
                 description = "Indicates the type of instance launches that the Capacity Reservation accepts",
                 exampleValues = "open | targeted"
         )
         val instanceMatchCriteria: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "create_date",
                 description = "The date and time at which the Capacity Reservation was created"
         )
         val createDate: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the Capacity Reservation"
         )

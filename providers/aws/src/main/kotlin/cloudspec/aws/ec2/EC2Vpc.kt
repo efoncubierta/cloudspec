@@ -34,71 +34,71 @@ import cloudspec.model.KeyValue
         description = "Virtual Private Cloud"
 )
 data class EC2Vpc(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "cidr_block",
                 description = "The primary IPv4 CIDR block for the VPC"
         )
         val cidrBlock: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "dhcp_options",
                 description = "The ID of the set of DHCP options you've associated with the VPC",
                 targetClass = EC2DhcpOptions::class
         )
         val dhcpOptionsId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The current state of the VPC"
         )
         val state: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "vpc_id",
                 description = "The ID of the VPC"
         )
         val vpcId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the VPC"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_tenancy",
                 description = "The allowed tenancy of instances launched into the VPC",
                 exampleValues = "default | dedicated | host"
         )
         val instanceTenancy: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_block_associations",
                 description = "Information about the IPv6 CIDR blocks associated with the VPC"
         )
         val ipv6CidrBlockAssociations: List<EC2VpcIpv6CidrBlockAssociation>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "cidr_block_associations",
                 description = "Information about the IPv4 CIDR blocks associated with the VPC"
         )
         val cidrBlockAssociations: List<EC2VpcCidrBlockAssociation>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "is_default",
                 description = "Indicates whether the VPC is the default VPC"
         )
         val isDefault: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the VPC"
         )

@@ -22,7 +22,7 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2Ipv6Range(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "cidr_ipv6",
                 description = "The IPv6 CIDR range"
         )

@@ -22,13 +22,13 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2CpuOptions(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "core_count",
                 description = "The number of CPU cores for the instance"
         )
         val coreCount: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "threads_per_core",
                 description = "The number of threads per CPU core"
         )

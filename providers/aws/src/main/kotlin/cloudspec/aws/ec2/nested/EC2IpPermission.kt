@@ -22,43 +22,43 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2IpPermission(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "from_port",
                 description = "The start of port range for the TCP and UDP protocols, or an ICMP/ICMPv6 type number"
         )
         val fromPort: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ip_protocol",
                 description = "The IP protocol name or number"
         )
         val ipProtocol: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ip_ranges",
                 description = "The IPv4 ranges"
         )
         val ipRanges: List<EC2IpRange>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_ranges",
                 description = "[VPC only] The IPv6 ranges"
         )
         val ipv6Ranges: List<EC2Ipv6Range>?
         ,
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "prefix_list_ids",
                 description = "[VPC only] The prefix list IDs for an AWS service"
         )
         val prefixListIds: List<String>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "to_port",
                 description = "The end of port range for the TCP and UDP protocols, or an ICMP/ICMPv6 code"
         )
         val toPort: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "user_groups",
                 description = "The security group and AWS account ID pairs"
         )

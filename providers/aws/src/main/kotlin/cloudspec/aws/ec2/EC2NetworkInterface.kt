@@ -35,121 +35,121 @@ import cloudspec.model.KeyValue
         description = "Network Interface"
 )
 data class EC2NetworkInterface(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "association",
                 description = "The association information for an Elastic IP address (IPv4) associated with the network interface"
         )
         val association: EC2NetworkInterfaceAssociation?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "attachment",
                 description = "The network interface attachment"
         )
         val attachment: EC2NetworkInterfaceAttachment?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "availability_zone",
                 description = "The Availability Zone"
         )
         val availabilityZone: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "groups",
                 description = "Any security groups for the network interface",
                 targetClass = EC2SecurityGroup::class
         )
         val groupIds: List<String>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "interface_type",
                 description = "The type of network interface"
         )
         val interfaceType: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_addresses",
                 description = "The IPv6 addresses associated with the network interface"
         )
         val ipv6Addresses: List<String>?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "network_interface_id",
                 description = "The ID of the network interface"
         )
         val networkInterfaceId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "outpost_arn",
                 description = "The Amazon Resource Name (ARN) of the Outpost"
         )
         val outpostArn: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The AWS account ID of the owner of the network interface"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "private_dns_name",
                 description = "The private DNS name"
         )
         val privateDnsName: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "private_ip_address",
                 description = "The IPv4 address of the network interface within the subnet"
         )
         val privateIpAddress: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "private_ip_addresses",
                 description = "The private IPv4 addresses associated with the network interface"
         )
         val privateIpAddresses: List<EC2NetworkInterfacePrivateIpAddress>?,
 
-        //    @AssociationDefinition(
+        //    @property:AssociationDefinition(
         //            name = "requester",
         //            description = ""
         //    )
         //    private final String requesterId;
         //    private final Boolean requesterManaged;
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "source_dest_check",
                 description = "Indicates whether traffic to or from the instance is validated"
         )
         val sourceDestCheck: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "status",
                 description = "The status of the network interface",
                 exampleValues = "available | associated | attaching | in-use | detaching"
         )
         val status: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "subnet",
                 description = "The subnet",
                 targetClass = EC2Subnet::class
         )
         val subnetId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the network interface"
         )
         val tagSet: List<KeyValue>?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The VPC",
                 targetClass = EC2Vpc::class

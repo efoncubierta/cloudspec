@@ -22,13 +22,13 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2PortRange(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "from",
                 description = "The first port in the range"
         )
         val from: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "to",
                 description = "The last port in the range"
         )

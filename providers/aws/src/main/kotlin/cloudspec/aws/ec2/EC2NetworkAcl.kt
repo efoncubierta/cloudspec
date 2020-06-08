@@ -33,53 +33,53 @@ import cloudspec.model.KeyValue
         description = "Network ACL"
 )
 data class EC2NetworkAcl(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "subnets",
                 description = "The subnet",
                 targetClass = EC2Subnet::class
         )
         val subnetIds: List<String>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "entries",
                 description = "One or more entries (rules) in the network ACL"
         )
         val entries: List<EC2NetworkAclEntry>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "is_default",
                 description = "Indicates whether this is the default network ACL for the VPC"
         )
         val isDefault: Boolean?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "network_acl_id",
                 description = "The ID of the network ACL"
         )
         val networkAclId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the network ACL"
         )
         val tags: List<KeyValue>?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The VPC for the network ACL",
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the network ACL"
         )

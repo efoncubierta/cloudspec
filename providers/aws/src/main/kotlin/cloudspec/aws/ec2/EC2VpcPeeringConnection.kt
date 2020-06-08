@@ -33,46 +33,46 @@ import java.time.Instant
         description = "VPC Peering Connection"
 )
 data class EC2VpcPeeringConnection(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "accepter_vpc_info",
                 description = "Information about the accepter VP"
         )
         val accepterVpcInfo: EC2VpcPeeringConnectionVpcInfo?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "expiration_time",
                 description = "The time that an unaccepted VPC peering connection will expire"
         )
         val expirationTime: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "requester_vpc_info",
                 description = "Information about the requester VPC"
         )
         val requesterVpcInfo: EC2VpcPeeringConnectionVpcInfo?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "status",
                 description = "The status of the VPC peering connection",
                 exampleValues = "initiating-request | pending-acceptance | active | deleted | rejected | failed | expired | provisioning | deleting"
         )
         val status: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the resource"
         )
         val tags: List<KeyValue>?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "vpc_peering_connection_id",
                 description = "The ID of the VPC peering connection"
         )

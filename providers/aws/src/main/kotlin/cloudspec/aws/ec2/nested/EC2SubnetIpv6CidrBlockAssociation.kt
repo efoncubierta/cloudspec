@@ -23,19 +23,19 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2SubnetIpv6CidrBlockAssociation(
 
-//    @AssociationDefinition(
+//    @property:AssociationDefinition(
         //            name = "association",
         //            description = ""
         //    )
         //    private final String associationId;
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_block",
                 description = "The IPv6 CIDR block"
         )
         val ipv6CidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_block_state",
                 description = "Information about the state of the CIDR block",
                 exampleValues = "associating | associated | disassociating | disassociated | failing | failed"

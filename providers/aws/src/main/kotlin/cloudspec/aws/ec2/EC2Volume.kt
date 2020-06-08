@@ -34,102 +34,102 @@ import java.time.Instant
         description = "Volume"
 )
 data class EC2Volume(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "attachments",
                 description = "Information about the volume attachments"
         )
         val attachments: List<EC2VolumeAttachment>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "availability_zone",
                 description = "The Availability Zone for the volume"
         )
         val availabilityZone: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "create_time",
                 description = "The time stamp when volume creation was initiated"
         )
         val createTime: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "encrypted",
                 description = "Indicates whether the volume is encrypted"
         )
         val encrypted: Boolean?,
 
-        //    @AssociationDefinition(
+        //    @property:AssociationDefinition(
         //            name = "kms_key",
         //            description = "The Amazon Resource Name (ARN) of the AWS Key Management Service (AWS KMS) customer master key (CMK)"
         //    )
         val kmsKeyId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "outpost_arn",
                 description = "The Amazon Resource Name (ARN) of the Outpost"
         )
         val outpostArn: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "size",
                 description = "The size of the volume, in GiBs"
         )
         val size: Int?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "snapshot",
                 description = "The snapshot from which the volume was created, if applicable",
                 targetClass = EC2Snapshot::class
         )
         val snapshotId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The volume state",
                 exampleValues = "creating | available | in-use | deleting | deleted | error"
         )
         val state: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "volume_id",
                 description = "The ID of the volume"
         )
         val volumeId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "iops",
                 description = "The number of I/O operations per second (IOPS) that the volume supports"
         )
         val iops: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the volume"
         )
         val tags: List<KeyValue>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "volume_type",
                 description = "The volume type",
                 exampleValues = "standard | io1 | gp2 | sc1 | st1"
         )
         val volumeType: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "fast_restored",
                 description = "Indicates whether the volume was created using fast snapshot restore"
         )
         val fastRestored: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "multi_attach_enabled",
                 description = "Indicates whether Amazon EBS Multi-Attach is enabled"
         )

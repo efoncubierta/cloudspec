@@ -22,25 +22,25 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2NetworkInterfacePrivateIpAddress(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "association",
                 description = "The association information for an Elastic IP address (IPv4) associated with the network interface"
         )
         val association: EC2NetworkInterfaceAssociation?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "primary",
                 description = "Indicates whether this IPv4 address is the primary private IPv4 address of the network interface"
         )
         val primary: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "private_dns_name",
                 description = "The private DNS name"
         )
         val privateDnsName: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "private_ip_address",
                 description = "The private IPv4 address"
         )

@@ -30,26 +30,26 @@ import cloudspec.annotation.ResourceDefinition
         description = "Amazon Machine Image"
 )
 data class IAMInstanceProfileResource(
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "id",
                 description = "Instance profile ID"
         )
         val id: String,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "name",
                 description = "Instance profile name"
         )
         val name: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "path",
                 description = "Path"
         )
         val path: String?,
 
-//    @AssociationDefinition(
+//    @property:AssociationDefinition(
 //            name = "roles",
 //            description = "IAM Roles",
 //            targetClass = IAMRoleResource.class

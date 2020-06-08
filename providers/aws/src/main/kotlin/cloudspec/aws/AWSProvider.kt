@@ -24,7 +24,7 @@ import cloudspec.aws.ec2.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
 import cloudspec.aws.s3.S3BucketLoader
 import cloudspec.aws.s3.S3BucketResource
-import cloudspec.model.BaseProvider
+import cloudspec.model.Provider
 import cloudspec.model.ResourceDefRef
 import java.util.*
 
@@ -56,15 +56,15 @@ import java.util.*
             S3BucketResource::class
         ]
 )
-class AWSProvider(clientsProvider: IAWSClientsProvider) : BaseProvider() {
+class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     private val loaders: MutableMap<String, AWSResourceLoader<*>> = HashMap()
 
-    override fun getResources(resourceDefRef: ResourceDefRef): List<*> {
-        return getLoader(resourceDefRef)?.all ?: emptyList<Unit>()
+    override fun resourcesByRef(ref: ResourceDefRef): List<Any> {
+        return getLoader(ref)?.all ?: emptyList<Unit>()
     }
 
-    override fun getResource(resourceDefRef: ResourceDefRef, resourceId: String): Optional<*> {
-        return Optional.ofNullable(getLoader(resourceDefRef)?.byId(resourceId))
+    override fun resourceById(ref: ResourceDefRef, id: String): Any? {
+        return getLoader(ref)?.byId(id)
     }
 
     private fun getLoader(resourceDefRef: ResourceDefRef): AWSResourceLoader<*>? {

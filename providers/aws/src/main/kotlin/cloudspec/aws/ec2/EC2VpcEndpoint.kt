@@ -33,117 +33,117 @@ import java.time.Instant
         description = "VPC Endpoint"
 )
 data class EC2VpcEndpoint(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "vpc_endpoint_id",
                 description = "The ID of the VPC endpoint"
         )
         val vpcEndpointId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "vpc_endpoint_type",
                 description = "The type of endpoint",
                 exampleValues = "Interface | Gateway"
         )
         val vpcEndpointType: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The VPC to which the endpoint is associated",
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "service_name",
                 description = "The name of the service to which the endpoint is associated"
         )
         val serviceName: String?
         ,
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the VPC endpoint"
         )
         val state: String?, // TODO review
 
-        //    @PropertyDefinition(
+        //    @property:PropertyDefinition(
         //            name = "policy_document",
         //            description = "The policy document associated with the endpoint, if applicable"
         //    )
         //    private final String policyDocument;
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "route_tables",
                 description = "(Gateway endpoint) One or more route tables associated with the endpoint",
                 targetClass = EC2RouteTable::class
         )
         val routeTableIds: List<String>?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "subnets",
                 description = "(Interface endpoint) One or more subnets in which the endpoint is located",
                 targetClass = EC2Subnet::class
         )
         val subnetIds: List<String>?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "groups",
                 description = "(Interface endpoint) Information about the security groups that are associated with the network interface",
                 targetClass = EC2SecurityGroup::class
         )
         val groups: List<String>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "private_dns_enabled",
                 description = "(Interface endpoint) Indicates whether the VPC is associated with a private hosted zone"
         )
         val privateDnsEnabled: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "requester_managed",
                 description = "Indicates whether the VPC endpoint is being managed by its service"
         )
         val requesterManaged: Boolean?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "network_interfaces",
                 description = "(Interface endpoint) One or more network interfaces for the endpoint",
                 targetClass = EC2NetworkInterface::class
         )
         val networkInterfaceIds: List<String>?, // TODO review
 
-        //    @PropertyDefinition(
+        //    @property:PropertyDefinition(
         //            name = "dns_entries",
         //            description = "(Interface endpoint) The DNS entries for the endpoint"
         //    )
         //    private final List<DnsEntry> dnsEntries;
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "creation_timestamp",
                 description = "The date and time that the VPC endpoint was created"
         )
         val creationTimestamp: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the VPC endpoint"
         )
         val tags: List<KeyValue>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the VPC endpoint"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "last_error",
                 description = "The last error that occurred for VPC endpoint"
         )

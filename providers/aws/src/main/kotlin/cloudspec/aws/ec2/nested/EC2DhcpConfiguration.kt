@@ -22,13 +22,13 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2DhcpConfiguration(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "key",
                 description = "The name of a DHCP option"
         )
         val key: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "values",
                 description = "One or more values for the DHCP option"
         )

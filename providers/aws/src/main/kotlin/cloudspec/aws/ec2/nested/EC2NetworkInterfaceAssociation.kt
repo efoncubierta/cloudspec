@@ -22,29 +22,29 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2NetworkInterfaceAssociation(
-//    @AssociationDefinition(
+//    @property:AssociationDefinition(
         //            name = "allocation",
         //            description = "The allocation"
         //    )
         //    private final String allocationId;
-        //    @AssociationDefinition(
+        //    @property:AssociationDefinition(
         //            name = "association",
         //            description = "The association"
         //    )
         //    private final String associationId;
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ip_owner_id",
                 description = "The ID of the Elastic IP address owner"
         )
         val ipOwnerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "public_dns_name",
                 description = "The public DNS name"
         )
         val publicDnsName: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "public_ip",
                 description = "The address of the Elastic IP address bound to the network interface"
         )

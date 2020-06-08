@@ -26,40 +26,40 @@ import cloudspec.aws.ec2.EC2RouteTable
 import cloudspec.aws.ec2.EC2Subnet
 
 data class EC2RouteTableAssociation(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "main",
                 description = "Indicates whether this is the main route table"
         )
         val main: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "main",
                 description = "The ID of the association"
         )
         val routeTableAssociationId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "route_table",
                 description = "The route table",
                 targetClass = EC2RouteTable::class
         )
         val routeTableId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "subnet",
                 description = "The subnet",
                 targetClass = EC2Subnet::class
         )
         val subnetId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "gateway",
                 description = "The internet gateway or virtual private gateway",
                 targetClass = EC2InternetGateway::class
         )
         val gatewayId: String?, // TODO support VPG
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the association",
                 exampleValues = "associating | associated | disassociating | disassociated | failed"

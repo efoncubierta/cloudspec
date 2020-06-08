@@ -23,13 +23,13 @@ import cloudspec.annotation.PropertyDefinition
 import software.amazon.awssdk.services.ec2.model.ProductCode
 
 data class EC2ProductCode(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "id",
                 description = "The product code"
         )
         val productCodeId: String,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "type",
                 description = "The type of product code",
                 exampleValues = "devpay | marketplace"

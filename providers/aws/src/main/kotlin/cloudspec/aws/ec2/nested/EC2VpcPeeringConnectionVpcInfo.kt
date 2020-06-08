@@ -24,44 +24,44 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Vpc
 
 data class EC2VpcPeeringConnectionVpcInfo(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "cidr_block",
                 description = "The IPv4 CIDR block for the VPC"
         )
         val cidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_blocks",
                 description = "The IPv6 CIDR block for the VPC"
         )
         val ipv6CidrBlocks: List<String>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "cidr_blocks",
                 description = "Information about the IPv4 CIDR blocks for the VPC"
         )
         val cidrBlocks: List<String>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The AWS account ID of the VPC owner"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "peering_options",
                 description = "Information about the VPC peering connection options for the accepter or requester VPC"
         )
         val peeringOptions: EC2VpcPeeringConnectionOptionsDescription?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The VPC",
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The Region in which the VPC is located"
         )

@@ -24,14 +24,14 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Vpc
 
 data class EC2InternetGatewayAttachment(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The current state of the attachment",
                 exampleValues = "attaching | attached | detaching | detached"
         )
         val state: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The VPC",
                 targetClass = EC2Vpc::class

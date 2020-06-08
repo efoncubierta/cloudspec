@@ -24,39 +24,39 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Snapshot
 
 data class EC2EbsBlockDevice(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "delete_on_termination",
                 description = "Indicates whether the EBS volume is deleted on instance termination"
         )
         val deleteOnTermination: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "iops",
                 description = "The number of I/O operations per second (IOPS) that the volume supports"
         )
         val iops: Int?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "snapshot",
                 description = "The ID of the snapshot",
                 targetClass = EC2Snapshot::class
         )
         val snapshotId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "volume_size",
                 description = "The size of the volume, in GiB"
         )
         val volumeSize: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "volume_type",
                 description = "The volume type",
                 exampleValues = "gp2, st1, sc1, standard"
         )
         val volumeType: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "encrypted",
                 description = "Indicates whether the encryption state of an EBS volume is changed while being restored from a backing snapshot"
         )

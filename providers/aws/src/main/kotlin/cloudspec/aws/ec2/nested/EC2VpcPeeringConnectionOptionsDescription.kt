@@ -22,19 +22,19 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2VpcPeeringConnectionOptionsDescription(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "allow_dns_resolution_from_remote_vpc",
                 description = "Indicates whether a local VPC can resolve public DNS hostnames to private IP addresses when queried from instances in a peer VPC"
         )
         val allowDnsResolutionFromRemoteVpc: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "allow_egress_from_local_classic_link_to_remote_vpc",
                 description = "Indicates whether a local ClassicLink connection can communicate with the peer VPC over the VPC peering connection"
         )
         val allowEgressFromLocalClassicLinkToRemoteVpc: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "allow_egress_from_local_vpc_to_remote_classic_link",
                 description = "Indicates whether a local VPC can communicate with a ClassicLink connection in the peer VPC over the VPC peering connection"
         )

@@ -34,52 +34,52 @@ import cloudspec.model.KeyValue
         description = "Route Table"
 )
 data class EC2RouteTable(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "associations",
                 description = "The associations between the route table and one or more subnets or a gateway"
         )
         val associations: List<EC2RouteTableAssociation>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "propagating_gateway",
                 description = "Any virtual private gateway (VGW) propagating routes"
         )
         val propagatingGatewayIds: List<String>?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "route_table_id",
                 description = "The ID of the route table"
         )
         val routeTableId: String,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "routes",
                 description = "The routes in the route table"
         )
         val routes: List<EC2Route>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the route table"
         )
         val tags: List<KeyValue>?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The ID of the VPC",
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the route table"
         )

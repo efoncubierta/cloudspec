@@ -22,30 +22,30 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2VpcIpv6CidrBlockAssociation(
-//    @AssociationDefinition(
+//    @property:AssociationDefinition(
         //            name = "association",
         //            description = "The association for the IPv6 CIDR block"
         //    )
         //    private final String associationId;
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_block",
                 description = "The IPv6 CIDR block"
         )
         val ipv6CidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_block_state",
                 description = "Information about the state of the CIDR block"
         )
         val ipv6CidrBlockState: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "network_border_group",
                 description = "The name of the location from which we advertise the IPV6 CIDR block"
         )
         val networkBorderGroup: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_pool",
                 description = "The ID of the IPv6 address pool from which the IPv6 CIDR block is allocated"
         )

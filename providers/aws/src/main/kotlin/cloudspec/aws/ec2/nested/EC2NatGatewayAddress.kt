@@ -24,25 +24,25 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2NetworkInterface
 
 data class EC2NatGatewayAddress(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "allocation_id",
                 description = "The allocation ID of the Elastic IP address that's associated with the NAT gateway")
         val allocationId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "network_interface",
                 description = "The ID of the network interface associated with the NAT gateway",
                 targetClass = EC2NetworkInterface::class
         )
         val networkInterfaceId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "private_ip",
                 description = "The private IP address associated with the Elastic IP address"
         )
         val privateIp: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "public_ip",
                 description = "The Elastic IP address associated with the NAT gateway"
         )

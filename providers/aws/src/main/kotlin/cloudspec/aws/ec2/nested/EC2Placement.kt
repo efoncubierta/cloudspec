@@ -22,37 +22,37 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2Placement(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "availability_zone",
                 description = "The Availability Zone of the instance"
         )
         val availabilityZone: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "affinity",
                 description = "The affinity setting for the instance on the Dedicated Host"
         )
         val affinity: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "group_name",
                 description = "The name of the placement group the instance is in"
         )
         val groupName: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "partition_number",
                 description = "The number of the partition the instance is in"
         )
         val partitionNumber: Int?,
 
-        //    @AssociationDefinition(
+        //    @property:AssociationDefinition(
         //            name = "host",
         //            description = "The ID of the Dedicated Host on which the instance resides"
         //    )
         //    val hostId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tenancy",
                 description = "The tenancy of the instance (if the instance is running in a VPC)",
                 exampleValues = "default | dedicated | host"

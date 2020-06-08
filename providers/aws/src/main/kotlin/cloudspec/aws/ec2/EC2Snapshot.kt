@@ -33,7 +33,7 @@ import java.time.Instant
         description = "Snapshot"
 )
 data class EC2Snapshot(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
@@ -42,7 +42,7 @@ data class EC2Snapshot(
 
         // private final String dataEncryptionKeyId;
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "encrypted",
                 description = "Indicates whether the snapshot is encrypted"
         )
@@ -50,51 +50,51 @@ data class EC2Snapshot(
 
         // private final String kmsKeyId;
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The AWS account ID of the EBS snapshot owner"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "progress",
                 description = "The progress of the snapshot, as a percentage"
         )
         val progress: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "snapshotId",
                 description = "The ID of the snapshot. Each snapshot receives a unique identifier when it is created"
         )
         val snapshotId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "start_time",
                 description = "The time stamp when the snapshot was initiated"
         )
         val startTime: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The snapshot state"
         )
         val state: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "volume",
                 description = "The volume that was used to create the snapshot",
                 targetClass = EC2Volume::class
         )
         val volumeId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "volume_size",
                 description = " The size of the volume, in GiB"
         )
         val volumeSize: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the snapshot"
         )

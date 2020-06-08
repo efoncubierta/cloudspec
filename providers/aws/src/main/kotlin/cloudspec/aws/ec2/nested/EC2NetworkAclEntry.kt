@@ -22,43 +22,43 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2NetworkAclEntry(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "cidr_block",
                 description = "The IPv4 network range to allow or deny, in CIDR notation"
         )
         val cidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "egress",
                 description = "Indicates whether the rule is an egress rule"
         )
         val egress: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "icmp_type_code",
                 description = "The ICMP code. A value of -1 means all codes for the specified ICMP type"
         )
         val icmpTypeCode: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_block",
                 description = "The IPv6 network range to allow or deny, in CIDR notation"
         )
         val ipv6CidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "port_range",
                 description = "TCP or UDP protocols: The range of ports the rule applies to"
         )
         val portRange: EC2PortRange?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "protocol",
                 description = "The protocol number. A value of \"-1\" means all protocols"
         )
         val protocol: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "rule_action",
                 description = "Indicates whether to allow or deny the traffic that matches the rule",
                 exampleValues = "allow | deny"

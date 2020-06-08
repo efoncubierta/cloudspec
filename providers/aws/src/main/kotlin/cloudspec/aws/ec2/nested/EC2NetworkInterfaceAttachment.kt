@@ -25,38 +25,38 @@ import cloudspec.aws.ec2.EC2Instance
 import java.time.Instant
 
 data class EC2NetworkInterfaceAttachment(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "attach_time",
                 description = "The timestamp indicating when the attachment initiated"
         )
         val attachTime: Instant?,
 
-        //    @AssociationDefinition(
+        //    @property:AssociationDefinition(
         //            name = "attachment_id",
         //            description = ""
         //    )
         //    private final String attachmentId;
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "delete_on_termination",
                 description = "Indicates whether the network interface is deleted when the instance is terminated"
         )
         val deleteOnTermination: Boolean?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "instance",
                 description = "The instance",
                 targetClass = EC2Instance::class
         )
         val instanceId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_owner_id",
                 description = "The AWS account ID of the owner of the instance"
         )
         val instanceOwnerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "status",
                 description = "The attachment state"
         )

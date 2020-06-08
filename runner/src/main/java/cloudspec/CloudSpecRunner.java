@@ -87,12 +87,12 @@ public class CloudSpecRunner {
         System.out.println(String.format("Providers: %s", String.join(", ", providersNames)));
     }
 
-    private void printGroupResult(CloudSpecValidatorResult.GroupResult groupResult) {
+    private void printGroupResult(GroupResult groupResult) {
         cp.println("  " + groupResult.getGroupName(), Ansi.Attribute.BOLD, Ansi.FColor.BLUE, Ansi.BColor.NONE);
         groupResult.getRuleResults().forEach(this::printRuleResult);
     }
 
-    private void printRuleResult(CloudSpecValidatorResult.RuleResult ruleResult) {
+    private void printRuleResult(RuleResult ruleResult) {
         cp.println(
                 String.format("    %s ... %s", ruleResult.getRuleName(), ruleResult.isSuccess() ? "OK" : "FAIL"),
                 Ansi.Attribute.BOLD,
@@ -103,11 +103,10 @@ public class CloudSpecRunner {
         if (!ruleResult.isSuccess()) {
             System.out.println();
 
-            if (ruleResult.getThrowable().isPresent()) {
-                cp.println(ruleResult.getThrowable().get().getMessage(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+            if (ruleResult.getThrowable() != null) {
+                cp.println(ruleResult.getThrowable().getMessage(), Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
             } else {
-                ruleResult
-                        .getResourceValidationResults()
+                ruleResult.getResourceValidationResults()
                         .stream()
                         .filter(resourceValidationResult -> !resourceValidationResult.isSuccess())
                         .peek(resourceValidationResult ->
@@ -121,14 +120,12 @@ public class CloudSpecRunner {
                                 )
                         )
                         .flatMap(resourceValidationResult -> resourceValidationResult.getAssertResults().stream())
-                        .filter(assertValidationResult -> !assertValidationResult.isSuccess())
+                        .filter(assertValidationResult -> !assertValidationResult.getSuccess())
                         .forEach(assertValidationResult ->
                                 {
-                                    Optional<AssertValidationError> assertValidationErrorOptional = assertValidationResult.getError();
+                                    AssertValidationError assertValidationError = assertValidationResult.getError();
 
-                                    if (assertValidationErrorOptional.isPresent()) {
-                                        AssertValidationError assertValidationError = assertValidationErrorOptional.get();
-
+                                    if (assertValidationError != null) {
                                         if (assertValidationError instanceof AssertValidationMismatchError) {
                                             AssertValidationMismatchError mismatchError = (AssertValidationMismatchError) assertValidationError;
                                             cp.println(

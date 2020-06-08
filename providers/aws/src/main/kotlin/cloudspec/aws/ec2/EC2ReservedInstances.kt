@@ -33,116 +33,116 @@ import java.time.Instant
         description = "Reserved Instances"
 )
 data class EC2ReservedInstances(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "availability_zone",
                 description = "The Availability Zone in which the Reserved Instance can be used"
         )
         val availabilityZone: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "duration",
                 description = "The duration of the Reserved Instance, in seconds"
         )
         val duration: Long?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "end",
                 description = "The time when the Reserved Instance expires"
         )
         val end: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "fixed_price",
                 description = "The purchase price of the Reserved Instance"
         )
         val fixedPrice: Float?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_count",
                 description = "The number of reservations purchased"
         )
         val instanceCount: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_type",
                 description = "The instance type on which the Reserved Instance can be used"
         )
         val instanceType: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "reserved_instances_id",
                 description = "The ID of the Reserved Instance"
         )
         val reservedInstancesId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "start",
                 description = "The date and time the Reserved Instance started"
         )
         val start: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the Reserved Instance purchase",
                 exampleValues = "payment-pending | active | payment-failed | retired | queued | queue-deleted"
         )
         val state: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "usage_price",
                 description = "The usage price of the Reserved Instance, per hour"
         )
         val usagePrice: Float?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "currency_code",
                 description = "The currency of the Reserved Instance",
                 exampleValues = "USD"
         )
         val currencyCode: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "instance_tenancy",
                 description = "The tenancy of the instance",
                 exampleValues = "default | dedicated | host"
         )
         val instanceTenancy: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "offering_class",
                 description = "The offering class of the Reserved Instance",
                 exampleValues = "standard | convertible"
         )
         val offeringClass: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "offering_type",
                 description = "The Reserved Instance offering type",
                 exampleValues = "Heavy Utilization | Medium Utilization | Light Utilization | No Upfront | Partial Upfront | All Upfront"
         )
         val offeringType: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "recurring_charges",
                 description = "The recurring charge tag assigned to the resource"
         )
         val recurringCharges: List<EC2RecurringCharge>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "scope",
                 description = "The scope of the Reserved Instance"
         )
         val scope: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the resource"
         )

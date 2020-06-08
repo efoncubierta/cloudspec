@@ -34,66 +34,66 @@ import java.time.Instant
         description = "NAT Gateway"
 )
 data class EC2NatGateway(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "create_time",
                 description = "The date and time the NAT gateway was created"
         )
         val createTime: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "delete_time",
                 description = "The date and time the NAT gateway was deleted, if applicable"
         )
         val deleteTime: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "failure_code",
                 description = "If the NAT gateway could not be created, specifies the error code for the failure."
         )
         val failureCode: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "nat_gateway_addresses",
                 description = "Information about the IP addresses and network interface associated with the NAT gateway"
         )
         val natGatewayAddresses: List<EC2NatGatewayAddress>?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "nat_gateway_id",
                 description = "The ID of the NAT gateway"
         )
         val natGatewayId: String?
         ,
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the NAT gateway",
                 exampleValues = "pending | failed | available | deleting | deleted"
         )
         val state: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "subnet",
                 description = "The subnet in which the NAT gateway is located",
                 targetClass = EC2Subnet::class
         )
         val subnetId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The VPC in which the NAT gateway is located",
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "The tags for the NAT gateway"
         )

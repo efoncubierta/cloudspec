@@ -32,33 +32,33 @@ import cloudspec.model.KeyValue
         description = "DHCP Options"
 )
 data class EC2DhcpOptions(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "dhcp_configurations",
                 description = "One or more DHCP options in the set"
         )
         val dhcpConfigurations: List<EC2DhcpConfiguration>?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "dhcp_options_id",
                 description = "The ID of the set of DHCP options"
         )
         val dhcpOptionsId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the Capacity Reservation"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the DHCP options set"
         )

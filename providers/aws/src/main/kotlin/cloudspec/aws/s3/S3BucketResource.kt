@@ -29,13 +29,13 @@ import cloudspec.annotation.ResourceDefinition
         description = "S3 Bucket"
 )
 data class S3BucketResource(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "AWS Region"
         )
         var region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "bucket_name",
                 description = "Bucket name"
         )

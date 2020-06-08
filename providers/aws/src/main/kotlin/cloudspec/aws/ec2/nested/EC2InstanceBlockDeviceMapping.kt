@@ -22,13 +22,13 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2InstanceBlockDeviceMapping(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "device_name",
                 description = "The device name"
         )
         val deviceName: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ebs",
                 description = "Parameters used to automatically set up EBS volumes when the instance is launched"
         )

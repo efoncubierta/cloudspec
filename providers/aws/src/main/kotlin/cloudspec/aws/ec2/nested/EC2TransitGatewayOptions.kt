@@ -24,51 +24,51 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2RouteTable
 
 data class EC2TransitGatewayOptions(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "auto_accept_shared_attachments",
                 description = "Indicates whether attachment requests are automatically accepted"
         )
         val autoAcceptSharedAttachments: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "default_route_table_association",
                 description = "Indicates whether resource attachments are automatically associated with the default association route table"
         )
         val defaultRouteTableAssociation: Boolean?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "association_default_route_table",
                 description = "The default association route table",
                 targetClass = EC2RouteTable::class
         )
         val associationDefaultRouteTableId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "default_route_table_propagation",
                 description = "Indicates whether resource attachments automatically propagate routes to the default propagation route table"
         )
         val defaultRouteTablePropagation: Boolean?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "propagation_default_route_table",
                 description = "The default propagation route table",
                 targetClass = EC2RouteTable::class
         )
         val propagationDefaultRouteTableId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "vpn_ecmp_support",
                 description = "Indicates whether Equal Cost Multipath Protocol support is enabled"
         )
         val vpnEcmpSupport: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "dns_support",
                 description = "Indicates whether DNS support is enabled"
         )
         val dnsSupport: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "multicast_support",
                 description = "Indicates whether multicast is enabled on the transit gateway"
         )

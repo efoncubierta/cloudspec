@@ -32,51 +32,51 @@ import java.time.Instant
         description = "Transit Gateway"
 )
 data class EC2TransitGateway(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "transit_gateway_id",
                 description = "The ID of the transit gateway"
         )
         val transitGatewayId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "transit_gateway_arn",
                 description = "The Amazon Resource Name (ARN) of the transit gateway"
         )
         val transitGatewayArn: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the transit gateway",
                 exampleValues = "pending | available | modifying | deleting | deleted"
         )
         val state: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account ID that owns the transit gateway"
         )
         val ownerId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "creation_time",
                 description = "The creation time"
         )
         val creationTime: Instant?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "options",
                 description = "The transit gateway options"
         )
         val options: EC2TransitGatewayOptions?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "The tags for the transit gateway"
         )

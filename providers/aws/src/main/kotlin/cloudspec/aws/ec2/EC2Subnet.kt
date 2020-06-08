@@ -33,95 +33,95 @@ import cloudspec.model.KeyValue
         description = "VPC Subnet"
 )
 data class EC2Subnet(
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "region",
                 description = "The AWS region",
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "availability_zone",
                 description = "The Availability Zone of the subnet"
         )
         val availabilityZone: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "available_ip_address_count",
                 description = "The number of unused private IPv4 addresses in the subnet"
         )
         val availableIpAddressCount: Int?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "cidr_block",
                 description = "The IPv4 CIDR block assigned to the subnet"
         )
         val cidrBlock: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "default_for_az",
                 description = "Indicates whether this is the default subnet for the Availability Zone"
         )
         val defaultForAz: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "map_public_ip_on_launch",
                 description = "Indicates whether instances launched in this subnet receive a public IPv4 address"
         )
         val mapPublicIpOnLaunch: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "state",
                 description = "The current state of the subnet",
                 exampleValues = "pending | available"
         )
         val state: String?,
 
-        @IdDefinition
-        @PropertyDefinition(
+        @property:IdDefinition
+        @property:PropertyDefinition(
                 name = "subnet_id",
                 description = "The ID of the subnet"
         )
         val subnetId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The ID of the VPC the subnet is in",
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "owner_id",
                 description = "The ID of the AWS account that owns the subnet"
         )
         val ownerId: String?
         ,
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "assign_ipv6_address_on_creation",
                 description = "Indicates whether a network interface created in this subnet receives an IPv6 address."
         )
         val assignIpv6AddressOnCreation: Boolean?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "ipv6_cidr_block_associations",
                 description = "Information about the IPv6 CIDR blocks associated with the subnet"
         )
         val ipv6CidrBlockAssociations: List<EC2SubnetIpv6CidrBlockAssociation>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "tags",
                 description = "Any tags assigned to the subnet"
         )
         val tags: List<KeyValue>?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "subnet_arn",
                 description = "The Amazon Resource Name (ARN) of the subnet"
         )
         val subnetArn: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "outpost_arn",
                 description = "The Amazon Resource Name (ARN) of the Outpost"
         )

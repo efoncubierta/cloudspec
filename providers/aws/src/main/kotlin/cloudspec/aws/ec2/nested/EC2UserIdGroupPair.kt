@@ -26,39 +26,39 @@ import cloudspec.aws.ec2.EC2Vpc
 import cloudspec.aws.ec2.EC2VpcPeeringConnection
 
 data class EC2UserIdGroupPair(
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "group",
                 description = "The security group",
                 targetClass = EC2SecurityGroup::class
         )
         val groupId: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "group_name",
                 description = "The name of the security group"
         )
         val groupName: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "peering_status",
                 description = "The status of a VPC peering connection, if applicable"
         )
         val peeringStatus: String?,
 
-        @PropertyDefinition(
+        @property:PropertyDefinition(
                 name = "userId",
                 description = "The ID of an AWS account"
         )
         val userId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc",
                 description = "The VPC for the referenced security group, if applicable",
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
-        @AssociationDefinition(
+        @property:AssociationDefinition(
                 name = "vpc_peering_connection",
                 description = "The VPC peering connection, if applicable",
                 targetClass = EC2VpcPeeringConnection::class
