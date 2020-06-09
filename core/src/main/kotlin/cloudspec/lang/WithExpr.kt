@@ -28,7 +28,7 @@ data class WithExpr(val statements: List<Statement>) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(spaces: Int): String {
         val sb = StringBuilder()
 
-        (0..statements.size).forEach { i: Int ->
+        (statements.indices).forEach { i: Int ->
             if (i == 0) {
                 sb.appendln("${" ".repeat(spaces)}With")
             } else {

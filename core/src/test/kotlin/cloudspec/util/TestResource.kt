@@ -39,7 +39,7 @@ data class TestResource(
                 description = ModelTestUtils.PROP_ID_DESCRIPTION,
                 exampleValues = ModelTestUtils.PROP_ID_EXAMPLE_VALUES
         )
-        val id: String?,
+        val id: String,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_NUMBER_NAME,

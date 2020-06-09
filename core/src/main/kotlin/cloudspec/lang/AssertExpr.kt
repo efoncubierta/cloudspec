@@ -27,7 +27,8 @@ package cloudspec.lang
 data class AssertExpr(val statements: List<Statement>) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(spaces: Int): String {
         val sb = StringBuilder()
-        (0..statements.size).forEach { i ->
+
+        (statements.indices).forEach { i ->
             if (i == 0) {
                 sb.appendln("${" ".repeat(spaces)}Assert")
             } else {
@@ -35,6 +36,7 @@ data class AssertExpr(val statements: List<Statement>) : CloudSpecSyntaxProducer
             }
             sb.appendln(statements[i].toCloudSpecSyntax(spaces + 4))
         }
+
         return sb.toString()
     }
 

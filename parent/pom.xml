@@ -247,6 +247,7 @@
                                 <sourceDirs>
                                     <source>src/main/java</source>
                                     <source>src/main/kotlin</source>
+                                    <source>target/generated-sources/antlr4</source>
                                 </sourceDirs>
                             </configuration>
                         </execution>
