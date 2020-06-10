@@ -50,7 +50,7 @@ data class EC2InternetGateway(
                 name = "internet_gateway_id",
                 description = "The ID of the internet gateway"
         )
-        val internetGatewayId: String?,
+        val internetGatewayId: String,
 
         @property:PropertyDefinition(
                 name = "owner_id",

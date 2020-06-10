@@ -19,10 +19,11 @@
  */
 package cloudspec.util
 
+import arrow.core.Option
+import arrow.core.none
 import cloudspec.annotation.ProviderDefinition
 import cloudspec.model.Provider
 import cloudspec.model.ResourceDefRef
-import java.util.*
 
 @ProviderDefinition(
         name = ProviderDataUtil.PROVIDER_NAME,
@@ -34,7 +35,7 @@ class TestProvider : Provider() {
         return emptyList()
     }
 
-    override fun resourceById(ref: ResourceDefRef, id: String): Optional<*> {
-        return Optional.empty<Any>()
+    override fun resourceById(ref: ResourceDefRef, id: String): Option<Any> {
+        return none<Any>()
     }
 }

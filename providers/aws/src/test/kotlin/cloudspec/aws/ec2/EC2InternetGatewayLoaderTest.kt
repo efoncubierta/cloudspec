@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.InternetGatewayGenerator.internetGatewayId
 import datagen.services.ec2.model.InternetGatewayGenerator.internetGateways
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeInternetGatewaysRequest
 import software.amazon.awssdk.services.ec2.model.DescribeInternetGatewaysResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2InternetGatewayLoaderTest : EC2LoaderTest() {
     private val loader = EC2InternetGatewayLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2InternetGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeInternetGatewaysResponse.builder()
                     .internetGateways(internetGateways)
@@ -52,8 +57,8 @@ class EC2InternetGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(internetGateways.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(internetGateways.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2InternetGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeInternetGatewaysResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(internetGatewayId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(internetGatewayId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2InternetGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeInternetGatewaysResponse.builder()
                     .internetGateways(internetGateways)
@@ -98,7 +103,7 @@ class EC2InternetGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val internetGateway = internetGateways[0]
-        val resource = loader.byId(internetGateway.internetGatewayId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(internetGateway.internetGatewayId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

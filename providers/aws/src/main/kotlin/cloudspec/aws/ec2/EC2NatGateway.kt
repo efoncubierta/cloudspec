@@ -70,8 +70,8 @@ data class EC2NatGateway(
                 name = "nat_gateway_id",
                 description = "The ID of the NAT gateway"
         )
-        val natGatewayId: String?
-        ,
+        val natGatewayId: String,
+
         @property:PropertyDefinition(
                 name = "state",
                 description = "The state of the NAT gateway",

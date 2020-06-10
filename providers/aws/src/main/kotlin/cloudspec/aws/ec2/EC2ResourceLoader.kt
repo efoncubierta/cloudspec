@@ -19,13 +19,15 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.Option
+import arrow.core.firstOrNone
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
 import software.amazon.awssdk.services.ec2.model.Filter
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
-    override fun byId(id: String): T? {
-        return getResources(listOf(id)).firstOrNull()
+    override fun byId(id: String): Option<T> {
+        return getResources(listOf(id)).firstOrNone()
     }
 
     override val all: List<T>

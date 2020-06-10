@@ -19,6 +19,10 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.none
+import arrow.core.toOption
+
 /**
  * Define the reference of a resource definition.
  */
@@ -38,14 +42,14 @@ data class ResourceDefRef(
          * @param refString Resource definition reference as string.
          * @return Optional resource definition reference.
          */
-        fun fromString(refString: String): ResourceDefRef? {
+        fun fromString(refString: String): Option<ResourceDefRef> {
             // TODO manage null or malformed strings
             val parts = refString.split(":".toRegex())
 
             return if (parts.size != 3) {
-                null
+                none()
             } else {
-                ResourceDefRef(parts[0], parts[1], parts[2])
+                ResourceDefRef(parts[0], parts[1], parts[2]).toOption()
             }
         }
     }

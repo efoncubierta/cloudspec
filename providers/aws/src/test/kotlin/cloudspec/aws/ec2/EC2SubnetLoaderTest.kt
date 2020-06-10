@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.SubnetGenerator.subnetId
 import datagen.services.ec2.model.SubnetGenerator.subnets
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeSubnetsRequest
 import software.amazon.awssdk.services.ec2.model.DescribeSubnetsResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2SubnetLoaderTest : EC2LoaderTest() {
     private val loader = EC2SubnetLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeSubnetsResponse.builder()
                     .subnets(subnets)
@@ -52,8 +57,8 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(subnets.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(subnets.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeSubnetsResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(subnetId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(subnetId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeSubnetsResponse.builder()
                     .subnets(subnets)
@@ -98,7 +103,7 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
         }
 
         val subnet = subnets[0]
-        val resource = loader.byId(subnet.subnetId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(subnet.subnetId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

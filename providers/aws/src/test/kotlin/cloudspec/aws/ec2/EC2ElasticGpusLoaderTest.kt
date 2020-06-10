@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.ElasticGpusGenerator.elasticGpuId
 import datagen.services.ec2.model.ElasticGpusGenerator.elasticGpusList
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeElasticGpusRequest
 import software.amazon.awssdk.services.ec2.model.DescribeElasticGpusResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2ElasticGpusLoaderTest : EC2LoaderTest() {
     private val loader = EC2ElasticGpuLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2ElasticGpusLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.elasticGpuIds().isEmpty())
+            assertTrue(request.elasticGpuIds().isEmpty())
 
             DescribeElasticGpusResponse.builder()
                     .elasticGpuSet(elasticGpusList)
@@ -52,8 +57,8 @@ class EC2ElasticGpusLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(elasticGpusList.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(elasticGpusList.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2ElasticGpusLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.elasticGpuIds().isEmpty())
+            assertFalse(request.elasticGpuIds().isEmpty())
 
             DescribeElasticGpusResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(elasticGpuId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(elasticGpuId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2ElasticGpusLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.elasticGpuIds().isEmpty())
+            assertFalse(request.elasticGpuIds().isEmpty())
 
             DescribeElasticGpusResponse.builder()
                     .elasticGpuSet(elasticGpusList)
@@ -98,7 +103,7 @@ class EC2ElasticGpusLoaderTest : EC2LoaderTest() {
         }
 
         val elasticGpus = elasticGpusList[0]
-        val resource = loader.byId(elasticGpus.elasticGpuId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(elasticGpus.elasticGpuId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

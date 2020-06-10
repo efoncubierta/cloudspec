@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.NetworkInterfaceGenerator.networkInterfaceId
 import datagen.services.ec2.model.NetworkInterfaceGenerator.networkInterfaces
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeNetworkInterfacesRequest
 import software.amazon.awssdk.services.ec2.model.DescribeNetworkInterfacesResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
     private val loader = EC2NetworkInterfaceLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeNetworkInterfacesResponse.builder()
                     .networkInterfaces(networkInterfaces)
@@ -52,8 +57,8 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(networkInterfaces.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(networkInterfaces.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeNetworkInterfacesResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(networkInterfaceId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(networkInterfaceId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeNetworkInterfacesResponse.builder()
                     .networkInterfaces(networkInterfaces)
@@ -98,7 +103,7 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
         }
 
         val networkInterface = networkInterfaces[0]
-        val resource = loader.byId(networkInterface.networkInterfaceId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(networkInterface.networkInterfaceId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

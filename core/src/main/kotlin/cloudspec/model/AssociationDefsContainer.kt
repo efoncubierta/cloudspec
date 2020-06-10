@@ -19,6 +19,9 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.firstOrNone
+
 /**
  * Interface for classes that manage associations definitions.
  */
@@ -32,9 +35,9 @@ interface AssociationDefsContainer {
      * Get an association definition by name.
      *
      * @param name Association name.
-     * @return Association definition or null.
+     * @return Optional association definition.
      */
-    fun associationByName(name: String): AssociationDef? {
-        return associations.firstOrNull { it.name == name }
+    fun associationByName(name: String): Option<AssociationDef> {
+        return associations.firstOrNone { it.name == name }
     }
 }

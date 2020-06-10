@@ -19,6 +19,11 @@
  */
 package cloudspec.graph
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
+import arrow.core.toOption
+import arrow.syntax.collections.flatten
 import cloudspec.lang.*
 import cloudspec.model.ResourceDefRef
 import cloudspec.validator.*
@@ -56,11 +61,12 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
     override fun validateById(ref: ResourceDefRef,
                               id: String,
                               filterStatements: List<Statement>,
-                              assertStatements: List<Statement>): ResourceValidationResult? {
+                              assertStatements: List<Statement>): Option<ResourceValidationResult> {
         return buildGetResourceByIdFilteringTraversal(ref, id, filterStatements)
                 .tryNext()
                 .orElse(null)
-                ?.let {
+                .toOption()
+                .flatMap {
                     validateResource(it.value(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
                                      it.value(GraphResourceStore.PROPERTY_RESOURCE_ID),
                                      assertStatements)
@@ -72,22 +78,23 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                              assertStatements: List<Statement>): List<ResourceValidationResult> {
         return buildGetAllResourcesFilteredTraversal(ref, filterStatements)
                 .toList()
-                .mapNotNull { resourceV ->
+                .map { resourceV ->
                     validateResource(resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
                                      resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_ID),
                                      assertStatements)
                 }
+                .flatten()
     }
 
     private fun validateResource(ref: ResourceDefRef,
                                  id: String,
-                                 assertStatements: List<Statement>): ResourceValidationResult? {
+                                 assertStatements: List<Statement>): Option<ResourceValidationResult> {
         // validate resource exists
         if (!existById(ref, id)) {
             logger.error(
                     "Resource '${ref}' with id '${id}' cannot be validated because it doesn't exist."
             )
-            return null
+            return none()
         }
 
         // process assessments
@@ -102,7 +109,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                 }
 
         // build resource validation result
-        return ResourceValidationResult(ref, id, assertValidationResults)
+        return ResourceValidationResult(ref, id, assertValidationResults).toOption()
     }
 
     private fun validateResourceByAssertTraversal(ref: ResourceDefRef,
@@ -352,11 +359,9 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
     private fun buildAssertionError(predicate: P<*>, value: Any): AssertValidationError {
         return when (predicate.biPredicate) {
             Compare.eq,
-            Compare.neq -> AssertValidationMismatchError(predicate.originalValue,
-                                                         value)
+            Compare.neq -> AssertValidationMismatchError(predicate.originalValue, value)
             Contains.within,
-            Contains.without -> AssertValidationContainError(predicate.originalValue as List<Any>,
-                                                             value)
+            Contains.without -> AssertValidationContainError(predicate.originalValue as List<Any>, value)
             else -> AssertValidationUnknownError("Unknown predicate ${predicate.biPredicate}")
         }
     }

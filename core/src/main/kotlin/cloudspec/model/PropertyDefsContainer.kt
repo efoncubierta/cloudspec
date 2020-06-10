@@ -19,6 +19,9 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.firstOrNone
+
 /**
  * Interface for classes that manage property definitions.
  */
@@ -34,7 +37,7 @@ interface PropertyDefsContainer {
      * @param name Property name.
      * @return Property definition or null.
      */
-    fun propertyByName(name: String): PropertyDef? {
-        return properties.firstOrNull { it.name == name }
+    fun propertyByName(name: String): Option<PropertyDef> {
+        return properties.firstOrNone { it.name == name }
     }
 }

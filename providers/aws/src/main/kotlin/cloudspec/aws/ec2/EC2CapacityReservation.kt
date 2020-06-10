@@ -44,7 +44,7 @@ data class EC2CapacityReservation(
                 name = "capacity_reservation_id",
                 description = "The ID of the Capacity Reservation"
         )
-        val capacityReservationId: String?,
+        val capacityReservationId: String,
 
         @property:PropertyDefinition(
                 name = "owner_id",

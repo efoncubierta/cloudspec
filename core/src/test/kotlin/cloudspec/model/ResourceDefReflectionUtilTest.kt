@@ -19,6 +19,8 @@
  */
 package cloudspec.model
 
+import arrow.core.None
+import arrow.core.Some
 import cloudspec.annotation.ResourceDefReflectionUtil.toAssociationDefs
 import cloudspec.annotation.ResourceDefReflectionUtil.toPropertyDefs
 import cloudspec.annotation.ResourceDefReflectionUtil.toResourceDef
@@ -34,28 +36,28 @@ import kotlin.test.*
 class ResourceDefReflectionUtilTest {
     @Test
     fun shouldProduceResourceDefRef() {
-        val resourceDefRef = toResourceDefRef(TestResource::class)
-        assertNotNull(resourceDefRef)
-        assertEquals(ModelTestUtils.RESOURCE_DEF_REF, resourceDefRef)
+        val resourceDefRefOpt = toResourceDefRef(TestResource::class)
+        assertTrue(resourceDefRefOpt is Some<ResourceDefRef>)
+        assertEquals(ModelTestUtils.RESOURCE_DEF_REF, resourceDefRefOpt.t)
     }
 
     @Test
     fun shouldNotProduceResourceDefRef() {
-        val resourceDefRef = toResourceDefRef(MyResource::class)
-        assertNull(resourceDefRef)
+        val resourceDefRefOpt = toResourceDefRef(MyResource::class)
+        assertTrue(resourceDefRefOpt is None)
     }
 
     @Test
     fun shouldProduceResourceDescription() {
-        val resourceDescription = toResourceDescription(TestResource::class)
-        assertNotNull(resourceDescription)
-        assertEquals(ModelTestUtils.RESOURCE_DESCRIPTION, resourceDescription)
+        val resourceDescriptionOpt = toResourceDescription(TestResource::class)
+        assertTrue(resourceDescriptionOpt is Some<String>)
+        assertEquals(ModelTestUtils.RESOURCE_DESCRIPTION, resourceDescriptionOpt.t)
     }
 
     @Test
     fun shouldNotProduceResourceDescription() {
-        val resourceDescription = toResourceDescription(MyResource::class)
-        assertNull(resourceDescription)
+        val resourceDescriptionOpt = toResourceDescription(MyResource::class)
+        assertTrue(resourceDescriptionOpt is None)
     }
 
     @Test
@@ -90,15 +92,15 @@ class ResourceDefReflectionUtilTest {
 
     @Test
     fun shouldProduceResourceDef() {
-        val resourceDef = toResourceDef(TestResource::class)
-        assertNotNull(resourceDef)
-        assertEquals(ModelTestUtils.RESOURCE_DEF, resourceDef)
+        val resourceDefOpt = toResourceDef(TestResource::class)
+        assertTrue(resourceDefOpt is Some<ResourceDef>)
+        assertEquals(ModelTestUtils.RESOURCE_DEF, resourceDefOpt.t)
     }
 
     @Test
     fun shouldNotProduceResourceDef() {
-        val resourceDef = toResourceDef(MyResource::class)
-        assertNull(resourceDef)
+        val resourceDefOpt = toResourceDef(MyResource::class)
+        assertTrue(resourceDefOpt is None)
     }
 
     private data class MyResource(val id: String)

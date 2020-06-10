@@ -19,6 +19,9 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.firstOrNone
+
 /**
  * Interface for classes that manage associations.
  */
@@ -33,7 +36,7 @@ interface AssociationsContainer {
      *
      * @return Association or null.
      */
-    fun associationByName(name: String): Association? {
-        return associations.firstOrNull { it.name == name }
+    fun associationByName(name: String): Option<Association> {
+        return associations.firstOrNone() { it.name == name }
     }
 }

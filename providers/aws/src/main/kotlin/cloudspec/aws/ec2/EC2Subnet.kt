@@ -82,7 +82,7 @@ data class EC2Subnet(
                 name = "subnet_id",
                 description = "The ID of the subnet"
         )
-        val subnetId: String?,
+        val subnetId: String,
 
         @property:AssociationDefinition(
                 name = "vpc",

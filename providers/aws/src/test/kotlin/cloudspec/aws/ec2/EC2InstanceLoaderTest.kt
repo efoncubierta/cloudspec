@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.InstanceGenerator.instanceId
 import datagen.services.ec2.model.ReservationGenerator.reservation
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2InstanceLoaderTest : EC2LoaderTest() {
     private val loader = EC2InstanceLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeInstancesResponse.builder()
                     .reservations(reservation)
@@ -52,8 +57,8 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(reservation.instances().size, resources.size)
+        assertNotNull(resources)
+        assertEquals(reservation.instances().size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeInstancesResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(instanceId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(instanceId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeInstancesResponse.builder()
                     .reservations(reservation)
@@ -98,7 +103,7 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
         }
 
         val instance = reservation.instances()[0]
-        val resource = loader.byId(instance.instanceId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(instance.instanceId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

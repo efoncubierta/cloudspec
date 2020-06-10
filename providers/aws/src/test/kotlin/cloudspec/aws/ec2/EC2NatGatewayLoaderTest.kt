@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.NatGatewayGenerator.natGatewayId
 import datagen.services.ec2.model.NatGatewayGenerator.natGateways
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysRequest
 import software.amazon.awssdk.services.ec2.model.DescribeNatGatewaysResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2NatGatewayLoaderTest : EC2LoaderTest() {
     private val loader = EC2NatGatewayLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2NatGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filter().isEmpty())
+            assertTrue(request.filter().isEmpty())
 
             DescribeNatGatewaysResponse.builder()
                     .natGateways(natGateways)
@@ -52,8 +57,8 @@ class EC2NatGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(natGateways.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(natGateways.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2NatGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filter().isEmpty())
+            assertFalse(request.filter().isEmpty())
 
             DescribeNatGatewaysResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(natGatewayId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(natGatewayId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2NatGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filter().isEmpty())
+            assertFalse(request.filter().isEmpty())
 
             DescribeNatGatewaysResponse.builder()
                     .natGateways(natGateways)
@@ -98,7 +103,7 @@ class EC2NatGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val natGateway = natGateways[0]
-        val resource = loader.byId(natGateway.natGatewayId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(natGateway.natGatewayId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

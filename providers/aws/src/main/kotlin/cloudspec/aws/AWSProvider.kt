@@ -19,6 +19,9 @@
  */
 package cloudspec.aws
 
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.core.toOption
 import cloudspec.annotation.ProviderDefinition
 import cloudspec.aws.ec2.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
@@ -60,15 +63,15 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     private val loaders: MutableMap<String, AWSResourceLoader<*>> = HashMap()
 
     override fun resourcesByRef(ref: ResourceDefRef): List<Any> {
-        return getLoader(ref)?.all ?: emptyList<Unit>()
+        return getLoader(ref).map { it.all }.getOrElse { emptyList<Unit>() }
     }
 
-    override fun resourceById(ref: ResourceDefRef, id: String): Any? {
-        return getLoader(ref)?.byId(id)
+    override fun resourceById(ref: ResourceDefRef, id: String): Option<Any> {
+        return getLoader(ref).map { it.byId(id) }
     }
 
-    private fun getLoader(resourceDefRef: ResourceDefRef): AWSResourceLoader<*>? {
-        return loaders[resourceDefRef.toString()]
+    private fun getLoader(resourceDefRef: ResourceDefRef): Option<AWSResourceLoader<*>> {
+        return loaders[resourceDefRef.toString()].toOption()
     }
 
     init {

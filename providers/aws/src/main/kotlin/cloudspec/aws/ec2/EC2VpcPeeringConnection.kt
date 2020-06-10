@@ -76,5 +76,5 @@ data class EC2VpcPeeringConnection(
                 name = "vpc_peering_connection_id",
                 description = "The ID of the VPC peering connection"
         )
-        val vpcPeeringConnectionId: String?
+        val vpcPeeringConnectionId: String
 ) : EC2Resource(region)

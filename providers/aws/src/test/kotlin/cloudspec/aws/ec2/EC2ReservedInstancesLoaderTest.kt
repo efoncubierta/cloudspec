@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.ReservedInstancesGenerator.reservedInstancesId
 import datagen.services.ec2.model.ReservedInstancesGenerator.reservedInstancesList
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeReservedInstancesRequest
 import software.amazon.awssdk.services.ec2.model.DescribeReservedInstancesResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2ReservedInstancesLoaderTest : EC2LoaderTest() {
     private val loader = EC2ReservedInstancesLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2ReservedInstancesLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeReservedInstancesResponse.builder()
                     .reservedInstances(reservedInstancesList)
@@ -52,8 +57,8 @@ class EC2ReservedInstancesLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(reservedInstancesList.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(reservedInstancesList.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2ReservedInstancesLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeReservedInstancesResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(reservedInstancesId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(reservedInstancesId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2ReservedInstancesLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeReservedInstancesResponse.builder()
                     .reservedInstances(reservedInstancesList)
@@ -98,7 +103,7 @@ class EC2ReservedInstancesLoaderTest : EC2LoaderTest() {
         }
 
         val reservedInstances = reservedInstancesList[0]
-        val resource = loader.byId(reservedInstances.reservedInstancesId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(reservedInstances.reservedInstancesId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

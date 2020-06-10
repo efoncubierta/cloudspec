@@ -50,7 +50,7 @@ data class EC2DhcpOptions(
                 name = "dhcp_options_id",
                 description = "The ID of the set of DHCP options"
         )
-        val dhcpOptionsId: String?,
+        val dhcpOptionsId: String,
 
         @property:PropertyDefinition(
                 name = "owner_id",

@@ -19,6 +19,9 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.firstOrNone
+
 /**
  * Interface for classes that manage properties.
  */
@@ -36,7 +39,7 @@ interface PropertiesContainer {
      * @param name Property name.
      * @return Property or null.
      */
-    fun getProperty(name: String): Property<*>? {
-        return properties.firstOrNull { it.name == name }
+    fun getProperty(name: String): Option<Property<*>> {
+        return properties.firstOrNone { it.name == name }
     }
 }

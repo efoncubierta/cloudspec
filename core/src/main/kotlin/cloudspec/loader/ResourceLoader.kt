@@ -19,12 +19,17 @@
  */
 package cloudspec.loader
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.getOrElse
+import arrow.syntax.collections.flatten
 import cloudspec.ProvidersRegistry
 import cloudspec.annotation.ResourceReflectionUtil
 import cloudspec.lang.*
 import cloudspec.model.Resource
 import cloudspec.model.ResourceDefRef
 import cloudspec.model.ResourceDefRef.Companion.fromString
+import cloudspec.model.Resources
 import cloudspec.store.ResourceStore
 import org.slf4j.LoggerFactory
 
@@ -42,30 +47,28 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
     }
 
     private fun loadFromRule(ruleExpr: RuleExpr) {
-        val resourceDefRef = fromString(ruleExpr.resourceDefRef)
+        when (val resourceDefRefOpt = fromString(ruleExpr.resourceDefRef)) {
+            is Some -> {
+                // Load all resource definitions to the plan
+                getAllResources(resourceDefRefOpt.t)
+                        .forEach { resource ->
+                            // load dependent resources from each statement
+                            ruleExpr.withExpr
+                                    .statements
+                                    .forEach {
+                                        loadFromStatement(resource, it, emptyList())
+                                    }
 
-        if (resourceDefRef == null) {
-            logger.error("Malformed resource definition '${ruleExpr.resourceDefRef}'. Ignoring it.")
-            return
+                            // load dependent resources from each statement
+                            ruleExpr.assertExpr
+                                    .statements
+                                    .forEach {
+                                        loadFromStatement(resource, it, emptyList())
+                                    }
+                        }
+            }
+            else -> logger.error("Malformed resource definition '${ruleExpr.resourceDefRef}'. Ignoring it.")
         }
-
-        // Load all resource definitions to the plan
-        getAllResources(resourceDefRef)
-                .forEach { resource ->
-                    // load dependent resources from each statement
-                    ruleExpr.withExpr
-                            .statements
-                            .forEach {
-                                loadFromStatement(resource, it, emptyList())
-                            }
-
-                    // load dependent resources from each statement
-                    ruleExpr.assertExpr
-                            .statements
-                            .forEach {
-                                loadFromStatement(resource, it, emptyList())
-                            }
-                }
     }
 
     private fun loadFromStatement(resource: Resource, statement: Statement, path: List<String>) {
@@ -89,64 +92,75 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         logger.debug("Loading resources for association '${statement.associationName}' " +
                              "in resource '${resource.resourceDefRef}' with id '${resource.resourceId}'")
 
-        val association = resource.getAssociationByPath(associationPath)
-        if (association == null) {
-            logger.error("Association '${statement.associationName}' does not exist " +
-                                 "in resource '${resource.resourceDefRef}' with id '${resource.resourceId}'. " +
-                                 "Ignoring it.")
-            return
-        }
+        when (val associationOpt = resource.getAssociationByPath(associationPath)) {
+            is Some -> {
+                // load associated resource
+                val association = associationOpt.t
+                when (val associatedResourceOpt = getResourceById(association.resourceDefRef, association.resourceId)) {
+                    is Some ->
+                        // load resources from each sub statement
+                        statement.statements.forEach {
+                            loadFromStatement(associatedResourceOpt.t, it, emptyList())
+                        }
+                    else ->
+                        logger.error("Associated resource '${statement.associationName}' " +
+                                             "in resource '${resource.resourceDefRef}' " +
+                                             "with id '${resource.resourceId}' does not exist. Ignoring it.")
 
-        // load associated resource
-        val associatedResource = getResourceById(association.resourceDefRef, association.resourceId)
-        if (associatedResource == null) {
-            logger.error("Associated resource '${statement.associationName}' " +
-                                 "in resource '${resource.resourceDefRef}' " +
-                                 "with id '${resource.resourceId}' does not exist. Ignoring it.")
-            return
-        }
-
-        // load resources from each sub statement
-        statement.statements.forEach {
-            loadFromStatement(associatedResource, it, emptyList())
+                }
+            }
+            else ->
+                logger.error("Association '${statement.associationName}' does not exist " +
+                                     "in resource '${resource.resourceDefRef}' with id '${resource.resourceId}'. " +
+                                     "Ignoring it.")
         }
     }
 
-    private fun getAllResources(resourceDefRef: ResourceDefRef): List<Resource> {
+    private fun getAllResources(resourceDefRef: ResourceDefRef): Resources {
         return if (!loadedResourceDefs.contains(resourceDefRef)) {
             logger.debug("Loading all resources of type '{}'", resourceDefRef)
 
             loadedResourceDefs.add(resourceDefRef)
 
             providersRegistry.getProvider(resourceDefRef.providerName)
-                    ?.resourcesByRef(resourceDefRef)
-                    ?.mapNotNull { ResourceReflectionUtil.toResource(it) }
-                    ?.onEach { (_, resourceId, properties, associations) ->
-                        resourceStore.saveResource(resourceDefRef,
-                                                   resourceId,
-                                                   properties,
-                                                   associations)
-                    } ?: emptyList()
+                    .map { provider ->
+                        provider.resourcesByRef(resourceDefRef)
+                                .map { ResourceReflectionUtil.toResource(it) }
+                                .flatten()
+                                .onEach { (_, resourceId, properties, associations) ->
+                                    resourceStore.saveResource(resourceDefRef,
+                                                               resourceId,
+                                                               properties,
+                                                               associations)
+                                }
+                    }.getOrElse {
+                        emptyList()
+                    }
         } else {
             resourceStore.resourcesByDefinition(resourceDefRef)
         }
     }
 
-    private fun getResourceById(resourceDefRef: ResourceDefRef, resourceId: String): Resource? {
+    private fun getResourceById(resourceDefRef: ResourceDefRef, resourceId: String): Option<Resource> {
         // TODO load incomplete resource from store
 //        Optional<Resource> resourceOpt = resourceStore.getResource(resourceDefRef, resourceId);
 //        if (!resourceOpt.isPresent()) {
         logger.debug("Loading resource of type '${resourceDefRef}' with id '${resourceId}'")
 
         return providersRegistry.getProvider(resourceDefRef.providerName)
-                ?.resourceById(resourceDefRef, resourceId)
-                ?.let { ResourceReflectionUtil.toResource(it) }
-                ?.also { (_, _, properties, associations) ->
-                    resourceStore.saveResource(resourceDefRef,
-                                               resourceId,
-                                               properties,
-                                               associations)
+                .flatMap { provider ->
+                    provider.resourceById(resourceDefRef, resourceId)
+                            .flatMap { ResourceReflectionUtil.toResource(it) }
+                            .also {
+                                if (it is Some) {
+                                    resourceStore.saveResource(resourceDefRef,
+                                                               resourceId,
+                                                               it.t.properties,
+                                                               it.t.associations)
+                                }
+                            }
                 }
+
         //        }
 //        return resourceOpt;
     }

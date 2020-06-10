@@ -102,7 +102,7 @@ data class EC2Volume(
                 name = "volume_id",
                 description = "The ID of the volume"
         )
-        val volumeId: String?,
+        val volumeId: String,
 
         @property:PropertyDefinition(
                 name = "iops",

@@ -19,6 +19,8 @@
  */
 package cloudspec.loader
 
+import arrow.core.Option
+import arrow.core.toOption
 import cloudspec.CloudSpecBaseListener
 import cloudspec.CloudSpecParser.*
 import cloudspec.lang.*
@@ -70,8 +72,8 @@ class CloudSpecLoaderListener : CloudSpecBaseListener() {
     private val currentValues = Stack<Any>()
     private var currentPredicate: P<*>? = null
 
-    val cloudSpec: CloudSpec?
-        get() = currentCloudSpecBuilder?.build()
+    val cloudSpec: Option<CloudSpec>
+        get() = currentCloudSpecBuilder?.build().toOption()
 
     override fun enterSpecDecl(ctx: SpecDeclContext) {
         currentCloudSpecBuilder = CloudSpec.builder().setName(stripQuotes(ctx.STRING().text))

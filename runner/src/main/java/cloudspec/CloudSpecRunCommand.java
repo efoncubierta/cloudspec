@@ -19,6 +19,8 @@
  */
 package cloudspec;
 
+import arrow.core.Option;
+import arrow.core.Some;
 import cloudspec.lang.CloudSpec;
 import cloudspec.loader.CloudSpecLoader;
 import picocli.CommandLine;
@@ -49,11 +51,13 @@ public class CloudSpecRunCommand implements Callable<Integer> {
         CloudSpecLoader loader = new CloudSpecLoader();
 
         // load spec
-        CloudSpec spec = loader.load(is);
+        Option<CloudSpec> spec = loader.load(is);
 
-        // run spec
-        CloudSpecRunner runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner();
-        runner.validate(spec);
+        if(spec.isDefined()) {
+            // run spec
+            CloudSpecRunner runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner();
+            runner.validate(((Some<CloudSpec>)spec).getT());
+        }
 
         return 0;
     }

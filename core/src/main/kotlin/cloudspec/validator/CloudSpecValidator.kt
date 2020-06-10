@@ -19,6 +19,7 @@
  */
 package cloudspec.validator
 
+import arrow.core.getOrElse
 import cloudspec.lang.CloudSpec
 import cloudspec.lang.GroupExpr
 import cloudspec.lang.RuleExpr
@@ -42,20 +43,19 @@ class CloudSpecValidator(private val resourceValidator: ResourceValidator) {
     }
 
     private fun validateRule(rule: RuleExpr): RuleResult {
-        return fromString(rule.resourceDefRef).let { resourceDefRef ->
-            if (resourceDefRef == null) {
-                RuleResult(rule.name,
-                           throwable = RuntimeException("Malformed resource definition reference '${rule.resourceDefRef}'"))
-            } else try {
+        return fromString(rule.resourceDefRef).map { resourceDefRef ->
+            try {
                 // validate all resources
                 RuleResult(rule.name,
                            resourceValidator.validateAll(resourceDefRef,
                                                          rule.withExpr.statements,
-                                                         rule.assertExpr.statements)
-                )
+                                                         rule.assertExpr.statements))
             } catch (e: RuntimeException) {
                 RuleResult(rule.name, throwable = e)
             }
+        }.getOrElse {
+            RuleResult(rule.name,
+                       throwable = RuntimeException("Malformed resource definition reference '${rule.resourceDefRef}'"))
         }
     }
 

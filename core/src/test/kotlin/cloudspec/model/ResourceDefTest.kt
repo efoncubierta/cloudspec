@@ -19,26 +19,28 @@
  */
 package cloudspec.model
 
+import arrow.core.None
+import arrow.core.Some
 import cloudspec.util.ModelGenerator.randomName
 import cloudspec.util.ModelTestUtils
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ResourceDefTest {
     @Test
     fun shouldNotGetPropertyByPath() {
         val path = listOf(ModelTestUtils.PROP_NESTED_NAME, randomName())
-        val propertyDef = ModelTestUtils.RESOURCE_DEF.propertyByPath(path)
-        assertNull(propertyDef)
+        val propertyDefOpt = ModelTestUtils.RESOURCE_DEF.propertyByPath(path)
+        assertTrue(propertyDefOpt is None)
     }
 
     @Test
     fun shouldGetPropertyByPath() {
         val path = listOf(ModelTestUtils.PROP_NESTED_NAME, ModelTestUtils.PROP_NUMBER_NAME)
-        val propertyDef = ModelTestUtils.RESOURCE_DEF.propertyByPath(path)
-        assertNotNull(propertyDef)
-        assertEquals(ModelTestUtils.PROP_NUMBER_DEF, propertyDef)
+        val propertyDefOpt = ModelTestUtils.RESOURCE_DEF.propertyByPath(path)
+        assertTrue(propertyDefOpt is Some<PropertyDef>)
+        assertEquals(ModelTestUtils.PROP_NUMBER_DEF, propertyDefOpt.t)
     }
 }

@@ -19,11 +19,13 @@
  */
 package cloudspec.model
 
+import arrow.core.Some
 import cloudspec.util.ModelTestUtils
 import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ResourceTest {
     @Test
@@ -32,8 +34,8 @@ class ResourceTest {
         path.add(ModelTestUtils.PROP_NESTED_NAME)
         path.add(ModelTestUtils.PROP_STRING_NAME)
 
-        val propertyDef = ModelTestUtils.RESOURCE_DEF.propertyByPath(path)
-        assertNotNull(propertyDef)
-        assertEquals(ModelTestUtils.PROP_STRING_DEF, propertyDef)
+        val propertyDefOpt = ModelTestUtils.RESOURCE_DEF.propertyByPath(path)
+        assertTrue(propertyDefOpt is Some<PropertyDef>)
+        assertEquals(ModelTestUtils.PROP_STRING_DEF, propertyDefOpt.t)
     }
 }

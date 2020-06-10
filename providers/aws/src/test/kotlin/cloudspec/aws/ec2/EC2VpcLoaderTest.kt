@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.VpcGenerator.vpcId
 import datagen.services.ec2.model.VpcGenerator.vpcs
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeVpcsRequest
 import software.amazon.awssdk.services.ec2.model.DescribeVpcsResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2VpcLoaderTest : EC2LoaderTest() {
     private val loader = EC2VpcLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeVpcsResponse.builder()
                     .vpcs(vpcs)
@@ -52,8 +57,8 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(vpcs.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(vpcs.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeVpcsResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(vpcId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(vpcId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeVpcsResponse.builder()
                     .vpcs(vpcs)
@@ -98,7 +103,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
         }
 
         val vpc = vpcs[0]
-        val resource = loader.byId(vpc.vpcId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(vpc.vpcId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

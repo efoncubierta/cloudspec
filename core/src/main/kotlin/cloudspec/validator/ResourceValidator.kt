@@ -19,6 +19,7 @@
  */
 package cloudspec.validator
 
+import arrow.core.Option
 import cloudspec.lang.Statement
 import cloudspec.model.ResourceDefRef
 
@@ -56,7 +57,7 @@ interface ResourceValidator {
     fun validateById(ref: ResourceDefRef,
                      id: String,
                      filterStatements: List<Statement>,
-                     assertStatements: List<Statement>): ResourceValidationResult?
+                     assertStatements: List<Statement>): Option<ResourceValidationResult>
 
     /**
      * Validate all resources of a kind.

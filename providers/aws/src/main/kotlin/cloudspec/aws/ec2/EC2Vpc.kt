@@ -65,7 +65,7 @@ data class EC2Vpc(
                 name = "vpc_id",
                 description = "The ID of the VPC"
         )
-        val vpcId: String?,
+        val vpcId: String,
 
         @property:PropertyDefinition(
                 name = "owner_id",

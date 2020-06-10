@@ -19,7 +19,9 @@
  */
 package cloudspec.aws
 
+import arrow.core.Option
+
 interface AWSResourceLoader<T : AWSResource> {
-    fun byId(id: String): T?
+    fun byId(id: String): Option<T>
     val all: List<T>
 }

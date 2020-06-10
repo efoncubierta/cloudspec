@@ -19,6 +19,9 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.none
+
 /**
  * Interface for classes that manage properties and associations definitions.
  */
@@ -29,10 +32,10 @@ interface MemberDefsContainer : PropertyDefsContainer, AssociationDefsContainer 
      * @param path Property path
      * @return Property or null.
      */
-    fun propertyByPath(path: List<String>): PropertyDef? {
+    fun propertyByPath(path: List<String>): Option<PropertyDef> {
         val property = propertyByName(path[0])
         if (path.size > 1) {
-            return property?.propertyByPath(path.subList(1, path.size))
+            return property.flatMap { it.propertyByPath(path.subList(1, path.size)) }
         }
         return property
     }
@@ -43,12 +46,12 @@ interface MemberDefsContainer : PropertyDefsContainer, AssociationDefsContainer 
      * @param path Association path
      * @return Association or null.
      */
-    fun associationByPath(path: List<String>): AssociationDef? {
+    fun associationByPath(path: List<String>): Option<AssociationDef> {
         if (path.size == 1) {
             return associationByName(path[0])
         } else if (path.size > 1) {
-            return propertyByName(path[0])?.associationByPath(path.subList(1, path.size))
+            return propertyByName(path[0]).flatMap { it.associationByPath(path.subList(1, path.size)) }
         }
-        return null
+        return none()
     }
 }

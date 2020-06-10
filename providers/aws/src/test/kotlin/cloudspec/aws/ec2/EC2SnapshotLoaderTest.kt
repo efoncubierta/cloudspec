@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.SnapshotGenerator.snapshotId
 import datagen.services.ec2.model.SnapshotGenerator.snapshots
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeSnapshotsRequest
 import software.amazon.awssdk.services.ec2.model.DescribeSnapshotsResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2SnapshotLoaderTest : EC2LoaderTest() {
     private val loader = EC2SnapshotLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeSnapshotsResponse.builder()
                     .snapshots(snapshots)
@@ -52,8 +57,8 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(snapshots.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(snapshots.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeSnapshotsResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(snapshotId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(snapshotId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeSnapshotsResponse.builder()
                     .snapshots(snapshots)
@@ -98,7 +103,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
         }
 
         val snapshot = snapshots[0]
-        val resource = loader.byId(snapshot.snapshotId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(snapshot.snapshotId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

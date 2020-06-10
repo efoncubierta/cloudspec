@@ -81,7 +81,7 @@ data class EC2ReservedInstances(
                 name = "reserved_instances_id",
                 description = "The ID of the Reserved Instance"
         )
-        val reservedInstancesId: String?,
+        val reservedInstancesId: String,
 
         @property:PropertyDefinition(
                 name = "start",

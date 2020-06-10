@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.NetworkAclGenerator.networkAclId
 import datagen.services.ec2.model.NetworkAclGenerator.networkAcls
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeNetworkAclsRequest
 import software.amazon.awssdk.services.ec2.model.DescribeNetworkAclsResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2NetworkAclLoaderTest : EC2LoaderTest() {
     private val loader = EC2NetworkAclLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeNetworkAclsResponse.builder()
                     .networkAcls(networkAcls)
@@ -52,8 +57,8 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(networkAcls.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(networkAcls.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeNetworkAclsResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(networkAclId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(networkAclId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeNetworkAclsResponse.builder()
                     .networkAcls(networkAcls)
@@ -98,7 +103,7 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
         }
 
         val networkAcl = networkAcls[0]
-        val resource = loader.byId(networkAcl.networkAclId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(networkAcl.networkAclId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

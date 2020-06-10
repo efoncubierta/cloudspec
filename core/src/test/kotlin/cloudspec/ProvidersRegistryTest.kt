@@ -19,11 +19,14 @@
  */
 package cloudspec
 
+import arrow.core.Some
+import cloudspec.model.Provider
 import cloudspec.model.ProviderTest
 import cloudspec.util.ModelTestUtils
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ProvidersRegistryTest {
     @Test
@@ -31,9 +34,9 @@ class ProvidersRegistryTest {
         val registry = ProvidersRegistry()
 
         registry.register(ProviderTest.TEST_PROVIDER)
-        val provider = registry.getProvider(ModelTestUtils.PROVIDER_NAME)
-        assertNotNull(provider)
-        assertEquals(ModelTestUtils.PROVIDER_NAME, provider.name)
+        val providerOpt = registry.getProvider(ModelTestUtils.PROVIDER_NAME)
+        assertTrue(providerOpt is Some<Provider>)
+        assertEquals(ModelTestUtils.PROVIDER_NAME, providerOpt.t.name)
         val providers = registry.getProviders()
         assertEquals(1, providers.size)
         assertEquals(ModelTestUtils.PROVIDER_NAME, providers[0].name)

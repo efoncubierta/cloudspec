@@ -19,6 +19,7 @@
  */
 package cloudspec.aws.ec2
 
+import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.ec2.nested.EC2TransitGatewayOptions
@@ -39,11 +40,12 @@ data class EC2TransitGateway(
         )
         override val region: String?,
 
+        @property:IdDefinition
         @property:PropertyDefinition(
                 name = "transit_gateway_id",
                 description = "The ID of the transit gateway"
         )
-        val transitGatewayId: String?,
+        val transitGatewayId: String,
 
         @property:PropertyDefinition(
                 name = "transit_gateway_arn",

@@ -19,7 +19,12 @@
  */
 package cloudspec.graph
 
+import arrow.core.None
+import arrow.core.Some
+import cloudspec.model.Associations
+import cloudspec.model.Properties
 import cloudspec.model.Resource
+import cloudspec.model.Resources
 import cloudspec.util.ModelGenerator.randomAssociation
 import cloudspec.util.ModelGenerator.randomProperty
 import cloudspec.util.ModelGenerator.randomResource
@@ -32,7 +37,10 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.junit.Before
 import org.junit.Test
 import java.util.function.Consumer
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFails
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class GraphResourceStoreTest {
     private val graph: Graph = TinkerGraph.open()
@@ -80,77 +88,75 @@ class GraphResourceStoreTest {
 
     @Test
     fun shouldNotGetRandomResource() {
-        val resource = resourceStore.resourceById(
+        val resourceOpt = resourceStore.resourceById(
                 randomResourceDefRef(),
                 randomResourceId()
         )
-        assertNull(resource)
+        assertTrue(resourceOpt is None)
     }
 
     @Test
     fun shouldGetResource() {
-        val resource = resourceStore.resourceById(
+        val resourceOpt = resourceStore.resourceById(
                 ModelTestUtils.RESOURCE.resourceDefRef,
                 ModelTestUtils.RESOURCE.resourceId
         )
-        assertNotNull(resource)
-        assertEquals(ModelTestUtils.RESOURCE, resource)
+        assertTrue(resourceOpt is Some<Resource>)
+        assertEquals(ModelTestUtils.RESOURCE, resourceOpt.t)
     }
 
     @Test
     fun shouldNotGetPropertiesOfRandomResource() {
-        val properties = resourceStore.resourceProperties(
+        val propertiesOpt = resourceStore.resourceProperties(
                 randomResourceDefRef(),
                 randomResourceId()
         )
-        assertNull(properties)
+        assertTrue(propertiesOpt is None)
     }
 
     @Test
     fun shouldGetPropertiesOfResource() {
-        val properties = resourceStore.resourceProperties(
+        val propertiesOpt = resourceStore.resourceProperties(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID
         )
-        assertNotNull(properties)
-        assertEquals(ModelTestUtils.PROPERTIES.size, properties.size)
-        assertEquals(ModelTestUtils.PROPERTIES, properties)
+        assertTrue(propertiesOpt is Some<Properties>)
+        assertEquals(ModelTestUtils.PROPERTIES.size, propertiesOpt.t.size)
+        assertEquals(ModelTestUtils.PROPERTIES, propertiesOpt.t)
     }
 
     @Test
     fun shouldNotGetAssociationsOfRandomResource() {
-        val associations = resourceStore.resourceAssociations(
+        val associationsOpt = resourceStore.resourceAssociations(
                 randomResourceDefRef(),
                 randomResourceId()
         )
-        assertNull(associations)
+        assertTrue(associationsOpt is None)
     }
 
     @Test
     fun shouldGetAssociationsOfResource() {
-        val associations = resourceStore.resourceAssociations(
+        val associationsOpt = resourceStore.resourceAssociations(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID
         )
-        assertNotNull(associations)
-        assertEquals(ModelTestUtils.ASSOCIATIONS, associations)
+        assertTrue(associationsOpt is Some<Associations>)
+        assertEquals(ModelTestUtils.ASSOCIATIONS, associationsOpt.t)
     }
 
     @Test
     fun shouldNotGetResourcesByRandomDefinition() {
-        val resources: List<Resource> = resourceStore.resourcesByDefinition(
+        val resources: Resources = resourceStore.resourcesByDefinition(
                 randomResourceDefRef()
         )
-        assertNotNull(resources)
         assertTrue(resources.isEmpty())
     }
 
     @Test
     fun shouldGetResourcesByDefinition() {
-        val resources: List<Resource> = resourceStore.resourcesByDefinition(
+        val resources: Resources = resourceStore.resourcesByDefinition(
                 ModelTestUtils.RESOURCE_DEF_REF
         )
-        assertNotNull(resources)
         assertFalse(resources.isEmpty())
         assertEquals(1, resources.size)
         assertEquals(ModelTestUtils.RESOURCE, resources[0])
@@ -166,8 +172,8 @@ class GraphResourceStoreTest {
                 resourceId,
                 property
         )
-        val properties = resourceStore.resourceProperties(resourceDefRef, resourceId)
-        assertNull(properties)
+        val propertiesOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        assertTrue(propertiesOpt is None)
     }
 
     @Test
@@ -178,9 +184,9 @@ class GraphResourceStoreTest {
         resourceDefStore.saveResourceDef(resourceDef)
         resourceStore.saveResource(resourceDefRef, resourceId)
         assertFails { resourceStore.saveProperty(resourceDefRef, resourceId, property) }
-        val properties = resourceStore.resourceProperties(resourceDefRef, resourceId)
-        assertNotNull(properties)
-        assertTrue(properties.isEmpty())
+        val propertiesOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        assertTrue(propertiesOpt is Some<Properties>)
+        assertTrue(propertiesOpt.t.isEmpty())
     }
 
     @Test
@@ -191,10 +197,10 @@ class GraphResourceStoreTest {
         resourceDefStore.saveResourceDef(resourceDef)
         resourceStore.saveResource(resourceDefRef, resourceId)
         resourceStore.saveProperty(resourceDefRef, resourceId, property)
-        val props = resourceStore.resourceProperties(resourceDefRef, resourceId)
-        assertNotNull(props)
-        assertEquals(1, props.size)
-        assertEquals(property, props.elementAt(0))
+        val propsOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        assertTrue(propsOpt is Some<Properties>)
+        assertEquals(1, propsOpt.t.size)
+        assertEquals(property, propsOpt.t.elementAt(0))
     }
 
     @Test
@@ -204,9 +210,9 @@ class GraphResourceStoreTest {
         resourceDefStore.saveResourceDef(resourceDef)
         resourceStore.saveResource(resourceDefRef, resourceId)
         resourceStore.saveProperties(resourceDefRef, resourceId, properties)
-        val props = resourceStore.resourceProperties(resourceDefRef, resourceId)
-        assertNotNull(props)
-        assertEquals(properties, props)
+        val propsOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        assertTrue(propsOpt is Some<Properties>)
+        assertEquals(properties, propsOpt.t)
     }
 
     @Test
@@ -219,8 +225,8 @@ class GraphResourceStoreTest {
                 resourceId,
                 association
         )
-        val assocs = resourceStore.resourceAssociations(resourceDefRef, resourceId)
-        assertNull(assocs)
+        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        assertTrue(assocsOpt is None)
     }
 
     @Test
@@ -237,9 +243,9 @@ class GraphResourceStoreTest {
                     association
             )
         }
-        val assocs = resourceStore.resourceAssociations(resourceDefRef, resourceId)
-        assertNotNull(assocs)
-        assertTrue(assocs.isEmpty())
+        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        assertTrue(assocsOpt is Some<Associations>)
+        assertTrue(assocsOpt.t.isEmpty())
     }
 
     @Test
@@ -250,9 +256,9 @@ class GraphResourceStoreTest {
         resourceDefStore.saveResourceDef(resourceDef)
         resourceStore.saveResource(resourceDefRef, resourceId)
         assertFails { resourceStore.saveAssociation(resourceDefRef, resourceId, association) }
-        val assocs = resourceStore.resourceAssociations(resourceDefRef, resourceId)
-        assertNotNull(assocs)
-        assertTrue(assocs.isEmpty())
+        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        assertTrue(assocsOpt is Some<Associations>)
+        assertTrue(assocsOpt.t.isEmpty())
     }
 
     @Test
@@ -270,10 +276,10 @@ class GraphResourceStoreTest {
         resourceDefStore.saveResourceDef(resourceDef)
         resourceStore.saveResource(resourceDefRef, resourceId)
         resourceStore.saveAssociation(resourceDefRef, resourceId, association)
-        val assocs = resourceStore.resourceAssociations(resourceDefRef, resourceId)
-        assertNotNull(assocs)
-        assertEquals(1, assocs.size)
-        assertEquals(association, assocs.elementAt(0))
+        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        assertTrue(assocsOpt is Some<Associations>)
+        assertEquals(1, assocsOpt.t.size)
+        assertEquals(association, assocsOpt.t.elementAt(0))
     }
 
     @Test
@@ -289,8 +295,8 @@ class GraphResourceStoreTest {
         })
         resourceStore.saveResource(resourceDefRef, resourceId)
         resourceStore.saveAssociations(resourceDefRef, resourceId, associations)
-        val assocs = resourceStore.resourceAssociations(resourceDefRef, resourceId)
-        assertNotNull(assocs)
-        assertEquals(associations, assocs)
+        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        assertTrue(assocsOpt is Some<Associations>)
+        assertEquals(associations, assocsOpt.t)
     }
 }

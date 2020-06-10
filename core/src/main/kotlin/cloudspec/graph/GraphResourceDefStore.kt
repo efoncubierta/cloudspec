@@ -19,6 +19,8 @@
  */
 package cloudspec.graph
 
+import arrow.core.*
+import arrow.syntax.collections.flatten
 import cloudspec.model.AssociationDef
 import cloudspec.model.PropertyDef
 import cloudspec.model.ResourceDef
@@ -62,7 +64,7 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
         addAssociationDefs(resourceV, resourceDef.associations)
     }
 
-    override fun getResourceDef(ref: ResourceDefRef): ResourceDef? {
+    override fun getResourceDef(ref: ResourceDefRef): Option<ResourceDef> {
         logger.debug("Getting resource definition '${ref}'")
 
         return graphTraversal
@@ -75,8 +77,9 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                     logger.debug("- Found resource definition '${it.value<Any>(PROPERTY_RESOURCE_DEF_REF)}'")
                 }
                 // map vertex to resource definition
-                .mapNotNull { toResourceDefFromVertex(it) }
-                .firstOrNull()
+                .map { toResourceDefFromVertex(it) }
+                .flatten()
+                .firstOrNone()
     }
 
     override val resourceDefs: List<ResourceDef>
@@ -92,23 +95,24 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                     .onEach {
                         logger.debug("- Found resource definition '${it.value<Any>(PROPERTY_RESOURCE_DEF_REF)}'")
                     }
-                    .mapNotNull { toResourceDefFromVertex(it) }
+                    .map { toResourceDefFromVertex(it) }
+                    .flatten()
         }
 
-    private fun toResourceDefFromVertex(resourceDefV: Vertex): ResourceDef? {
+    private fun toResourceDefFromVertex(resourceDefV: Vertex): Option<ResourceDef> {
         return when (resourceDefV.label()) {
             LABEL_RESOURCE_DEF -> ResourceDef(resourceDefV.value(PROPERTY_RESOURCE_DEF_REF),
                                               resourceDefV.value(PROPERTY_DESCRIPTION),
                                               getPropertyDefs(resourceDefV),
-                                              getAssociationDefs(resourceDefV))
+                                              getAssociationDefs(resourceDefV)).toOption()
             else -> {
                 logger.error("Vertex is not of type '${LABEL_RESOURCE_DEF}'.")
-                null
+                none()
             }
         }
     }
 
-    private fun toPropertyDefFromVertex(propertyDefV: Vertex): PropertyDef? {
+    private fun toPropertyDefFromVertex(propertyDefV: Vertex): Option<PropertyDef> {
         return when (propertyDefV.label()) {
             LABEL_PROPERTY_DEF -> PropertyDef(propertyDefV.value(PROPERTY_NAME),
                                               propertyDefV.value(PROPERTY_DESCRIPTION),
@@ -116,23 +120,23 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                                               propertyDefV.value(PROPERTY_IS_MULTIVALUED),
                                               propertyDefV.value(PROPERTY_EXAMPLE_VALUES),
                                               getPropertyDefs(propertyDefV),
-                                              getAssociationDefs(propertyDefV))
+                                              getAssociationDefs(propertyDefV)).toOption()
             else -> {
                 logger.error("Vertex is not of type '${LABEL_PROPERTY_DEF}'.")
-                null
+                none()
             }
         }
     }
 
-    private fun toAssociationDefFromVertex(associationDefV: Vertex): AssociationDef? {
+    private fun toAssociationDefFromVertex(associationDefV: Vertex): Option<AssociationDef> {
         return when (associationDefV.label()) {
             LABEL_ASSOCIATION_DEF -> AssociationDef(associationDefV.value(PROPERTY_NAME),
                                                     associationDefV.value(PROPERTY_DESCRIPTION),
                                                     associationDefV.value(PROPERTY_RESOURCE_DEF_REF),
-                                                    associationDefV.value(PROPERTY_IS_MANY))
+                                                    associationDefV.value(PROPERTY_IS_MANY)).toOption()
             else -> {
                 logger.error("Vertex is not of type '{}'.", LABEL_ASSOCIATION_DEF)
-                null
+                none()
             }
         }
     }
@@ -147,7 +151,8 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                 .onEach {
                     logger.debug("- Found property definition '${it.value<String>(PROPERTY_NAME)}'")
                 }
-                .mapNotNull { toPropertyDefFromVertex(it) }
+                .map { toPropertyDefFromVertex(it) }
+                .flatten()
                 .toSet()
     }
 
@@ -159,7 +164,8 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                 .onEach {
                     logger.debug("- Found association definition '${it.value<String>(PROPERTY_NAME)}'")
                 }
-                .mapNotNull { toAssociationDefFromVertex(it) }
+                .map { toAssociationDefFromVertex(it) }
+                .flatten()
                 .toSet()
     }
 

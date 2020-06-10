@@ -19,26 +19,31 @@
  */
 package cloudspec.model
 
+import arrow.core.None
+import arrow.core.Some
 import cloudspec.annotation.ResourceReflectionUtil.toAssociations
 import cloudspec.annotation.ResourceReflectionUtil.toProperties
 import cloudspec.annotation.ResourceReflectionUtil.toResource
 import cloudspec.annotation.ResourceReflectionUtil.toResourceId
 import cloudspec.util.ModelTestUtils
 import org.junit.Test
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ResourceReflectionUtilTest {
     @Test
     fun shouldProduceResourceId() {
-        val resourceId = toResourceId(ModelTestUtils.TEST_RESOURCE)
-        assertNotNull(resourceId)
-        assertEquals(ModelTestUtils.RESOURCE_ID, resourceId)
+        val resourceIdOpt = toResourceId(ModelTestUtils.TEST_RESOURCE)
+        assertTrue(resourceIdOpt is Some<String>)
+        assertEquals(ModelTestUtils.RESOURCE_ID, resourceIdOpt.t)
     }
 
     @Test
     fun shouldNotProduceResourceId() {
-        val resourceId = toResourceId(MyResource("test"))
-        assertNull(resourceId)
+        val resourceIdOpt = toResourceId(MyResource("test"))
+        assertTrue(resourceIdOpt is None)
     }
 
     @Test
@@ -73,15 +78,15 @@ class ResourceReflectionUtilTest {
 
     @Test
     fun shouldProduceResource() {
-        val resource = toResource(ModelTestUtils.TEST_RESOURCE)
-        assertNotNull(resource)
-        assertEquals(ModelTestUtils.RESOURCE, resource)
+        val resourceOpt = toResource(ModelTestUtils.TEST_RESOURCE)
+        assertTrue(resourceOpt is Some<Resource>)
+        assertEquals(ModelTestUtils.RESOURCE, resourceOpt.t)
     }
 
     @Test
     fun shouldNotProduceResource() {
-        val resource = toResource(MyResource("test"))
-        assertNull(resource)
+        val resourceOpt = toResource(MyResource("test"))
+        assertTrue(resourceOpt is None)
     }
 
     private inner class MyResource(val id: String)

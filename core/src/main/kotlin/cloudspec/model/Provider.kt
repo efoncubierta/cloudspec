@@ -19,6 +19,9 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.firstOrNone
+import arrow.syntax.collections.flatten
 import cloudspec.annotation.ProviderDefinition
 import cloudspec.annotation.ResourceDefReflectionUtil
 import cloudspec.annotation.ResourceDefinition
@@ -66,17 +69,18 @@ abstract class Provider {
         description = providerDefinition.description
         resourceDefs = providerDefinition.resources
                 .filter { it.annotations.any { annotation -> annotation is ResourceDefinition } }
-                .mapNotNull { ResourceDefReflectionUtil.toResourceDef(it) }
+                .map { ResourceDefReflectionUtil.toResourceDef(it) }
+                .flatten()
     }
 
     /**
      * Get a resource definition by its reference.
      *
      * @param ref Resource definition reference.
-     * @return Resource definition or null.
+     * @return Optional resource definition.
      */
-    fun resourceDef(ref: ResourceDefRef): ResourceDef? {
-        return resourceDefs.firstOrNull { it.ref == ref }
+    fun resourceDef(ref: ResourceDefRef): Option<ResourceDef> {
+        return resourceDefs.firstOrNone { it.ref == ref }
     }
 
     /**
@@ -92,7 +96,7 @@ abstract class Provider {
      *
      * @param ref Resource definition reference.
      * @param id  Resource id.
-     * @return Resource or null.
+     * @return Optional resource.
      */
-    abstract fun resourceById(ref: ResourceDefRef, id: String): Any?
+    abstract fun resourceById(ref: ResourceDefRef, id: String): Option<Any>
 }

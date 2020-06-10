@@ -19,15 +19,13 @@
  */
 package cloudspec.graph
 
+import arrow.core.Some
 import cloudspec.lang.AssociationStatement
 import cloudspec.lang.KeyValueStatement
 import cloudspec.lang.NestedStatement
 import cloudspec.lang.PropertyStatement
 import cloudspec.util.ModelTestUtils
-import cloudspec.validator.AssertValidationContainError
-import cloudspec.validator.AssertValidationKeyNotFoundError
-import cloudspec.validator.AssertValidationMemberNotFoundError
-import cloudspec.validator.AssertValidationMismatchError
+import cloudspec.validator.*
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
@@ -211,7 +209,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnMemberNotFoundErrorOnPropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 PropertyStatement(
@@ -219,7 +217,9 @@ class GraphResourceValidatorTest {
                         P.eq("zzz")
                 )
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
@@ -229,7 +229,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnMemberNotFoundErrorOnKeyValuePropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 KeyValueStatement(
@@ -238,7 +238,9 @@ class GraphResourceValidatorTest {
                         P.eq("zzz")
                 )
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
@@ -248,7 +250,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnKeyNotFoundErrorOnKeyValuePropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 KeyValueStatement(
@@ -257,7 +259,9 @@ class GraphResourceValidatorTest {
                         P.eq("zzz")
                 )
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
@@ -267,7 +271,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnMemberNotFoundErrorOnNestedPropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 NestedStatement(
@@ -278,7 +282,9 @@ class GraphResourceValidatorTest {
                         )
                 ))
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
@@ -288,7 +294,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnMemberNotFoundErrorOnAssociationAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 AssociationStatement(
@@ -299,7 +305,9 @@ class GraphResourceValidatorTest {
                         )
                 ))
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
@@ -309,7 +317,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnMistMatchErrorOnPropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 PropertyStatement(
@@ -317,7 +325,9 @@ class GraphResourceValidatorTest {
                         P.eq("zzz")
                 )
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
@@ -327,7 +337,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnMistMatchErrorOnNestedPropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 NestedStatement(
@@ -338,7 +348,9 @@ class GraphResourceValidatorTest {
                         )
                 ))
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
@@ -348,7 +360,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnMisMatchErrorOnKeyValuePropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 KeyValueStatement(
@@ -357,7 +369,9 @@ class GraphResourceValidatorTest {
                         P.eq("zzz")
                 )
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
@@ -367,7 +381,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnContainErrorOnPropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 PropertyStatement(
@@ -375,7 +389,9 @@ class GraphResourceValidatorTest {
                         P.within("zzz")
                 )
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
@@ -385,7 +401,7 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldReturnContainErrorOnKeyValuePropertyAssertion() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
                 ModelTestUtils.RESOURCE_ID, emptyList(), listOf(
                 KeyValueStatement(
@@ -394,7 +410,9 @@ class GraphResourceValidatorTest {
                         P.within("zzz")
                 )
         ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertFalse(result.isSuccess)
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
@@ -404,20 +422,25 @@ class GraphResourceValidatorTest {
 
     @Test
     fun shouldSuccessAssertingPropertiesOfResourceById() {
-        val result = validator.validateById(
+        val resultOpt = validator.validateById(
                 ModelTestUtils.RESOURCE_DEF_REF,
-                ModelTestUtils.RESOURCE_ID, listOf(
-                PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
-        ), listOf(
-                NestedStatement(
-                        ModelTestUtils.PROP_NESTED_NAME, listOf(
-                        PropertyStatement(
-                                ModelTestUtils.PROP_STRING_NAME,
-                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
-                        )
+                ModelTestUtils.RESOURCE_ID,
+                listOf(
+                        PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
+                ),
+                listOf(
+                        NestedStatement(
+                                ModelTestUtils.PROP_NESTED_NAME,
+                                listOf(
+                                        PropertyStatement(
+                                                ModelTestUtils.PROP_STRING_NAME,
+                                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                        )
+                                ))
                 ))
-        ))
-        assertNotNull(result)
+        assertTrue(resultOpt is Some<ResourceValidationResult>)
+
+        val result = resultOpt.t
         assertTrue(result.isSuccess)
         assertEquals(ModelTestUtils.RESOURCE_DEF_REF, result.resourceDefRef)
         assertNotNull(result.resourceId)
@@ -432,18 +455,21 @@ class GraphResourceValidatorTest {
     @Test
     fun shouldSuccessAssertingProperties() {
         val results = validator.validateAll(
-                ModelTestUtils.RESOURCE_DEF_REF, listOf(
-                PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
-        ), listOf(
-                NestedStatement(
-                        ModelTestUtils.PROP_NESTED_NAME, listOf(
-                        PropertyStatement(
-                                ModelTestUtils.PROP_STRING_NAME,
-                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
-                        )
+                ModelTestUtils.RESOURCE_DEF_REF,
+                listOf(
+                        PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
+                ),
+                listOf(
+                        NestedStatement(
+                                ModelTestUtils.PROP_NESTED_NAME,
+                                listOf(
+                                        PropertyStatement(
+                                                ModelTestUtils.PROP_STRING_NAME,
+                                                P.eq(ModelTestUtils.PROP_STRING_VALUE)
+                                        )
+                                ))
                 ))
-        ))
-        assertNotNull(results)
+
         assertTrue(results.isNotEmpty())
         results.forEach { r ->
             assertTrue(r.isSuccess)
@@ -461,15 +487,18 @@ class GraphResourceValidatorTest {
     @Test
     fun shouldSuccessAssertingAssociations() {
         val results = validator.validateAll(
-                ModelTestUtils.RESOURCE_DEF_REF, listOf(
-                PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
-        ), listOf(
-                AssociationStatement(
-                        ModelTestUtils.ASSOC_NAME, listOf(
-                        PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE))
+                ModelTestUtils.RESOURCE_DEF_REF,
+                listOf(
+                        PropertyStatement(ModelTestUtils.PROP_NUMBER_NAME, P.eq(ModelTestUtils.PROP_NUMBER_VALUE))
+                ),
+                listOf(
+                        AssociationStatement(
+                                ModelTestUtils.ASSOC_NAME,
+                                listOf(
+                                        PropertyStatement(ModelTestUtils.PROP_STRING_NAME, P.eq(ModelTestUtils.PROP_STRING_VALUE))
+                                ))
                 ))
-        ))
-        assertNotNull(results)
+        
         assertTrue(results.isNotEmpty())
         results.forEach(Consumer { r ->
             assertTrue(r.isSuccess)

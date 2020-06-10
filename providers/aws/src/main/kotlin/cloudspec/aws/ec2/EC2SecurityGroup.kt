@@ -63,7 +63,7 @@ data class EC2SecurityGroup(
                 name = "group_id",
                 description = "The ID of the security group"
         )
-        val groupId: String?,
+        val groupId: String,
 
         @property:PropertyDefinition(
                 name = "ip_permissions_egress",

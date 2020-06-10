@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.VpcPeeringConnectionGenerator.vpcPeeringConnectionId
 import datagen.services.ec2.model.VpcPeeringConnectionGenerator.vpcPeeringConnections
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeVpcPeeringConnectionsRequest
 import software.amazon.awssdk.services.ec2.model.DescribeVpcPeeringConnectionsResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
     private val loader = EC2VpcPeeringConnectionLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeVpcPeeringConnectionsResponse.builder()
                     .vpcPeeringConnections(vpcPeeringConnections)
@@ -52,8 +57,8 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(vpcPeeringConnections.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(vpcPeeringConnections.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeVpcPeeringConnectionsResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(vpcPeeringConnectionId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(vpcPeeringConnectionId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeVpcPeeringConnectionsResponse.builder()
                     .vpcPeeringConnections(vpcPeeringConnections)
@@ -98,7 +103,7 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
         }
 
         val vpcPeeringConnection = vpcPeeringConnections[0]
-        val resource = loader.byId(vpcPeeringConnection.vpcPeeringConnectionId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(vpcPeeringConnection.vpcPeeringConnectionId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -19,13 +19,14 @@
  */
 package cloudspec.loader
 
+import arrow.core.Some
 import cloudspec.lang.CloudSpec
 import cloudspec.lang.GroupExpr
 import cloudspec.lang.RuleExpr
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class CloudSpecLoaderTest {
     private val cloudSpecLoader = CloudSpecLoader()
@@ -34,12 +35,12 @@ class CloudSpecLoaderTest {
     fun shouldLoadFullSpec() {
         val cloudSpecOriginal = CloudSpecGenerator.fullSpec()
 
-        val cloudSpecLoaded = cloudSpecLoader.load(
+        val cloudSpecLoadedOpt = cloudSpecLoader.load(
                 ByteArrayInputStream(cloudSpecOriginal.toCloudSpecSyntax().toByteArray())
         )
 
-        assertNotNull(cloudSpecLoaded)
-        compareSpecs(cloudSpecOriginal, cloudSpecLoaded)
+        assertTrue(cloudSpecLoadedOpt is Some<CloudSpec>)
+        compareSpecs(cloudSpecOriginal, cloudSpecLoadedOpt.t)
     }
 
     private fun compareSpecs(expected: CloudSpec, actual: CloudSpec) {

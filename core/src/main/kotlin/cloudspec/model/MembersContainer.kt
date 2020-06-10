@@ -19,6 +19,11 @@
  */
 package cloudspec.model
 
+import arrow.core.Option
+import arrow.core.none
+import arrow.core.orElse
+import arrow.core.toOption
+
 /**
  * Interface for classes that manage properties and associations.
  */
@@ -27,14 +32,16 @@ interface MembersContainer : PropertiesContainer, AssociationsContainer {
      * Get a property by its path.
      *
      * @param path Property path
-     * @return Property or null.
+     * @return Optional property.
      */
-    fun propertyByPath(path: List<String>): Property<*>? {
-        return getProperty(path[0])?.let {
-            if (path.size > 1 && it is NestedProperty) {
-                return it.value?.propertyByPath(path.subList(1, path.size))
+    fun propertyByPath(path: List<String>): Option<Property<*>> {
+        return getProperty(path[0]).flatMap { property ->
+            if (path.size > 1 && property is NestedProperty) {
+                return@flatMap property.value.toOption().flatMap {
+                    it.propertyByPath(path.subList(1, path.size))
+                }
             }
-            return it
+            property.toOption()
         }
     }
 
@@ -42,14 +49,16 @@ interface MembersContainer : PropertiesContainer, AssociationsContainer {
      * Get an association by its path.
      *
      * @param path Association path
-     * @return Association or null.
+     * @return Optional association.
      */
-    fun getAssociationByPath(path: List<String>): Association? {
-        return getProperty(path[0])?.let {
-            if (path.size > 1 && it is NestedProperty) {
-                return it.value?.getAssociationByPath(path.subList(1, path.size))
+    fun getAssociationByPath(path: List<String>): Option<Association> {
+        return getProperty(path[0]).flatMap { property ->
+            if (path.size > 1 && property is NestedProperty) {
+                return@flatMap property.value.toOption().flatMap {
+                    it.getAssociationByPath(path.subList(1, path.size))
+                }
             }
-            return null
-        } ?: return associationByName(path[0])
+            none<Association>()
+        }.orElse { associationByName(path[0]) }
     }
 }

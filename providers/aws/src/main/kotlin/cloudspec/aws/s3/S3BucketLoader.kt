@@ -19,13 +19,15 @@
  */
 package cloudspec.aws.s3
 
+import arrow.core.Option
+import arrow.core.firstOrNone
 import cloudspec.aws.IAWSClientsProvider
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.Bucket
 
 class S3BucketLoader(private val clientsProvider: IAWSClientsProvider) : S3ResourceLoader<S3BucketResource> {
-    override fun byId(id: String): S3BucketResource? {
-        return getBuckets(listOf(id)).firstOrNull()
+    override fun byId(id: String): Option<S3BucketResource> {
+        return getBuckets(listOf(id)).firstOrNone()
     }
 
     override val all: List<S3BucketResource>

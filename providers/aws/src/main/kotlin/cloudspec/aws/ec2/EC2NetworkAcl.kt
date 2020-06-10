@@ -64,7 +64,7 @@ data class EC2NetworkAcl(
                 name = "network_acl_id",
                 description = "The ID of the network ACL"
         )
-        val networkAclId: String?,
+        val networkAclId: String,
 
         @property:PropertyDefinition(
                 name = "tags",

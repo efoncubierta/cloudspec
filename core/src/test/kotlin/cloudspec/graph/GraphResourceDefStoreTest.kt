@@ -19,16 +19,16 @@
  */
 package cloudspec.graph
 
+import arrow.core.None
+import arrow.core.Some
+import cloudspec.model.ResourceDef
 import cloudspec.util.ModelGenerator.randomResourceDef
 import cloudspec.util.ModelTestUtils
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class GraphResourceDefStoreTest {
     private val graph: Graph = TinkerGraph.open()
@@ -42,15 +42,15 @@ class GraphResourceDefStoreTest {
     @Test
     fun shouldNotGetRandomResourceDef() {
         val resourceDefOpt = resourceDefStore.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF)
-        assertNull(resourceDefOpt)
+        assertTrue(resourceDefOpt is None)
     }
 
     @Test
     fun shouldCreateResourceDef() {
         resourceDefStore.saveResourceDef(ModelTestUtils.RESOURCE_DEF)
-        val resourceDef = resourceDefStore.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF)
-        assertNotNull(resourceDef)
-        assertEquals(ModelTestUtils.RESOURCE_DEF, resourceDef)
+        val resourceDefOpt = resourceDefStore.getResourceDef(ModelTestUtils.RESOURCE_DEF_REF)
+        assertTrue(resourceDefOpt is Some<ResourceDef>)
+        assertEquals(ModelTestUtils.RESOURCE_DEF, resourceDefOpt.t)
     }
 
     @Test

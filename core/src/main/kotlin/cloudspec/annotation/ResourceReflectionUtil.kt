@@ -19,6 +19,9 @@
  */
 package cloudspec.annotation
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.firstOrNone
 import cloudspec.annotation.ResourceDefReflectionUtil.guessContainedType
 import cloudspec.annotation.ResourceDefReflectionUtil.guessPropertyType
 import cloudspec.annotation.ResourceDefReflectionUtil.isNullableString
@@ -41,11 +44,11 @@ object ResourceReflectionUtil {
      * Extract resource out of an object of a class annotated with @ResourceDefinition.
      *
      * @param obj Object.
-     * @return Resource or null.
+     * @return Optional resource.
      */
-    fun toResource(obj: Any): Resource? {
-        return toResourceDefRef(obj::class)?.let { ref ->
-            toResourceId(obj)?.let { id ->
+    fun toResource(obj: Any): Option<Resource> {
+        return toResourceDefRef(obj::class).flatMap { ref ->
+            toResourceId(obj).map { id ->
                 Resource(ref, id, toProperties(obj), toAssociations(obj))
             }
         }
@@ -57,9 +60,8 @@ object ResourceReflectionUtil {
      * @param obj Object.
      * @return Resource id or null.
      */
-    fun toResourceId(obj: Any): String? {
+    fun toResourceId(obj: Any): Option<String> {
         return obj::class.memberProperties
-                .asSequence()
                 .onEach {
                     if (it.findAnnotation<IdDefinition>() == null || !isString(it.returnType)) {
                         logger.debug("Cannot produce a resource id from property '${it.name}' " +
@@ -68,8 +70,7 @@ object ResourceReflectionUtil {
                                              "or is not a String")
                     }
                 }
-                .filter { it.findAnnotation<IdDefinition>() != null }
-                .filter { isString(it.returnType) }
+                .filter { it.findAnnotation<IdDefinition>() != null && isString(it.returnType) }
                 .map {
                     if (logger.isDebugEnabled) {
                         logger.debug("Found @IdDefinition annotation in property '${it.name}' " +
@@ -83,7 +84,7 @@ object ResourceReflectionUtil {
                                                        "of object of class ${obj::class.qualifiedName}'")
                     }
                 }
-                .firstOrNull()
+                .firstOrNone()
     }
 
     /**
@@ -112,31 +113,33 @@ object ResourceReflectionUtil {
                         }
 
                         values.mapNotNull { value ->
-                            when (guessPropertyType(kprop)) {
-                                PropertyType.NUMBER ->
-                                    NumberProperty(propertyDefAnnotation.name, (value as Number?))
-                                PropertyType.STRING ->
-                                    StringProperty(propertyDefAnnotation.name, (value as String?))
-                                PropertyType.BOOLEAN ->
-                                    BooleanProperty(propertyDefAnnotation.name, (value as Boolean?))
-                                PropertyType.DATE ->
-                                    InstantProperty(
-                                            propertyDefAnnotation.name,
-                                            when (value) {
-                                                is Date -> value.toInstant()
-                                                is Instant -> value
-                                                else -> null
-                                            }
-                                    )
-                                PropertyType.KEY_VALUE ->
-                                    KeyValueProperty(propertyDefAnnotation.name, (value as KeyValue?))
-                                PropertyType.NESTED ->
-                                    NestedProperty(
-                                            propertyDefAnnotation.name,
-                                            value?.let {
-                                                NestedPropertyValue(toProperties(value), toAssociations(value))
-                                            }
-                                    )
+                            when (val propertyType = guessPropertyType(kprop)) {
+                                is Some -> when (propertyType.t) {
+                                    PropertyType.NUMBER ->
+                                        NumberProperty(propertyDefAnnotation.name, (value as Number?))
+                                    PropertyType.STRING ->
+                                        StringProperty(propertyDefAnnotation.name, (value as String?))
+                                    PropertyType.BOOLEAN ->
+                                        BooleanProperty(propertyDefAnnotation.name, (value as Boolean?))
+                                    PropertyType.DATE ->
+                                        InstantProperty(
+                                                propertyDefAnnotation.name,
+                                                when (value) {
+                                                    is Date -> value.toInstant()
+                                                    is Instant -> value
+                                                    else -> null
+                                                }
+                                        )
+                                    PropertyType.KEY_VALUE ->
+                                        KeyValueProperty(propertyDefAnnotation.name, (value as KeyValue?))
+                                    PropertyType.NESTED ->
+                                        NestedProperty(
+                                                propertyDefAnnotation.name,
+                                                value?.let {
+                                                    NestedPropertyValue(toProperties(value), toAssociations(value))
+                                                }
+                                        )
+                                }
                                 else -> {
                                     val realType = guessContainedType(kprop.returnType)
                                     logger.warn("Type $realType of property '${kprop.name}' " +
@@ -175,26 +178,28 @@ object ResourceReflectionUtil {
                         return@flatMap emptyList<Association>()
                     }
 
-                    toResourceDefRef(associationDefinitionAnnotation.targetClass)
-                            ?.let { resourceDefRef ->
-                                // TODO add validation for association name and resourceDefRef
-                                try {
-                                    kprop.call(obj)?.let { id ->
-                                        when (id) {
-                                            is List<*> -> id.toSet()
-                                            is Set<*> -> id
-                                            else -> setOf(id)
-                                        }.map { resourceId ->
-                                            Association(associationDefinitionAnnotation.name,
-                                                        resourceDefRef,
-                                                        resourceId as String)
-                                        }
-                                    } ?: emptyList()
-                                } catch (exception: IllegalAccessException) {
-                                    throw RuntimeException("Could not obtain value from property ${kprop.name} " +
-                                                                   "in class ${obj::class.qualifiedName}")
-                                }
-                            } ?: emptyList()
+                    when (val resourceDefRefOpt= toResourceDefRef(associationDefinitionAnnotation.targetClass)) {
+                        is Some -> {
+                            // TODO add validation for association name and resourceDefRef
+                            try {
+                                kprop.call(obj)?.let { id ->
+                                    when (id) {
+                                        is List<*> -> id.toSet()
+                                        is Set<*> -> id
+                                        else -> setOf(id)
+                                    }.map { resourceId ->
+                                        Association(associationDefinitionAnnotation.name,
+                                                    resourceDefRefOpt.t,
+                                                    resourceId as String)
+                                    }
+                                } ?: emptyList()
+                            } catch (exception: IllegalAccessException) {
+                                throw RuntimeException("Could not obtain value from property ${kprop.name} " +
+                                                               "in class ${obj::class.qualifiedName}")
+                            }
+                        }
+                        else -> emptyList()
+                    }
                 }
                 .toSet()
     }

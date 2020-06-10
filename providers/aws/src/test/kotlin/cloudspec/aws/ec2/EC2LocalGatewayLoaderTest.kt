@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.LocalGatewayGenerator.localGatewayId
 import datagen.services.ec2.model.LocalGatewayGenerator.localGateways
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeLocalGatewaysRequest
 import software.amazon.awssdk.services.ec2.model.DescribeLocalGatewaysResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
     private val loader = EC2LocalGatewayLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeLocalGatewaysResponse.builder()
                     .localGateways(localGateways)
@@ -52,8 +57,8 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(localGateways.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(localGateways.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeLocalGatewaysResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(localGatewayId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(localGatewayId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeLocalGatewaysResponse.builder()
                     .localGateways(localGateways)
@@ -98,7 +103,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val localGateway = localGateways[0]
-        val resource = loader.byId(localGateway.localGatewayId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(localGateway.localGatewayId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

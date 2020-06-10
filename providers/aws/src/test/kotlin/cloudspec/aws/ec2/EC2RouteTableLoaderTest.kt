@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.RouteTableGenerator.routeTableId
 import datagen.services.ec2.model.RouteTableGenerator.routeTables
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeRouteTablesRequest
 import software.amazon.awssdk.services.ec2.model.DescribeRouteTablesResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2RouteTableLoaderTest : EC2LoaderTest() {
     private val loader = EC2RouteTableLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeRouteTablesResponse.builder()
                     .routeTables(routeTables)
@@ -52,8 +57,8 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(routeTables.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(routeTables.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeRouteTablesResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(routeTableId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(routeTableId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeRouteTablesResponse.builder()
                     .routeTables(routeTables)
@@ -98,7 +103,7 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
         }
 
         val routeTable = routeTables[0]
-        val resource = loader.byId(routeTable.routeTableId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(routeTable.routeTableId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

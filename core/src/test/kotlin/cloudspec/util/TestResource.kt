@@ -130,5 +130,12 @@ data class TestResource(
                 description = ModelTestUtils.ASSOC_DESCRIPTION,
                 targetClass = TestTargetResource::class
         )
-        val associationId: String?
+        val associationId: String?,
+
+        @property:AssociationDefinition(
+                name = ModelTestUtils.ASSOC_NAME,
+                description = ModelTestUtils.ASSOC_DESCRIPTION,
+                targetClass = TestTargetResource::class
+        )
+        val associationId2: Int? = null
 )

@@ -19,6 +19,11 @@
  */
 package cloudspec.annotation
 
+import arrow.core.Option
+import arrow.core.extensions.fx
+import arrow.core.none
+import arrow.core.toOption
+import arrow.syntax.collections.flatten
 import cloudspec.model.*
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -38,16 +43,21 @@ object ResourceDefReflectionUtil {
      * Extract resource definition out of a class annotated with @ResourceDefinition.
      *
      * @param kclass Class.
-     * @return Resource definition or null.
+     * @return Optional resource definition.
      */
-    fun toResourceDef(kclass: KClass<*>): ResourceDef? {
-        return toResourceDefRef(kclass)?.let { ref ->
-            toResourceDescription(kclass)?.let { description ->
+    fun toResourceDef(kclass: KClass<*>): Option<ResourceDef> {
+        return if (isValid(kclass)) {
+            Option.fx {
+                val (ref) = toResourceDefRef(kclass)
+                val (description) = toResourceDescription(kclass)
+
                 ResourceDef(ref,
                             description,
                             toPropertyDefs(kclass),
                             toAssociationDefs(kclass))
             }
+        } else {
+            return none()
         }
     }
 
@@ -55,21 +65,19 @@ object ResourceDefReflectionUtil {
      * Extract resource definition reference out of a class annotated with @ResourceDefinition.
      *
      * @param kclass Class.
-     * @return Resource definition reference or null.
+     * @return Optional resource definition reference.
      */
-    fun toResourceDefRef(kclass: KClass<*>): ResourceDefRef? {
-        return kclass.findAnnotation<ResourceDefinition>()?.let {
+    fun toResourceDefRef(kclass: KClass<*>): Option<ResourceDefRef> {
+        return kclass.findAnnotation<ResourceDefinition>().toOption().map { annotation ->
             if (logger.isDebugEnabled) {
                 logger.debug("Obtained " +
-                                     "provider='${it.provider}', " +
-                                     "group='${it.group}', " +
-                                     "name='${it.name}' " +
+                                     "provider='${annotation.provider}', " +
+                                     "group='${annotation.group}', " +
+                                     "name='${annotation.name}' " +
                                      "from class ${kclass.qualifiedName}")
             }
 
-            return ResourceDefRef(it.provider,
-                                  it.group,
-                                  it.name)
+            ResourceDefRef(annotation.provider, annotation.group, annotation.name)
         }
     }
 
@@ -77,16 +85,16 @@ object ResourceDefReflectionUtil {
      * Extract resource description out of a class annotated with @ResourceDefinition.
      *
      * @param kclass Class.
-     * @return Resource description or null
+     * @return Optional resource description.
      */
-    fun toResourceDescription(kclass: KClass<*>): String? {
-        return kclass.findAnnotation<ResourceDefinition>()?.let {
+    fun toResourceDescription(kclass: KClass<*>): Option<String> {
+        return kclass.findAnnotation<ResourceDefinition>().toOption().map { annotation ->
             if (logger.isDebugEnabled) {
-                logger.debug("Obtained description='${it.description}' " +
+                logger.debug("Obtained description='${annotation.description}' " +
                                      "from class ${kclass.qualifiedName}")
             }
 
-            return it.description
+            annotation.description
         }
     }
 
@@ -98,20 +106,23 @@ object ResourceDefReflectionUtil {
      */
     fun toPropertyDefs(kclass: KClass<*>): Set<PropertyDef> {
         return kclass.memberProperties
-                .mapNotNull { toPropertyDef(kclass, it) }
+                .map { toPropertyDef(it) }
+                .flatten()
                 .toSet()
     }
 
     /**
      * Extract property definition out of a class' property annotated with @PropertyDefinition.
      *
-     * @param kclass Class.
      * @param kprop Property.
-     * @return Property definition or null.
+     * @return Optional property definition.
      */
-    private fun toPropertyDef(kclass: KClass<*>, kprop: KProperty<*>): PropertyDef? {
-        return kprop.findAnnotation<PropertyDefinition>()?.let { annotation ->
-            when (val propertyType = guessPropertyType(kprop)) {
+    private fun toPropertyDef(kprop: KProperty<*>): Option<PropertyDef> {
+        return Option.fx {
+            val (annotation) = kprop.findAnnotation<PropertyDefinition>().toOption()
+            val (propertyType) = guessPropertyType(kprop)
+
+            when (propertyType) {
                 PropertyType.KEY_VALUE,
                 PropertyType.NUMBER,
                 PropertyType.STRING,
@@ -132,12 +143,6 @@ object ResourceDefReflectionUtil {
                                 toPropertyDefs(nestedClass),
                                 toAssociationDefs(nestedClass))
                 }
-                else -> {
-                    val realType = guessContainedType(kprop.returnType)
-                    logger.warn("Type $realType of property '${kprop.name}' " +
-                                        "in class ${kclass.qualifiedName} is not supported")
-                    null
-                }
             }
         }
     }
@@ -150,7 +155,8 @@ object ResourceDefReflectionUtil {
      */
     fun toAssociationDefs(kclass: KClass<*>): Set<AssociationDef> {
         return kclass.memberProperties
-                .mapNotNull { toAssociationDef(kclass, it) }
+                .map { toAssociationDef(kclass, it) }
+                .flatten()
                 .toSet()
     }
 
@@ -159,26 +165,25 @@ object ResourceDefReflectionUtil {
      *
      * @param kclass Class.
      * @param kprop Property.
-     * @return Association definition or null.
+     * @return Optional association definition.
      */
-    private fun toAssociationDef(kclass: KClass<*>, kprop: KProperty<*>): AssociationDef? {
-        return kprop.findAnnotation<AssociationDefinition>()?.let { annotation ->
-            val realType = guessContainedType(kprop.returnType)
+    private fun toAssociationDef(kclass: KClass<*>, kprop: KProperty<*>): Option<AssociationDef> {
+        val realType = guessContainedType(kprop.returnType)
 
-            // only strings are supported
-            if (!isNullableString(realType)) {
-                logger.warn("Type $realType of association '${kprop.name}' " +
-                                    "in class ${kclass.qualifiedName} is not supported"
-                )
-                return@let null
-            }
+        // only strings are supported
+        if (!isNullableString(realType)) {
+            logger.warn("Type $realType of association '${kprop.name}' " +
+                                "in class ${kclass.qualifiedName} is not supported")
+            return none<AssociationDef>()
+        }
 
-            return@let toResourceDefRef(annotation.targetClass)?.let { ref ->
-                AssociationDef(annotation.name,
-                               annotation.description,
-                               ref,
-                               isMultiValued(kprop))
-            }
+        return Option.fx {
+            val (annotation) = kprop.findAnnotation<AssociationDefinition>().toOption()
+            val (ref) = toResourceDefRef(annotation.targetClass)
+            AssociationDef(annotation.name,
+                           annotation.description,
+                           ref,
+                           isMultiValued(kprop))
         }
     }
 
@@ -186,9 +191,9 @@ object ResourceDefReflectionUtil {
      * Guess the property type of a class property.
      *
      * @param kprop Class property.
-     * @return Property type or null.
+     * @return Optional property type.
      */
-    fun guessPropertyType(kprop: KProperty<*>): PropertyType? {
+    fun guessPropertyType(kprop: KProperty<*>): Option<PropertyType> {
         return guessPropertyType(kprop.returnType)
     }
 
@@ -196,18 +201,61 @@ object ResourceDefReflectionUtil {
      * Guess the property type of a type.
      *
      * @param ktype Type.
-     * @return Property type or null
+     * @return Optional property type.
      */
-    fun guessPropertyType(ktype: KType): PropertyType? {
+    fun guessPropertyType(ktype: KType): Option<PropertyType> {
         return when {
             isMultiValued(ktype) -> guessPropertyType(guessContainedType(ktype))
-            isNullableNumber(ktype) -> PropertyType.NUMBER
-            isNullableString(ktype) -> PropertyType.STRING
-            isNullableBoolean(ktype) -> PropertyType.BOOLEAN
-            isNullableDate(ktype) -> PropertyType.DATE
-            isNullableKeyValue(ktype) -> PropertyType.KEY_VALUE
-            isNullableNestedProperty(ktype) -> PropertyType.NESTED
-            else -> null
+            isNullableNumber(ktype) -> PropertyType.NUMBER.toOption()
+            isNullableString(ktype) -> PropertyType.STRING.toOption()
+            isNullableBoolean(ktype) -> PropertyType.BOOLEAN.toOption()
+            isNullableDate(ktype) -> PropertyType.DATE.toOption()
+            isNullableKeyValue(ktype) -> PropertyType.KEY_VALUE.toOption()
+            isNullableNestedProperty(ktype) -> PropertyType.NESTED.toOption()
+            else -> null.toOption()
+        }
+    }
+
+    /**
+     * Check whether the class is valid.
+     */
+    fun isValid(kclass: KClass<*>): Boolean {
+        return hasResourceAnnotation(kclass) && hasIdAnnotation(kclass)
+    }
+
+    /**
+     * Check whether the class has the @ResourceDefinition annotation.
+     */
+    fun hasResourceAnnotation(kclass: KClass<*>): Boolean {
+        return kclass.findAnnotation<ResourceDefinition>() != null
+    }
+
+    /**
+     * Check whether the class has only one @IdDefinition
+     */
+    fun hasIdAnnotation(kclass: KClass<*>): Boolean {
+        val kprops = kclass.memberProperties
+                .filter {
+                    it.findAnnotation<IdDefinition>() != null
+                }
+                .filter {
+                    if (it.returnType.isMarkedNullable) {
+                        logger.error("Id '${it.name}' property of class '${kclass.qualifiedName}' cannot be nullable.")
+                        return@filter false
+                    }
+                    return@filter true
+                }
+
+        return when {
+            kprops.isEmpty() ->
+                false.also {
+                    logger.error("Class '${kclass.qualifiedName}' does not have any ID property")
+                }
+            kprops.size > 1 ->
+                false.also {
+                    logger.error("Class '${kclass.qualifiedName}' cannot have more than one ID property")
+                }
+            else -> true
         }
     }
 

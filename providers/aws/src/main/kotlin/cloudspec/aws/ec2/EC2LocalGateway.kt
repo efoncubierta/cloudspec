@@ -43,7 +43,7 @@ data class EC2LocalGateway(
                 name = "local_gateway_id",
                 description = "The ID of the local gateway"
         )
-        val localGatewayId: String?,
+        val localGatewayId: String,
 
         @property:PropertyDefinition(
                 name = "outpost_arn",

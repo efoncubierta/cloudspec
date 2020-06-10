@@ -84,7 +84,7 @@ data class EC2NetworkInterface(
                 name = "network_interface_id",
                 description = "The ID of the network interface"
         )
-        val networkInterfaceId: String?,
+        val networkInterfaceId: String,
 
         @property:PropertyDefinition(
                 name = "outpost_arn",

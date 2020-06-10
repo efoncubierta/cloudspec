@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.ImageGenerator.imageId
 import datagen.services.ec2.model.ImageGenerator.images
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeImagesRequest
 import software.amazon.awssdk.services.ec2.model.DescribeImagesResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2ImageLoaderTest : EC2LoaderTest() {
     private val loader = EC2ImageLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeImagesResponse.builder()
                     .images(images)
@@ -52,8 +57,8 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(images.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(images.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeImagesResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(imageId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(imageId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeImagesResponse.builder()
                     .images(images)
@@ -98,7 +103,7 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
         }
 
         val image = images[0]
-        val resource = loader.byId(image.imageId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(image.imageId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -19,11 +19,12 @@
  */
 package cloudspec.store
 
+import arrow.core.Option
 import cloudspec.model.ResourceDef
 import cloudspec.model.ResourceDefRef
 
 interface ResourceDefStore {
     val resourceDefs: List<ResourceDef>
     fun saveResourceDef(resourceDef: ResourceDef)
-    fun getResourceDef(ref: ResourceDefRef): ResourceDef?
+    fun getResourceDef(ref: ResourceDefRef): Option<ResourceDef>
 }

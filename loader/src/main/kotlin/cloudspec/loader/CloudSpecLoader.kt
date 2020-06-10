@@ -19,6 +19,7 @@
  */
 package cloudspec.loader
 
+import arrow.core.Option
 import cloudspec.CloudSpecLexer
 import cloudspec.CloudSpecParser
 import cloudspec.lang.CloudSpec
@@ -31,7 +32,7 @@ import java.io.InputStream
 
 class CloudSpecLoader {
     @Throws(IOException::class)
-    fun load(`is`: InputStream?): CloudSpec? {
+    fun load(`is`: InputStream?): Option<CloudSpec> {
         val lexer = CloudSpecLexer(ANTLRInputStream(`is`))
         val tokens = CommonTokenStream(lexer)
         val parser = CloudSpecParser(tokens)

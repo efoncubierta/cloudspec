@@ -19,18 +19,20 @@
  */
 package cloudspec
 
+import arrow.core.Option
+import arrow.core.firstOrNone
 import cloudspec.model.Provider
 import cloudspec.model.ResourceDefRef
 
 class ProvidersRegistry {
     private val providers = mutableListOf<Provider>()
 
-    fun getProvider(resourceDefRef: ResourceDefRef): Provider? {
+    fun getProvider(resourceDefRef: ResourceDefRef): Option<Provider> {
         return getProvider(resourceDefRef.providerName)
     }
 
-    fun getProvider(providerName: String): Provider? {
-        return getProviders().firstOrNull { it.name == providerName }
+    fun getProvider(providerName: String): Option<Provider> {
+        return getProviders().firstOrNone { it.name == providerName }
     }
 
     fun getProviders(): List<Provider> {

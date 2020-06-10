@@ -19,6 +19,8 @@
  */
 package cloudspec.preflight
 
+import arrow.core.None
+import arrow.core.Some
 import cloudspec.lang.*
 import cloudspec.model.PropertyDef
 import cloudspec.model.PropertyType
@@ -29,7 +31,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.Compare
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.Text
 import org.slf4j.LoggerFactory
-import java.util.*
 
 class CloudSpecPreflight(private val resourceDefStore: ResourceDefStore) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -55,18 +56,24 @@ class CloudSpecPreflight(private val resourceDefStore: ResourceDefStore) {
     private fun preflightRule(rule: RuleExpr) {
         logger.debug("Preflight of rule {}", rule.name)
 
-        val resourceDefRef = fromString(rule.resourceDefRef)
-                ?: throw CloudSpecPreflightException("Malformed resource definition reference '${rule.resourceDefRef}'")
-
-        // lookup resource definition
-        val resourceDef = resourceDefStore.getResourceDef(resourceDefRef)
-                ?: throw CloudSpecPreflightException("Resource of type '${rule.resourceDefRef}' is not supported.")
-
-        // preflight withs and asserts
-        rule.withExpr.statements
-                .forEach { preflightStatement(resourceDef, it, emptyList()) }
-        rule.assertExpr.statements
-                .forEach { preflightStatement(resourceDef, it, emptyList()) }
+        fromString(rule.resourceDefRef)
+                .flatMap {
+                    resourceDefStore.getResourceDef(it)
+                }
+                .also { resourceDefOpt ->
+                    when (resourceDefOpt) {
+                        is Some -> {
+                            // preflight withs and asserts
+                            rule.withExpr.statements
+                                    .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
+                            rule.assertExpr.statements
+                                    .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
+                        }
+                        else ->
+                            throw CloudSpecPreflightException("Resource of type '${rule.resourceDefRef}' " +
+                                                                      "is not supported.")
+                    }
+                }
     }
 
     private fun preflightStatement(resourceDef: ResourceDef, statement: Statement, path: List<String>) {
@@ -81,57 +88,62 @@ class CloudSpecPreflight(private val resourceDefStore: ResourceDefStore) {
     private fun preflightNestedStatement(resourceDef: ResourceDef, statement: NestedStatement, path: List<String>) {
         val nestedPath = path.plus(statement.propertyName)
 
-        if (resourceDef.propertyByPath(nestedPath) == null) {
-            throw CloudSpecPreflightException("Resource type '${resourceDef.ref}' " +
-                                                      "does not define property '${statement.propertyName}'.")
+        when (resourceDef.propertyByPath(nestedPath)) {
+            is Some ->
+                statement.statements.forEach {
+                    preflightStatement(resourceDef, it, nestedPath)
+                }
+            else ->
+                throw CloudSpecPreflightException("Resource type '${resourceDef.ref}' " +
+                                                          "does not define property '${statement.propertyName}'.")
         }
-
-        statement.statements
-                .forEach { preflightStatement(resourceDef, it, nestedPath) }
     }
 
     private fun preflightAssociationStatement(resourceDef: ResourceDef, statement: AssociationStatement, path: List<String>) {
         val associationPath = path.plus(statement.associationName)
 
-        val (_, _, resourceDefRef) = resourceDef.associationByPath(associationPath)
-                ?: throw CloudSpecPreflightException("Resource type '${resourceDef.ref}' does not define association " +
-                                                             "'${statement.associationName}'.")
+        when (val associationOpt = resourceDef.associationByPath(associationPath)) {
+            is Some -> {
+                val (_, _, resourceDefRef) = associationOpt.t
 
-        val associatedResourceDef = resourceDefStore.getResourceDef(resourceDefRef)
-                ?: throw CloudSpecPreflightException("Associated resource of type '${resourceDefRef}' " +
-                                                             "is not supported.")
-
-        statement.statements
-                .forEach { preflightStatement(associatedResourceDef, it, ArrayList()) }
+                when (val associatedResourceDefOpt = resourceDefStore.getResourceDef(resourceDefRef)) {
+                    is Some ->
+                        statement.statements.forEach {
+                            preflightStatement(associatedResourceDefOpt.t, it, emptyList())
+                        }
+                    else ->
+                        throw CloudSpecPreflightException("Associated resource of type '${resourceDefRef}' " +
+                                                                  "is not supported.")
+                }
+            }
+            else ->
+                throw CloudSpecPreflightException("Resource type '${resourceDef.ref}' does not define association " +
+                                                          "'${statement.associationName}'.")
+        }
     }
 
     private fun preflightPropertyStatement(resourceDef: ResourceDef, statement: PropertyStatement, path: List<String>) {
         val propertyPath = path.plus(statement.propertyName)
 
-        val propertyDef = resourceDef.propertyByPath(propertyPath)
-                ?: throw CloudSpecPreflightException("Resource type '${resourceDef.ref}' does not define property " +
-                                                             "'${propertyPath.joinToString(".")}'.")
-
-        if (isNumberOnlyPredicate(statement.predicate) && !isNumberProperty(propertyDef)) {
-            throw CloudSpecPreflightException("Predicate ${statement.predicate} is only supported " +
-                                                      "on number properties (i.e. integer and double), " +
-                                                      "and property '${propertyPath.joinToString(".")}' " +
-                                                      "is a '${propertyDef.propertyType}'")
-        }
-
-        if (isStringOnlyPredicate(statement.predicate) && !isStringProperty(propertyDef)) {
-            throw CloudSpecPreflightException("Predicate ${statement.predicate} is only supported " +
-                                                      "on string properties, " +
-                                                      "and property '${propertyPath.joinToString(".")}' " +
-                                                      "is a '${propertyDef.propertyType}'"
-            )
+        when (val propertyDefOpt = resourceDef.propertyByPath(propertyPath)) {
+            is Some -> {
+                if (isNumberOnlyPredicate(statement.predicate) && !isNumberProperty(propertyDefOpt.t)) {
+                    throw CloudSpecPreflightException("Predicate ${statement.predicate} is only supported " +
+                                                              "on number properties (i.e. integer and double), " +
+                                                              "and property '${propertyPath.joinToString(".")}' " +
+                                                              "is a '${propertyDefOpt.t.propertyType}'")
+                }
+            }
+            else ->
+                throw CloudSpecPreflightException("Resource type '${resourceDef.ref}' does not define property " +
+                                                          "'${propertyPath.joinToString(".")}'.")
         }
     }
 
     private fun preflightKeyValueStatement(resourceDef: ResourceDef, statement: KeyValueStatement, path: List<String>) {
         val propertyPath = path.plus(statement.propertyName)
 
-        if (resourceDef.propertyByPath(propertyPath) == null) {
+        if (resourceDef.propertyByPath(propertyPath) is None) {
             throw CloudSpecPreflightException("Resource type '${resourceDef.ref}' " +
                                                       "does not define property '${statement.propertyName}'.")
         }

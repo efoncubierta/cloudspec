@@ -67,7 +67,7 @@ data class EC2Snapshot(
                 name = "snapshotId",
                 description = "The ID of the snapshot. Each snapshot receives a unique identifier when it is created"
         )
-        val snapshotId: String?,
+        val snapshotId: String,
 
         @property:PropertyDefinition(
                 name = "start_time",

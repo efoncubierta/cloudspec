@@ -19,14 +19,19 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.core.None
+import arrow.core.Some
 import datagen.services.ec2.model.VolumeGenerator.volumeId
 import datagen.services.ec2.model.VolumeGenerator.volumes
 import io.mockk.every
-import org.junit.Assert
 import org.junit.Test
 import software.amazon.awssdk.services.ec2.model.DescribeVolumesRequest
 import software.amazon.awssdk.services.ec2.model.DescribeVolumesResponse
 import java.util.function.Consumer
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EC2VolumeLoaderTest : EC2LoaderTest() {
     private val loader = EC2VolumeLoader(clientsProvider)
@@ -44,7 +49,7 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertTrue(request.filters().isEmpty())
+            assertTrue(request.filters().isEmpty())
 
             DescribeVolumesResponse.builder()
                     .volumes(volumes)
@@ -52,8 +57,8 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
         }
 
         val resources = loader.all
-        Assert.assertNotNull(resources)
-        Assert.assertEquals(volumes.size, resources.size)
+        assertNotNull(resources)
+        assertEquals(volumes.size, resources.size)
     }
 
     @Test
@@ -67,14 +72,14 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeVolumesResponse.builder()
                     .build()
         }
 
-        val resource = loader.byId(volumeId())
-        Assert.assertNull(resource)
+        val resourceOpt = loader.byId(volumeId())
+        assertTrue(resourceOpt is None)
     }
 
     @Test
@@ -90,7 +95,7 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
             builderLambda.accept(builder)
 
             val request = builder.build()
-            Assert.assertFalse(request.filters().isEmpty())
+            assertFalse(request.filters().isEmpty())
 
             DescribeVolumesResponse.builder()
                     .volumes(volumes)
@@ -98,7 +103,7 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
         }
 
         val volume = volumes[0]
-        val resource = loader.byId(volume.volumeId())
-        Assert.assertNotNull(resource)
+        val resourceOpt = loader.byId(volume.volumeId())
+        assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -45,7 +45,7 @@ data class EC2VpcEndpoint(
                 name = "vpc_endpoint_id",
                 description = "The ID of the VPC endpoint"
         )
-        val vpcEndpointId: String?,
+        val vpcEndpointId: String,
 
         @property:PropertyDefinition(
                 name = "vpc_endpoint_type",
