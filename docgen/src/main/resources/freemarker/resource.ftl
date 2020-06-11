@@ -17,7 +17,7 @@ Example values: `${propertyDef.exampleValues}`
 <#macro associationDefinitionsList associationDefs>
   <#list associationDefs as associationDef>
 * **${associationDef.name}**
-(*${associationDef.resourceDefRef}*):
+(*${associationDef.defRef}*${associationDef.isMany()?string('[]', '')}):
 ${associationDef.description}
   </#list>
 </#macro>

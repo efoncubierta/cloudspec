@@ -45,6 +45,9 @@ The ID of the network interface.
 * **outpost_arn**
 (`string`):
 The Amazon Resource Name (ARN) of the Outpost.
+* **owner_id**
+(`string`):
+The AWS account ID of the owner of the network interface.
 * **private_dns_name**
 (`string`):
 The private DNS name.
@@ -75,6 +78,10 @@ The private DNS name.
     * **private_ip_address**
 (`string`):
 The private IPv4 address.
+* **region**
+(`string`):
+The AWS region.
+Example values: `us-east-1 | eu-west-1`
 * **source_dest_check**
 (`boolean`):
 Indicates whether traffic to or from the instance is validated.
@@ -89,7 +96,7 @@ Any tags assigned to the network interface.
 ## Associations
 
 * **groups**
-(*aws:ec2:security_group*):
+(*aws:ec2:security_group*[]):
 Any security groups for the network interface
 * **subnet**
 (*aws:ec2:subnet*):
