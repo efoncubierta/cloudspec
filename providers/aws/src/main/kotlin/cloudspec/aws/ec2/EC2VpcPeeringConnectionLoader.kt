@@ -20,12 +20,16 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 class EC2VpcPeeringConnectionLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2VpcPeeringConnection>(clientsProvider) {
 
-    override fun getResourcesInRegion(region: String,
-                                      ids: List<String>): List<EC2VpcPeeringConnection> {
+    override suspend fun resourcesInRegion(region: String,
+                                           ids: List<String>): List<EC2VpcPeeringConnection> = coroutineScope {
         clientsProvider.ec2ClientForRegion(region).use { client ->
             val filters = buildFilters(
                     mapOf(
@@ -33,7 +37,8 @@ class EC2VpcPeeringConnectionLoader(clientsProvider: IAWSClientsProvider) :
                     )
             )
 
-            return client
+            withContext(Dispatchers.Default) {
+                client
                     // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcPeeringConnections.html
                     .describeVpcPeeringConnections { builder ->
                         if (filters.isNotEmpty()) {
@@ -41,7 +46,10 @@ class EC2VpcPeeringConnectionLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .vpcPeeringConnections()
+                    .stream()
                     .map { it.toEC2VpcPeeringConnection(region) }
+                    .toList()
+            }
         }
     }
 

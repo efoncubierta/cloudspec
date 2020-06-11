@@ -168,6 +168,10 @@ object ResourceDefReflectionUtil {
      * @return Optional association definition.
      */
     private fun toAssociationDef(kclass: KClass<*>, kprop: KProperty<*>): Option<AssociationDef> {
+        if(kprop.findAnnotation<AssociationDefinition>() == null) {
+            return none<AssociationDef>()
+        }
+
         val realType = guessContainedType(kprop.returnType)
 
         // only strings are supported

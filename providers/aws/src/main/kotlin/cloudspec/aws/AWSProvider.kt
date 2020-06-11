@@ -63,12 +63,12 @@ import java.util.*
 class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     private val loaders: MutableMap<String, AWSResourceLoader<*>> = HashMap()
 
-    override fun resourcesByRef(ref: ResourceDefRef): List<Any> {
-        return getLoader(ref).map { it.all }.getOrElse { emptyList<Unit>() }
+    override fun resourcesByRef(ref: ResourceDefRef): List<AWSResource> {
+        return getLoader(ref).map { it.all }.getOrElse { emptyList() }
     }
 
-    override fun resource(ref: ResourceRef): Option<Any> {
-        return getLoader(ref.defRef).map { it.byId(ref.id) }
+    override fun resource(ref: ResourceRef): Option<AWSResource> {
+        return getLoader(ref.defRef).flatMap { it.byId(ref.id) }
     }
 
     private fun getLoader(resourceDefRef: ResourceDefRef): Option<AWSResourceLoader<*>> {

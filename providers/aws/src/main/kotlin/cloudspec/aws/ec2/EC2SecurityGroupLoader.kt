@@ -20,12 +20,16 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 class EC2SecurityGroupLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2SecurityGroup>(clientsProvider) {
 
-    override fun getResourcesInRegion(region: String,
-                                      ids: List<String>): List<EC2SecurityGroup> {
+    override suspend fun resourcesInRegion(region: String,
+                                           ids: List<String>): List<EC2SecurityGroup> = coroutineScope {
         clientsProvider.ec2ClientForRegion(region).use { client ->
             val filters = buildFilters(
                     mapOf(
@@ -33,7 +37,8 @@ class EC2SecurityGroupLoader(clientsProvider: IAWSClientsProvider) :
                     )
             )
 
-            return client
+            withContext(Dispatchers.Default) {
+                client
                     // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSecurityGroups.html
                     .describeSecurityGroups { builder ->
                         if (filters.isNotEmpty()) {
@@ -41,7 +46,10 @@ class EC2SecurityGroupLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .securityGroups()
+                    .stream()
                     .map { it.toEC2SecurityGroup(region) }
+                    .toList()
+            }
         }
     }
 

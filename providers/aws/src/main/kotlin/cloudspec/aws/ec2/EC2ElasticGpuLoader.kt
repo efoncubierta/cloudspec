@@ -20,13 +20,18 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 class EC2ElasticGpuLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2ElasticGpu>(clientsProvider) {
-    override fun getResourcesInRegion(region: String,
-                                      ids: List<String>): List<EC2ElasticGpu> {
+    override suspend fun resourcesInRegion(region: String,
+                                           ids: List<String>): List<EC2ElasticGpu> = coroutineScope {
         clientsProvider.ec2ClientForRegion(region).use { client ->
-            return client
+            withContext(Dispatchers.Default) {
+                client
                     // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeElasticGpus.html
                     .describeElasticGpus { builder ->
                         if (ids.isNotEmpty()) {
@@ -34,7 +39,10 @@ class EC2ElasticGpuLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .elasticGpuSet()
+                    .stream()
                     .map { it.toEC2ElasticGpu(region) }
+                    .toList()
+            }
         }
     }
 }

@@ -23,44 +23,45 @@ import arrow.core.Option
 import arrow.core.firstOrNone
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.*
 import software.amazon.awssdk.services.ec2.model.Filter
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
-    override fun byId(id: String): Option<T> {
-        return getResources(listOf(id)).firstOrNone()
+    override fun byId(id: String): Option<T> = runBlocking {
+        getResources(listOf(id)).firstOrNone()
     }
 
     override val all: List<T>
-        get() {
-            return getResources()
-        }
+        get() = runBlocking { getResources() }
 
-    private fun getResources(ids: List<String> = emptyList()): List<T> {
-        return availableRegions.flatMap {
-            getResourcesInRegion(it, ids)
+    private suspend fun getResources(ids: List<String> = emptyList()): List<T> = coroutineScope {
+        availableRegions()
+            .map { async { resourcesInRegion(it, ids) } }
+            .awaitAll()
+            .flatten()
+    }
+
+    abstract suspend fun resourcesInRegion(region: String, ids: List<String>): List<T>
+
+    protected suspend fun availableRegions(): List<String> = coroutineScope {
+        clientsProvider.ec2Client.use { ec2Client ->
+            withContext(Dispatchers.Default) {
+                ec2Client.describeRegions()
+                    .regions()
+                    .map { it.regionName() }
+            }
         }
     }
 
-    abstract fun getResourcesInRegion(region: String, ids: List<String>): List<T>
-
-    protected val availableRegions: List<String>
-        get() {
-            clientsProvider.ec2Client.use { ec2Client ->
-                return ec2Client.describeRegions()
-                        .regions()
-                        .map { it.regionName() }
-            }
-        }
-
     protected fun buildFilters(filterValues: Map<String, List<String>>): List<Filter> {
         return filterValues.keys
-                .filter {
-                    !filterValues[it].isNullOrEmpty()
-                }.map {
-                    Filter.builder()
-                            .name(it)
-                            .values(filterValues[it])
-                            .build()
-                }
+            .filter {
+                !filterValues[it].isNullOrEmpty()
+            }.map {
+                Filter.builder()
+                    .name(it)
+                    .values(filterValues[it])
+                    .build()
+            }
     }
 }

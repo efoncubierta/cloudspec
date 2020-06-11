@@ -43,8 +43,8 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
     fun load(spec: CloudSpec) {
         logger.info("Loading resources required to run this test")
         spec.groups
-                .flatMap { (_, rules) -> rules }
-                .forEach { loadFromRule(it) }
+            .flatMap { (_, rules) -> rules }
+            .forEach { loadFromRule(it) }
     }
 
     private fun loadFromRule(ruleExpr: RuleExpr) {
@@ -52,21 +52,21 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
             is Some -> {
                 // Load all resource definitions to the plan
                 getAllResources(resourceDefRefOpt.t)
-                        .forEach { resource ->
-                            // load dependent resources from each statement
-                            ruleExpr.withExpr
-                                    .statements
-                                    .forEach {
-                                        loadFromStatement(resource, it, emptyList())
-                                    }
+                    .forEach { resource ->
+                        // load dependent resources from each statement
+                        ruleExpr.withExpr
+                            .statements
+                            .forEach {
+                                loadFromStatement(resource, it, emptyList())
+                            }
 
-                            // load dependent resources from each statement
-                            ruleExpr.assertExpr
-                                    .statements
-                                    .forEach {
-                                        loadFromStatement(resource, it, emptyList())
-                                    }
-                        }
+                        // load dependent resources from each statement
+                        ruleExpr.assertExpr
+                            .statements
+                            .forEach {
+                                loadFromStatement(resource, it, emptyList())
+                            }
+                    }
             }
             else -> logger.error("Malformed resource definition '${ruleExpr.resourceDefRef}'. Ignoring it.")
         }
@@ -104,8 +104,8 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
                             loadFromStatement(associatedResourceOpt.t, it, emptyList())
                         }
                     else ->
-                        logger.error("Associated resource '${statement.associationName}' " +
-                                             "in resource '${resource.ref}' " +
+                        logger.error("Associated resource '${association.resourceRef}' " +
+                                             "from resource '${resource.ref}' (name = '${statement.associationName}') " +
                                              "does not exist. Ignoring it.")
 
                 }
@@ -124,18 +124,18 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
             loadedResourceDefs.add(resourceDefRef)
 
             providersRegistry.getProvider(resourceDefRef.providerName)
-                    .map { provider ->
-                        provider.resourcesByRef(resourceDefRef)
-                                .map { ResourceReflectionUtil.toResource(it) }
-                                .flatten()
-                                .onEach { (ref, properties, associations) ->
-                                    resourceStore.saveResource(ref,
-                                                               properties,
-                                                               associations)
-                                }
-                    }.getOrElse {
-                        emptyList()
-                    }
+                .map { provider ->
+                    provider.resourcesByRef(resourceDefRef)
+                        .map { ResourceReflectionUtil.toResource(it) }
+                        .flatten()
+                        .onEach { (ref, properties, associations) ->
+                            resourceStore.saveResource(ref,
+                                                       properties,
+                                                       associations)
+                        }
+                }.getOrElse {
+                    emptyList()
+                }
         } else {
             resourceStore.resourcesByDefinition(resourceDefRef)
         }
@@ -148,17 +148,17 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         logger.debug("Loading resource of type '${ref}'")
 
         return providersRegistry.getProvider(ref.defRef)
-                .flatMap { provider ->
-                    provider.resource(ref)
-                            .flatMap { ResourceReflectionUtil.toResource(it) }
-                            .also {
-                                if (it is Some) {
-                                    resourceStore.saveResource(ref,
-                                                               it.t.properties,
-                                                               it.t.associations)
-                                }
-                            }
-                }
+            .flatMap { provider ->
+                provider.resource(ref)
+                    .flatMap { ResourceReflectionUtil.toResource(it) }
+                    .also {
+                        if (it is Some) {
+                            resourceStore.saveResource(ref,
+                                                       it.t.properties,
+                                                       it.t.associations)
+                        }
+                    }
+            }
 
         //        }
 //        return resourceOpt;

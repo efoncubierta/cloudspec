@@ -20,20 +20,25 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 class EC2SubnetLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2Subnet>(clientsProvider) {
 
-    override fun getResourcesInRegion(region: String,
-                                      ids: List<String>): List<EC2Subnet> {
+    override suspend fun resourcesInRegion(region: String,
+                                           ids: List<String>): List<EC2Subnet> = coroutineScope {
         clientsProvider.ec2ClientForRegion(region).use { client ->
             val filters = buildFilters(
                     mapOf(
-                            EC2SubnetLoader.FILTER_SUBNET_ID to ids
+                            FILTER_SUBNET_ID to ids
                     )
             )
 
-            return client
+            withContext(Dispatchers.Default) {
+                client
                     // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSubnets.html
                     .describeSubnets { builder ->
                         if (filters.isNotEmpty()) {
@@ -41,7 +46,10 @@ class EC2SubnetLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .subnets()
+                    .stream()
                     .map { it.toEC2Subnet(region) }
+                    .toList()
+            }
         }
     }
 

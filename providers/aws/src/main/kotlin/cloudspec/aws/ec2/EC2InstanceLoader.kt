@@ -20,12 +20,16 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 class EC2InstanceLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2Instance>(clientsProvider) {
 
-    override fun getResourcesInRegion(region: String,
-                                      ids: List<String>): List<EC2Instance> {
+    override suspend fun resourcesInRegion(region: String,
+                                           ids: List<String>): List<EC2Instance> = coroutineScope {
         clientsProvider.ec2ClientForRegion(region).use { client ->
             val filters = buildFilters(
                     mapOf(
@@ -33,7 +37,8 @@ class EC2InstanceLoader(clientsProvider: IAWSClientsProvider) :
                     )
             )
 
-            return client
+            withContext(Dispatchers.Default) {
+                client
                     // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
                     .describeInstances { builder ->
                         if (filters.isNotEmpty()) {
@@ -41,8 +46,11 @@ class EC2InstanceLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .reservations()
-                    .flatMap { it.instances() }
+                    .stream()
+                    .flatMap { it.instances().stream() }
                     .map { it.toEC2Instance(region) }
+                    .toList()
+            }
         }
     }
 

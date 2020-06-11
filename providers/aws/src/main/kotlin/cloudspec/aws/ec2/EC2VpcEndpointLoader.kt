@@ -20,12 +20,16 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 class EC2VpcEndpointLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2VpcEndpoint>(clientsProvider) {
 
-    override fun getResourcesInRegion(region: String,
-                                      ids: List<String>): List<EC2VpcEndpoint> {
+    override suspend fun resourcesInRegion(region: String,
+                                           ids: List<String>): List<EC2VpcEndpoint> = coroutineScope {
         clientsProvider.ec2ClientForRegion(region).use { client ->
             val filters = buildFilters(
                     mapOf(
@@ -33,7 +37,8 @@ class EC2VpcEndpointLoader(clientsProvider: IAWSClientsProvider) :
                     )
             )
 
-            return client
+            withContext(Dispatchers.Default) {
+                client
                     // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcEndpoints.html
                     .describeVpcEndpoints { builder ->
                         if (filters.isNotEmpty()) {
@@ -41,7 +46,10 @@ class EC2VpcEndpointLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .vpcEndpoints()
+                    .stream()
                     .map { it.toEC2VpcEndpoint(region) }
+                    .toList()
+            }
         }
     }
 

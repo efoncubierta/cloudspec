@@ -20,12 +20,15 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 
 class EC2VolumeLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2Volume>(clientsProvider) {
 
-    override fun getResourcesInRegion(region: String,
-                                      ids: List<String>): List<EC2Volume> {
+    override suspend fun resourcesInRegion(region: String,
+                                           ids: List<String>): List<EC2Volume> = coroutineScope {
         clientsProvider.ec2ClientForRegion(region).use { client ->
             val filters = buildFilters(
                     mapOf(
@@ -33,15 +36,20 @@ class EC2VolumeLoader(clientsProvider: IAWSClientsProvider) :
                     )
             )
 
-            return client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+            withContext(Dispatchers.Default) {
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+                client
                     .describeVolumes { builder ->
                         if (filters.isNotEmpty()) {
                             builder.filters(filters)
                         }
                     }
                     .volumes()
-                    .map { it.toEC2Volume(region) }
+                    .map {
+                        it.toEC2Volume(region)
+                    }
+            }
+
         }
     }
 
