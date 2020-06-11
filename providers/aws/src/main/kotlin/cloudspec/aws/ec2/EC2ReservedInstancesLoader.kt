@@ -20,9 +20,7 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
 class EC2ReservedInstancesLoader(clientsProvider: IAWSClientsProvider) :
@@ -30,26 +28,24 @@ class EC2ReservedInstancesLoader(clientsProvider: IAWSClientsProvider) :
 
     override suspend fun resourcesInRegion(region: String,
                                            ids: List<String>): List<EC2ReservedInstances> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
+        requestInRegion(region) { client ->
             val filters = buildFilters(
                     mapOf(
                             FILTER_RESERVED_INSTANCES_ID to ids
                     )
             )
 
-            withContext(Dispatchers.Default) {
-                client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeReservedInstancess.html
-                    .describeReservedInstances { builder ->
-                        if (filters.isNotEmpty()) {
-                            builder.filters(filters)
-                        }
+            client
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeReservedInstancess.html
+                .describeReservedInstances { builder ->
+                    if (filters.isNotEmpty()) {
+                        builder.filters(filters)
                     }
-                    .reservedInstances()
-                    .stream()
-                    .map { it.toEC2ReservedInstances(region) }
-                    .toList()
-            }
+                }
+                .reservedInstances()
+                .stream()
+                .map { it.toEC2ReservedInstances(region) }
+                .toList()
         }
     }
 

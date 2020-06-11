@@ -20,9 +20,7 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
 class EC2SnapshotLoader(clientsProvider: IAWSClientsProvider) :
@@ -30,26 +28,24 @@ class EC2SnapshotLoader(clientsProvider: IAWSClientsProvider) :
 
     override suspend fun resourcesInRegion(region: String,
                                            ids: List<String>): List<EC2Snapshot> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
+        requestInRegion(region) { client ->
             val filters = buildFilters(
                     mapOf(
                             FILTER_SNAPSHOT_ID to ids
                     )
             )
 
-            withContext(Dispatchers.Default) {
-                client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSnapshots.html
-                    .describeSnapshots { builder ->
-                        if (filters.isNotEmpty()) {
-                            builder.filters(filters)
-                        }
+            client
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSnapshots.html
+                .describeSnapshots { builder ->
+                    if (filters.isNotEmpty()) {
+                        builder.filters(filters)
                     }
-                    .snapshots()
-                    .stream()
-                    .map { it.toEC2Snapshot(region) }
-                    .toList()
-            }
+                }
+                .snapshots()
+                .stream()
+                .map { it.toEC2Snapshot(region) }
+                .toList()
         }
     }
 

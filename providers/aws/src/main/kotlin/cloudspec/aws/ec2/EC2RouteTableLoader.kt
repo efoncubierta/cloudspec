@@ -20,9 +20,7 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
 class EC2RouteTableLoader(clientsProvider: IAWSClientsProvider) :
@@ -30,26 +28,24 @@ class EC2RouteTableLoader(clientsProvider: IAWSClientsProvider) :
 
     override suspend fun resourcesInRegion(region: String,
                                            ids: List<String>): List<EC2RouteTable> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
+        requestInRegion(region) { client ->
             val filters = buildFilters(
                     mapOf(
                             FILTER_ROUTE_TABLE_ID to ids
                     )
             )
 
-            withContext(Dispatchers.Default) {
-                client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeRouteTables.html
-                    .describeRouteTables { builder ->
-                        if (filters.isNotEmpty()) {
-                            builder.filters(filters)
-                        }
+            client
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeRouteTables.html
+                .describeRouteTables { builder ->
+                    if (filters.isNotEmpty()) {
+                        builder.filters(filters)
                     }
-                    .routeTables()
-                    .stream()
-                    .map { it.toEC2RouteTable(region) }
-                    .toList()
-            }
+                }
+                .routeTables()
+                .stream()
+                .map { it.toEC2RouteTable(region) }
+                .toList()
         }
     }
 

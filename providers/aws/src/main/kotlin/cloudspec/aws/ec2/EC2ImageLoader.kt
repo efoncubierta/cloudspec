@@ -20,36 +20,31 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
-class EC2ImageLoader(clientsProvider: IAWSClientsProvider) :
-        EC2ResourceLoader<EC2Image>(clientsProvider) {
+class EC2ImageLoader(clientsProvider: IAWSClientsProvider) : EC2ResourceLoader<EC2Image>(clientsProvider) {
 
     override suspend fun resourcesInRegion(region: String,
                                            ids: List<String>): List<EC2Image> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
+        requestInRegion(region) { client ->
             val filters = buildFilters(
                     mapOf(
                             FILTER_IMAGE_ID to ids
                     )
             )
 
-            withContext(Dispatchers.Default) {
-                client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeImages.html
-                    .describeImages { builder ->
-                        if (filters.isNotEmpty()) {
-                            builder.filters(filters)
-                        }
+            client
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeImages.html
+                .describeImages { builder ->
+                    if (filters.isNotEmpty()) {
+                        builder.filters(filters)
                     }
-                    .images()
-                    .stream()
-                    .map { it.toEC2Image(region) }
-                    .toList()
-            }
+                }
+                .images()
+                .stream()
+                .map { it.toEC2Image(region) }
+                .toList()
         }
     }
 

@@ -24,17 +24,18 @@ import arrow.core.firstOrNone
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
 import kotlinx.coroutines.*
+import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.Filter
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
     override fun byId(id: String): Option<T> = runBlocking {
-        getResources(listOf(id)).firstOrNone()
+        resources(listOf(id)).firstOrNone()
     }
 
     override val all: List<T>
-        get() = runBlocking { getResources() }
+        get() = runBlocking { resources() }
 
-    private suspend fun getResources(ids: List<String> = emptyList()): List<T> = coroutineScope {
+    private suspend fun resources(ids: List<String> = emptyList()): List<T> = coroutineScope {
         availableRegions()
             .map { async { resourcesInRegion(it, ids) } }
             .awaitAll()
@@ -42,6 +43,15 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
     }
 
     abstract suspend fun resourcesInRegion(region: String, ids: List<String>): List<T>
+
+    protected suspend fun requestInRegion(region: String,
+                                          handler: (client: Ec2Client) -> List<T>): List<T> = coroutineScope {
+        clientsProvider.ec2ClientForRegion(region).use { client ->
+            withContext(Dispatchers.Default) {
+                handler(client)
+            }
+        }
+    }
 
     protected suspend fun availableRegions(): List<String> = coroutineScope {
         clientsProvider.ec2Client.use { ec2Client ->

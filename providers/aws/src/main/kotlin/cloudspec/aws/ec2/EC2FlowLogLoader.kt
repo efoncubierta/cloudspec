@@ -20,36 +20,31 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
-class EC2FlowLogLoader(clientsProvider: IAWSClientsProvider) :
-        EC2ResourceLoader<EC2FlowLog>(clientsProvider) {
+class EC2FlowLogLoader(clientsProvider: IAWSClientsProvider) : EC2ResourceLoader<EC2FlowLog>(clientsProvider) {
 
     override suspend fun resourcesInRegion(region: String,
                                            ids: List<String>): List<EC2FlowLog> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
+        requestInRegion(region) { client ->
             val filters = buildFilters(
                     mapOf(
                             FILTER_FLOW_LOG_ID to ids
                     )
             )
 
-            withContext(Dispatchers.Default) {
-                client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeFlowLogs.html
-                    .describeFlowLogs { builder ->
-                        if (filters.isNotEmpty()) {
-                            builder.filter(filters)
-                        }
+            client
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeFlowLogs.html
+                .describeFlowLogs { builder ->
+                    if (filters.isNotEmpty()) {
+                        builder.filter(filters)
                     }
-                    .flowLogs()
-                    .stream()
-                    .map { it.toEC2FlowLog(region) }
-                    .toList()
-            }
+                }
+                .flowLogs()
+                .stream()
+                .map { it.toEC2FlowLog(region) }
+                .toList()
         }
     }
 

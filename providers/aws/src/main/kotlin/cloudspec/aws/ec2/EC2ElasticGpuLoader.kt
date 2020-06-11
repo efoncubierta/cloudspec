@@ -20,29 +20,24 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
-class EC2ElasticGpuLoader(clientsProvider: IAWSClientsProvider) :
-        EC2ResourceLoader<EC2ElasticGpu>(clientsProvider) {
+class EC2ElasticGpuLoader(clientsProvider: IAWSClientsProvider) : EC2ResourceLoader<EC2ElasticGpu>(clientsProvider) {
     override suspend fun resourcesInRegion(region: String,
                                            ids: List<String>): List<EC2ElasticGpu> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
-            withContext(Dispatchers.Default) {
-                client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeElasticGpus.html
-                    .describeElasticGpus { builder ->
-                        if (ids.isNotEmpty()) {
-                            builder.elasticGpuIds(ids)
-                        }
+        requestInRegion(region) { client ->
+            client
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeElasticGpus.html
+                .describeElasticGpus { builder ->
+                    if (ids.isNotEmpty()) {
+                        builder.elasticGpuIds(ids)
                     }
-                    .elasticGpuSet()
-                    .stream()
-                    .map { it.toEC2ElasticGpu(region) }
-                    .toList()
-            }
+                }
+                .elasticGpuSet()
+                .stream()
+                .map { it.toEC2ElasticGpu(region) }
+                .toList()
         }
     }
 }

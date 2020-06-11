@@ -20,9 +20,7 @@
 package cloudspec.aws.ec2
 
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
 class EC2NatGatewayLoader(clientsProvider: IAWSClientsProvider) :
@@ -30,26 +28,24 @@ class EC2NatGatewayLoader(clientsProvider: IAWSClientsProvider) :
 
     override suspend fun resourcesInRegion(region: String,
                                            ids: List<String>): List<EC2NatGateway> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
+        requestInRegion(region) { client ->
             val filters = buildFilters(
                     mapOf(
                             FILTER_NAT_GATEWAY_ID to ids
                     )
             )
 
-            withContext(Dispatchers.Default) {
-                client
-                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNatGateways.html
-                    .describeNatGateways { builder ->
-                        if (filters.isNotEmpty()) {
-                            builder.filter(filters)
-                        }
+            client
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNatGateways.html
+                .describeNatGateways { builder ->
+                    if (filters.isNotEmpty()) {
+                        builder.filter(filters)
                     }
-                    .natGateways()
-                    .stream()
-                    .map { it.toEC2NatGateway(region) }
-                    .toList()
-            }
+                }
+                .natGateways()
+                .stream()
+                .map { it.toEC2NatGateway(region) }
+                .toList()
         }
     }
 
