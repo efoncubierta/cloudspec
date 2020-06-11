@@ -41,7 +41,7 @@ class EC2FlowLogLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .flowLogs()
-                    .map { flowLog -> flowLog.toEC2FlowLog(region) }
+                    .map { it.toEC2FlowLog(region) }
         }
     }
 

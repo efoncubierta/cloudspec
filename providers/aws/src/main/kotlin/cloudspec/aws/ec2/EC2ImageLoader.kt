@@ -41,7 +41,7 @@ class EC2ImageLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .images()
-                    .map { image -> image.toEC2Image(region) }
+                    .map { it.toEC2Image(region) }
         }
     }
 

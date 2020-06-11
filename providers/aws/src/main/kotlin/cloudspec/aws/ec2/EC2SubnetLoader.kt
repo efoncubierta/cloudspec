@@ -41,7 +41,7 @@ class EC2SubnetLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .subnets()
-                    .map { subnet -> subnet.toEC2Subnet(region) }
+                    .map { it.toEC2Subnet(region) }
         }
     }
 

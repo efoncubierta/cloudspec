@@ -35,7 +35,7 @@ class EC2CapacityReservationLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .capacityReservations()
-                    .map { capacityReservation -> capacityReservation.toEC2CapacityReservation(region) }
+                    .map { it.toEC2CapacityReservation(region) }
         }
     }
 }

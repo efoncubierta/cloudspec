@@ -29,6 +29,7 @@ import cloudspec.lang.*
 import cloudspec.model.Resource
 import cloudspec.model.ResourceDefRef
 import cloudspec.model.ResourceDefRef.Companion.fromString
+import cloudspec.model.ResourceRef
 import cloudspec.model.Resources
 import cloudspec.store.ResourceStore
 import org.slf4j.LoggerFactory
@@ -90,13 +91,13 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         val associationPath = path.plus(statement.associationName)
 
         logger.debug("Loading resources for association '${statement.associationName}' " +
-                             "in resource '${resource.resourceDefRef}' with id '${resource.resourceId}'")
+                             "in resource '${resource.ref}'")
 
         when (val associationOpt = resource.getAssociationByPath(associationPath)) {
             is Some -> {
                 // load associated resource
                 val association = associationOpt.t
-                when (val associatedResourceOpt = getResourceById(association.resourceDefRef, association.resourceId)) {
+                when (val associatedResourceOpt = getResource(association.resourceRef)) {
                     is Some ->
                         // load resources from each sub statement
                         statement.statements.forEach {
@@ -104,14 +105,14 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
                         }
                     else ->
                         logger.error("Associated resource '${statement.associationName}' " +
-                                             "in resource '${resource.resourceDefRef}' " +
-                                             "with id '${resource.resourceId}' does not exist. Ignoring it.")
+                                             "in resource '${resource.ref}' " +
+                                             "does not exist. Ignoring it.")
 
                 }
             }
             else ->
                 logger.error("Association '${statement.associationName}' does not exist " +
-                                     "in resource '${resource.resourceDefRef}' with id '${resource.resourceId}'. " +
+                                     "in resource '${resource.ref}'." +
                                      "Ignoring it.")
         }
     }
@@ -127,9 +128,8 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
                         provider.resourcesByRef(resourceDefRef)
                                 .map { ResourceReflectionUtil.toResource(it) }
                                 .flatten()
-                                .onEach { (_, resourceId, properties, associations) ->
-                                    resourceStore.saveResource(resourceDefRef,
-                                                               resourceId,
+                                .onEach { (ref, properties, associations) ->
+                                    resourceStore.saveResource(ref,
                                                                properties,
                                                                associations)
                                 }
@@ -141,20 +141,19 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         }
     }
 
-    private fun getResourceById(resourceDefRef: ResourceDefRef, resourceId: String): Option<Resource> {
+    private fun getResource(ref: ResourceRef): Option<Resource> {
         // TODO load incomplete resource from store
 //        Optional<Resource> resourceOpt = resourceStore.getResource(resourceDefRef, resourceId);
 //        if (!resourceOpt.isPresent()) {
-        logger.debug("Loading resource of type '${resourceDefRef}' with id '${resourceId}'")
+        logger.debug("Loading resource of type '${ref}'")
 
-        return providersRegistry.getProvider(resourceDefRef.providerName)
+        return providersRegistry.getProvider(ref.defRef)
                 .flatMap { provider ->
-                    provider.resourceById(resourceDefRef, resourceId)
+                    provider.resource(ref)
                             .flatMap { ResourceReflectionUtil.toResource(it) }
                             .also {
                                 if (it is Some) {
-                                    resourceStore.saveResource(resourceDefRef,
-                                                               resourceId,
+                                    resourceStore.saveResource(ref,
                                                                it.t.properties,
                                                                it.t.associations)
                                 }

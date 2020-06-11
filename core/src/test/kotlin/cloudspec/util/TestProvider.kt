@@ -24,6 +24,7 @@ import arrow.core.none
 import cloudspec.annotation.ProviderDefinition
 import cloudspec.model.Provider
 import cloudspec.model.ResourceDefRef
+import cloudspec.model.ResourceRef
 
 @ProviderDefinition(
         name = ProviderDataUtil.PROVIDER_NAME,
@@ -35,7 +36,7 @@ class TestProvider : Provider() {
         return emptyList()
     }
 
-    override fun resourceById(ref: ResourceDefRef, id: String): Option<Any> {
+    override fun resource(ref: ResourceRef): Option<Any> {
         return none<Any>()
     }
 }

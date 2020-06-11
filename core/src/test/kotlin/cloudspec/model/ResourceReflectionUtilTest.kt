@@ -37,7 +37,7 @@ class ResourceReflectionUtilTest {
     fun shouldProduceResourceId() {
         val resourceIdOpt = toResourceId(ModelTestUtils.TEST_RESOURCE)
         assertTrue(resourceIdOpt is Some<String>)
-        assertEquals(ModelTestUtils.RESOURCE_ID, resourceIdOpt.t)
+        assertEquals(ModelTestUtils.RESOURCE_REF.id, resourceIdOpt.t)
     }
 
     @Test

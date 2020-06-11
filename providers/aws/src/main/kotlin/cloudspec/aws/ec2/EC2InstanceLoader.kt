@@ -41,8 +41,8 @@ class EC2InstanceLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .reservations()
-                    .flatMap { reservation -> reservation.instances() }
-                    .map { instance -> instance.toEC2Instance(region) }
+                    .flatMap { it.instances() }
+                    .map { it.toEC2Instance(region) }
         }
     }
 

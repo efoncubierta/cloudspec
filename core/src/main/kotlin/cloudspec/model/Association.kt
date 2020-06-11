@@ -27,6 +27,5 @@ package cloudspec.model
  */
 data class Association(
         override val name: String,
-        val resourceDefRef: ResourceDefRef,
-        val resourceId: String
+        val resourceRef: ResourceRef
 ) : Member

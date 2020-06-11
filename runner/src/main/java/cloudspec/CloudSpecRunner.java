@@ -27,7 +27,6 @@ import com.diogonunes.jcdp.color.api.Ansi;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CloudSpecRunner {
@@ -112,9 +111,8 @@ public class CloudSpecRunner {
                         .peek(resourceValidationResult ->
                                 cp.println(
                                         String.format(
-                                                "Resource '%s' with id '%s'",
-                                                resourceValidationResult.getResourceDefRef(),
-                                                resourceValidationResult.getResourceId()
+                                                "Resource '%s'",
+                                                resourceValidationResult.getRef()
                                         ),
                                         Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE
                                 )

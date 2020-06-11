@@ -41,7 +41,7 @@ class EC2SecurityGroupLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .securityGroups()
-                    .map { securityGroup -> securityGroup.toEC2SecurityGroup(region) }
+                    .map { it.toEC2SecurityGroup(region) }
         }
     }
 

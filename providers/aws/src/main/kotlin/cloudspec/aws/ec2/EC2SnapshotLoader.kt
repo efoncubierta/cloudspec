@@ -41,7 +41,7 @@ class EC2SnapshotLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .snapshots()
-                    .map { snapshot -> snapshot.toEC2Snapshot(region) }
+                    .map { it.toEC2Snapshot(region) }
         }
     }
 

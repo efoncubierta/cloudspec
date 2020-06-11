@@ -41,7 +41,7 @@ class EC2NetworkInterfaceLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .networkInterfaces()
-                    .map { networkInterface -> networkInterface.toEC2NetworkInterface(region) }
+                    .map { it.toEC2NetworkInterface(region) }
         }
     }
 

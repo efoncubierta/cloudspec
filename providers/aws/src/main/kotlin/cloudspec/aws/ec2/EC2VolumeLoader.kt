@@ -41,7 +41,7 @@ class EC2VolumeLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .volumes()
-                    .map { volume -> volume.toEC2Volume(region) }
+                    .map { it.toEC2Volume(region) }
         }
     }
 

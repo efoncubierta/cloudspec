@@ -36,8 +36,8 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
         }
 
     private fun getResources(ids: List<String> = emptyList()): List<T> {
-        return availableRegions.flatMap { region ->
-            getResourcesInRegion(region, ids)
+        return availableRegions.flatMap {
+            getResourcesInRegion(it, ids)
         }
     }
 
@@ -48,18 +48,18 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
             clientsProvider.ec2Client.use { ec2Client ->
                 return ec2Client.describeRegions()
                         .regions()
-                        .map { region -> region.regionName() }
+                        .map { it.regionName() }
             }
         }
 
     protected fun buildFilters(filterValues: Map<String, List<String>>): List<Filter> {
         return filterValues.keys
-                .filter { key ->
-                    !filterValues[key].isNullOrEmpty()
-                }.map { key ->
+                .filter {
+                    !filterValues[it].isNullOrEmpty()
+                }.map {
                     Filter.builder()
-                            .name(key)
-                            .values(filterValues[key])
+                            .name(it)
+                            .values(filterValues[it])
                             .build()
                 }
     }

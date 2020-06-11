@@ -34,7 +34,7 @@ class EC2ElasticGpuLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .elasticGpuSet()
-                    .map { elasticGpu -> elasticGpu.toEC2ElasticGpu(region) }
+                    .map { it.toEC2ElasticGpu(region) }
         }
     }
 }

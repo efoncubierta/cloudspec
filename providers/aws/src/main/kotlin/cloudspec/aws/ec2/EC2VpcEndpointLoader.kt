@@ -41,7 +41,7 @@ class EC2VpcEndpointLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .vpcEndpoints()
-                    .map { vpcEndpoint -> vpcEndpoint.toEC2VpcEndpoint(region) }
+                    .map { it.toEC2VpcEndpoint(region) }
         }
     }
 

@@ -20,12 +20,12 @@
 package cloudspec.graph
 
 import arrow.core.Option
-import arrow.core.Some
 import arrow.core.none
 import arrow.core.toOption
 import arrow.syntax.collections.flatten
 import cloudspec.lang.*
 import cloudspec.model.ResourceDefRef
+import cloudspec.model.ResourceRef
 import cloudspec.validator.*
 import org.apache.tinkerpop.gremlin.process.traversal.Compare
 import org.apache.tinkerpop.gremlin.process.traversal.Contains
@@ -50,49 +50,45 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
 
     private val graphTraversal: GraphTraversalSource = graph.traversal()
 
-    override fun existById(ref: ResourceDefRef, id: String): Boolean {
-        return buildGetResourceByIdTraversal(ref, id).hasNext()
+    override fun exist(ref: ResourceRef): Boolean {
+        return buildResourceTraversal(ref).hasNext()
     }
 
-    override fun existAny(ref: ResourceDefRef, statements: List<Statement>): Boolean {
-        return buildGetAllResourcesFilteredTraversal(ref, statements).hasNext()
+    override fun existAny(defRef: ResourceDefRef, statements: List<Statement>): Boolean {
+        return buildResourcesFilteringTraversal(defRef, statements).hasNext()
     }
 
-    override fun validateById(ref: ResourceDefRef,
-                              id: String,
-                              filterStatements: List<Statement>,
-                              assertStatements: List<Statement>): Option<ResourceValidationResult> {
-        return buildGetResourceByIdFilteringTraversal(ref, id, filterStatements)
+    override fun validate(ref: ResourceRef,
+                          filterStatements: List<Statement>,
+                          assertStatements: List<Statement>): Option<ResourceValidationResult> {
+        return buildResourceFilteringTraversal(ref, filterStatements)
                 .tryNext()
                 .orElse(null)
                 .toOption()
                 .flatMap {
-                    validateResource(it.value(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
-                                     it.value(GraphResourceStore.PROPERTY_RESOURCE_ID),
+                    validateResource(it.value(GraphResourceStore.PROPERTY_RESOURCE_REF),
                                      assertStatements)
                 }
     }
 
-    override fun validateAll(ref: ResourceDefRef,
+    override fun validateAll(defRef: ResourceDefRef,
                              filterStatements: List<Statement>,
                              assertStatements: List<Statement>): List<ResourceValidationResult> {
-        return buildGetAllResourcesFilteredTraversal(ref, filterStatements)
+        return buildResourcesFilteringTraversal(defRef, filterStatements)
                 .toList()
                 .map { resourceV ->
-                    validateResource(resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_DEF_REF),
-                                     resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_ID),
+                    validateResource(resourceV.value(GraphResourceStore.PROPERTY_RESOURCE_REF),
                                      assertStatements)
                 }
                 .flatten()
     }
 
-    private fun validateResource(ref: ResourceDefRef,
-                                 id: String,
+    private fun validateResource(ref: ResourceRef,
                                  assertStatements: List<Statement>): Option<ResourceValidationResult> {
         // validate resource exists
-        if (!existById(ref, id)) {
+        if (!exist(ref)) {
             logger.error(
-                    "Resource '${ref}' with id '${id}' cannot be validated because it doesn't exist."
+                    "Resource '${ref}' cannot be validated because it doesn't exist."
             )
             return none()
         }
@@ -105,51 +101,51 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                 }
                 .map {
                     // validate resource
-                    validateResourceByAssertTraversal(ref, id, it)
+                    validateResourceByAssertTraversal(ref, it)
                 }
 
         // build resource validation result
-        return ResourceValidationResult(ref, id, assertValidationResults).toOption()
+        return ResourceValidationResult(ref, assertValidationResults).toOption()
     }
 
-    private fun validateResourceByAssertTraversal(ref: ResourceDefRef,
-                                                  id: String,
+    private fun validateResourceByAssertTraversal(ref: ResourceRef,
                                                   assertTraversal: GraphTraversal<*, AssertValidationResult>): AssertValidationResult {
         // get resource and apply assert traversal
-        return buildGetResourceByIdTraversal(ref, id)
+        return buildResourceTraversal(ref)
                 .flatMap(assertTraversal)
                 .next()
     }
 
-    private fun buildGetResourcesByDefinitionTraversal(ref: ResourceDefRef): GraphTraversal<Vertex, *> {
+    private fun buildResourcesTraversal(defRef: ResourceDefRef): GraphTraversal<Vertex, *> {
         // get all resource vertex by resource definition
         return graphTraversal.V()
+                .has(GraphResourceDefStore.LABEL_RESOURCE_DEF,
+                     GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
+                     defRef)
+                .`in`(GraphResourceStore.LABEL_IS_RESOURCE_DEF)
+    }
+
+    private fun buildResourceTraversal(ref: ResourceRef): GraphTraversal<Vertex, *> {
+        // get all resource vertex by resource reference
+        return graphTraversal.V()
                 .has(GraphResourceStore.LABEL_RESOURCE,
-                     GraphResourceStore.PROPERTY_RESOURCE_DEF_REF,
+                     GraphResourceStore.PROPERTY_RESOURCE_REF,
                      ref)
     }
 
-    private fun buildGetResourceByIdTraversal(ref: ResourceDefRef,
-                                              id: String): GraphTraversal<Vertex, *> {
-        // get all resource vertex by resource definition and resource id
-        return buildGetResourcesByDefinitionTraversal(ref)
-                .has(GraphResourceStore.PROPERTY_RESOURCE_ID, id)
-    }
-
-    private fun buildGetResourceByIdFilteringTraversal(ref: ResourceDefRef,
-                                                       id: String,
-                                                       statements: List<Statement>): GraphTraversal<Vertex, Vertex> {
+    private fun buildResourceFilteringTraversal(ref: ResourceRef,
+                                                statements: List<Statement>): GraphTraversal<Vertex, Vertex> {
         // get resource by definition and id and apply statements
-        return buildGetResourceByIdTraversal(ref, id)
+        return buildResourceTraversal(ref)
                 .and(*statements
                         .map { buildFilteringTraversal(it) }
                         .toTypedArray()
                 ) as GraphTraversal<Vertex, Vertex>
     }
 
-    private fun buildGetAllResourcesFilteredTraversal(ref: ResourceDefRef,
-                                                      statements: List<Statement>): GraphTraversal<Vertex, Vertex> {
-        return buildGetResourcesByDefinitionTraversal(ref)
+    private fun buildResourcesFilteringTraversal(ref: ResourceDefRef,
+                                                 statements: List<Statement>): GraphTraversal<Vertex, Vertex> {
+        return buildResourcesTraversal(ref)
                 .and(*statements
                         .map { buildFilteringTraversal(it) }
                         .toTypedArray()

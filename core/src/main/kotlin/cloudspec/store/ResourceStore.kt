@@ -23,15 +23,15 @@ import arrow.core.Option
 import cloudspec.model.*
 
 interface ResourceStore {
-    fun saveResource(ref: ResourceDefRef, id: String)
-    fun saveResource(ref: ResourceDefRef, id: String, properties: Properties, associations: Associations)
-    fun exists(ref: ResourceDefRef, id: String): Boolean
-    fun resourceById(ref: ResourceDefRef, id: String): Option<Resource>
+    fun saveResource(ref: ResourceRef)
+    fun saveResource(ref: ResourceRef, properties: Properties, associations: Associations)
+    fun exists(ref: ResourceRef): Boolean
+    fun resourceById(ref: ResourceRef): Option<Resource>
     fun resourcesByDefinition(ref: ResourceDefRef): Resources
-    fun resourceProperties(ref: ResourceDefRef, id: String): Option<Properties>
-    fun saveProperty(ref: ResourceDefRef, id: String, property: Property<*>)
-    fun saveProperties(ref: ResourceDefRef, id: String, properties: Properties)
-    fun resourceAssociations(ref: ResourceDefRef, id: String): Option<Associations>
-    fun saveAssociation(ref: ResourceDefRef, id: String, association: Association)
-    fun saveAssociations(ref: ResourceDefRef, id: String, associations: Associations)
+    fun resourceProperties(ref: ResourceRef): Option<Properties>
+    fun saveProperty(ref: ResourceRef, property: Property<*>)
+    fun saveProperties(ref: ResourceRef, properties: Properties)
+    fun resourceAssociations(ref: ResourceRef): Option<Associations>
+    fun saveAssociation(ref: ResourceRef, association: Association)
+    fun saveAssociations(ref: ResourceRef, associations: Associations)
 }

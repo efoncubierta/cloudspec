@@ -40,28 +40,22 @@ class S3BucketLoader(private val clientsProvider: IAWSClientsProvider) : S3Resou
             } else {
                 client.listBuckets()
                         .buckets()
-                        .map { obj: Bucket -> obj.name() }
+                        .map { it.name() }
             }
 
-            return buckets.map { bucketName ->
-                toResource(
-                        client,
-                        bucketName
-                )
+            return buckets.map {
+                toResource(client, it)
             }
         }
     }
 
-    private fun toResource(s3Client: S3Client, bucketName: String?): S3BucketResource {
+    private fun toResource(s3Client: S3Client, bucketName: String): S3BucketResource {
 
-        val region = s3Client.getBucketLocation { builder -> builder.bucket(bucketName) }
+        val region = s3Client.getBucketLocation { it.bucket(bucketName) }
                 .locationConstraint()
                 .toString()
 
-        return S3BucketResource(
-                bucketName,
-                region
-        )
+        return S3BucketResource(bucketName, region)
     }
 
 }

@@ -35,13 +35,13 @@ object ModelTestUtils {
     const val TARGET_RESOURCE_NAME = "mytargetresource"
     const val TARGET_RESOURCE_DESCRIPTION = "My target resource"
     val TARGET_RESOURCE_DEF_REF = ResourceDefRef(ProviderDataUtil.PROVIDER_NAME, RESOURCE_GROUP, TARGET_RESOURCE_NAME)
-    val RESOURCE_ID = UUID.randomUUID().toString()
-    val TARGET_RESOURCE_ID = UUID.randomUUID().toString()
+    val RESOURCE_REF = ResourceRef(RESOURCE_DEF_REF, UUID.randomUUID().toString())
+    val TARGET_RESOURCE_REF = ResourceRef(TARGET_RESOURCE_DEF_REF, UUID.randomUUID().toString())
     const val ASSOC_NAME = "myassociation"
     const val ASSOC_DESCRIPTION = "My association"
     val ASSOCIATION_DEF = AssociationDef(ASSOC_NAME, ASSOC_DESCRIPTION,
-            TARGET_RESOURCE_DEF_REF, false)
-    val ASSOCIATION = Association(ASSOC_NAME, TARGET_RESOURCE_DEF_REF, TARGET_RESOURCE_ID)
+                                         TARGET_RESOURCE_DEF_REF, false)
+    val ASSOCIATION = Association(ASSOC_NAME, TARGET_RESOURCE_REF)
     val ASSOCIATIONS: Associations = setOf(ASSOCIATION)
     val ASSOCIATION_DEFS = setOf(ASSOCIATION_DEF)
     val TARGET_ASSOCIATIONS: Associations = emptySet()
@@ -57,7 +57,7 @@ object ModelTestUtils {
             false,
             PROP_ID_EXAMPLE_VALUES
     )
-    val PROP_ID = StringProperty(PROP_ID_NAME, RESOURCE_ID)
+    val PROP_ID = StringProperty(PROP_ID_NAME, RESOURCE_REF.id)
     const val PROP_NUMBER_NAME = "number_property"
     const val PROP_NUMBER_DESCRIPTION = "Number property"
     const val PROP_NUMBER_EXAMPLE_VALUES = "The number property"
@@ -90,7 +90,6 @@ object ModelTestUtils {
     val PROP_STRING_TYPE = PropertyType.STRING
     const val PROP_STRING_VALUE = "foo"
 
-    @JvmField
     val PROP_STRING_DEF = PropertyDef(
             PROP_STRING_NAME,
             PROP_STRING_DESCRIPTION,
@@ -169,7 +168,6 @@ object ModelTestUtils {
     const val PROP_KEY_VALUE_EXAMPLE_VALUES = "The key value property"
     val PROP_KEY_VALUE_TYPE = PropertyType.KEY_VALUE
 
-    @JvmField
     val PROP_KEY_VALUE_VALUE = KeyValue(PROP_STRING_NAME, PROP_STRING_VALUE)
     val PROP_KEY_VALUE_DEF = PropertyDef(
             PROP_KEY_VALUE_NAME,
@@ -304,15 +302,13 @@ object ModelTestUtils {
     )
 
     val RESOURCE = Resource(
-            RESOURCE_DEF_REF,
-            RESOURCE_ID,
+            RESOURCE_REF,
             PROPERTIES,
             ASSOCIATIONS
     )
 
     val TARGET_RESOURCE = Resource(
-            TARGET_RESOURCE_DEF_REF,
-            TARGET_RESOURCE_ID,
+            TARGET_RESOURCE_REF,
             TARGET_PROPERTIES,
             TARGET_ASSOCIATIONS
     )
@@ -320,7 +316,7 @@ object ModelTestUtils {
     val TEST_PROVIDER: Provider = TestProvider()
 
     val TEST_RESOURCE = TestResource(
-            RESOURCE_ID,
+            RESOURCE_REF.id,
             PROP_NUMBER_VALUE,
             PROP_NUMBER_LIST_VALUE,
             PROP_STRING_VALUE,
@@ -342,7 +338,7 @@ object ModelTestUtils {
                     PROP_DATE_LIST_VALUE,
                     PROP_KEY_VALUE_VALUE,
                     PROP_KEY_VALUE_LIST_VALUE,
-                    TARGET_RESOURCE_ID
+                    TARGET_RESOURCE_REF.id
             ),
             listOf(
                     TestNestedProperty(
@@ -356,13 +352,12 @@ object ModelTestUtils {
                             PROP_DATE_LIST_VALUE,
                             PROP_KEY_VALUE_VALUE,
                             PROP_KEY_VALUE_LIST_VALUE,
-                            TARGET_RESOURCE_ID
+                            TARGET_RESOURCE_REF.id
                     )
             ),
-            TARGET_RESOURCE_ID
+            TARGET_RESOURCE_REF.id
     )
 
-    @JvmStatic
     fun comparePropertyDefs(propertyDefs1: Set<PropertyDef>, propertyDefs2: Set<PropertyDef?>) {
         assertNotNull(propertyDefs1)
         assertNotNull(propertyDefs2)
@@ -370,7 +365,6 @@ object ModelTestUtils {
         assertTrue(propertyDefs1.containsAll(propertyDefs2))
     }
 
-    @JvmStatic
     fun compareAssociationDefs(associationDefs1: Set<AssociationDef>, associationDefs2: Set<AssociationDef?>) {
         assertNotNull(associationDefs1)
         assertNotNull(associationDefs2)

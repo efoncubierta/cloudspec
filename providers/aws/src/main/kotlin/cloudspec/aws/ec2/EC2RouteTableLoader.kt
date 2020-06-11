@@ -41,7 +41,7 @@ class EC2RouteTableLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .routeTables()
-                    .map { routeTable -> routeTable.toEC2RouteTable(region) }
+                    .map { it.toEC2RouteTable(region) }
         }
     }
 

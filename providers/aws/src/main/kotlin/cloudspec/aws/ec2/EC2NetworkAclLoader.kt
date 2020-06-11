@@ -41,7 +41,7 @@ class EC2NetworkAclLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .networkAcls()
-                    .map { networkAcl -> networkAcl.toEC2NetworkAcl(region) }
+                    .map { it.toEC2NetworkAcl(region) }
         }
     }
 

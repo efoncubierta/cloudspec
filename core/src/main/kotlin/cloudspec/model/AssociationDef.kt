@@ -38,7 +38,7 @@ data class AssociationDef(
         /**
          * Resource definition.
          */
-        val resourceDefRef: ResourceDefRef,
+        val defRef: ResourceDefRef,
 
         /**
          * Indicates whether the association is to-many.

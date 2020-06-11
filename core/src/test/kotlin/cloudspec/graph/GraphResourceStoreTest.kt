@@ -30,7 +30,7 @@ import cloudspec.util.ModelGenerator.randomProperty
 import cloudspec.util.ModelGenerator.randomResource
 import cloudspec.util.ModelGenerator.randomResourceDef
 import cloudspec.util.ModelGenerator.randomResourceDefRef
-import cloudspec.util.ModelGenerator.randomResourceId
+import cloudspec.util.ModelGenerator.randomResourceRef
 import cloudspec.util.ModelTestUtils
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
@@ -53,14 +53,12 @@ class GraphResourceStoreTest {
         resourceDefStore.saveResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF)
         resourceDefStore.saveResourceDef(ModelTestUtils.RESOURCE_DEF)
         resourceStore.saveResource(
-                ModelTestUtils.TARGET_RESOURCE_DEF_REF,
-                ModelTestUtils.TARGET_RESOURCE_ID,
+                ModelTestUtils.TARGET_RESOURCE_REF,
                 ModelTestUtils.TARGET_PROPERTIES,
                 ModelTestUtils.TARGET_ASSOCIATIONS
         )
         resourceStore.saveResource(
-                ModelTestUtils.RESOURCE_DEF_REF,
-                ModelTestUtils.RESOURCE_ID,
+                ModelTestUtils.RESOURCE_REF,
                 ModelTestUtils.PROPERTIES,
                 ModelTestUtils.ASSOCIATIONS
         )
@@ -69,37 +67,27 @@ class GraphResourceStoreTest {
     @Test
     fun shouldNotExistRandomResourceId() {
         assertFalse(
-                resourceStore.exists(
-                        randomResourceDefRef(),
-                        randomResourceId()
-                )
+                resourceStore.exists(randomResourceRef())
         )
     }
 
     @Test
     fun shouldExistResource() {
         assertTrue(
-                resourceStore.exists(
-                        ModelTestUtils.RESOURCE_DEF_REF,
-                        ModelTestUtils.RESOURCE_ID
-                )
+                resourceStore.exists(ModelTestUtils.RESOURCE_REF)
         )
     }
 
     @Test
     fun shouldNotGetRandomResource() {
-        val resourceOpt = resourceStore.resourceById(
-                randomResourceDefRef(),
-                randomResourceId()
-        )
+        val resourceOpt = resourceStore.resourceById(randomResourceRef())
         assertTrue(resourceOpt is None)
     }
 
     @Test
     fun shouldGetResource() {
         val resourceOpt = resourceStore.resourceById(
-                ModelTestUtils.RESOURCE.resourceDefRef,
-                ModelTestUtils.RESOURCE.resourceId
+                ModelTestUtils.RESOURCE.ref
         )
         assertTrue(resourceOpt is Some<Resource>)
         assertEquals(ModelTestUtils.RESOURCE, resourceOpt.t)
@@ -107,18 +95,14 @@ class GraphResourceStoreTest {
 
     @Test
     fun shouldNotGetPropertiesOfRandomResource() {
-        val propertiesOpt = resourceStore.resourceProperties(
-                randomResourceDefRef(),
-                randomResourceId()
-        )
+        val propertiesOpt = resourceStore.resourceProperties(randomResourceRef())
         assertTrue(propertiesOpt is None)
     }
 
     @Test
     fun shouldGetPropertiesOfResource() {
         val propertiesOpt = resourceStore.resourceProperties(
-                ModelTestUtils.RESOURCE_DEF_REF,
-                ModelTestUtils.RESOURCE_ID
+                ModelTestUtils.RESOURCE_REF
         )
         assertTrue(propertiesOpt is Some<Properties>)
         assertEquals(ModelTestUtils.PROPERTIES.size, propertiesOpt.t.size)
@@ -127,19 +111,13 @@ class GraphResourceStoreTest {
 
     @Test
     fun shouldNotGetAssociationsOfRandomResource() {
-        val associationsOpt = resourceStore.resourceAssociations(
-                randomResourceDefRef(),
-                randomResourceId()
-        )
+        val associationsOpt = resourceStore.resourceAssociations(randomResourceRef())
         assertTrue(associationsOpt is None)
     }
 
     @Test
     fun shouldGetAssociationsOfResource() {
-        val associationsOpt = resourceStore.resourceAssociations(
-                ModelTestUtils.RESOURCE_DEF_REF,
-                ModelTestUtils.RESOURCE_ID
-        )
+        val associationsOpt = resourceStore.resourceAssociations(ModelTestUtils.RESOURCE_REF)
         assertTrue(associationsOpt is Some<Associations>)
         assertEquals(ModelTestUtils.ASSOCIATIONS, associationsOpt.t)
     }
@@ -164,27 +142,22 @@ class GraphResourceStoreTest {
 
     @Test
     fun shouldNotSetRandomPropertyToRandomResource() {
-        val resourceDefRef = randomResourceDefRef()
-        val resourceId = randomResourceId()
+        val resourceRef = randomResourceRef()
         val property = randomProperty()
-        resourceStore.saveProperty(
-                resourceDefRef,
-                resourceId,
-                property
-        )
-        val propertiesOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        resourceStore.saveProperty(resourceRef, property)
+        val propertiesOpt = resourceStore.resourceProperties(resourceRef)
         assertTrue(propertiesOpt is None)
     }
 
     @Test
     fun shouldNotSetRandomPropertyToResource() {
         val resourceDef = randomResourceDef()
-        val (resourceDefRef, resourceId) = randomResource(resourceDef)
+        val (ref) = randomResource(resourceDef)
         val property = randomProperty()
         resourceDefStore.saveResourceDef(resourceDef)
-        resourceStore.saveResource(resourceDefRef, resourceId)
-        assertFails { resourceStore.saveProperty(resourceDefRef, resourceId, property) }
-        val propertiesOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        resourceStore.saveResource(ref)
+        assertFails { resourceStore.saveProperty(ref, property) }
+        val propertiesOpt = resourceStore.resourceProperties(ref)
         assertTrue(propertiesOpt is Some<Properties>)
         assertTrue(propertiesOpt.t.isEmpty())
     }
@@ -192,12 +165,12 @@ class GraphResourceStoreTest {
     @Test
     fun shouldSetPropertyToResource() {
         val resourceDef = randomResourceDef()
-        val (resourceDefRef, resourceId, properties) = randomResource(resourceDef)
+        val (ref, properties) = randomResource(resourceDef)
         val property = properties.elementAt(0)
         resourceDefStore.saveResourceDef(resourceDef)
-        resourceStore.saveResource(resourceDefRef, resourceId)
-        resourceStore.saveProperty(resourceDefRef, resourceId, property)
-        val propsOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        resourceStore.saveResource(ref)
+        resourceStore.saveProperty(ref, property)
+        val propsOpt = resourceStore.resourceProperties(ref)
         assertTrue(propsOpt is Some<Properties>)
         assertEquals(1, propsOpt.t.size)
         assertEquals(property, propsOpt.t.elementAt(0))
@@ -206,44 +179,35 @@ class GraphResourceStoreTest {
     @Test
     fun shouldSetMultiplePropertiesToResource() {
         val resourceDef = randomResourceDef()
-        val (resourceDefRef, resourceId, properties) = randomResource(resourceDef)
+        val (ref, properties) = randomResource(resourceDef)
         resourceDefStore.saveResourceDef(resourceDef)
-        resourceStore.saveResource(resourceDefRef, resourceId)
-        resourceStore.saveProperties(resourceDefRef, resourceId, properties)
-        val propsOpt = resourceStore.resourceProperties(resourceDefRef, resourceId)
+        resourceStore.saveResource(ref)
+        resourceStore.saveProperties(ref, properties)
+        val propsOpt = resourceStore.resourceProperties(ref)
         assertTrue(propsOpt is Some<Properties>)
         assertEquals(properties, propsOpt.t)
     }
 
     @Test
     fun shouldNotSetRandomAssociationToRandomResource() {
-        val resourceDefRef = randomResourceDefRef()
-        val resourceId = randomResourceId()
+        val ref = randomResourceRef()
         val association = randomAssociation()
-        resourceStore.saveAssociation(
-                resourceDefRef,
-                resourceId,
-                association
-        )
-        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        resourceStore.saveAssociation(ref, association)
+        val assocsOpt = resourceStore.resourceAssociations(ref)
         assertTrue(assocsOpt is None)
     }
 
     @Test
     fun shouldNotSetRandomAssociationToResource() {
         val resourceDef = randomResourceDef()
-        val (resourceDefRef, resourceId) = randomResource(resourceDef)
+        val (ref) = randomResource(resourceDef)
         val association = randomAssociation()
         resourceDefStore.saveResourceDef(resourceDef)
-        resourceStore.saveResource(resourceDefRef, resourceId)
+        resourceStore.saveResource(ref)
         assertFails {
-            resourceStore.saveAssociation(
-                    resourceDefRef,
-                    resourceId,
-                    association
-            )
+            resourceStore.saveAssociation(ref, association)
         }
-        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        val assocsOpt = resourceStore.resourceAssociations(ref)
         assertTrue(assocsOpt is Some<Associations>)
         assertTrue(assocsOpt.t.isEmpty())
     }
@@ -251,12 +215,12 @@ class GraphResourceStoreTest {
     @Test
     fun shouldNotSetAssociationToRandomTargetResource() {
         val resourceDef = randomResourceDef()
-        val (resourceDefRef, resourceId, _, associations) = randomResource(resourceDef)
+        val (ref, _, associations) = randomResource(resourceDef)
         val association = associations.elementAt(0)
         resourceDefStore.saveResourceDef(resourceDef)
-        resourceStore.saveResource(resourceDefRef, resourceId)
-        assertFails { resourceStore.saveAssociation(resourceDefRef, resourceId, association) }
-        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        resourceStore.saveResource(ref)
+        assertFails { resourceStore.saveAssociation(ref, association) }
+        val assocsOpt = resourceStore.resourceAssociations(ref)
         assertTrue(assocsOpt is Some<Associations>)
         assertTrue(assocsOpt.t.isEmpty())
     }
@@ -264,19 +228,19 @@ class GraphResourceStoreTest {
     @Test
     fun shouldSetAssociationToResource() {
         val resourceDef = randomResourceDef()
-        val (resourceDefRef, resourceId, _, associations) = randomResource(resourceDef)
+        val (ref, _, associations) = randomResource(resourceDef)
         val association = associations.elementAt(0)
-        val targetResourceDef = randomResourceDef(association.resourceDefRef)
+        val targetResourceDef = randomResourceDef(association.resourceRef.defRef)
 
         // create target resource
         resourceDefStore.saveResourceDef(targetResourceDef)
-        resourceStore.saveResource(association.resourceDefRef, association.resourceId)
+        resourceStore.saveResource(association.resourceRef)
 
         // create resource
         resourceDefStore.saveResourceDef(resourceDef)
-        resourceStore.saveResource(resourceDefRef, resourceId)
-        resourceStore.saveAssociation(resourceDefRef, resourceId, association)
-        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        resourceStore.saveResource(ref)
+        resourceStore.saveAssociation(ref, association)
+        val assocsOpt = resourceStore.resourceAssociations(ref)
         assertTrue(assocsOpt is Some<Associations>)
         assertEquals(1, assocsOpt.t.size)
         assertEquals(association, assocsOpt.t.elementAt(0))
@@ -285,17 +249,17 @@ class GraphResourceStoreTest {
     @Test
     fun shouldSetMultipleAssociationsToResource() {
         val resourceDef = randomResourceDef()
-        val (resourceDefRef, resourceId, _, associations) = randomResource(resourceDef)
+        val (ref, _, associations) = randomResource(resourceDef)
         resourceDefStore.saveResourceDef(resourceDef)
 
         // create associated resources
-        associations.forEach(Consumer { (_, resourceDefRef1, resourceId1) ->
-            resourceDefStore.saveResourceDef(randomResourceDef(resourceDefRef1))
-            resourceStore.saveResource(resourceDefRef1, resourceId1)
-        })
-        resourceStore.saveResource(resourceDefRef, resourceId)
-        resourceStore.saveAssociations(resourceDefRef, resourceId, associations)
-        val assocsOpt = resourceStore.resourceAssociations(resourceDefRef, resourceId)
+        associations.forEach { (_, resourceDefRef1) ->
+            resourceDefStore.saveResourceDef(randomResourceDef(resourceDefRef1.defRef))
+            resourceStore.saveResource(resourceDefRef1)
+        }
+        resourceStore.saveResource(ref)
+        resourceStore.saveAssociations(ref, associations)
+        val assocsOpt = resourceStore.resourceAssociations(ref)
         assertTrue(assocsOpt is Some<Associations>)
         assertEquals(associations, assocsOpt.t)
     }

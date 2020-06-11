@@ -214,7 +214,7 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                 .addV(LABEL_ASSOCIATION_DEF)
                 .property(PROPERTY_NAME, associationDef.name)
                 .property(PROPERTY_DESCRIPTION, associationDef.description)
-                .property(PROPERTY_RESOURCE_DEF_REF, associationDef.resourceDefRef)
+                .property(PROPERTY_RESOURCE_DEF_REF, associationDef.defRef)
                 .property(PROPERTY_IS_MANY, associationDef.isMany)
                 .next()
 

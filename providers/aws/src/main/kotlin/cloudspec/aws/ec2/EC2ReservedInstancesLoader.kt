@@ -41,7 +41,7 @@ class EC2ReservedInstancesLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .reservedInstances()
-                    .map { reservedInstances -> reservedInstances.toEC2ReservedInstances(region) }
+                    .map { it.toEC2ReservedInstances(region) }
         }
     }
 

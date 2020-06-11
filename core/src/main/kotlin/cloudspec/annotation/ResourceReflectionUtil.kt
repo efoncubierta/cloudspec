@@ -21,6 +21,7 @@ package cloudspec.annotation
 
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.extensions.fx
 import arrow.core.firstOrNone
 import cloudspec.annotation.ResourceDefReflectionUtil.guessContainedType
 import cloudspec.annotation.ResourceDefReflectionUtil.guessPropertyType
@@ -47,10 +48,22 @@ object ResourceReflectionUtil {
      * @return Optional resource.
      */
     fun toResource(obj: Any): Option<Resource> {
-        return toResourceDefRef(obj::class).flatMap { ref ->
-            toResourceId(obj).map { id ->
-                Resource(ref, id, toProperties(obj), toAssociations(obj))
-            }
+        return toResourceRef(obj).map { ref ->
+            Resource(ref, toProperties(obj), toAssociations(obj))
+        }
+    }
+
+    /**
+     * Extract full resource reference out of an object with a class annotated with @ResourceDefinition.
+     *
+     * @param obj Object.
+     * @return Optional resource reference.
+     */
+    fun toResourceRef(obj: Any): Option<ResourceRef> {
+        return Option.fx {
+            val (defRef) = toResourceDefRef(obj::class)
+            val (id) = toResourceId(obj)
+            ResourceRef(defRef, id)
         }
     }
 
@@ -58,7 +71,7 @@ object ResourceReflectionUtil {
      * Extract resource id out of an object with a class annotated with @ResourceDefinition.
      *
      * @param obj Object.
-     * @return Resource id or null.
+     * @return Optional resource id.
      */
     fun toResourceId(obj: Any): Option<String> {
         return obj::class.memberProperties
@@ -178,7 +191,7 @@ object ResourceReflectionUtil {
                         return@flatMap emptyList<Association>()
                     }
 
-                    when (val resourceDefRefOpt= toResourceDefRef(associationDefinitionAnnotation.targetClass)) {
+                    when (val resourceDefRefOpt = toResourceDefRef(associationDefinitionAnnotation.targetClass)) {
                         is Some -> {
                             // TODO add validation for association name and resourceDefRef
                             try {
@@ -189,8 +202,10 @@ object ResourceReflectionUtil {
                                         else -> setOf(id)
                                     }.map { resourceId ->
                                         Association(associationDefinitionAnnotation.name,
-                                                    resourceDefRefOpt.t,
-                                                    resourceId as String)
+                                                    ResourceRef(
+                                                            resourceDefRefOpt.t,
+                                                            resourceId as String
+                                                    ))
                                     }
                                 } ?: emptyList()
                             } catch (exception: IllegalAccessException) {

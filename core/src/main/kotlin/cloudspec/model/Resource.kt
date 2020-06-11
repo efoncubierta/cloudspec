@@ -28,8 +28,7 @@ package cloudspec.model
  * Resources are provided by the providers.
  */
 data class Resource(
-        val resourceDefRef: ResourceDefRef,
-        val resourceId: String,
+        val ref: ResourceRef,
         override val properties: Properties = emptySet(),
         override val associations: Associations = emptySet()
 ) : MembersContainer

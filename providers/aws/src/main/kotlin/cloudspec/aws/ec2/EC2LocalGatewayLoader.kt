@@ -41,7 +41,7 @@ class EC2LocalGatewayLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .localGateways()
-                    .map { localGateway -> localGateway.toEC2LocalGateway(region) }
+                    .map { it.toEC2LocalGateway(region) }
         }
     }
 

@@ -41,7 +41,7 @@ class EC2DhcpOptionsLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .dhcpOptions()
-                    .map { dhcpOptions -> dhcpOptions.toEC2DhcpOptions(region) }
+                    .map { it.toEC2DhcpOptions(region) }
         }
     }
 

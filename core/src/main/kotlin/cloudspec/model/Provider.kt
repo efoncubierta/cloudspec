@@ -94,9 +94,8 @@ abstract class Provider {
     /**
      * Get a resource by resource definition and id.
      *
-     * @param ref Resource definition reference.
-     * @param id  Resource id.
+     * @param ref Resource reference.
      * @return Optional resource.
      */
-    abstract fun resourceById(ref: ResourceDefRef, id: String): Option<Any>
+    abstract fun resource(ref: ResourceRef): Option<Any>
 }

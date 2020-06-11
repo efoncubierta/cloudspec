@@ -22,6 +22,7 @@ package cloudspec.validator
 import arrow.core.Option
 import cloudspec.lang.Statement
 import cloudspec.model.ResourceDefRef
+import cloudspec.model.ResourceRef
 
 /**
  * Define a resource validator.
@@ -34,40 +35,38 @@ interface ResourceValidator {
      * @param id  Resource id.
      * @return True if resource exists. False otherwise.
      */
-    fun existById(ref: ResourceDefRef, id: String): Boolean
+    fun exist(ref: ResourceRef): Boolean
 
     /**
      * Check whether any resource exist.
      *
-     * @param ref   Resource definition reference.
+     * @param defRef   Resource definition reference.
      * @param statements List of statements for filtering.
      * @return True if at least one resource exists. False otherwise.
      */
-    fun existAny(ref: ResourceDefRef, statements: List<Statement>): Boolean
+    fun existAny(defRef: ResourceDefRef, statements: List<Statement>): Boolean
 
     /**
      * Validate an individual resource.
      *
-     * @param ref   Resource definition reference.
-     * @param id       Resource id.
+     * @param ref   Resource reference.
      * @param filterStatements List of statements for filtering.
      * @param assertStatements List of statements for asserting.
      * @return Resource validator result or null.
      */
-    fun validateById(ref: ResourceDefRef,
-                     id: String,
-                     filterStatements: List<Statement>,
-                     assertStatements: List<Statement>): Option<ResourceValidationResult>
+    fun validate(ref: ResourceRef,
+                 filterStatements: List<Statement>,
+                 assertStatements: List<Statement>): Option<ResourceValidationResult>
 
     /**
      * Validate all resources of a kind.
      *
-     * @param ref   Resource definition reference.
+     * @param defRef   Resource definition reference.
      * @param filterStatements List of statements for filtering.
      * @param assertStatements List of statements for asserting.
      * @return List of resource validator results.
      */
-    fun validateAll(ref: ResourceDefRef,
+    fun validateAll(defRef: ResourceDefRef,
                     filterStatements: List<Statement>,
                     assertStatements: List<Statement>): List<ResourceValidationResult>
 }

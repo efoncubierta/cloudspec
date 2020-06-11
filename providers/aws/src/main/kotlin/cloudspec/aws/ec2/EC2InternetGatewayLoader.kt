@@ -41,7 +41,7 @@ class EC2InternetGatewayLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .internetGateways()
-                    .map { internetGateway -> internetGateway.toEC2InternetGateway(region) }
+                    .map { it.toEC2InternetGateway(region) }
         }
     }
 

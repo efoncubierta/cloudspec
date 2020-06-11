@@ -41,7 +41,7 @@ class EC2NatGatewayLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .natGateways()
-                    .map { natGateway -> natGateway.toEC2NatGateway(region) }
+                    .map { it.toEC2NatGateway(region) }
         }
     }
 

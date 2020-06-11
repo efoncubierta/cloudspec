@@ -160,8 +160,7 @@ object ModelGenerator {
     fun randomAssociation(associationDef: AssociationDef = randomAssociationDef()): Association {
         return Association(
                 associationDef.name,
-                associationDef.resourceDefRef,
-                randomResourceId()
+                randomResourceRef(associationDef.defRef)
         )
     }
 
@@ -194,10 +193,13 @@ object ModelGenerator {
         )
     }
 
+    fun randomResourceRef(defRef: ResourceDefRef? = null): ResourceRef {
+        return ResourceRef(defRef ?: randomResourceDefRef(), randomResourceId())
+    }
+
     fun randomResource(resourceDef: ResourceDef = randomResourceDef()): Resource {
         return Resource(
-                resourceDef.ref,
-                randomResourceId(),
+                randomResourceRef(resourceDef.ref),
                 randomProperties(resourceDef.properties),
                 randomAssociations(resourceDef.associations)
         )

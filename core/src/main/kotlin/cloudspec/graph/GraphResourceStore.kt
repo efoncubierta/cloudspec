@@ -43,16 +43,16 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
     private val graphTraversal: GraphTraversalSource = graph.traversal()
 
-    override fun exists(ref: ResourceDefRef, id: String): Boolean {
-        logger.debug("Checking whether resource '${ref}' with id '${id}' exists")
-        return getResourceVertexById(ref, id) is Some<Vertex>
+    override fun exists(ref: ResourceRef): Boolean {
+        logger.debug("Checking whether resource '${ref}' exists")
+        return getResourceVertexById(ref) is Some<Vertex>
     }
 
-    override fun resourceById(ref: ResourceDefRef, id: String): Option<Resource> {
-        logger.debug("Getting resource '${ref}' with id '${id}'")
+    override fun resourceById(ref: ResourceRef): Option<Resource> {
+        logger.debug("Getting resource '${ref}'")
 
-        // get resource vertex by resource id, and map it to resource object
-        return getResourceVertexById(ref, id).flatMap {
+        // get resource vertex by resource ref, and map it to resource object
+        return getResourceVertexById(ref).flatMap {
             toResourceFromVertex(it)
         }
     }
@@ -66,34 +66,34 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
                 .flatten()
     }
 
-    override fun resourceProperties(ref: ResourceDefRef, id: String): Option<Properties> {
-        logger.debug("Getting properties of resource '${ref}' with id '${id}'")
+    override fun resourceProperties(ref: ResourceRef): Option<Properties> {
+        logger.debug("Getting properties of resource '${ref}'")
 
         // get resource vertex by its id, and map it to a properties object
-        return getResourceVertexById(ref, id).map {
+        return getResourceVertexById(ref).map {
             toPropertiesFromVertex(it)
         }
     }
 
-    override fun resourceAssociations(ref: ResourceDefRef, id: String): Option<Associations> {
-        logger.debug("Getting associations of resource '${ref}' with id '${id}'")
+    override fun resourceAssociations(ref: ResourceRef): Option<Associations> {
+        logger.debug("Getting associations of resource '${ref}'")
 
         // get resource vertex by its id, and map it to an associations object
-        return getResourceVertexById(ref, id).map {
+        return getResourceVertexById(ref).map {
             toAssociationsFromVertex(it)
         }
     }
 
-    override fun saveResource(ref: ResourceDefRef, id: String): Unit {
+    override fun saveResource(ref: ResourceRef) {
         // default to empty properties and associations
-        saveResource(ref, id, emptySet(), emptySet())
+        saveResource(ref, emptySet(), emptySet())
     }
 
-    override fun saveResource(ref: ResourceDefRef, id: String, properties: Properties, associations: Associations): Unit {
-        logger.debug("Saving resource '${ref}' with id '${id}'")
+    override fun saveResource(ref: ResourceRef, properties: Properties, associations: Associations) {
+        logger.debug("Saving resource '${ref}'")
 
         // get, or create, resource vertex by its id
-        val resourceV = getOrCreateResourceVertexById(ref, id)
+        val resourceV = getOrCreateResourceVertexById(ref)
 
         // save resource properties
         savePropertiesFromVertex(resourceV, properties)
@@ -102,56 +102,55 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         saveAssociationsFromVertex(resourceV, associations)
     }
 
-    override fun saveProperties(ref: ResourceDefRef, id: String, properties: Properties): Unit {
-        logger.debug("Saving ${properties.size} properties on resource '${ref}' with id '${id}'")
+    override fun saveProperties(ref: ResourceRef, properties: Properties) {
+        logger.debug("Saving ${properties.size} properties on resource '${ref}'")
 
-        when (val vertex = getResourceVertexById(ref, id)) {
+        when (val vertex = getResourceVertexById(ref)) {
             is Some ->
                 savePropertiesFromVertex(vertex.t, properties)
             else ->
-                logger.error("Couldn't save properties. Resource '${ref}' with id '${id}' not found. ")
+                logger.error("Couldn't save properties. Resource '${ref}' not found. ")
         }
     }
 
-    override fun saveProperty(ref: ResourceDefRef, id: String, property: Property<*>) {
-        logger.debug("Saving property '${property.name}' on resource '${ref}' with id '${id}'")
+    override fun saveProperty(ref: ResourceRef, property: Property<*>) {
+        logger.debug("Saving property '${property.name}' on resource '${ref}'")
 
-        when (val vertex = getResourceVertexById(ref, id)) {
+        when (val vertex = getResourceVertexById(ref)) {
             is Some ->
                 savePropertyFromVertex(vertex.t, property)
             else ->
                 logger.error("Couldn't save property '${property.name}'. " +
-                                     "Resource '${ref}' with id '${id}' not found. ")
+                                     "Resource '${ref}' not found. ")
         }
     }
 
-    override fun saveAssociations(ref: ResourceDefRef, id: String, associations: Associations): Unit {
-        logger.debug("Saving ${associations.size} associations on resource '${ref}' with id '${id}'")
+    override fun saveAssociations(ref: ResourceRef, associations: Associations) {
+        logger.debug("Saving ${associations.size} associations on resource '${ref}'")
 
-        when (val vertex = getResourceVertexById(ref, id)) {
+        when (val vertex = getResourceVertexById(ref)) {
             is Some ->
                 saveAssociationsFromVertex(vertex.t, associations)
             else ->
-                logger.error("Couldn't save associations. Resource '${ref}' with id '${id}' not found.")
+                logger.error("Couldn't save associations. Resource '${ref}' not found.")
         }
     }
 
-    override fun saveAssociation(ref: ResourceDefRef, id: String, association: Association): Unit {
-        logger.debug("Saving association '${association.name}' on resource '${ref}' with id '${id}'")
+    override fun saveAssociation(ref: ResourceRef, association: Association) {
+        logger.debug("Saving association '${association.name}' on resource '${ref}'")
 
-        when (val vertex = getResourceVertexById(ref, id)) {
+        when (val vertex = getResourceVertexById(ref)) {
             is Some ->
                 saveAssociationFromVertex(vertex.t, association)
             else ->
                 logger.error("Couldn't save association '${association.name}'. " +
-                                     "Resource '${ref}' with id '${id}' not found.")
+                                     "Resource '${ref}' not found.")
         }
     }
 
-    private fun getResourceVertexById(ref: ResourceDefRef, id: String): Option<Vertex> {
+    private fun getResourceVertexById(ref: ResourceRef): Option<Vertex> {
         return graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, ref)
-                .has(PROPERTY_RESOURCE_ID, id)
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_REF, ref)
                 .tryNext()
                 .orElse(null)
                 .toOption()
@@ -159,35 +158,36 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
     private fun getResourceVerticesByDefinition(ref: ResourceDefRef): List<Vertex> {
         return graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, ref)
+                .has(GraphResourceDefStore.LABEL_RESOURCE_DEF,
+                     GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
+                     ref)
+                .`in`()
                 .toList()
     }
 
-    private fun getOrCreateResourceVertexById(ref: ResourceDefRef, id: String): Vertex {
-        logger.debug("Getting, or creating, resource vertex for resource '${ref}' with id '${id}'")
+    private fun getOrCreateResourceVertexById(ref: ResourceRef): Vertex {
+        logger.debug("Getting, or creating, resource vertex for resource '${ref}'")
 
         val resourceV = graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_DEF_REF, ref)
-                .has(PROPERTY_RESOURCE_ID, id)
+                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_REF, ref)
                 .fold() // check whether the resource vertex exist, or create it otherwise
                 .coalesce(
                         underscore.unfold(),
                         underscore.addV<Any>(LABEL_RESOURCE)
-                                .property(PROPERTY_RESOURCE_DEF_REF, ref)
-                                .property(PROPERTY_RESOURCE_ID, id)
+                                .property(PROPERTY_RESOURCE_REF, ref)
                 )
                 .next()
 
         // new resource vertex must have an edge to its resource definition vertex
         if (!resourceV.edges(Direction.OUT, LABEL_IS_RESOURCE_DEF).hasNext()) {
-            logger.debug("Created vertex for resource '${ref}' with id '${id}'")
+            logger.debug("Created vertex for resource '${ref}'")
 
             // get resource definition vertex
             val resourceDefVOpt = graphTraversal
                     .V()
                     .has(GraphResourceDefStore.LABEL_RESOURCE_DEF,
                          GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
-                         ref)
+                         ref.defRef)
                     .tryNext()
 
             // if resource definition vertex doesn't exist, roll back and throw an error
@@ -274,11 +274,11 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         return propertyV
     }
 
-    private fun savePropertiesFromVertex(sourceV: Vertex, properties: Properties): Unit {
+    private fun savePropertiesFromVertex(sourceV: Vertex, properties: Properties) {
         properties.forEach { savePropertyFromVertex(sourceV, it) }
     }
 
-    private fun savePropertyFromVertex(sourceV: Vertex, property: Property<*>): Unit {
+    private fun savePropertyFromVertex(sourceV: Vertex, property: Property<*>) {
         // source vertex can be a resource or a property value
         logger.debug("- Saving property '${toMemberPath(sourceV, property.name)}' with value $property")
 
@@ -291,7 +291,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         }
     }
 
-    private fun saveNestedPropertyValueFromVertex(propertyV: Vertex, nestedProperty: NestedPropertyValue?): Unit {
+    private fun saveNestedPropertyValueFromVertex(propertyV: Vertex, nestedProperty: NestedPropertyValue?) {
         // nested property values are empty, but with edges to properties and associations
         val propertyValueV = graphTraversal.V(propertyV.id())
                 .addV(LABEL_PROPERTY_VALUE)
@@ -311,7 +311,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         saveAssociationsFromVertex(propertyValueV, nestedProperty?.associations ?: emptySet())
     }
 
-    private fun saveAtomicPropertyValueFromVertex(propertyV: Vertex, obj: Any?): Unit {
+    private fun saveAtomicPropertyValueFromVertex(propertyV: Vertex, obj: Any?) {
         // atomic property values hold a value
         val propertyValueV = graphTraversal.V(propertyV.id())
                 .addV(LABEL_PROPERTY_VALUE)
@@ -326,7 +326,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
                 .next()
     }
 
-    private fun saveKeyValuePropertyValueFromVertex(propertyV: Vertex, keyValue: KeyValue?): Unit {
+    private fun saveKeyValuePropertyValueFromVertex(propertyV: Vertex, keyValue: KeyValue?) {
         // key value property values hold a key and a value properties
         val propertyValueV = graphTraversal.V(propertyV.id())
                 .addV(LABEL_PROPERTY_VALUE)
@@ -342,18 +342,18 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
                 .next()
     }
 
-    private fun saveAssociationsFromVertex(sourceV: Vertex, associations: Associations): Unit {
+    private fun saveAssociationsFromVertex(sourceV: Vertex, associations: Associations) {
         associations.forEach { saveAssociationFromVertex(sourceV, it) }
     }
 
-    private fun saveAssociationFromVertex(sourceV: Vertex, association: Association): Unit {
+    private fun saveAssociationFromVertex(sourceV: Vertex, association: Association) {
         // source vertex can be a resource or a property value
         logger.debug("- Saving association '${toMemberPath(sourceV, association.name)}' with value $association")
 
         // TODO remove old associations?
 
         // get, or create, target resource by it ids
-        val targetV = getOrCreateResourceVertexById(association.resourceDefRef, association.resourceId)
+        val targetV = getOrCreateResourceVertexById(association.resourceRef)
 
         // link source resource to target resource
         graphTraversal
@@ -365,8 +365,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
                                 .outE(LABEL_HAS_ASSOCIATION)
                                 .has(PROPERTY_NAME, association.name)
                                 .inV()
-                                .has(PROPERTY_RESOURCE_DEF_REF, association.resourceDefRef)
-                                .has(PROPERTY_RESOURCE_ID, association.resourceId),
+                                .has(PROPERTY_RESOURCE_REF, association.resourceRef),
                         underscore.addE<Any>(LABEL_HAS_ASSOCIATION)
                                 .property(PROPERTY_NAME, association.name)
                                 .from(sourceV)
@@ -379,13 +378,11 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         return when (resourceV.label()) {
             LABEL_RESOURCE -> {
                 // get resource data
-                val resourceDefRef = resourceV.value<ResourceDefRef>(PROPERTY_RESOURCE_DEF_REF)
-                val resourceId = resourceV.value<String>(PROPERTY_RESOURCE_ID)
-                logger.debug("Found resource '${resourceDefRef}' with id '${resourceId}'")
+                val resourceDefRef = resourceV.value<ResourceRef>(PROPERTY_RESOURCE_REF)
+                logger.debug("Found resource '${resourceDefRef}' ")
 
                 // return resource
                 Resource(resourceDefRef,
-                         resourceId,
                          toPropertiesFromVertex(resourceV),
                          toAssociationsFromVertex(resourceV)).toOption()
             }
@@ -467,8 +464,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
                                     .inV()
                                     .map { v ->
                                         Association(it.value(PROPERTY_NAME),
-                                                    v.get().value(PROPERTY_RESOURCE_DEF_REF),
-                                                    v.get().value(PROPERTY_RESOURCE_ID))
+                                                    v.get().value(PROPERTY_RESOURCE_REF))
                                     }
                                     .toList()
                         }
@@ -511,8 +507,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         const val LABEL_HAS_PROPERTY_VALUE = "hasPropertyValue"
         const val LABEL_IS_PROPERTY_DEF = "isPropertyDef"
         const val LABEL_HAS_ASSOCIATION = "hasAssociation"
-        const val PROPERTY_RESOURCE_ID = "resourceId"
-        const val PROPERTY_RESOURCE_DEF_REF = "resourceDefRef"
+        const val PROPERTY_RESOURCE_REF = "ref"
         const val PROPERTY_NAME = "name"
         const val PROPERTY_KEY = "key"
         const val PROPERTY_VALUE = "value"

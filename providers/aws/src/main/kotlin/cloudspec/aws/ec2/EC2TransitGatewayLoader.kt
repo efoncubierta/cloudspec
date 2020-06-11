@@ -41,7 +41,7 @@ class EC2TransitGatewayLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .transitGateways()
-                    .map { transitGateway -> transitGateway.toEC2TransitGateway(region) }
+                    .map { it.toEC2TransitGateway(region) }
         }
     }
 

@@ -41,7 +41,7 @@ class EC2VpcPeeringConnectionLoader(clientsProvider: IAWSClientsProvider) :
                         }
                     }
                     .vpcPeeringConnections()
-                    .map { vpcPeeringConnection -> vpcPeeringConnection.toEC2VpcPeeringConnection(region) }
+                    .map { it.toEC2VpcPeeringConnection(region) }
         }
     }
 

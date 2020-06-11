@@ -33,13 +33,11 @@ import kotlin.test.assertTrue
 class CloudSpecValidatorTest {
     companion object {
         val resourceValidator = mockk<ResourceValidator>()
-        val resourceValidationResults = ResourceValidationResult(
-                ModelTestUtils.RESOURCE_DEF_REF,
-                ModelTestUtils.RESOURCE_ID, emptyList())
+        val resourceValidationResults = ResourceValidationResult(ModelTestUtils.RESOURCE_REF, emptyList())
 
         init {
             every {
-                resourceValidator.validateAll(any<ResourceDefRef>(), any<List<Statement>>(), any<List<Statement>>())
+                resourceValidator.validateAll(any(), any(), any())
             } returns listOf(resourceValidationResults)
         }
     }

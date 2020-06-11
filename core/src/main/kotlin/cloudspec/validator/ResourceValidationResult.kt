@@ -19,11 +19,10 @@
  */
 package cloudspec.validator
 
-import cloudspec.model.ResourceDefRef
+import cloudspec.model.ResourceRef
 
 data class ResourceValidationResult(
-        val resourceDefRef: ResourceDefRef,
-        val resourceId: String,
+        val ref: ResourceRef,
         val assertResults: List<AssertValidationResult>
 ) {
     val isSuccess: Boolean

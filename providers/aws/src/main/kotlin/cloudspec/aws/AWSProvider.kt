@@ -29,6 +29,7 @@ import cloudspec.aws.s3.S3BucketLoader
 import cloudspec.aws.s3.S3BucketResource
 import cloudspec.model.Provider
 import cloudspec.model.ResourceDefRef
+import cloudspec.model.ResourceRef
 import java.util.*
 
 @ProviderDefinition(
@@ -66,8 +67,8 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
         return getLoader(ref).map { it.all }.getOrElse { emptyList<Unit>() }
     }
 
-    override fun resourceById(ref: ResourceDefRef, id: String): Option<Any> {
-        return getLoader(ref).map { it.byId(id) }
+    override fun resource(ref: ResourceRef): Option<Any> {
+        return getLoader(ref.defRef).map { it.byId(ref.id) }
     }
 
     private fun getLoader(resourceDefRef: ResourceDefRef): Option<AWSResourceLoader<*>> {
