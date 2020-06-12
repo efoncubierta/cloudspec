@@ -39,6 +39,7 @@ import cloudspec.model.PropertyType
 import com.github.javafaker.Faker
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.TextP
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -47,37 +48,37 @@ object CloudSpecGenerator {
 
     fun fullSpec(): CloudSpec {
         return CloudSpec.builder()
-                .setName(faker.lorem().sentence())
-                .addGroups(fullGroup())
-                .build()
+            .setName(faker.lorem().sentence())
+            .addGroups(fullGroup())
+            .build()
     }
 
     fun fullGroup(): GroupExpr {
         return GroupExpr.builder()
-                .setName(faker.lorem().sentence())
-                .addRules(fullRule())
-                .build()
+            .setName(faker.lorem().sentence())
+            .addRules(fullRule())
+            .build()
     }
 
     fun fullRule(): RuleExpr {
         return RuleExpr.builder()
-                .setName(faker.lorem().sentence())
-                .setResourceDefRef("${faker.lorem().word()}:${faker.lorem().word()}:${faker.lorem().word()}")
-                .setWithExpr(fullWith())
-                .setAssertExp(fullAssert())
-                .build()
+            .setName(faker.lorem().sentence())
+            .setResourceDefRef("${faker.lorem().word()}:${faker.lorem().word()}:${faker.lorem().word()}")
+            .setWithExpr(fullWith())
+            .setAssertExp(fullAssert())
+            .build()
     }
 
     fun fullWith(): WithExpr {
         return WithExpr.builder()
-                .setStatements(fullStatements(includeNested = true, includeAssociation = true))
-                .build()
+            .setStatements(fullStatements(includeNested = true, includeAssociation = true))
+            .build()
     }
 
     fun fullAssert(): AssertExpr {
         return AssertExpr.builder()
-                .setStatement(fullStatements(includeNested = true, includeAssociation = true))
-                .build()
+            .setStatement(fullStatements(includeNested = true, includeAssociation = true))
+            .build()
     }
 
     fun fullStatements(includeNested: Boolean, includeAssociation: Boolean): List<Statement> {
@@ -338,35 +339,35 @@ object CloudSpecGenerator {
     fun randomDateBeforePredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                before(randomDate())
+                before(randomInstant())
         )
     }
 
     fun randomDateNotBeforePredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                notBefore(randomDate())
+                notBefore(randomInstant())
         )
     }
 
     fun randomDateAfterPredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                after(randomDate())
+                after(randomInstant())
         )
     }
 
     fun randomDateNotAfterPredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                notAfter(randomDate())
+                notAfter(randomInstant())
         )
     }
 
     fun randomDateBetweenPredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                between(randomDate(), randomDate())
+                between(randomInstant(), randomInstant())
         )
     }
 
@@ -472,6 +473,10 @@ object CloudSpecGenerator {
     @JvmOverloads
     fun randomValues(propertyType: PropertyType? = randomPropertyType()): List<Any> {
         return (0..5).map { randomValue(propertyType) }
+    }
+
+    fun randomInstant(): Instant {
+        return randomDate().toInstant()
     }
 
     fun randomDate(): Date {

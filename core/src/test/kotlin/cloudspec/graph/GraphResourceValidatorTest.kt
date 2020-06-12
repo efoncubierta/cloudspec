@@ -223,7 +223,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationMemberNotFoundError)
+        assertTrue(result.assertResults[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -245,7 +245,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationMemberNotFoundError)
+        assertTrue(result.assertResults[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -267,7 +267,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationKeyNotFoundError)
+        assertTrue(result.assertResults[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -291,7 +291,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size)
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationMemberNotFoundError)
+        assertTrue(result.assertResults[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -315,7 +315,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationMemberNotFoundError)
+        assertTrue(result.assertResults[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -336,7 +336,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationMismatchError)
+        assertTrue(result.assertResults[0].error is AssertMismatchError)
     }
 
     @Test
@@ -360,7 +360,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationMismatchError)
+        assertTrue(result.assertResults[0].error is AssertMismatchError)
     }
 
     @Test
@@ -382,7 +382,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationMismatchError)
+        assertTrue(result.assertResults[0].error is AssertMismatchError)
     }
 
     @Test
@@ -403,7 +403,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationContainError)
+        assertTrue(result.assertResults[0].error is AssertMismatchError)
     }
 
     @Test
@@ -425,7 +425,7 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size.toLong())
         assertFalse(result.assertResults[0].success)
         assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertValidationContainError)
+        assertTrue(result.assertResults[0].error is AssertMismatchError)
     }
 
     @Test

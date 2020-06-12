@@ -121,31 +121,54 @@ public class CloudSpecRunner {
                         .filter(assertValidationResult -> !assertValidationResult.getSuccess())
                         .forEach(assertValidationResult ->
                                 {
-                                    AssertValidationError assertValidationError = assertValidationResult.getError();
+                                    AssertError assertError = assertValidationResult.getError();
 
-                                    if (assertValidationError != null) {
-                                        if (assertValidationError instanceof AssertValidationMismatchError) {
-                                            AssertValidationMismatchError mismatchError = (AssertValidationMismatchError) assertValidationError;
+                                    if (assertError != null) {
+                                        if (assertError instanceof AssertMismatchError) {
+                                            AssertMismatchError mismatchError = (AssertMismatchError) assertError;
                                             cp.println(
                                                     String.format(
-                                                            " - %s: expected = %s, actual = %s",
-                                                            String.join(".", assertValidationResult.getPath()),
-                                                            valueToCloudSpecSyntax(mismatchError.getExpected()),
+                                                            " - %s",
+                                                            String.join(".", assertValidationResult.getPath())
+                                                    ),
+                                                    Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+                                            cp.println(
+                                                    String.format(
+                                                            "        Expected: %s %s",
+                                                            mismatchError.getCondition(),
+                                                            valueToCloudSpecSyntax(mismatchError.getExpected())
+                                                    ),
+                                                    Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+                                            cp.println(
+                                                    String.format(
+                                                            "        Actual: %s",
                                                             valueToCloudSpecSyntax(mismatchError.getActual())
                                                     ),
                                                     Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
-                                        } else if (assertValidationError instanceof AssertValidationContainError) {
-                                            AssertValidationContainError containError = (AssertValidationContainError) assertValidationError;
+                                        } else if (assertError instanceof AssertRangeError) {
+                                            AssertRangeError rangeError = (AssertRangeError) assertError;
                                             cp.println(
                                                     String.format(
-                                                            " - %s: value (%s) - list (%s)",
-                                                            String.join(".", assertValidationResult.getPath()),
-                                                            valueToCloudSpecSyntax(containError.getValue()),
-                                                            valueToCloudSpecSyntax(containError.getValueList())
+                                                            " - %s",
+                                                            String.join(".", assertValidationResult.getPath())
                                                     ),
                                                     Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
-                                        } else if (assertValidationError instanceof AssertValidationMemberNotFoundError) {
-                                            AssertValidationMemberNotFoundError notFoundError = (AssertValidationMemberNotFoundError) assertValidationError;
+                                            cp.println(
+                                                    String.format(
+                                                            "        Expected: %s %s and %s",
+                                                            rangeError.getCondition(),
+                                                            valueToCloudSpecSyntax(rangeError.getExpectedLeft()),
+                                                            valueToCloudSpecSyntax(rangeError.getExpectedRight())
+                                                    ),
+                                                    Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+                                            cp.println(
+                                                    String.format(
+                                                            "        Actual: %s",
+                                                            valueToCloudSpecSyntax(rangeError.getActual())
+                                                    ),
+                                                    Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
+                                        } else if (assertError instanceof AssertNotFoundError) {
+                                            AssertNotFoundError notFoundError = (AssertNotFoundError) assertError;
                                             cp.println(
                                                     String.format(
                                                             " - %s: %s",
@@ -153,17 +176,8 @@ public class CloudSpecRunner {
                                                             notFoundError.getMessage()
                                                     ),
                                                     Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
-                                        } else if (assertValidationError instanceof AssertValidationKeyNotFoundError) {
-                                            AssertValidationKeyNotFoundError notFoundError = (AssertValidationKeyNotFoundError) assertValidationError;
-                                            cp.println(
-                                                    String.format(
-                                                            " - %s: %s",
-                                                            String.join(".", assertValidationResult.getPath()),
-                                                            notFoundError.getMessage()
-                                                    ),
-                                                    Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE);
-                                        } else if (assertValidationError instanceof AssertValidationUnknownError) {
-                                            AssertValidationUnknownError unknownError = (AssertValidationUnknownError) assertValidationError;
+                                        } else if (assertError instanceof AssertUnknownError) {
+                                            AssertUnknownError unknownError = (AssertUnknownError) assertError;
                                             cp.println(
                                                     String.format(
                                                             " - %s: %s",

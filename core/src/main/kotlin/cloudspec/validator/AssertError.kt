@@ -19,26 +19,25 @@
  */
 package cloudspec.validator
 
-sealed class AssertValidationError
+sealed class AssertError
 
-data class AssertValidationContainError(
-        val valueList: List<Any>,
-        val value: Any
-) : AssertValidationError()
-
-data class AssertValidationKeyNotFoundError(
+data class AssertNotFoundError(
         val message: String
-) : AssertValidationError()
+) : AssertError()
 
-data class AssertValidationMemberNotFoundError(
-        val message: String
-) : AssertValidationError()
-
-data class AssertValidationMismatchError(
+data class AssertMismatchError(
+        val condition: String,
         val expected: Any,
         val actual: Any
-) : AssertValidationError()
+) : AssertError()
 
-class AssertValidationUnknownError(
+data class AssertRangeError(
+        val condition: String,
+        val expectedLeft: Any,
+        val expectedRight: Any,
+        val actual: Any
+) : AssertError()
+
+class AssertUnknownError(
         val message: String
-) : AssertValidationError()
+) : AssertError()

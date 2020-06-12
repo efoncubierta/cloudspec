@@ -22,5 +22,5 @@ package cloudspec.validator
 data class AssertValidationResult(
         val path: List<String>,
         val success: Boolean,
-        val error: AssertValidationError? = null
+        val error: AssertError? = null
 )

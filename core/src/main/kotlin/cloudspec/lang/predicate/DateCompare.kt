@@ -19,12 +19,13 @@
  */
 package cloudspec.lang.predicate
 
+import java.time.Instant
 import java.util.*
 import java.util.function.BiPredicate
 
-enum class DateCompare : BiPredicate<Date?, Date?> {
+enum class DateCompare : BiPredicate<Instant?, Instant?> {
     before {
-        override fun test(value: Date?, input: Date?): Boolean {
+        override fun test(value: Instant?, input: Instant?): Boolean {
             return value?.let {
                 it < input
             } ?: false
@@ -35,7 +36,7 @@ enum class DateCompare : BiPredicate<Date?, Date?> {
         }
     },
     notBefore {
-        override fun test(value: Date?, input: Date?): Boolean {
+        override fun test(value: Instant?, input: Instant?): Boolean {
             return value?.let {
                 it >= input
             } ?: false
@@ -46,7 +47,7 @@ enum class DateCompare : BiPredicate<Date?, Date?> {
         }
     },
     after {
-        override fun test(value: Date?, input: Date?): Boolean {
+        override fun test(value: Instant?, input: Instant?): Boolean {
             return value?.let {
                 it > input
             } ?: false
@@ -57,7 +58,7 @@ enum class DateCompare : BiPredicate<Date?, Date?> {
         }
     },
     notAfter {
-        override fun test(value: Date?, input: Date?): Boolean {
+        override fun test(value: Instant?, input: Instant?): Boolean {
             return value?.let {
                 it <= input
             } ?: false

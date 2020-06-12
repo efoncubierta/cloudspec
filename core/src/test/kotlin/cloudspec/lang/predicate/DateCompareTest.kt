@@ -33,15 +33,15 @@ class DateCompareTest {
     fun shouldValidateBeforeDate() {
         val baseDate = faker.date().past(1000, TimeUnit.DAYS)
         val targetDate = Date()
-        assertTrue(DateCompare.before.test(baseDate, targetDate))
-        assertFalse(DateCompare.notBefore.test(baseDate, targetDate))
+        assertTrue(DateCompare.before.test(baseDate.toInstant(), targetDate.toInstant()))
+        assertFalse(DateCompare.notBefore.test(baseDate.toInstant(), targetDate.toInstant()))
     }
 
     @Test
     fun shouldValidateAfterDate() {
         val baseDate = Date()
         val targetDate = faker.date().past(1000, TimeUnit.DAYS)
-        assertTrue(DateCompare.after.test(baseDate, targetDate))
-        assertFalse(DateCompare.notAfter.test(baseDate, targetDate))
+        assertTrue(DateCompare.after.test(baseDate.toInstant(), targetDate.toInstant()))
+        assertFalse(DateCompare.notAfter.test(baseDate.toInstant(), targetDate.toInstant()))
     }
 }

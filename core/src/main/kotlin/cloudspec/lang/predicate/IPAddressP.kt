@@ -44,51 +44,41 @@ class IPAddressP(biPredicate: BiPredicate<String?, String?>, value: String?) : P
     }
 
     companion object {
-        @JvmStatic
         fun eq(value: String?): IPAddressP {
             return IPAddressP(IPAddress.eq, value)
         }
 
-        @JvmStatic
         fun neq(value: String?): IPAddressP {
             return IPAddressP(IPAddress.neq, value)
         }
 
-        @JvmStatic
         fun lt(value: String?): IPAddressP {
             return IPAddressP(IPAddress.lt, value)
         }
 
-        @JvmStatic
         fun lte(value: String?): IPAddressP {
             return IPAddressP(IPAddress.lte, value)
         }
 
-        @JvmStatic
         fun gt(value: String?): IPAddressP {
             return IPAddressP(IPAddress.gt, value)
         }
 
-        @JvmStatic
         fun gte(value: String?): IPAddressP {
             return IPAddressP(IPAddress.gte, value)
         }
 
-        @JvmStatic
         fun withinNetwork(value: String?): IPAddressP {
             return IPAddressP(IPAddress.withinNetwork, value)
         }
 
-        @JvmStatic
         fun withoutNetwork(value: String?): IPAddressP {
             return IPAddressP(IPAddress.withoutNetwork, value)
         }
 
-        @JvmStatic
         val isIpv4: IPAddressP
             get() = IPAddressP(IPAddress.isIpv4, "")
 
-        @JvmStatic
         val isIpv6: IPAddressP
             get() = IPAddressP(IPAddress.isIpv6, "")
     }

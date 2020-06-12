@@ -24,15 +24,15 @@ import arrow.core.none
 import arrow.core.toOption
 import arrow.syntax.collections.flatten
 import cloudspec.lang.*
+import cloudspec.lang.predicate.DateCompare
+import cloudspec.lang.predicate.IPAddress
 import cloudspec.model.ResourceDefRef
 import cloudspec.model.ResourceRef
 import cloudspec.validator.*
-import org.apache.tinkerpop.gremlin.process.traversal.Compare
-import org.apache.tinkerpop.gremlin.process.traversal.Contains
-import org.apache.tinkerpop.gremlin.process.traversal.P
-import org.apache.tinkerpop.gremlin.process.traversal.Traverser
+import org.apache.tinkerpop.gremlin.process.traversal.*
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
+import org.apache.tinkerpop.gremlin.process.traversal.util.AndP
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.slf4j.LoggerFactory
@@ -232,7 +232,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                             underscore.constant(
                                     AssertValidationResult(propertyPath,
                                                            false,
-                                                           AssertValidationMemberNotFoundError("Property does not exist"))
+                                                           AssertNotFoundError("Property does not exist"))
                             )
                     )
         )
@@ -268,14 +268,14 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                                         underscore.constant(
                                                 AssertValidationResult(propertyPath,
                                                                        false,
-                                                                       AssertValidationKeyNotFoundError("Key ${statement.key} not found"))
+                                                                       AssertNotFoundError("Key ${statement.key} does not exist"))
                                         )
                                 ),
                             underscore.constant(
                                     AssertValidationResult(
                                             propertyPath,
                                             false,
-                                            AssertValidationMemberNotFoundError("Property does not exist")
+                                            AssertNotFoundError("Property does not exist")
                                     )
                             )
                     )
@@ -315,7 +315,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                             underscore.constant(
                                     AssertValidationResult(nestedPath,
                                                            false,
-                                                           AssertValidationMemberNotFoundError("Property does not exist"))
+                                                           AssertNotFoundError("Property does not exist"))
                             )
                     )
             }
@@ -357,19 +357,140 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                             underscore.constant(
                                     AssertValidationResult(associationPath,
                                                            false,
-                                                           AssertValidationMemberNotFoundError("Association does not exist"))
+                                                           AssertNotFoundError("Association does not exist"))
                             )
                     )
             }
     }
 
-    private fun buildAssertionError(predicate: P<*>, value: Any): AssertValidationError {
-        return when (predicate.biPredicate) {
-            Compare.eq,
-            Compare.neq -> AssertValidationMismatchError(predicate.originalValue, value)
-            Contains.within,
-            Contains.without -> AssertValidationContainError(predicate.originalValue as List<Any>, value)
-            else -> AssertValidationUnknownError("Unknown predicate ${predicate.biPredicate}")
+    private fun buildAssertionError(predicate: P<*>, value: Any): AssertError {
+        return when {
+            predicate.biPredicate == Compare.eq ->
+                AssertMismatchError("equal to",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Compare.neq ->
+                AssertMismatchError("not equal to",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Text.startingWith ->
+                AssertMismatchError("starting with",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Text.notStartingWith ->
+                AssertMismatchError("not starting with",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Text.endingWith ->
+                AssertMismatchError("ending with",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Text.notEndingWith ->
+                AssertMismatchError("not ending with",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Text.containing ->
+                AssertMismatchError("containing",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Text.notContaining ->
+                AssertMismatchError("not containing",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.eq ->
+                AssertMismatchError("IP address equal to",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.neq ->
+                AssertMismatchError("IP address not equal to",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.lt ->
+                AssertMismatchError("IP address less than",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.lte ->
+                AssertMismatchError("IP address less than or equal to",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.gt ->
+                AssertMismatchError("IP address greater than",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.gte ->
+                AssertMismatchError("IP address greater than or equal to",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.withinNetwork ->
+                AssertMismatchError("IP address within network",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.withoutNetwork ->
+                AssertMismatchError("IP address not within network",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.isIpv4 ->
+                AssertMismatchError("IP address is IPv4",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == IPAddress.isIpv6 ->
+                AssertMismatchError("IP address is IPv6",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == DateCompare.before ->
+                AssertMismatchError("date before",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == DateCompare.notBefore ->
+                AssertMismatchError("date not before",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == DateCompare.after ->
+                AssertMismatchError("date after",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == DateCompare.notAfter ->
+                AssertMismatchError("date not after",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Contains.within ->
+                AssertMismatchError("value within",
+                                    predicate.originalValue,
+                                    value)
+            predicate.biPredicate == Contains.without ->
+                AssertMismatchError("value not within",
+                                    predicate.originalValue,
+                                    value)
+            predicate is AndP<*> ->
+                when {
+                    isNumberBetween(predicate) ->
+                        AssertRangeError("number between",
+                                         predicate.predicates[0].originalValue,
+                                         predicate.predicates[1].originalValue,
+                                         value)
+                    isDateBetween(predicate) ->
+                        AssertRangeError("date between",
+                                         predicate.predicates[0].originalValue,
+                                         predicate.predicates[1].originalValue,
+                                         value)
+                    else ->
+                        AssertUnknownError("Unknown predicate ${predicate.biPredicate}")
+                }
+            else -> AssertUnknownError("Unknown predicate ${predicate.biPredicate}")
         }
+    }
+
+    private fun isNumberBetween(predicate: AndP<*>): Boolean {
+        val leftPredicate = predicate.predicates[0]
+        val rightPredicate = predicate.predicates[1]
+        return leftPredicate.biPredicate == Compare.gte &&
+                rightPredicate.biPredicate == Compare.lt
+    }
+
+    private fun isDateBetween(predicate: AndP<*>): Boolean {
+        val leftPredicate = predicate.predicates[0]
+        val rightPredicate = predicate.predicates[1]
+        return leftPredicate.biPredicate == DateCompare.notBefore &&
+                rightPredicate.biPredicate == DateCompare.before
     }
 }

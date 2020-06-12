@@ -48,6 +48,7 @@ import org.apache.commons.lang3.time.DateUtils
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.TextP
 import java.text.ParseException
+import java.time.Instant
 import java.util.*
 
 class CloudSpecLoaderListener : CloudSpecBaseListener() {
@@ -304,23 +305,23 @@ class CloudSpecLoaderListener : CloudSpecBaseListener() {
     }
 
     override fun exitDateBeforePredicate(ctx: DateBeforePredicateContext) {
-        currentPredicate = before(currentValues.pop() as Date?)
+        currentPredicate = before((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateNotBeforePredicate(ctx: DateNotBeforePredicateContext) {
-        currentPredicate = notBefore(currentValues.pop() as Date?)
+        currentPredicate = notBefore((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateAfterPredicate(ctx: DateAfterPredicateContext) {
-        currentPredicate = after(currentValues.pop() as Date?)
+        currentPredicate = after((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateNotAfterPredicate(ctx: DateNotAfterPredicateContext) {
-        currentPredicate = notAfter(currentValues.pop() as Date?)
+        currentPredicate = notAfter((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateBetweenPredicate(ctx: DateBetweenPredicateContext) {
-        currentPredicate = between(currentValues[0] as Date?, currentValues[1] as Date?)
+        currentPredicate = between((currentValues[0] as Date?)?.toInstant(), (currentValues[1] as Date?)?.toInstant())
         currentValues.clear()
     }
 

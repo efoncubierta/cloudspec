@@ -21,10 +21,10 @@ package cloudspec.lang.predicate
 
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.util.AndP
-import java.util.*
+import java.time.Instant
 import java.util.function.BiPredicate
 
-class DateP(biPredicate: BiPredicate<Date?, Date?>, value: Date?) : P<Date>(biPredicate, value) {
+class DateP(biPredicate: BiPredicate<Instant?, Instant?>, value: Instant?) : P<Instant>(biPredicate, value) {
     override fun equals(other: Any?): Boolean {
         return other is DateP && super.equals(other)
     }
@@ -46,28 +46,23 @@ class DateP(biPredicate: BiPredicate<Date?, Date?>, value: Date?) : P<Date>(biPr
     }
 
     companion object {
-        @JvmStatic
-        fun before(value: Date?): DateP {
+        fun before(value: Instant?): DateP {
             return DateP(DateCompare.before, value)
         }
 
-        @JvmStatic
-        fun notBefore(value: Date?): DateP {
+        fun notBefore(value: Instant?): DateP {
             return DateP(DateCompare.notBefore, value)
         }
 
-        @JvmStatic
-        fun after(value: Date?): DateP {
+        fun after(value: Instant?): DateP {
             return DateP(DateCompare.after, value)
         }
 
-        @JvmStatic
-        fun notAfter(value: Date?): DateP {
+        fun notAfter(value: Instant?): DateP {
             return DateP(DateCompare.notAfter, value)
         }
 
-        @JvmStatic
-        fun between(from: Date?, to: Date?): P<Date> {
+        fun between(from: Instant?, to: Instant?): P<Instant> {
             return AndP(listOf(DateP(DateCompare.notBefore, from),
                                DateP(DateCompare.before, to)))
         }
