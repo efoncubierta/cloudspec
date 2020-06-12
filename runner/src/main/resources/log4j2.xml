@@ -1,7 +1,7 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="ConsoleAppender" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} %m%n"/>
+      <PatternLayout pattern="[%highlight{%p}] %m%n"/>
     </Console>
   </Appenders>
 

@@ -169,13 +169,13 @@ mvn clean package
 Run CloudSpec on your specification file:
 
 ```
-java -jar runner/target/cloudspec-runner-0.0.1-SNAPSHOT-jar-with-dependencies.jar -s my.cloudspec
+java -jar runner/target/cloudspec-runner-0.0.1-SNAPSHOT-exec.jar -s my.cloudspec
 ```
 
 For more options, check the command's help:
 
 ```$bash
-java -jar runner/target/cloudspec-runner-0.0.1-SNAPSHOT-jar-with-dependencies.jar -h
+java -jar runner/target/cloudspec-runner-0.0.1-SNAPSHOT-exec.jar -h
 ```
 
 ## Collaborations

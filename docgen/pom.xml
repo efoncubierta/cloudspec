@@ -2,109 +2,111 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>cloudspec</groupId>
-    <artifactId>cloudspec-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../parent</relativePath>
-  </parent>
+    <parent>
+        <groupId>cloudspec</groupId>
+        <artifactId>cloudspec-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../parent</relativePath>
+    </parent>
 
-  <artifactId>cloudspec-docgen</artifactId>
+    <artifactId>cloudspec-docgen</artifactId>
 
-  <name>CloudSpec Documentation Generator</name>
-  <description>CloudSpec Documentation Generator</description>
+    <name>CloudSpec Documentation Generator</name>
+    <description>CloudSpec Documentation Generator</description>
 
-  <properties>
-    <freemarker.version>2.3.30</freemarker.version>
-    <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-  </properties>
+    <properties>
+        <freemarker.version>2.3.30</freemarker.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+    </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>cloudspec</groupId>
-      <artifactId>cloudspec-loader</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>cloudspec</groupId>
+            <artifactId>cloudspec-loader</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>cloudspec</groupId>
-      <artifactId>cloudspec-aws</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>cloudspec</groupId>
+            <artifactId>cloudspec-aws</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>info.picocli</groupId>
-      <artifactId>picocli</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>com.google.dagger</groupId>
-      <artifactId>dagger</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>com.diogonunes</groupId>
-      <artifactId>JCDP</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>com.diogonunes</groupId>
+            <artifactId>JCDP</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>org.freemarker</groupId>
-      <artifactId>freemarker</artifactId>
-      <version>${freemarker.version}</version>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
+        </dependency>
+    </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-      </plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven.compiler.plugin.version}</version>
-        <configuration>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>com.google.dagger</groupId>
-              <artifactId>dagger-compiler</artifactId>
-              <version>${dagger.version}</version>
-            </path>
-          </annotationProcessorPaths>
-        </configuration>
-      </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${dagger.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
 
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>${maven.assembly.plugin.version}</version>
-        <executions>
-          <execution>
-            <id>create-bundle</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <archive>
-                <manifest>
-                  <mainClass>
-                    cloudspec.docgen.CloudSpecDocGenMain
-                  </mainClass>
-                </manifest>
-              </archive>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven.assembly.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>create-bundle</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>cloudspec-docgen-${version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        cloudspec.docgen.CloudSpecDocGenMain
+                                    </mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

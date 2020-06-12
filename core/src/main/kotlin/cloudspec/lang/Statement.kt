@@ -21,7 +21,6 @@ package cloudspec.lang
 
 import cloudspec.lang.predicate.DateCompare
 import cloudspec.lang.predicate.IPAddress
-import org.apache.commons.lang.text.StrBuilder
 import org.apache.tinkerpop.gremlin.process.traversal.Compare
 import org.apache.tinkerpop.gremlin.process.traversal.Contains
 import org.apache.tinkerpop.gremlin.process.traversal.P
@@ -30,6 +29,9 @@ import org.apache.tinkerpop.gremlin.process.traversal.util.AndP
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 sealed class Statement : CloudSpecSyntaxProducer
@@ -213,9 +215,17 @@ fun valueToCloudSpecSyntax(value: Any?): String {
         is String -> {
             "\"${value}\""
         }
+        is Instant -> {
+            "\"${DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.systemDefault())
+                .format(value)}\""
+        }
         is Date -> {
-            val df: DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-            "\"${df.format(value)}\""
+            "\"${DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.systemDefault())
+                .format(value.toInstant())}\""
         }
         is Double -> {
             val format = DecimalFormat("0.0000000000000000000")

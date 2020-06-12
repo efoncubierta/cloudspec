@@ -43,7 +43,7 @@ data class CloudSpec(
 
     class CloudSpecBuilder {
         private var name: String = ""
-        private var groups = emptyList<GroupExpr>()
+        private var groups = mutableListOf<GroupExpr>()
 
         fun setName(name: String): CloudSpecBuilder {
             this.name = name
@@ -51,7 +51,7 @@ data class CloudSpec(
         }
 
         fun addGroups(vararg groups: GroupExpr): CloudSpecBuilder {
-            this.groups = listOf(*groups)
+            this.groups.addAll(listOf(*groups))
             return this
         }
 

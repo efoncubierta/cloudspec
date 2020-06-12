@@ -43,7 +43,7 @@ data class GroupExpr(
 
     class GroupExprBuilder {
         private var name: String = ""
-        private var rules = emptyList<RuleExpr>()
+        private var rules = mutableListOf<RuleExpr>()
 
         fun setName(name: String): GroupExprBuilder {
             this.name = name
@@ -51,7 +51,7 @@ data class GroupExpr(
         }
 
         fun addRules(vararg rules: RuleExpr): GroupExprBuilder {
-            this.rules = listOf(*rules)
+            this.rules.addAll(listOf(*rules))
             return this
         }
 

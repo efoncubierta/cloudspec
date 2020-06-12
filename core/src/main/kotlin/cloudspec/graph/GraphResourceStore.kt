@@ -19,10 +19,7 @@
  */
 package cloudspec.graph
 
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.none
-import arrow.core.toOption
+import arrow.core.*
 import arrow.syntax.collections.flatten
 import cloudspec.model.*
 import cloudspec.store.ResourceStore
@@ -191,7 +188,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
                     .tryNext()
 
             // if resource definition vertex doesn't exist, roll back and throw an error
-            if (resourceDefVOpt.isEmpty) {
+            if (!resourceDefVOpt.isPresent) {
                 resourceV.remove()
                 throw RuntimeException("Resource definition '${ref}' not found.")
             }
@@ -240,7 +237,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
                 .tryNext()
 
         // property definition must exists to be able to create the property
-        if (propertyDefVOpt.isEmpty) {
+        if (!propertyDefVOpt.isPresent) {
             throw RuntimeException("Property definition '${property.name}' not found.")
         }
 

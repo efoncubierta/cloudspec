@@ -20,8 +20,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+<!--        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>-->
 
         <kotlin.version>1.3.72</kotlin.version>
         <kotlinx.version>1.3.7</kotlinx.version>
@@ -213,6 +215,7 @@
                             </goals>
                             <configuration>
                                 <sources>
+                                    <source>src/main/java</source>
                                     <source>src/main/kotlin</source>
                                 </sources>
                             </configuration>
@@ -225,6 +228,7 @@
                             </goals>
                             <configuration>
                                 <sources>
+                                    <source>src/test/java</source>
                                     <source>src/test/kotlin</source>
                                 </sources>
                             </configuration>
@@ -258,6 +262,25 @@
                     <version>${kotlin.version}</version>
                     <executions>
                         <execution>
+                            <id>kapt</id>
+                            <goals>
+                                <goal>kapt</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>src/main/kotlin</sourceDir>
+                                    <sourceDir>src/main/java</sourceDir>
+                                </sourceDirs>
+                                <annotationProcessorPaths>
+                                    <annotationProcessorPath>
+                                        <groupId>com.google.dagger</groupId>
+                                        <artifactId>dagger-compiler</artifactId>
+                                        <version>${dagger.version}</version>
+                                    </annotationProcessorPath>
+                                </annotationProcessorPaths>
+                            </configuration>
+                        </execution>
+                        <execution>
                             <id>compile</id>
                             <phase>compile</phase>
                             <goals>
@@ -272,16 +295,87 @@
                             </configuration>
                         </execution>
                         <execution>
+                            <id>test-kapt</id>
+                            <goals>
+                                <goal>test-kapt</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>src/test/kotlin</sourceDir>
+                                    <sourceDir>src/test/java</sourceDir>
+                                </sourceDirs>
+                                <annotationProcessorPaths>
+                                    <annotationProcessorPath>
+                                        <groupId>com.google.dagger</groupId>
+                                        <artifactId>dagger-compiler</artifactId>
+                                        <version>${dagger.version}</version>
+                                    </annotationProcessorPath>
+                                </annotationProcessorPaths>
+                            </configuration>
+                        </execution>
+                        <execution>
                             <id>test-compile</id>
                             <phase>test-compile</phase>
                             <goals>
                                 <goal>test-compile</goal>
                             </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>src/test/kotlin</sourceDir>
+                                    <sourceDir>src/test/java</sourceDir>
+                                    <sourceDir>target/generated-sources/kapt/test</sourceDir>
+                                </sourceDirs>
+                            </configuration>
                         </execution>
                     </executions>
                     <configuration>
                         <jvmTarget>1.8</jvmTarget>
                     </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <executions>
+                        <!-- Replacing default-compile as it is treated specially by maven -->
+                        <execution>
+                            <id>default-compile</id>
+                            <phase>none</phase>
+                        </execution>
+                        <!-- Replacing default-testCompile as it is treated specially by maven -->
+                        <execution>
+                            <id>default-testCompile</id>
+                            <phase>none</phase>
+                        </execution>
+                        <execution>
+                            <id>java-compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>java-test-compile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>testCompile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -49,14 +49,14 @@ object CloudSpecGenerator {
     fun fullSpec(): CloudSpec {
         return CloudSpec.builder()
             .setName(faker.lorem().sentence())
-            .addGroups(fullGroup())
+            .addGroups(fullGroup(), fullGroup())
             .build()
     }
 
     fun fullGroup(): GroupExpr {
         return GroupExpr.builder()
             .setName(faker.lorem().sentence())
-            .addRules(fullRule())
+            .addRules(fullRule(), fullRule())
             .build()
     }
 

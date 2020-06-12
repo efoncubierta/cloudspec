@@ -17,14 +17,13 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec;
+package cloudspec
 
-public class CloudSpecRunnerException extends RuntimeException {
-    public CloudSpecRunnerException(String message) {
-        super(message);
-    }
+import dagger.Component
+import javax.inject.Singleton
 
-    public CloudSpecRunnerException(String message, Throwable cause) {
-        super(message, cause);
-    }
+@Singleton
+@Component(modules = [CloudSpecRunnerModule::class])
+interface CloudSpecRunnerComponent {
+    fun buildCloudSpecRunner(): CloudSpecRunner
 }
