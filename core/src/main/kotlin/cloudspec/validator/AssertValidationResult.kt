@@ -19,8 +19,31 @@
  */
 package cloudspec.validator
 
+sealed class Path {
+    fun toPathString(): String {
+        return when (this) {
+            is PropertyPath -> ".${this.name}"
+            is NestedPropertyPath -> ".${this.name}"
+            is KeyValuePropertyPath -> ".${this.name}[${this.key}]"
+            is AssociationPath -> ">${this.name}[${this.id}]"
+        }
+    }
+}
+
+fun List<Path>.toPathString(): String {
+    return when {
+        this.isNotEmpty() -> "${this[0].toPathString()}${this.drop(1).toPathString()}"
+        else -> ""
+    }
+}
+
+data class PropertyPath(val name: String) : Path()
+data class NestedPropertyPath(val name: String) : Path()
+data class KeyValuePropertyPath(val name: String, val key: String) : Path()
+data class AssociationPath(val name: String, val id: String? = null) : Path()
+
 data class AssertValidationResult(
-        val path: String,
+        val path: List<Path>,
         val success: Boolean,
         val error: AssertError? = null
 )

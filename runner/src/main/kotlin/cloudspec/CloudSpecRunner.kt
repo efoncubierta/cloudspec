@@ -123,7 +123,7 @@ class CloudSpecRunner @Inject constructor(private val version: String,
                     .filter { !it.success }
                     .forEach { (path, _, assertError) ->
                         println()
-                        cp.println("  $path",
+                        cp.println("  ${path.toPathString()}",
                                    Ansi.Attribute.BOLD,
                                    Ansi.FColor.WHITE,
                                    Ansi.BColor.NONE)

@@ -453,8 +453,8 @@ class GraphResourceValidatorTest {
         assertEquals(1, result.assertResults.size)
         assertTrue(result.assertResults[0].success)
         assertEquals(
-                "${ModelTestUtils.PROP_NESTED_NAME}.${ModelTestUtils.PROP_STRING_NAME}",
-                result.assertResults[0].path
+                ".${ModelTestUtils.PROP_NESTED_NAME}.${ModelTestUtils.PROP_STRING_NAME}",
+                result.assertResults[0].path.toPathString()
         )
     }
 
@@ -483,8 +483,8 @@ class GraphResourceValidatorTest {
             assertEquals(1, r.assertResults.size)
             assertTrue(r.assertResults[0].success)
             assertEquals(
-                    "${ModelTestUtils.PROP_NESTED_NAME}.${ModelTestUtils.PROP_STRING_NAME}",
-                    r.assertResults[0].path
+                    ".${ModelTestUtils.PROP_NESTED_NAME}.${ModelTestUtils.PROP_STRING_NAME}",
+                    r.assertResults[0].path.toPathString()
             )
         }
     }
@@ -511,8 +511,8 @@ class GraphResourceValidatorTest {
             assertEquals(1, r.assertResults.size)
             assertTrue(r.assertResults[0].success)
             assertEquals(
-                    ">${ModelTestUtils.ASSOC_NAME}.${ModelTestUtils.PROP_STRING_NAME}",
-                    r.assertResults[0].path
+                    ">${ModelTestUtils.ASSOC_NAME}[${ModelTestUtils.TARGET_RESOURCE_REF.id}].${ModelTestUtils.PROP_STRING_NAME}",
+                    r.assertResults[0].path.toPathString()
             )
         })
     }
