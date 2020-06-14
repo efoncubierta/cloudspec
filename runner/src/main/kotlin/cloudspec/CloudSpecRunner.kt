@@ -51,36 +51,26 @@ class CloudSpecRunner @Inject constructor(private val version: String,
         logger.info("Generating report")
 
         println()
-        cp.println("${" ".repeat(2)}${result.specName}",
-                   Ansi.Attribute.NONE,
-                   Ansi.FColor.BLUE,
-                   Ansi.BColor.NONE)
+        cp.println("${margin(1)}${result.specName}",
+                   Ansi.Attribute.NONE, Ansi.FColor.BLUE, Ansi.BColor.NONE)
         result.groupResults.forEach { printGroupResult(it) }
         printErrors()
     }
 
     private fun printGroupResult(groupResult: GroupResult) {
-        cp.println("${" ".repeat(4)}${groupResult.groupName}",
-                   Ansi.Attribute.NONE,
-                   Ansi.FColor.YELLOW,
-                   Ansi.BColor.NONE)
+        cp.println("${margin(2)}${groupResult.groupName}",
+                   Ansi.Attribute.NONE, Ansi.FColor.YELLOW, Ansi.BColor.NONE)
         groupResult.ruleResults.forEach { printRuleResult(it) }
     }
 
     private fun printRuleResult(ruleResult: RuleResult) {
         when {
             ruleResult.isSuccess ->
-                cp.println("${" ".repeat(6)}✓ ${ruleResult.ruleName}",
-                           Ansi.Attribute.NONE,
-                           Ansi.FColor.GREEN,
-                           Ansi.BColor.NONE
-                )
+                cp.println("${margin(3)}✓ ${ruleResult.ruleName}",
+                           Ansi.Attribute.NONE, Ansi.FColor.GREEN, Ansi.BColor.NONE)
             else -> {
-                cp.println("${" ".repeat(6)}✗ ${ruleResult.ruleName} [${errors.size + 1}]",
-                           Ansi.Attribute.NONE,
-                           Ansi.FColor.RED,
-                           Ansi.BColor.NONE
-                )
+                cp.println("${margin(3)}✗ ${ruleResult.ruleName} [${errors.size + 1}]",
+                           Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
 
                 errors.add(ruleResult)
             }
@@ -90,10 +80,8 @@ class CloudSpecRunner @Inject constructor(private val version: String,
     private fun printErrors() {
         (errors.indices).forEach {
             println()
-            cp.println("[${it + 1}]",
-                       Ansi.Attribute.NONE,
-                       Ansi.FColor.WHITE,
-                       Ansi.BColor.NONE)
+            cp.println("[${it + 1}] ${errors[it].ruleName}",
+                       Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
 
             printErrors(errors[it])
         }
@@ -103,67 +91,56 @@ class CloudSpecRunner @Inject constructor(private val version: String,
         when {
             ruleResult.throwable != null ->
                 cp.println(ruleResult.throwable?.message,
-                           Ansi.Attribute.NONE,
-                           Ansi.FColor.RED,
-                           Ansi.BColor.NONE)
+                           Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
             else -> {
                 ruleResult.resourceValidationResults
                     .filter { !it.isSuccess }
                     .onEach {
                         cp.print("On resource ",
-                                 Ansi.Attribute.NONE,
-                                 Ansi.FColor.WHITE,
-                                 Ansi.BColor.NONE)
+                                 Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                         cp.println(it.ref,
-                                   Ansi.Attribute.BOLD,
-                                   Ansi.FColor.WHITE,
-                                   Ansi.BColor.NONE)
+                                   Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                     }
                     .flatMap { it.assertResults }
                     .filter { !it.success }
                     .forEach { (path, _, assertError) ->
                         println()
-                        cp.println("  ${path.toPathString()}",
-                                   Ansi.Attribute.BOLD,
-                                   Ansi.FColor.WHITE,
-                                   Ansi.BColor.NONE)
+                        cp.println("${margin(1)}${path.toPathString()}",
+                                   Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                         when (assertError) {
                             is AssertMismatchError -> {
                                 val (condition, expected, actual) = assertError
-                                cp.println("""
-                                    |    Expected: $condition ${valueToCloudSpecSyntax(expected)}
-                                    |      Actual: ${valueToCloudSpecSyntax(actual)}
-                                """.trimMargin(),
-                                           Ansi.Attribute.NONE,
-                                           Ansi.FColor.WHITE,
-                                           Ansi.BColor.NONE)
+                                cp.print("${margin(2)}Expected: ",
+                                           Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
+                                cp.println("$condition ${valueToCloudSpecSyntax(expected)}",
+                                           Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
+                                cp.print("${margin(2)}Actual: ",
+                                           Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
+                                cp.println(valueToCloudSpecSyntax(actual),
+                                           Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                             }
                             is AssertRangeError -> {
                                 val (condition, expectedLeft, expectedRight, actual) = assertError
-                                cp.println("""
-                                    |    Expected: $condition ${valueToCloudSpecSyntax(expectedLeft)} and ${valueToCloudSpecSyntax(expectedRight)} 
-                                    |      Actual: ${valueToCloudSpecSyntax(actual)}
-                                """.trimMargin(),
-                                           Ansi.Attribute.NONE,
-                                           Ansi.FColor.WHITE,
-                                           Ansi.BColor.NONE)
+                                cp.print("${margin(2)}Expected: ",
+                                         Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
+                                cp.println("$condition ${valueToCloudSpecSyntax(expectedLeft)} and ${valueToCloudSpecSyntax(expectedRight)}",
+                                           Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
+                                cp.print("${margin(2)}Actual: ",
+                                           Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
+                                cp.println(valueToCloudSpecSyntax(actual),
+                                           Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                             }
                             is AssertNotFoundError -> {
-                                cp.println("""
-                                    |    Error: ${assertError.message}
-                                """.trimMargin(),
-                                           Ansi.Attribute.NONE,
-                                           Ansi.FColor.WHITE,
-                                           Ansi.BColor.NONE)
+                                cp.print("${margin(2)}Error: ",
+                                         Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
+                                cp.println(assertError.message,
+                                           Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
                             }
                             is AssertUnknownError -> {
-                                cp.println("""
-                                    |  - $path
-                                    |    Error: ${assertError.message}
-                                """.trimMargin(),
-                                           Ansi.Attribute.NONE,
-                                           Ansi.FColor.WHITE,
-                                           Ansi.BColor.NONE)
+                                cp.print("${margin(2)}Error: ",
+                                         Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
+                                cp.println(assertError.message,
+                                           Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
                             }
                         }
                     }
@@ -185,7 +162,12 @@ class CloudSpecRunner @Inject constructor(private val version: String,
         }
     }
 
+    private fun margin(n: Int): String {
+        return " ".repeat(n * MARGIN_SIZE)
+    }
+
     companion object {
+        private const val MARGIN_SIZE = 2
         private val cp = ColoredPrinter.Builder(1, false).build()
     }
 }

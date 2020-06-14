@@ -39,8 +39,8 @@ import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.slf4j.LoggerFactory
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.`__` as underscore
 
-typealias PathToTraversalV = (path: List<Path>) -> GraphTraversal<Vertex, AssertValidationResult>
-typealias ListPathToTraversalF = List<PathToTraversalV>
+typealias PathToAssertTraversalF = (path: List<Path>) -> GraphTraversal<Vertex, AssertValidationResult>
+typealias ListOfPathToAssertTraversalF = List<PathToAssertTraversalF>
 
 /**
  * Graph-based implementation of resource validator.
@@ -175,7 +175,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
         }
     }
 
-    private fun buildAssertionTraversals(statement: Statement): ListPathToTraversalF {
+    private fun buildAssertionTraversals(statement: Statement): ListOfPathToAssertTraversalF {
         return when (statement) {
             is KeyValueStatement -> buildKeyValueAssertionTraversal(statement)
             is PropertyStatement -> buildPropertyAssertionTraversal(statement)
@@ -203,7 +203,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
             .has(GraphResourceStore.PROPERTY_VALUE, statement.predicate)
     }
 
-    private fun buildPropertyAssertionTraversal(statement: PropertyStatement): ListPathToTraversalF {
+    private fun buildPropertyAssertionTraversal(statement: PropertyStatement): ListOfPathToAssertTraversalF {
         return listOf(
                 fun (path: List<Path>) = run {
                     // add property element to the path
@@ -241,7 +241,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
         )
     }
 
-    private fun buildKeyValueAssertionTraversal(statement: KeyValueStatement): ListPathToTraversalF {
+    private fun buildKeyValueAssertionTraversal(statement: KeyValueStatement): ListOfPathToAssertTraversalF {
         return listOf(
                 fun(path: List<Path>) = run {
                     val propertyPath = path.plus(KeyValuePropertyPath(statement.propertyName, statement.key))
@@ -297,7 +297,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
             )
     }
 
-    private fun buildNestedAssertionTraversal(statement: NestedStatement): ListPathToTraversalF {
+    private fun buildNestedAssertionTraversal(statement: NestedStatement): ListOfPathToAssertTraversalF {
         return statement.statements
             .flatMap { buildAssertionTraversals(it) }
             .map { assertionTraversal ->
@@ -337,7 +337,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
             )
     }
 
-    private fun buildAssociationAssertionTraversal(statement: AssociationStatement): ListPathToTraversalF {
+    private fun buildAssociationAssertionTraversal(statement: AssociationStatement): ListOfPathToAssertTraversalF {
         return statement.statements
             .flatMap { buildAssertionTraversals(it) }
             .map {assertionTraversal ->

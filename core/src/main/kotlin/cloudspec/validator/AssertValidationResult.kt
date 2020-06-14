@@ -25,7 +25,10 @@ sealed class Path {
             is PropertyPath -> ".${this.name}"
             is NestedPropertyPath -> ".${this.name}"
             is KeyValuePropertyPath -> ".${this.name}[${this.key}]"
-            is AssociationPath -> ">${this.name}[${this.id}]"
+            is AssociationPath -> when {
+                this.id.isNullOrEmpty() -> ">${this.name}"
+                else -> ">${this.name}[${this.id}]"
+            }
         }
     }
 }
