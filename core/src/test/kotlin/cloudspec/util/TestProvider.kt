@@ -22,9 +22,7 @@ package cloudspec.util
 import arrow.core.Option
 import arrow.core.none
 import cloudspec.annotation.ProviderDefinition
-import cloudspec.model.Provider
-import cloudspec.model.ResourceDefRef
-import cloudspec.model.ResourceRef
+import cloudspec.model.*
 
 @ProviderDefinition(
         name = ProviderDataUtil.PROVIDER_NAME,
@@ -32,11 +30,19 @@ import cloudspec.model.ResourceRef
         resources = [TestResource::class]
 )
 class TestProvider : Provider() {
-    override fun resourcesByRef(ref: ResourceDefRef): List<Any> {
+    override val configDefs: ConfigDefs
+        get() = setOf(
+                ConfigDef(ConfigRef(ProviderDataUtil.PROVIDER_NAME, "myconfig"),
+                          "My config",
+                          ConfigValueType.STRING,
+                          false)
+        )
+
+    override fun resourcesByRef(config: ConfigValues, ref: ResourceDefRef): List<Any> {
         return emptyList()
     }
 
-    override fun resource(ref: ResourceRef): Option<Any> {
-        return none<Any>()
+    override fun resource(config: ConfigValues, ref: ResourceRef): Option<Any> {
+        return none()
     }
 }

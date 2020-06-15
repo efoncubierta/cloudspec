@@ -54,7 +54,6 @@ data class AssertExpr(val statements: List<Statement>) : CloudSpecSyntaxProducer
     }
 
     companion object {
-        @JvmStatic
         fun builder(): AssertExprBuilder {
             return AssertExprBuilder()
         }

@@ -56,7 +56,7 @@ class EC2SecurityGroupLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(securityGroups.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2SecurityGroupLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(securityGroupId())
+        val resourceOpt = loader.byId(emptySet(), securityGroupId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2SecurityGroupLoaderTest : EC2LoaderTest() {
         }
 
         val securityGroup = securityGroups[0]
-        val resourceOpt = loader.byId(securityGroup.groupId())
+        val resourceOpt = loader.byId(emptySet(), securityGroup.groupId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -1,12 +1,20 @@
 grammar CloudSpec;
 
-spec: specDecl groupDecl+;
+spec: globalConfig* specDecl specConfig* groupDecl+;
+
+globalConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
+
+specConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
+
+groupConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
+
+ruleConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
 
 specDecl: SPEC STRING;
 
-groupDecl: GROUP STRING ruleDecl+;
+groupDecl: GROUP STRING groupConfig* ruleDecl+;
 
-ruleDecl: RULE STRING onDecl withDecl? assertDecl;
+ruleDecl: RULE STRING onDecl ruleConfig* withDecl? assertDecl;
 
 onDecl: ON RESOURCE_DEF_REF;
 
@@ -18,10 +26,10 @@ andDecl: AND statement;
 
 predicate: IS_NULL                        # ValueNullPredicate
          | IS_NOT_NULL                    # ValueNotNullPredicate
-         | IS_EQUAL_TO value              # ValueEqualPredicate
-         | IS_NOT_EQUAL_TO value          # ValueNotEqualPredicate
-         | IS_WITHIN array                # ValueWithinPredicate
-         | IS_NOT_WITHIN array            # ValueNotWithinPredicate
+         | IS_EQUAL_TO singleValue              # ValueEqualPredicate
+         | IS_NOT_EQUAL_TO singleValue          # ValueNotEqualPredicate
+         | IS_WITHIN arrayValue                # ValueWithinPredicate
+         | IS_NOT_WITHIN arrayValue            # ValueNotWithinPredicate
          // number predicates
          | IS_LESS_THAN numberValue                # NumberLessThanPredicate
          | IS_LESS_THAN_EQUAL numberValue          # NumberLessThanEqualPredicate
@@ -70,13 +78,22 @@ numberValue: (INTEGER | DOUBLE);
 booleanValue: BOOLEAN;
 dateValue: DATE_STRING;
 
-value: numberValue
-     | stringValue
-     | booleanValue
-     | dateValue
-     ;
+singleValue: numberValue
+           | stringValue
+           | booleanValue
+           | dateValue
+           ;
 
-array: '[' value (',' value)* ']';
+singleConfigValue: numberValue
+                 | stringValue
+                 | booleanValue
+                 ;
+
+arrayValue: '[' singleValue (',' singleValue)* ']';
+
+arrayConfigValue: '[' singleConfigValue (',' singleConfigValue)* ']';
+
+configValue: singleConfigValue | arrayConfigValue;
 
 // Date value
 DATE_STRING: '"' DATE_FORMAT (' ' TIME_FORMAT)? '"';
@@ -138,6 +155,9 @@ IS_NOT_BEFORE:                    (IS ' ')? NOT ' ' BEFORE;
 IS_AFTER:                         (IS ' ')? AFTER;
 IS_NOT_AFTER:                     (IS ' ')? NOT ' ' AFTER;
 
+// Assignment
+EQUAL_SYMBOL: '=';
+
 // Vocabulary
 SPEC: [Ss][Pp][Ee][Cc];
 GROUP: [Gg][Rr][Oo][Uu][Pp];
@@ -146,6 +166,7 @@ ON: [Oo][Nn];
 WITH: [Ww][Ii][Tt][Hh];
 ASSERT: [Aa][Ss][Ss][Ee][Rr][Tt];
 AND: [Aa][Nn][Dd];
+CONFIG: [Cc][Oo][Nn][Ff][Ii][Gg];
 
 fragment STARTING:   [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg];
 fragment ENDING:     [Ee][Nn][Dd][Ii][Nn][Gg];
@@ -194,10 +215,12 @@ fragment ALPHANUM: [a-zA-Z0-9];
 fragment ALPHANUMS: [a-zA-Z0-9]+;
 
 // Resource and member references
-RESOURCE_DEF_REF: PROVIDER_NAMESPACE (':' GROUP_NAMESPACE)? ':' RESOURCE_TYPE;
-fragment PROVIDER_NAMESPACE: LETTER ALPHANUM*;
-fragment GROUP_NAMESPACE: LETTER ALPHANUM*;
-fragment RESOURCE_TYPE: LETTER ALPHANUM*;
+RESOURCE_DEF_REF: PROVIDER_NAME ':' GROUP_NAME ':' RESOURCE_NAME;
+CONFIG_REF: PROVIDER_NAME ':' CONFIG_NAME;
+fragment PROVIDER_NAME: LETTER [a-zA-Z0-9_]*;
+fragment GROUP_NAME: LETTER [a-zA-Z0-9_]*;
+fragment RESOURCE_NAME: LETTER [a-zA-Z0-9_]*;
+fragment CONFIG_NAME: LETTER [a-zA-Z0-9_]*;
 MEMBER_NAME: LETTER [a-zA-Z0-9_]*;
 
 WS: [ \t\r\n]+ -> skip;

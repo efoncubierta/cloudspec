@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec AWS Provider
+ * CloudSpec Core Library
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
@@ -17,12 +17,20 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.aws
+package cloudspec.lang
 
-import arrow.core.Option
-import cloudspec.model.ConfigValues
+/**
+ * Define a config expression.
+ */
+data class ConfigExpr(
+        val configRef: String,
+        val value: Any
+) : CloudSpecSyntaxProducer {
+    override fun toCloudSpecSyntax(spaces: Int): String {
+        val sb = StringBuilder()
 
-interface AWSResourceLoader<T : AWSResource> {
-    fun byId(config: ConfigValues, id: String): Option<T>
-    fun all(config: ConfigValues): List<T>
+        sb.appendln("${" ".repeat(spaces)}Config $configRef = ${valueToCloudSpecSyntax(value)}")
+
+        return sb.toString()
+    }
 }

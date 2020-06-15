@@ -35,6 +35,7 @@ import cloudspec.lang.predicate.IPAddressP.Companion.lte
 import cloudspec.lang.predicate.IPAddressP.Companion.neq
 import cloudspec.lang.predicate.IPAddressP.Companion.withinNetwork
 import cloudspec.lang.predicate.IPAddressP.Companion.withoutNetwork
+import cloudspec.model.ConfigValueType
 import cloudspec.model.PropertyType
 import com.github.javafaker.Faker
 import org.apache.tinkerpop.gremlin.process.traversal.P
@@ -49,6 +50,7 @@ object CloudSpecGenerator {
     fun fullSpec(): CloudSpec {
         return CloudSpec.builder()
             .setName(faker.lorem().sentence())
+            .addConfig(fullConfig(), fullConfig())
             .addGroups(fullGroup(), fullGroup())
             .build()
     }
@@ -56,6 +58,7 @@ object CloudSpecGenerator {
     fun fullGroup(): GroupExpr {
         return GroupExpr.builder()
             .setName(faker.lorem().sentence())
+            .addConfig(fullConfig(), fullConfig())
             .addRules(fullRule(), fullRule())
             .build()
     }
@@ -64,9 +67,17 @@ object CloudSpecGenerator {
         return RuleExpr.builder()
             .setName(faker.lorem().sentence())
             .setResourceDefRef("${faker.lorem().word()}:${faker.lorem().word()}:${faker.lorem().word()}")
+            .addConfig(fullConfig(), fullConfig())
             .setWithExpr(fullWith())
             .setAssertExp(fullAssert())
             .build()
+    }
+
+    fun fullConfig(): ConfigExpr {
+        return ConfigExpr(
+                "${faker.lorem().word()}:${faker.lorem().word()}",
+                randomConfigValue()
+        )
     }
 
     fun fullWith(): WithExpr {
@@ -453,8 +464,7 @@ object CloudSpecGenerator {
         return randomValue(PropertyType.NUMBER)
     }
 
-    @JvmOverloads
-    fun randomValue(propertyType: PropertyType? = randomPropertyType()): Any {
+    fun randomValue(propertyType: PropertyType = randomPropertyType()): Any {
         return when (propertyType) {
             PropertyType.NUMBER -> {
                 if (faker.random().nextBoolean()) {
@@ -470,9 +480,30 @@ object CloudSpecGenerator {
         }
     }
 
-    @JvmOverloads
-    fun randomValues(propertyType: PropertyType? = randomPropertyType()): List<Any> {
+    fun randomValues(propertyType: PropertyType = randomPropertyType()): List<Any> {
         return (0..5).map { randomValue(propertyType) }
+    }
+
+    fun randomConfigValueType(): ConfigValueType {
+        return listOf(
+                ConfigValueType.NUMBER,
+                ConfigValueType.STRING,
+                ConfigValueType.BOOLEAN
+        )[faker.random().nextInt(0, 2)]
+    }
+
+    fun randomConfigValue(configValueType: ConfigValueType = randomConfigValueType()): Any {
+        return when (configValueType) {
+            ConfigValueType.NUMBER -> {
+                if (faker.random().nextBoolean()) {
+                    faker.random().nextInt(0, 1000)
+                } else {
+                    faker.random().nextDouble()
+                }
+            }
+            ConfigValueType.BOOLEAN -> faker.random().nextBoolean()
+            ConfigValueType.STRING -> faker.lorem().word()
+        }
     }
 
     fun randomInstant(): Instant {

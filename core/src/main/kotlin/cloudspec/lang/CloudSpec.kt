@@ -24,12 +24,18 @@ package cloudspec.lang
  */
 data class CloudSpec(
         val name: String,
+        val config: Set<ConfigExpr>,
         val groups: List<GroupExpr>
 ) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(spaces: Int): String {
         val sb = StringBuilder()
 
         sb.appendln("${" ".repeat(spaces)}Spec \"${name}\"")
+
+        // add configs
+        config.forEach { config ->
+            sb.append(config.toCloudSpecSyntax(spaces))
+        }
 
         // add groups
         groups.forEach { group ->
@@ -43,10 +49,16 @@ data class CloudSpec(
 
     class CloudSpecBuilder {
         private var name: String = ""
+        private var config = mutableSetOf<ConfigExpr>()
         private var groups = mutableListOf<GroupExpr>()
 
         fun setName(name: String): CloudSpecBuilder {
             this.name = name
+            return this
+        }
+
+        fun addConfig(vararg config: ConfigExpr): CloudSpecBuilder {
+            this.config.addAll(setOf(*config))
             return this
         }
 
@@ -57,12 +69,11 @@ data class CloudSpec(
 
         fun build(): CloudSpec {
             // TODO validate
-            return CloudSpec(name, groups)
+            return CloudSpec(name, config, groups)
         }
     }
 
     companion object {
-        @JvmStatic
         fun builder(): CloudSpecBuilder {
             return CloudSpecBuilder()
         }

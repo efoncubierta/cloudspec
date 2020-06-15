@@ -27,9 +27,7 @@ import cloudspec.aws.ec2.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
 import cloudspec.aws.s3.S3BucketLoader
 import cloudspec.aws.s3.S3BucketResource
-import cloudspec.model.Provider
-import cloudspec.model.ResourceDefRef
-import cloudspec.model.ResourceRef
+import cloudspec.model.*
 import java.util.*
 
 @ProviderDefinition(
@@ -63,12 +61,15 @@ import java.util.*
 class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     private val loaders: MutableMap<String, AWSResourceLoader<*>> = HashMap()
 
-    override fun resourcesByRef(ref: ResourceDefRef): List<AWSResource> {
-        return getLoader(ref).map { it.all }.getOrElse { emptyList() }
+    override val configDefs: ConfigDefs
+        get() = AWSConfig.CONFIG_DEFS
+
+    override fun resourcesByRef(config: ConfigValues, ref: ResourceDefRef): List<AWSResource> {
+        return getLoader(ref).map { it.all(config) }.getOrElse { emptyList() }
     }
 
-    override fun resource(ref: ResourceRef): Option<AWSResource> {
-        return getLoader(ref.defRef).flatMap { it.byId(ref.id) }
+    override fun resource(config: ConfigValues, ref: ResourceRef): Option<AWSResource> {
+        return getLoader(ref.defRef).flatMap { it.byId(config, ref.id) }
     }
 
     private fun getLoader(resourceDefRef: ResourceDefRef): Option<AWSResourceLoader<*>> {

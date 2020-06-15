@@ -21,22 +21,22 @@ package cloudspec.preflight
 
 import arrow.core.None
 import arrow.core.Some
+import cloudspec.ProvidersRegistry
 import cloudspec.lang.*
-import cloudspec.model.PropertyDef
-import cloudspec.model.PropertyType
-import cloudspec.model.ResourceDef
-import cloudspec.model.ResourceDefRef.Companion.fromString
+import cloudspec.model.*
 import cloudspec.store.ResourceDefStore
 import org.apache.tinkerpop.gremlin.process.traversal.Compare
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.Text
 import org.slf4j.LoggerFactory
 
-class CloudSpecPreflight(private val resourceDefStore: ResourceDefStore) {
+class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
+                         private val resourceDefStore: ResourceDefStore) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun preflight(spec: CloudSpec) {
         logger.info("Validating CloudSpec input")
+        preflightConfig(spec.config)
         preflightGroups(spec.groups)
     }
 
@@ -46,6 +46,7 @@ class CloudSpecPreflight(private val resourceDefStore: ResourceDefStore) {
 
     private fun preflightGroup(group: GroupExpr) {
         logger.debug("Preflight of group {}", group.name)
+        preflightConfig(group.config)
         preflightRules(group.rules)
     }
 
@@ -56,24 +57,26 @@ class CloudSpecPreflight(private val resourceDefStore: ResourceDefStore) {
     private fun preflightRule(rule: RuleExpr) {
         logger.debug("Preflight of rule {}", rule.name)
 
-        fromString(rule.resourceDefRef)
-                .flatMap {
-                    resourceDefStore.getResourceDef(it)
-                }
-                .also { resourceDefOpt ->
-                    when (resourceDefOpt) {
-                        is Some -> {
-                            // preflight withs and asserts
-                            rule.withExpr.statements
-                                    .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
-                            rule.assertExpr.statements
-                                    .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
-                        }
-                        else ->
-                            throw CloudSpecPreflightException("Resource of type '${rule.resourceDefRef}' " +
-                                                                      "is not supported.")
+        preflightConfig(rule.config)
+
+        ResourceDefRef.fromString(rule.resourceDefRef)
+            .flatMap {
+                resourceDefStore.getResourceDef(it)
+            }
+            .also { resourceDefOpt ->
+                when (resourceDefOpt) {
+                    is Some -> {
+                        // preflight withs and asserts
+                        rule.withExpr.statements
+                            .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
+                        rule.assertExpr.statements
+                            .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
                     }
+                    else ->
+                        throw CloudSpecPreflightException("Resource of type '${rule.resourceDefRef}' " +
+                                                                  "is not supported.")
                 }
+            }
     }
 
     private fun preflightStatement(resourceDef: ResourceDef, statement: Statement, path: List<String>) {
@@ -173,5 +176,23 @@ class CloudSpecPreflight(private val resourceDefStore: ResourceDefStore) {
 
     private fun isStringProperty(propertyDef: PropertyDef): Boolean {
         return propertyDef.propertyType == PropertyType.STRING
+    }
+
+    private fun preflightConfig(config: Set<ConfigExpr>) {
+        config.forEach { c ->
+            when (val configRefOpt = ConfigRef.fromString(c.configRef)) {
+                is Some<ConfigRef> ->
+                    if (!providersRegistry.getProvider(configRefOpt.t.provider)
+                                .exists {
+                                    it.configDefs.any { configDef -> configRefOpt.t == configDef.ref }
+                                }
+                    ) {
+                        throw CloudSpecPreflightException("Config '${c.configRef}' is not supported.")
+                    }
+                else ->
+                    throw CloudSpecPreflightException("Config ref '${c.configRef}' is malformed.")
+            }
+
+        }
     }
 }

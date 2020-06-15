@@ -56,7 +56,7 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(vpcPeeringConnections.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(vpcPeeringConnectionId())
+        val resourceOpt = loader.byId(emptySet(), vpcPeeringConnectionId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2VpcPeeringConnectionLoaderTest : EC2LoaderTest() {
         }
 
         val vpcPeeringConnection = vpcPeeringConnections[0]
-        val resourceOpt = loader.byId(vpcPeeringConnection.vpcPeeringConnectionId())
+        val resourceOpt = loader.byId(emptySet(), vpcPeeringConnection.vpcPeeringConnectionId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

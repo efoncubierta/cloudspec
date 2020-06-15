@@ -20,23 +20,30 @@
 package cloudspec.aws.ec2
 
 import arrow.core.Option
+import arrow.core.extensions.list.alternative.orElse
 import arrow.core.firstOrNone
+import cloudspec.aws.AWSConfig
+import cloudspec.aws.AWSProvider
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
+import cloudspec.model.ConfigValues
+import cloudspec.model.StringConfigValue
+import cloudspec.model.getStrings
 import kotlinx.coroutines.*
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.Filter
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
-    override fun byId(id: String): Option<T> = runBlocking {
-        resources(listOf(id)).firstOrNone()
+    override fun byId(config: ConfigValues, id: String): Option<T> = runBlocking {
+        resources(config, listOf(id)).firstOrNone()
     }
 
-    override val all: List<T>
-        get() = runBlocking { resources() }
+    override fun all(config: ConfigValues): List<T> = runBlocking { resources(config) }
 
-    private suspend fun resources(ids: List<String> = emptyList()): List<T> = coroutineScope {
-        availableRegions()
+    private suspend fun resources(config: ConfigValues,
+                                  ids: List<String> = emptyList()): List<T> = coroutineScope {
+        config.getStrings(AWSConfig.REGIONS_REF)
+            .let { if (it.isEmpty()) availableRegions(config) else it }
             .map { async { resourcesInRegion(it, ids) } }
             .awaitAll()
             .flatten()
@@ -53,7 +60,7 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
         }
     }
 
-    protected suspend fun availableRegions(): List<String> = coroutineScope {
+    protected suspend fun availableRegions(config: ConfigValues): List<String> = coroutineScope {
         clientsProvider.ec2Client.use { ec2Client ->
             withContext(Dispatchers.Default) {
                 ec2Client.describeRegions()

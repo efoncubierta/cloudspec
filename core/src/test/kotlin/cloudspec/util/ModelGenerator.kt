@@ -91,8 +91,8 @@ object ModelGenerator {
         return when (propertyDef.propertyType) {
             PropertyType.NESTED -> NestedPropertyValue(
                     propertyDef.properties
-                            .map { obj: PropertyDef -> randomProperty(obj) }
-                            .toSet(),
+                        .map { obj: PropertyDef -> randomProperty(obj) }
+                        .toSet(),
                     emptySet()
             )
             PropertyType.KEY_VALUE -> KeyValue(faker.lorem().word(), faker.lorem().word())
@@ -203,5 +203,48 @@ object ModelGenerator {
                 randomProperties(resourceDef.properties),
                 randomAssociations(resourceDef.associations)
         )
+    }
+
+    fun randomConfigRef(): ConfigRef {
+        return ConfigRef(
+                randomName(),
+                randomName()
+        )
+    }
+
+    fun randomConfigValueType(): ConfigValueType {
+        return ConfigValueType.values()[faker.random().nextInt(0, ConfigValueType.values().size)]
+    }
+
+    fun randomConfigDef(): ConfigDef {
+        return ConfigDef(randomConfigRef(),
+                         randomDescription(),
+                         randomConfigValueType(),
+                         faker.random().nextBoolean())
+    }
+
+    fun randomConfigDefs(n: Int): Set<ConfigDef> {
+        return (0..n).map { randomConfigDef() }.toSet()
+    }
+
+    fun randomConfigValue(configDef: ConfigDef): ConfigValue<*> {
+        return when (configDef.type) {
+            ConfigValueType.NUMBER -> NumberConfigValue(
+                    configDef.ref,
+                    if (faker.random().nextBoolean()) faker.random().nextInt(Int.MAX_VALUE) else faker.random().nextDouble()
+            )
+            ConfigValueType.BOOLEAN -> BooleanConfigValue(
+                    configDef.ref,
+                    faker.random().nextBoolean()
+            )
+            ConfigValueType.STRING -> StringConfigValue(
+                    configDef.ref,
+                    faker.lorem().sentence()
+            )
+        }
+    }
+
+    fun randomConfigValues(n: Int): ConfigValues {
+        return (0..n).map { randomConfigValue(randomConfigDef()) }.toSet()
     }
 }

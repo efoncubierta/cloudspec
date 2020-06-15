@@ -56,7 +56,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(localGateways.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(localGatewayId())
+        val resourceOpt = loader.byId(emptySet(), localGatewayId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val localGateway = localGateways[0]
-        val resourceOpt = loader.byId(localGateway.localGatewayId())
+        val resourceOpt = loader.byId(emptySet(), localGateway.localGatewayId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -54,6 +54,13 @@ abstract class Provider {
     val resourceDefs: ResourceDefs
 
     /**
+     *  Get all configuration definitions the provider provides.
+     *
+     * @return List of configuration definitions.
+     */
+    abstract val configDefs: ConfigDefs
+
+    /**
      * Constructor.
      *
      * When a instance of a class implementing this class is constructed, all
@@ -68,14 +75,15 @@ abstract class Provider {
         name = providerDefinition.name
         description = providerDefinition.description
         resourceDefs = providerDefinition.resources
-                .filter { it.annotations.any { annotation -> annotation is ResourceDefinition } }
-                .map { ResourceDefReflectionUtil.toResourceDef(it) }
-                .flatten()
+            .filter { it.annotations.any { annotation -> annotation is ResourceDefinition } }
+            .map { ResourceDefReflectionUtil.toResourceDef(it) }
+            .flatten()
     }
 
     /**
      * Get a resource definition by its reference.
      *
+     * @param config CloudSpec config.
      * @param ref Resource definition reference.
      * @return Optional resource definition.
      */
@@ -86,16 +94,18 @@ abstract class Provider {
     /**
      * Get all resources of a particular resource definition.
      *
+     * @param config CloudSpec config.
      * @param ref Resource definition reference.
      * @return List of resources.
      */
-    abstract fun resourcesByRef(ref: ResourceDefRef): List<Any>
+    abstract fun resourcesByRef(config: ConfigValues, ref: ResourceDefRef): List<Any>
 
     /**
      * Get a resource by resource definition and id.
      *
+     * @param config CloudSpec config.
      * @param ref Resource reference.
      * @return Optional resource.
      */
-    abstract fun resource(ref: ResourceRef): Option<Any>
+    abstract fun resource(config: ConfigValues, ref: ResourceRef): Option<Any>
 }

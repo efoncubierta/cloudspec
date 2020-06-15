@@ -56,7 +56,7 @@ class EC2CapacityReservationLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(capacityReservations.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2CapacityReservationLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(capacityReservationId())
+        val resourceOpt = loader.byId(emptySet(), capacityReservationId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2CapacityReservationLoaderTest : EC2LoaderTest() {
         }
 
         val capacityReservation = capacityReservations[0]
-        val resourceOpt = loader.byId(capacityReservation.capacityReservationId())
+        val resourceOpt = loader.byId(emptySet(), capacityReservation.capacityReservationId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

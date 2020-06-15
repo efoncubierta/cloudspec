@@ -56,7 +56,7 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(images.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(imageId())
+        val resourceOpt = loader.byId(emptySet(), imageId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2ImageLoaderTest : EC2LoaderTest() {
         }
 
         val image = images[0]
-        val resourceOpt = loader.byId(image.imageId())
+        val resourceOpt = loader.byId(emptySet(), image.imageId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

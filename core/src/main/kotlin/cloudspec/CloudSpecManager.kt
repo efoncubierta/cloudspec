@@ -38,7 +38,7 @@ class CloudSpecManager(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val resourceLoader: ResourceLoader = ResourceLoader(providersRegistry, resourceStore)
-    private val cloudSpecPreflight: CloudSpecPreflight = CloudSpecPreflight(resourceDefStore)
+    private val cloudSpecPreflight: CloudSpecPreflight = CloudSpecPreflight(providersRegistry, resourceDefStore)
     private val cloudSpecValidator: CloudSpecValidator = CloudSpecValidator(resourceValidator)
     private var initiated = false
 

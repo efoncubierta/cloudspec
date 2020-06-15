@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec AWS Provider
+ * CloudSpec Core Library
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
@@ -17,12 +17,17 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.aws
+package cloudspec.model
 
-import arrow.core.Option
-import cloudspec.model.ConfigValues
+/**
+ * Config value type.
+ */
+enum class ConfigValueType(private val text: String) {
+    STRING("string"),
+    BOOLEAN("boolean"),
+    NUMBER("number");
 
-interface AWSResourceLoader<T : AWSResource> {
-    fun byId(config: ConfigValues, id: String): Option<T>
-    fun all(config: ConfigValues): List<T>
+    override fun toString(): String {
+        return text
+    }
 }

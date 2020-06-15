@@ -19,8 +19,11 @@
  */
 package cloudspec.preflight
 
+import cloudspec.ProvidersRegistry
 import cloudspec.graph.GraphResourceDefStore
 import cloudspec.lang.*
+import cloudspec.model.ConfigRef
+import cloudspec.model.ProviderTest
 import cloudspec.util.CloudSpecTestUtils
 import cloudspec.util.ModelGenerator.randomName
 import cloudspec.util.ModelGenerator.randomResourceDef
@@ -36,7 +39,12 @@ import kotlin.test.assertFails
 class CloudSpecPreflightTest {
     private val graph: Graph = TinkerGraph.open()
     private val resourceDefStore = GraphResourceDefStore(graph)
-    private val preflight = CloudSpecPreflight(resourceDefStore)
+    private val providersRegistry = ProvidersRegistry()
+    private val preflight = CloudSpecPreflight(providersRegistry, resourceDefStore)
+
+    init {
+        providersRegistry.register(ProviderTest.TEST_PROVIDER)
+    }
 
     @Before
     fun before() {
@@ -44,16 +52,49 @@ class CloudSpecPreflightTest {
     }
 
     @Test
+    fun shouldFailWithMalformedConfigDefString() {
+        val spec = CloudSpec(
+                randomName(),
+                setOf(
+                        ConfigExpr("test", 1)
+                ),
+                emptyList()
+        )
+
+        assertFails {
+            preflight.preflight(spec)
+        }
+    }
+
+    @Test
+    fun shouldFailWithRandomConfigDef() {
+        val spec = CloudSpec(
+                randomName(),
+                setOf(
+                        ConfigExpr("test:test", 1)
+                ),
+                emptyList()
+        )
+
+        assertFails {
+            preflight.preflight(spec)
+        }
+    }
+
+    @Test
     fun shouldFailWithMalformedResourceDefString() {
         val spec = CloudSpec(
                 randomName(),
+                emptySet(),
                 listOf(
                         GroupExpr(
                                 randomName(),
+                                emptySet(),
                                 listOf(
                                         RuleExpr(
                                                 randomName(),
                                                 randomName(),
+                                                emptySet(),
                                                 WithExpr(emptyList()),
                                                 AssertExpr(emptyList())
                                         )
@@ -70,13 +111,16 @@ class CloudSpecPreflightTest {
     fun shouldFailWithRandomResourceDefString() {
         val spec = CloudSpec(
                 randomName(),
+                emptySet(),
                 listOf(
                         GroupExpr(
                                 randomName(),
+                                emptySet(),
                                 listOf(
                                         RuleExpr(
                                                 randomName(),
                                                 randomResourceDefRef().toString(),
+                                                emptySet(),
                                                 WithExpr(emptyList()),
                                                 AssertExpr(emptyList())
                                         )
@@ -96,13 +140,16 @@ class CloudSpecPreflightTest {
 
         val spec = CloudSpec(
                 randomName(),
+                emptySet(),
                 listOf(
                         GroupExpr(
                                 randomName(),
+                                emptySet(),
                                 listOf(
                                         RuleExpr(
                                                 randomName(),
                                                 resourceDef.ref.toString(),
+                                                emptySet(),
                                                 WithExpr(
                                                         listOf(
                                                                 PropertyStatement(
@@ -129,13 +176,16 @@ class CloudSpecPreflightTest {
 
         val spec = CloudSpec(
                 randomName(),
+                emptySet(),
                 listOf(
                         GroupExpr(
                                 randomName(),
+                                emptySet(),
                                 listOf(
                                         RuleExpr(
                                                 randomName(),
                                                 resourceDef.ref.toString(),
+                                                emptySet(),
                                                 WithExpr(
                                                         listOf(
                                                                 KeyValueStatement(
@@ -163,11 +213,14 @@ class CloudSpecPreflightTest {
 
         val spec = CloudSpec(
                 randomName(),
+                emptySet(),
                 listOf(GroupExpr(
                         randomName(),
+                        emptySet(),
                         listOf(RuleExpr(
                                 randomName(),
                                 resourceDef.ref.toString(),
+                                emptySet(),
                                 WithExpr(listOf(
                                         NestedStatement(
                                                 resourceDef.properties.elementAt(0).name,
@@ -193,13 +246,16 @@ class CloudSpecPreflightTest {
 
         val spec = CloudSpec(
                 randomName(),
+                emptySet(),
                 listOf(
                         GroupExpr(
                                 randomName(),
+                                emptySet(),
                                 listOf(
                                         RuleExpr(
                                                 randomName(),
                                                 resourceDef.ref.toString(),
+                                                emptySet(),
                                                 WithExpr(
                                                         listOf(
                                                                 AssociationStatement(

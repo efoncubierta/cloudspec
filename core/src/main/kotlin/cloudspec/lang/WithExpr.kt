@@ -54,7 +54,6 @@ data class WithExpr(val statements: List<Statement>) : CloudSpecSyntaxProducer {
     }
 
     companion object {
-        @JvmStatic
         fun builder(): WithExprBuilder {
             return WithExprBuilder()
         }

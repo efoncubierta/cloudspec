@@ -24,7 +24,7 @@
     <dependencies>
         <dependency>
             <groupId>cloudspec</groupId>
-            <artifactId>cloudspec-loader</artifactId>
+            <artifactId>cloudspec-core</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

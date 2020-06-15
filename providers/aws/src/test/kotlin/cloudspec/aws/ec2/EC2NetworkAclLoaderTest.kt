@@ -56,7 +56,7 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(networkAcls.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(networkAclId())
+        val resourceOpt = loader.byId(emptySet(), networkAclId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2NetworkAclLoaderTest : EC2LoaderTest() {
         }
 
         val networkAcl = networkAcls[0]
-        val resourceOpt = loader.byId(networkAcl.networkAclId())
+        val resourceOpt = loader.byId(emptySet(), networkAcl.networkAclId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

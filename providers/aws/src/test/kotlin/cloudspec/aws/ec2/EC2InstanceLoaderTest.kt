@@ -56,7 +56,7 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(reservation.instances().size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(instanceId())
+        val resourceOpt = loader.byId(emptySet(), instanceId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2InstanceLoaderTest : EC2LoaderTest() {
         }
 
         val instance = reservation.instances()[0]
-        val resourceOpt = loader.byId(instance.instanceId())
+        val resourceOpt = loader.byId(emptySet(), instance.instanceId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

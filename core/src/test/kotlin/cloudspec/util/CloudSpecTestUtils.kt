@@ -27,6 +27,9 @@ object CloudSpecTestUtils {
     const val TEST_SPEC_GROUP_NAME = "mygroup"
     const val TEST_SPEC_RULE_NAME = "myrule"
 
+    const val TEST_CONFIG_REF = "${ProviderDataUtil.PROVIDER_NAME}:myconfig"
+    const val TEST_CONFIG_VALUE = 1
+
     val TEST_WITH_EXPR = WithExpr(
             listOf(
                     PropertyStatement(
@@ -98,6 +101,7 @@ object CloudSpecTestUtils {
                     )
             )
     )
+
     val TEST_ASSERT_EXPR = AssertExpr(
             listOf(
                     PropertyStatement(
@@ -164,11 +168,23 @@ object CloudSpecTestUtils {
     val TEST_RULE_EXPR = RuleExpr(
             TEST_SPEC_RULE_NAME,
             ModelTestUtils.RESOURCE_DEF_REF.toString(),
+            setOf(
+                    ConfigExpr(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
+            ),
             TEST_WITH_EXPR,
             TEST_ASSERT_EXPR
     )
-    val TEST_GROUP_EXPR = GroupExpr(
-            TEST_SPEC_GROUP_NAME, listOf(TEST_RULE_EXPR))
 
-    val TEST_SPEC = CloudSpec(TEST_SPEC_NAME, listOf(TEST_GROUP_EXPR))
+    val TEST_GROUP_EXPR = GroupExpr(
+            TEST_SPEC_GROUP_NAME,
+            setOf(
+                    ConfigExpr(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
+            ),
+            listOf(TEST_RULE_EXPR))
+
+    val TEST_SPEC = CloudSpec(TEST_SPEC_NAME,
+                              setOf(
+                                      ConfigExpr(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
+                              ),
+                              listOf(TEST_GROUP_EXPR))
 }

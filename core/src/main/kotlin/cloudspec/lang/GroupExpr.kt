@@ -26,12 +26,16 @@ package cloudspec.lang
  */
 data class GroupExpr(
         val name: String,
+        val config: Set<ConfigExpr>,
         val rules: List<RuleExpr>
 ) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(spaces: Int): String {
         val sb = StringBuilder()
 
         sb.appendln("${" ".repeat(spaces)}Group \"${name}\"")
+
+        // add config
+        config.forEach { config -> sb.append(config.toCloudSpecSyntax(4)) }
 
         // add rules
         rules.forEach { rule -> sb.append(rule.toCloudSpecSyntax(4)) }
@@ -43,10 +47,16 @@ data class GroupExpr(
 
     class GroupExprBuilder {
         private var name: String = ""
+        private var config = mutableSetOf<ConfigExpr>()
         private var rules = mutableListOf<RuleExpr>()
 
         fun setName(name: String): GroupExprBuilder {
             this.name = name
+            return this
+        }
+
+        fun addConfig(vararg config: ConfigExpr): GroupExprBuilder {
+            this.config.addAll(setOf(*config))
             return this
         }
 
@@ -56,12 +66,11 @@ data class GroupExpr(
         }
 
         fun build(): GroupExpr {
-            return GroupExpr(name, rules)
+            return GroupExpr(name, config, rules)
         }
     }
 
     companion object {
-        @JvmStatic
         fun builder(): GroupExprBuilder {
             return GroupExprBuilder()
         }

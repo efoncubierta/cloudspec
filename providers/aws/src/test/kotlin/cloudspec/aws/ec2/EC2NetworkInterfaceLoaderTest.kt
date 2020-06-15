@@ -56,7 +56,7 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all
+        val resources = loader.all(emptySet())
         assertNotNull(resources)
         assertEquals(networkInterfaces.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(networkInterfaceId())
+        val resourceOpt = loader.byId(emptySet(), networkInterfaceId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2NetworkInterfaceLoaderTest : EC2LoaderTest() {
         }
 
         val networkInterface = networkInterfaces[0]
-        val resourceOpt = loader.byId(networkInterface.networkInterfaceId())
+        val resourceOpt = loader.byId(emptySet(), networkInterface.networkInterfaceId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

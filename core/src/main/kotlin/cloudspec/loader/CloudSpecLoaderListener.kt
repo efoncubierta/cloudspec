@@ -48,7 +48,6 @@ import org.apache.commons.lang3.time.DateUtils
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.TextP
 import java.text.ParseException
-import java.time.Instant
 import java.util.*
 
 class CloudSpecLoaderListener : CloudSpecBaseListener() {
@@ -69,12 +68,29 @@ class CloudSpecLoaderListener : CloudSpecBaseListener() {
 
     // evaluator
     private val currentMemberNames = Stack<Stack<String>>()
+    private val globalConfig = mutableSetOf<ConfigExpr>()
     private val currentStatements = Stack<Stack<Statement>>()
     private val currentValues = Stack<Any>()
     private var currentPredicate: P<*>? = null
 
     val cloudSpec: Option<CloudSpec>
         get() = currentCloudSpecBuilder?.build().toOption()
+
+    override fun exitGlobalConfig(ctx: GlobalConfigContext) {
+        globalConfig.add(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    }
+
+    override fun exitSpecConfig(ctx: SpecConfigContext) {
+        currentCloudSpecBuilder?.addConfig(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    }
+
+    override fun exitGroupConfig(ctx: GroupConfigContext) {
+        currentGroupBuilder?.addConfig(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    }
+
+    override fun exitRuleConfig(ctx: RuleConfigContext) {
+        currentRuleBuilder?.addConfig(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    }
 
     override fun enterSpecDecl(ctx: SpecDeclContext) {
         currentCloudSpecBuilder = CloudSpec.builder().setName(stripQuotes(ctx.STRING().text))

@@ -45,6 +45,7 @@ class CloudSpecLoaderTest {
 
     private fun compareSpecs(expected: CloudSpec, actual: CloudSpec) {
         assertEquals(expected.name, actual.name)
+        assertEquals(expected.config, actual.config)
         assertEquals(expected.groups.size, actual.groups.size)
         val expectedS = expected.groups.sortedBy { it.name }
         val actualS = actual.groups.sortedBy { it.name }
@@ -55,6 +56,7 @@ class CloudSpecLoaderTest {
 
     private fun compareGroups(expected: GroupExpr, actual: GroupExpr) {
         assertEquals(expected.name, actual.name)
+        assertEquals(expected.config, actual.config)
         assertEquals(expected.rules.size, actual.rules.size)
         val expectedS = expected.rules.sortedBy { it.name }
         val actualS = actual.rules.sortedBy { it.name }
@@ -66,6 +68,7 @@ class CloudSpecLoaderTest {
     private fun compareRules(expected: RuleExpr, actual: RuleExpr) {
         assertEquals(expected.name, actual.name)
         assertEquals(expected.resourceDefRef, actual.resourceDefRef)
+        assertEquals(expected.config, actual.config)
         for (i in expected.withExpr.statements.indices) {
             assertEquals(expected.withExpr.statements[i], actual.withExpr.statements[i])
         }

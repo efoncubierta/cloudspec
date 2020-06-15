@@ -22,16 +22,15 @@ package cloudspec.aws.s3
 import arrow.core.Option
 import arrow.core.firstOrNone
 import cloudspec.aws.IAWSClientsProvider
+import cloudspec.model.ConfigValues
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.Bucket
 
 class S3BucketLoader(private val clientsProvider: IAWSClientsProvider) : S3ResourceLoader<S3BucketResource> {
-    override fun byId(id: String): Option<S3BucketResource> {
+    override fun byId(config: ConfigValues, id: String): Option<S3BucketResource> {
         return getBuckets(listOf(id)).firstOrNone()
     }
 
-    override val all: List<S3BucketResource>
-        get() = getBuckets(emptyList<String>())
+    override fun all(config: ConfigValues): List<S3BucketResource> = getBuckets(emptyList())
 
     fun getBuckets(bucketNames: List<String>): List<S3BucketResource> {
         clientsProvider.s3Client.use { client ->
@@ -39,8 +38,8 @@ class S3BucketLoader(private val clientsProvider: IAWSClientsProvider) : S3Resou
                 bucketNames
             } else {
                 client.listBuckets()
-                        .buckets()
-                        .map { it.name() }
+                    .buckets()
+                    .map { it.name() }
             }
 
             return buckets.map {
@@ -52,8 +51,8 @@ class S3BucketLoader(private val clientsProvider: IAWSClientsProvider) : S3Resou
     private fun toResource(s3Client: S3Client, bucketName: String): S3BucketResource {
 
         val region = s3Client.getBucketLocation { it.bucket(bucketName) }
-                .locationConstraint()
-                .toString()
+            .locationConstraint()
+            .toString()
 
         return S3BucketResource(bucketName, region)
     }
