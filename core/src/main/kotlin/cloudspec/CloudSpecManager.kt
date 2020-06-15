@@ -19,13 +19,13 @@
  */
 package cloudspec
 
-import cloudspec.lang.CloudSpec
+import cloudspec.lang.PlanDecl
 import cloudspec.loader.ResourceLoader
 import cloudspec.preflight.CloudSpecPreflight
 import cloudspec.store.ResourceDefStore
 import cloudspec.store.ResourceStore
 import cloudspec.validator.CloudSpecValidator
-import cloudspec.validator.CloudSpecValidatorResult
+import cloudspec.validator.PlanResult
 import cloudspec.validator.ResourceValidator
 import org.slf4j.LoggerFactory
 
@@ -61,9 +61,9 @@ class CloudSpecManager(
         initiated = true
     }
 
-    fun preflight(spec: CloudSpec) {
+    fun preflight(plan: PlanDecl) {
         mustBeInitiated()
-        cloudSpecPreflight.preflight(spec)
+        cloudSpecPreflight.preflight(plan)
     }
 
     private fun mustBeInitiated() {
@@ -72,14 +72,14 @@ class CloudSpecManager(
         }
     }
 
-    fun loadResources(spec: CloudSpec) {
+    fun loadResources(plan: PlanDecl) {
         mustBeInitiated()
-        resourceLoader.load(spec)
+        resourceLoader.load(plan)
     }
 
-    fun validate(spec: CloudSpec): CloudSpecValidatorResult {
+    fun validate(plan: PlanDecl): PlanResult {
         mustBeInitiated()
-        return cloudSpecValidator.validate(spec)
+        return cloudSpecValidator.validate(plan)
     }
 
 }

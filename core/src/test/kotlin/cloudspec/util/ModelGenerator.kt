@@ -245,6 +245,6 @@ object ModelGenerator {
     }
 
     fun randomConfigValues(n: Int): ConfigValues {
-        return (0..n).map { randomConfigValue(randomConfigDef()) }.toSet()
+        return (0..n).map { randomConfigValue(randomConfigDef()) }
     }
 }

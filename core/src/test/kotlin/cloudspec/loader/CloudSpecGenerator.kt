@@ -47,49 +47,46 @@ import java.util.concurrent.TimeUnit
 object CloudSpecGenerator {
     private val faker = Faker()
 
-    fun fullSpec(): CloudSpec {
-        return CloudSpec.builder()
-            .setName(faker.lorem().sentence())
-            .addConfig(fullConfig(), fullConfig())
-            .addGroups(fullGroup(), fullGroup())
-            .build()
+    fun fullPlan(): PlanDecl {
+        return PlanDecl(
+                listOf(fullConfig(), fullConfig()),
+                listOf(fullModule(), fullModule())
+        )
     }
 
-    fun fullGroup(): GroupExpr {
-        return GroupExpr.builder()
-            .setName(faker.lorem().sentence())
-            .addConfig(fullConfig(), fullConfig())
-            .addRules(fullRule(), fullRule())
-            .build()
+    fun fullModule(): ModuleDecl {
+        return ModuleDecl(faker.lorem().sentence(),
+                          listOf(fullConfig(), fullConfig()),
+                          listOf(fullGroup(), fullGroup()))
     }
 
-    fun fullRule(): RuleExpr {
-        return RuleExpr.builder()
-            .setName(faker.lorem().sentence())
-            .setResourceDefRef("${faker.lorem().word()}:${faker.lorem().word()}:${faker.lorem().word()}")
-            .addConfig(fullConfig(), fullConfig())
-            .setWithExpr(fullWith())
-            .setAssertExp(fullAssert())
-            .build()
+    fun fullGroup(): GroupDecl {
+        return GroupDecl(faker.lorem().sentence(),
+                         listOf(fullConfig(), fullConfig()),
+                         listOf(fullRule(), fullRule()))
     }
 
-    fun fullConfig(): ConfigExpr {
-        return ConfigExpr(
+    fun fullRule(): RuleDecl {
+        return RuleDecl(faker.lorem().sentence(),
+                        "${faker.lorem().word()}:${faker.lorem().word()}:${faker.lorem().word()}",
+                        listOf(fullConfig(), fullConfig()),
+                        fullWith(),
+                        fullAssert())
+    }
+
+    fun fullConfig(): ConfigDecl {
+        return ConfigDecl(
                 "${faker.lorem().word()}:${faker.lorem().word()}",
                 randomConfigValue()
         )
     }
 
-    fun fullWith(): WithExpr {
-        return WithExpr.builder()
-            .setStatements(fullStatements(includeNested = true, includeAssociation = true))
-            .build()
+    fun fullWith(): WithDecl {
+        return WithDecl(fullStatements(includeNested = true, includeAssociation = true))
     }
 
-    fun fullAssert(): AssertExpr {
-        return AssertExpr.builder()
-            .setStatement(fullStatements(includeNested = true, includeAssociation = true))
-            .build()
+    fun fullAssert(): AssertDecl {
+        return AssertDecl(fullStatements(includeNested = true, includeAssociation = true))
     }
 
     fun fullStatements(includeNested: Boolean, includeAssociation: Boolean): List<Statement> {

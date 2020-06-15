@@ -23,14 +23,14 @@ import cloudspec.lang.*
 import org.apache.tinkerpop.gremlin.process.traversal.P
 
 object CloudSpecTestUtils {
-    const val TEST_SPEC_NAME = "myspec"
+    const val TEST_MODULE_NAME = "myspec"
     const val TEST_SPEC_GROUP_NAME = "mygroup"
     const val TEST_SPEC_RULE_NAME = "myrule"
 
     const val TEST_CONFIG_REF = "${ProviderDataUtil.PROVIDER_NAME}:myconfig"
     const val TEST_CONFIG_VALUE = 1
 
-    val TEST_WITH_EXPR = WithExpr(
+    val TEST_WITH_EXPR = WithDecl(
             listOf(
                     PropertyStatement(
                             ModelTestUtils.PROP_NUMBER_NAME,
@@ -102,7 +102,7 @@ object CloudSpecTestUtils {
             )
     )
 
-    val TEST_ASSERT_EXPR = AssertExpr(
+    val TEST_ASSERT_EXPR = AssertDecl(
             listOf(
                     PropertyStatement(
                             ModelTestUtils.PROP_NUMBER_NAME,
@@ -165,26 +165,32 @@ object CloudSpecTestUtils {
             )
     )
 
-    val TEST_RULE_EXPR = RuleExpr(
+    val TEST_RULE_EXPR = RuleDecl(
             TEST_SPEC_RULE_NAME,
             ModelTestUtils.RESOURCE_DEF_REF.toString(),
-            setOf(
-                    ConfigExpr(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
+            listOf(
+                    ConfigDecl(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
             ),
             TEST_WITH_EXPR,
             TEST_ASSERT_EXPR
     )
 
-    val TEST_GROUP_EXPR = GroupExpr(
+    val TEST_GROUP_EXPR = GroupDecl(
             TEST_SPEC_GROUP_NAME,
-            setOf(
-                    ConfigExpr(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
+            listOf(
+                    ConfigDecl(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
             ),
             listOf(TEST_RULE_EXPR))
 
-    val TEST_SPEC = CloudSpec(TEST_SPEC_NAME,
-                              setOf(
-                                      ConfigExpr(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
-                              ),
-                              listOf(TEST_GROUP_EXPR))
+    val TEST_MODULE = ModuleDecl(TEST_MODULE_NAME,
+                                 listOf(
+                                         ConfigDecl(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
+                                 ),
+                                 listOf(TEST_GROUP_EXPR))
+
+    val TEST_PLAN = PlanDecl(
+            listOf(
+                    ConfigDecl(TEST_CONFIG_REF, TEST_CONFIG_VALUE)
+            ),
+            listOf(TEST_MODULE))
 }

@@ -34,32 +34,42 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
                          private val resourceDefStore: ResourceDefStore) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun preflight(spec: CloudSpec) {
+    fun preflight(plan: PlanDecl) {
         logger.info("Validating CloudSpec input")
-        preflightConfig(spec.config)
-        preflightGroups(spec.groups)
+        preflightConfig(plan.configs)
+        preflightModules(plan.modules)
     }
 
-    private fun preflightGroups(groups: List<GroupExpr>) {
+    private fun preflightModules(modules: List<ModuleDecl>) {
+        modules.forEach { preflightModule(it) }
+    }
+
+    private fun preflightModule(module: ModuleDecl) {
+        logger.debug("Preflight of module {}", module.name)
+        preflightConfig(module.configs)
+        preflightGroups(module.groups)
+    }
+
+    private fun preflightGroups(groups: List<GroupDecl>) {
         groups.forEach { preflightGroup(it) }
     }
 
-    private fun preflightGroup(group: GroupExpr) {
+    private fun preflightGroup(group: GroupDecl) {
         logger.debug("Preflight of group {}", group.name)
-        preflightConfig(group.config)
+        preflightConfig(group.configs)
         preflightRules(group.rules)
     }
 
-    private fun preflightRules(rules: List<RuleExpr>) {
+    private fun preflightRules(rules: List<RuleDecl>) {
         rules.forEach { preflightRule(it) }
     }
 
-    private fun preflightRule(rule: RuleExpr) {
+    private fun preflightRule(rule: RuleDecl) {
         logger.debug("Preflight of rule {}", rule.name)
 
-        preflightConfig(rule.config)
+        preflightConfig(rule.configs)
 
-        ResourceDefRef.fromString(rule.resourceDefRef)
+        ResourceDefRef.fromString(rule.defRef)
             .flatMap {
                 resourceDefStore.getResourceDef(it)
             }
@@ -67,13 +77,13 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
                 when (resourceDefOpt) {
                     is Some -> {
                         // preflight withs and asserts
-                        rule.withExpr.statements
+                        rule.withs.statements
                             .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
-                        rule.assertExpr.statements
+                        rule.asserts.statements
                             .forEach { preflightStatement(resourceDefOpt.t, it, emptyList()) }
                     }
                     else ->
-                        throw CloudSpecPreflightException("Resource of type '${rule.resourceDefRef}' " +
+                        throw CloudSpecPreflightException("Resource of type '${rule.defRef}' " +
                                                                   "is not supported.")
                 }
             }
@@ -178,7 +188,7 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
         return propertyDef.propertyType == PropertyType.STRING
     }
 
-    private fun preflightConfig(config: Set<ConfigExpr>) {
+    private fun preflightConfig(config: List<ConfigDecl>) {
         config.forEach { c ->
             when (val configRefOpt = ConfigRef.fromString(c.configRef)) {
                 is Some<ConfigRef> ->

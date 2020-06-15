@@ -22,7 +22,7 @@ package cloudspec.model
 import arrow.core.Option
 import arrow.core.firstOrNone
 
-typealias ConfigValues = Set<ConfigValue<*>>
+typealias ConfigValues = List<ConfigValue<*>>
 
 fun ConfigValues.getNumber(ref: ConfigRef): Option<Number> {
     return this.getNumbers(ref).firstOrNone()

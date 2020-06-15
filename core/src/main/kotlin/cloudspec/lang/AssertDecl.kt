@@ -20,43 +20,21 @@
 package cloudspec.lang
 
 /**
- * Define an 'assert' expression.
- *
- * Assert expressions ares used to validate resources.
+ * CloudSpec assert declaration.
  */
-data class AssertExpr(val statements: List<Statement>) : CloudSpecSyntaxProducer {
-    override fun toCloudSpecSyntax(spaces: Int): String {
+data class AssertDecl(val statements: List<Statement>) : CloudSpecSyntaxProducer {
+    override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
         (statements.indices).forEach { i ->
             if (i == 0) {
-                sb.appendln("${" ".repeat(spaces)}Assert")
+                sb.appendln("${printTabs(tabs)}Assert")
             } else {
-                sb.appendln("${" ".repeat(spaces)}And")
+                sb.appendln("${printTabs(tabs)}And")
             }
-            sb.appendln(statements[i].toCloudSpecSyntax(spaces + 4))
+            sb.appendln(statements[i].toCloudSpecSyntax(tabs + 1))
         }
 
         return sb.toString()
     }
-
-    class AssertExprBuilder {
-        private var statements: List<Statement> = emptyList()
-
-        fun setStatement(statements: List<Statement>): AssertExprBuilder {
-            this.statements = statements
-            return this
-        }
-
-        fun build(): AssertExpr {
-            return AssertExpr(statements)
-        }
-    }
-
-    companion object {
-        fun builder(): AssertExprBuilder {
-            return AssertExprBuilder()
-        }
-    }
-
 }

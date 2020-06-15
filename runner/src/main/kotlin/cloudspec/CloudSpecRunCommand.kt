@@ -19,8 +19,6 @@
  */
 package cloudspec
 
-import arrow.core.Some
-import cloudspec.lang.CloudSpec
 import cloudspec.loader.CloudSpecLoader
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
@@ -48,15 +46,10 @@ class CloudSpecRunCommand : Callable<Int> {
         val loader = CloudSpecLoader()
 
         // load spec
-        return when (val spec = loader.load(inputStream)) {
-            is Some -> {
-                // run spec
-                val runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner()
-                runner.validate(spec.t)
-                0
-            }
-            else ->
-                -1
-        }
+        val plan = loader.load(inputStream)
+        // run spec
+        val runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner()
+        runner.validate(plan)
+        return 0
     }
 }

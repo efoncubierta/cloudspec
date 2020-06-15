@@ -56,7 +56,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all(emptySet())
+        val resources = loader.all(emptyList())
         assertNotNull(resources)
         assertEquals(vpcs.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(emptySet(), vpcId())
+        val resourceOpt = loader.byId(emptyList(), vpcId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
         }
 
         val vpc = vpcs[0]
-        val resourceOpt = loader.byId(emptySet(), vpc.vpcId())
+        val resourceOpt = loader.byId(emptyList(), vpc.vpcId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

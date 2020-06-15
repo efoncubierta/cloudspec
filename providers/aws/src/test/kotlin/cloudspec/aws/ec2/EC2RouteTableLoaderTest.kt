@@ -56,7 +56,7 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all(emptySet())
+        val resources = loader.all(emptyList())
         assertNotNull(resources)
         assertEquals(routeTables.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(emptySet(), routeTableId())
+        val resourceOpt = loader.byId(emptyList(), routeTableId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2RouteTableLoaderTest : EC2LoaderTest() {
         }
 
         val routeTable = routeTables[0]
-        val resourceOpt = loader.byId(emptySet(), routeTable.routeTableId())
+        val resourceOpt = loader.byId(emptyList(), routeTable.routeTableId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

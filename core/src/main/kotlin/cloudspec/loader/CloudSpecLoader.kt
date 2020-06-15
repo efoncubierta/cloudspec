@@ -22,7 +22,8 @@ package cloudspec.loader
 import arrow.core.Option
 import cloudspec.CloudSpecLexer
 import cloudspec.CloudSpecParser
-import cloudspec.lang.CloudSpec
+import cloudspec.lang.ModuleDecl
+import cloudspec.lang.PlanDecl
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
@@ -32,7 +33,7 @@ import java.io.InputStream
 
 class CloudSpecLoader {
     @Throws(IOException::class)
-    fun load(`is`: InputStream?): Option<CloudSpec> {
+    fun load(`is`: InputStream?): PlanDecl {
         val lexer = CloudSpecLexer(ANTLRInputStream(`is`))
         val tokens = CommonTokenStream(lexer)
         val parser = CloudSpecParser(tokens)
@@ -41,6 +42,6 @@ class CloudSpecLoader {
         val walker = ParseTreeWalker()
         val listener = CloudSpecLoaderListener()
         walker.walk(listener, tree)
-        return listener.cloudSpec
+        return listener.plan
     }
 }

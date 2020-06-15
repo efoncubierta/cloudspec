@@ -26,9 +26,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Contains
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.Text
 import org.apache.tinkerpop.gremlin.process.traversal.util.AndP
-import java.text.DateFormat
 import java.text.DecimalFormat
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -43,15 +41,15 @@ data class AssociationStatement(
         val associationName: String,
         val statements: List<Statement>
 ) : Statement() {
-    override fun toCloudSpecSyntax(spaces: Int): String {
+    override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
-        sb.appendln("${" ".repeat(spaces)}>${associationName} ( ")
+        sb.appendln("${printTabs(tabs)}>${associationName} ( ")
         sb.appendln(
                 statements.joinToString(" And \n") { statement ->
-                    statement.toCloudSpecSyntax(spaces + 4)
+                    statement.toCloudSpecSyntax(tabs + 1)
                 }
         )
-        sb.appendln("${" ".repeat(spaces)})")
+        sb.appendln("${printTabs(tabs)})")
         return sb.toString()
     }
 }
@@ -63,9 +61,9 @@ data class PropertyStatement(
         val propertyName: String,
         val predicate: P<*>
 ) : Statement() {
-    override fun toCloudSpecSyntax(spaces: Int): String {
+    override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
-        sb.append("${" ".repeat(spaces)}${propertyName} ")
+        sb.append("${printTabs(tabs)}${propertyName} ")
         sb.append(predicateToCloudSpecSyntax(predicate))
         return sb.toString()
     }
@@ -79,9 +77,9 @@ data class KeyValueStatement(
         val key: String,
         val predicate: P<*>
 ) : Statement() {
-    override fun toCloudSpecSyntax(spaces: Int): String {
+    override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
-        sb.append("${" ".repeat(spaces)}${propertyName}[\"${key}\"] ")
+        sb.append("${printTabs(tabs)}${propertyName}[\"${key}\"] ")
         sb.append(predicateToCloudSpecSyntax(predicate))
         return sb.toString()
     }
@@ -94,15 +92,15 @@ data class NestedStatement(
         val propertyName: String,
         val statements: List<Statement>
 ) : Statement() {
-    override fun toCloudSpecSyntax(spaces: Int): String {
+    override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
-        sb.appendln("${" ".repeat(spaces)}${propertyName} ( ")
+        sb.appendln("${printTabs(tabs)}${propertyName} ( ")
         sb.appendln(
                 statements.joinToString(" and \n") { statement ->
-                    statement.toCloudSpecSyntax(spaces + 4)
+                    statement.toCloudSpecSyntax(tabs + 1)
                 }
         )
-        sb.appendln("${" ".repeat(spaces)})")
+        sb.appendln("${printTabs(tabs)})")
         return sb.toString()
     }
 }

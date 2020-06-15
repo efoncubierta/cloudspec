@@ -20,24 +20,30 @@
 package cloudspec.lang
 
 /**
- * Interface that each class of CloudSpec should implement to
- * write themselves in CloudSpec syntax.
+ * CloudSpec module declaration.
  */
-interface CloudSpecSyntaxProducer {
-    /**
-     * Write object in CloudSpec syntax.
-     *
-     * @return CloudSpec syntax.
-     */
-    fun toCloudSpecSyntax(): String {
-        return toCloudSpecSyntax(0)
-    }
+data class ModuleDecl(
+        val name: String,
+        val configs: List<ConfigDecl>,
+        val groups: List<GroupDecl>
+) : CloudSpecSyntaxProducer {
+    override fun toCloudSpecSyntax(tabs: Int): String {
+        val sb = StringBuilder()
 
-    /**
-     * Write object in CloudSpec syntax tabulated.
-     *
-     * @param spaces Number of spaces.
-     * @return CloudSpec syntax.
-     */
-    fun toCloudSpecSyntax(spaces: Int): String
+        sb.appendln("${printTabs(tabs)}Module \"${name}\"")
+
+        // add configs
+        configs.forEach { config ->
+            sb.append(config.toCloudSpecSyntax(tabs + 1))
+        }
+
+        // add groups
+        groups.forEach { group ->
+            sb.append(group.toCloudSpecSyntax(tabs + 1))
+        }
+
+        sb.appendln()
+
+        return sb.toString()
+    }
 }

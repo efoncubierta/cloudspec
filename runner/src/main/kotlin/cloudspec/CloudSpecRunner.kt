@@ -19,7 +19,7 @@
  */
 package cloudspec
 
-import cloudspec.lang.CloudSpec
+import cloudspec.lang.PlanDecl
 import cloudspec.validator.*
 import com.diogonunes.jcdp.color.ColoredPrinter
 import com.diogonunes.jcdp.color.api.Ansi
@@ -33,28 +33,32 @@ class CloudSpecRunner @Inject constructor(private val version: String,
 
     private val errors = mutableListOf<RuleResult>()
 
-    fun validate(spec: CloudSpec) {
+    fun validate(plan: PlanDecl) {
         // init manager
         cloudSpecManager.init()
 
         // preflight spec
-        cloudSpecManager.preflight(spec)
+        cloudSpecManager.preflight(plan)
 
         // load resources
-        cloudSpecManager.loadResources(spec)
+        cloudSpecManager.loadResources(plan)
 
         // validate spec
-        printResult(cloudSpecManager.validate(spec))
+        printResult(cloudSpecManager.validate(plan))
     }
 
-    private fun printResult(result: CloudSpecValidatorResult) {
+    private fun printResult(planResult: PlanResult) {
         logger.info("Generating report")
 
         println()
-        cp.println("${margin(1)}${result.specName}",
-                   Ansi.Attribute.NONE, Ansi.FColor.BLUE, Ansi.BColor.NONE)
-        result.groupResults.forEach { printGroupResult(it) }
+        planResult.moduleResults.forEach { printModuleResult(it) }
         printErrors()
+    }
+
+    private fun printModuleResult(moduleResult: ModuleResult) {
+        cp.println("${margin(1)}${moduleResult.moduleName}",
+                   Ansi.Attribute.NONE, Ansi.FColor.BLUE, Ansi.BColor.NONE)
+        moduleResult.groupResults.forEach { printGroupResult(it) }
     }
 
     private fun printGroupResult(groupResult: GroupResult) {
@@ -111,11 +115,11 @@ class CloudSpecRunner @Inject constructor(private val version: String,
                             is AssertMismatchError -> {
                                 val (condition, expected, actual) = assertError
                                 cp.print("${margin(2)}Expected: ",
-                                           Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
+                                         Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
                                 cp.println("$condition ${valueToCloudSpecSyntax(expected)}",
                                            Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                                 cp.print("${margin(2)}Actual: ",
-                                           Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
+                                         Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
                                 cp.println(valueToCloudSpecSyntax(actual),
                                            Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                             }
@@ -126,7 +130,7 @@ class CloudSpecRunner @Inject constructor(private val version: String,
                                 cp.println("$condition ${valueToCloudSpecSyntax(expectedLeft)} and ${valueToCloudSpecSyntax(expectedRight)}",
                                            Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                                 cp.print("${margin(2)}Actual: ",
-                                           Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
+                                         Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
                                 cp.println(valueToCloudSpecSyntax(actual),
                                            Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                             }

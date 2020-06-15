@@ -56,7 +56,7 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all(emptySet())
+        val resources = loader.all(emptyList())
         assertNotNull(resources)
         assertEquals(volumes.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(emptySet(), volumeId())
+        val resourceOpt = loader.byId(emptyList(), volumeId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2VolumeLoaderTest : EC2LoaderTest() {
         }
 
         val volume = volumes[0]
-        val resourceOpt = loader.byId(emptySet(), volume.volumeId())
+        val resourceOpt = loader.byId(emptyList(), volume.volumeId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

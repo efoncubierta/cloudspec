@@ -20,17 +20,28 @@
 package cloudspec.lang
 
 /**
- * Define a config expression.
+ * Interface that each class of CloudSpec should implement to
+ * write themselves in CloudSpec syntax.
  */
-data class ConfigExpr(
-        val configRef: String,
-        val value: Any
-) : CloudSpecSyntaxProducer {
-    override fun toCloudSpecSyntax(spaces: Int): String {
-        val sb = StringBuilder()
-
-        sb.appendln("${" ".repeat(spaces)}Config $configRef = ${valueToCloudSpecSyntax(value)}")
-
-        return sb.toString()
+interface CloudSpecSyntaxProducer {
+    /**
+     * Write object in CloudSpec syntax.
+     *
+     * @return CloudSpec syntax.
+     */
+    fun toCloudSpecSyntax(): String {
+        return toCloudSpecSyntax(0)
     }
+
+    /**
+     * Write object in CloudSpec syntax tabulated.
+     *
+     * @param tabs Number of tabs.
+     * @return CloudSpec syntax.
+     */
+    fun toCloudSpecSyntax(tabs: Int): String
+}
+
+fun printTabs(tabs: Int): String {
+    return " ".repeat(tabs*2)
 }

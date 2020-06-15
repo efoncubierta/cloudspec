@@ -19,16 +19,9 @@
  */
 package cloudspec.loader
 
-import arrow.core.Option
-import arrow.core.toOption
 import cloudspec.CloudSpecBaseListener
 import cloudspec.CloudSpecParser.*
 import cloudspec.lang.*
-import cloudspec.lang.AssertExpr.AssertExprBuilder
-import cloudspec.lang.CloudSpec.CloudSpecBuilder
-import cloudspec.lang.GroupExpr.GroupExprBuilder
-import cloudspec.lang.RuleExpr.RuleExprBuilder
-import cloudspec.lang.WithExpr.WithExprBuilder
 import cloudspec.lang.predicate.DateP.Companion.after
 import cloudspec.lang.predicate.DateP.Companion.before
 import cloudspec.lang.predicate.DateP.Companion.between
@@ -51,93 +44,87 @@ import java.text.ParseException
 import java.util.*
 
 class CloudSpecLoaderListener : CloudSpecBaseListener() {
-    // current spec
-    private var currentCloudSpecBuilder: CloudSpecBuilder? = null
-
-    // current group
-    private var currentGroupBuilder: GroupExprBuilder? = null
-
-    // current rule
-    private var currentRuleBuilder: RuleExprBuilder? = null
-
-    // current width
-    private var currentWithBuilder: WithExprBuilder? = null
-
-    // current assert
-    private var currentAssertBuilder: AssertExprBuilder? = null
-
     // evaluator
+    private val currentDefRef = Stack<String>()
+    private val currentConfigs = Stack<Stack<ConfigDecl>>()
+    private val currentPlans = Stack<PlanDecl>()
+    private val currentModules = Stack<ModuleDecl>()
+    private val currentGroups = Stack<GroupDecl>()
+    private val currentRules = Stack<RuleDecl>()
+    private val currentWiths = Stack<WithDecl>()
+    private val currentAsserts = Stack<AssertDecl>()
     private val currentMemberNames = Stack<Stack<String>>()
-    private val globalConfig = mutableSetOf<ConfigExpr>()
     private val currentStatements = Stack<Stack<Statement>>()
     private val currentValues = Stack<Any>()
     private var currentPredicate: P<*>? = null
 
-    val cloudSpec: Option<CloudSpec>
-        get() = currentCloudSpecBuilder?.build().toOption()
-
-    override fun exitGlobalConfig(ctx: GlobalConfigContext) {
-        globalConfig.add(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    init {
+        currentConfigs.push(Stack()) // plan configs
     }
 
-    override fun exitSpecConfig(ctx: SpecConfigContext) {
-        currentCloudSpecBuilder?.addConfig(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    val plan: PlanDecl
+        get() = PlanDecl(currentConfigs.pop().toList(),
+                         currentModules.toList())
+
+    override fun exitSetDecl(ctx: SetDeclContext) {
+        currentConfigs.peek().push(ConfigDecl(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
     }
 
-    override fun exitGroupConfig(ctx: GroupConfigContext) {
-        currentGroupBuilder?.addConfig(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    override fun enterModuleDecl(ctx: ModuleDeclContext) {
+        currentConfigs.push(Stack())
     }
 
-    override fun exitRuleConfig(ctx: RuleConfigContext) {
-        currentRuleBuilder?.addConfig(ConfigExpr(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
-    }
-
-    override fun enterSpecDecl(ctx: SpecDeclContext) {
-        currentCloudSpecBuilder = CloudSpec.builder().setName(stripQuotes(ctx.STRING().text))
+    override fun exitModuleDecl(ctx: ModuleDeclContext) {
+        currentModules.push(ModuleDecl(stripQuotes(ctx.STRING().text),
+                                       currentConfigs.pop().toList(),
+                                       currentGroups.toList()))
+        currentGroups.clear()
     }
 
     override fun enterGroupDecl(ctx: GroupDeclContext) {
-        currentGroupBuilder = GroupExpr.builder().setName(stripQuotes(ctx.STRING().text))
+        currentConfigs.push(Stack())
     }
 
     override fun exitGroupDecl(ctx: GroupDeclContext) {
-        currentCloudSpecBuilder?.addGroups(currentGroupBuilder!!.build())
+        currentGroups.push(GroupDecl(stripQuotes(ctx.STRING().text),
+                                     currentConfigs.pop().toList(),
+                                     currentRules.toList()))
+        currentRules.clear()
     }
 
     override fun enterRuleDecl(ctx: RuleDeclContext) {
-        currentRuleBuilder = RuleExpr.builder().setName(stripQuotes(ctx.STRING().text))
+        currentConfigs.push(Stack())
+        currentDefRef.push(stripQuotes(ctx.STRING().text))
     }
 
     override fun exitRuleDecl(ctx: RuleDeclContext) {
-        currentGroupBuilder?.addRules(currentRuleBuilder!!.build())
+        currentRules.push(RuleDecl(stripQuotes(ctx.STRING().text),
+                                   currentDefRef.pop(),
+                                   currentConfigs.pop().toList(),
+                                   if (!currentWiths.empty()) currentWiths.pop() else WithDecl(emptyList()),
+                                   currentAsserts.pop()))
     }
 
     override fun enterOnDecl(ctx: OnDeclContext) {
-        currentRuleBuilder?.setResourceDefRef(ctx.RESOURCE_DEF_REF().text)
+        currentDefRef.push(stripQuotes(ctx.RESOURCE_DEF_REF().text))
     }
 
     override fun enterWithDecl(ctx: WithDeclContext) {
-        currentWithBuilder = WithExpr.builder()
         currentStatements.push(Stack())
         currentMemberNames.push(Stack())
     }
 
     override fun exitWithDecl(ctx: WithDeclContext) {
-        currentWithBuilder?.setStatements(currentStatements.pop())
-        currentRuleBuilder?.setWithExpr(currentWithBuilder!!.build())
-        currentMemberNames.pop()
+        currentWiths.push(WithDecl(currentStatements.pop().toList()))
     }
 
     override fun enterAssertDecl(ctx: AssertDeclContext) {
-        currentAssertBuilder = AssertExpr.builder()
         currentStatements.push(Stack())
         currentMemberNames.push(Stack())
     }
 
     override fun exitAssertDecl(ctx: AssertDeclContext) {
-        currentAssertBuilder?.setStatement(currentStatements.pop())
-        currentRuleBuilder?.setAssertExp(currentAssertBuilder!!.build())
-        currentMemberNames.pop()
+        currentAsserts.push(AssertDecl(currentStatements.pop().toList()))
     }
 
     override fun enterAndDecl(ctx: AndDeclContext) {

@@ -36,41 +36,48 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
     private val loadedResourceDefs = mutableSetOf<ResourceDefRef>()
 
-    fun load(spec: CloudSpec) {
+    fun load(plan: PlanDecl) {
         logger.info("Loading resources required to run this test")
-        spec.groups
-            .map { (_, configExprs, rules) -> Pair(spec.config.plus(configExprs), rules) }
-            .forEach {
-                it.second.forEach { rule ->
-                    loadFromRule(it.first, rule)
-                }
 
+        plan.modules
+            .map { (_, moduleConfigs, groups) -> Pair(plan.configs.plus(moduleConfigs), groups) }
+            .forEach { pair ->
+                pair.second.forEach { group ->
+                    loadFromGroup(pair.first, group)
+                }
             }
     }
 
-    private fun loadFromRule(configExprs: Set<ConfigExpr>, ruleExpr: RuleExpr) {
-        val config = toConfigValue(configExprs)
-        when (val resourceDefRefOpt = ResourceDefRef.fromString(ruleExpr.resourceDefRef)) {
+    private fun loadFromGroup(configs: List<ConfigDecl>, group: GroupDecl) {
+        group.rules
+            .forEach { rule ->
+                loadFromRule(configs.plus(group.configs), rule)
+            }
+    }
+
+    private fun loadFromRule(configs: List<ConfigDecl>, ruleDecl: RuleDecl) {
+        val ruleConfigs = toConfigValue(configs.plus(ruleDecl.configs))
+        when (val resourceDefRefOpt = ResourceDefRef.fromString(ruleDecl.defRef)) {
             is Some -> {
                 // Load all resource definitions to the plan
-                getAllResources(config, resourceDefRefOpt.t)
+                getAllResources(ruleConfigs, resourceDefRefOpt.t)
                     .forEach { resource ->
                         // load dependent resources from each statement
-                        ruleExpr.withExpr
+                        ruleDecl.withs
                             .statements
                             .forEach {
-                                loadFromStatement(config, resource, it, emptyList())
+                                loadFromStatement(ruleConfigs, resource, it, emptyList())
                             }
 
                         // load dependent resources from each statement
-                        ruleExpr.assertExpr
+                        ruleDecl.asserts
                             .statements
                             .forEach {
-                                loadFromStatement(config, resource, it, emptyList())
+                                loadFromStatement(ruleConfigs, resource, it, emptyList())
                             }
                     }
             }
-            else -> logger.error("Malformed resource definition '${ruleExpr.resourceDefRef}'. Ignoring it.")
+            else -> logger.error("Malformed resource definition '${ruleDecl.defRef}'. Ignoring it.")
         }
     }
 
@@ -169,7 +176,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 //        return resourceOpt;
     }
 
-    private fun toConfigValue(config: Set<ConfigExpr>): ConfigValues {
+    private fun toConfigValue(config: List<ConfigDecl>): ConfigValues {
         return config.mapNotNull { c ->
             when (val configRefOpt = ConfigRef.fromString(c.configRef)) {
                 is Some ->
@@ -187,7 +194,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
                     null
                 }
             }
-        }.toSet()
+        }
     }
 
 }

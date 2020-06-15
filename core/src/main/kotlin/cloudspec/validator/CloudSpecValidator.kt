@@ -20,42 +20,51 @@
 package cloudspec.validator
 
 import arrow.core.getOrElse
-import cloudspec.lang.CloudSpec
-import cloudspec.lang.GroupExpr
-import cloudspec.lang.RuleExpr
+import cloudspec.lang.GroupDecl
+import cloudspec.lang.ModuleDecl
+import cloudspec.lang.PlanDecl
+import cloudspec.lang.RuleDecl
 import cloudspec.model.ResourceDefRef.Companion.fromString
 
 class CloudSpecValidator(private val resourceValidator: ResourceValidator) {
-    fun validate(spec: CloudSpec): CloudSpecValidatorResult {
-        return CloudSpecValidatorResult(spec.name, validateGroups(spec.groups))
+    fun validate(plan: PlanDecl): PlanResult {
+        return PlanResult(validateModules(plan.modules))
     }
 
-    private fun validateGroups(groups: List<GroupExpr>): List<GroupResult> {
+    private fun validateModules(modules: List<ModuleDecl>): List<ModuleResult> {
+        return modules.map { validateModule(it) }
+    }
+
+    private fun validateModule(module: ModuleDecl): ModuleResult {
+        return ModuleResult(module.name, validateGroups(module.groups))
+    }
+
+    private fun validateGroups(groups: List<GroupDecl>): List<GroupResult> {
         return groups.map { validateGroup(it) }
     }
 
-    private fun validateGroup(group: GroupExpr): GroupResult {
+    private fun validateGroup(group: GroupDecl): GroupResult {
         return GroupResult(group.name, validateRules(group.rules))
     }
 
-    private fun validateRules(rules: List<RuleExpr>): List<RuleResult> {
+    private fun validateRules(rules: List<RuleDecl>): List<RuleResult> {
         return rules.map { validateRule(it) }
     }
 
-    private fun validateRule(rule: RuleExpr): RuleResult {
-        return fromString(rule.resourceDefRef).map { resourceDefRef ->
+    private fun validateRule(rule: RuleDecl): RuleResult {
+        return fromString(rule.defRef).map { resourceDefRef ->
             try {
                 // validate all resources
                 RuleResult(rule.name,
                            resourceValidator.validateAll(resourceDefRef,
-                                                         rule.withExpr.statements,
-                                                         rule.assertExpr.statements))
+                                                         rule.withs.statements,
+                                                         rule.asserts.statements))
             } catch (e: RuntimeException) {
                 RuleResult(rule.name, throwable = e)
             }
         }.getOrElse {
             RuleResult(rule.name,
-                       throwable = RuntimeException("Malformed resource definition reference '${rule.resourceDefRef}'"))
+                       throwable = RuntimeException("Malformed resource definition reference '${rule.defRef}'"))
         }
     }
 

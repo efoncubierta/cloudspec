@@ -56,7 +56,7 @@ class EC2DhcpOptionsLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all(emptySet())
+        val resources = loader.all(emptyList())
         assertNotNull(resources)
         assertEquals(dhcpOptionsList.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2DhcpOptionsLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(emptySet(), dhcpOptionsId())
+        val resourceOpt = loader.byId(emptyList(), dhcpOptionsId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2DhcpOptionsLoaderTest : EC2LoaderTest() {
         }
 
         val dhcpOptions = dhcpOptionsList[0]
-        val resourceOpt = loader.byId(emptySet(), dhcpOptions.dhcpOptionsId())
+        val resourceOpt = loader.byId(emptyList(), dhcpOptions.dhcpOptionsId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

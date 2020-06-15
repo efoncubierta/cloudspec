@@ -56,7 +56,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all(emptySet())
+        val resources = loader.all(emptyList())
         assertNotNull(resources)
         assertEquals(snapshots.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(emptySet(), snapshotId())
+        val resourceOpt = loader.byId(emptyList(), snapshotId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
         }
 
         val snapshot = snapshots[0]
-        val resourceOpt = loader.byId(emptySet(), snapshot.snapshotId())
+        val resourceOpt = loader.byId(emptyList(), snapshot.snapshotId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -20,43 +20,21 @@
 package cloudspec.lang
 
 /**
- * Define a 'with' expression.
- *
- * With expressions ares used to filter resources.
+ * CloudSpec with declaration.
  */
-data class WithExpr(val statements: List<Statement>) : CloudSpecSyntaxProducer {
-    override fun toCloudSpecSyntax(spaces: Int): String {
+data class WithDecl(val statements: List<Statement>) : CloudSpecSyntaxProducer {
+    override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
         (statements.indices).forEach { i: Int ->
             if (i == 0) {
-                sb.appendln("${" ".repeat(spaces)}With")
+                sb.appendln("${printTabs(tabs)}With")
             } else {
-                sb.appendln("${" ".repeat(spaces)}And")
+                sb.appendln("${printTabs(tabs)}And")
             }
-            sb.appendln(statements[i].toCloudSpecSyntax(spaces + 4))
+            sb.appendln(statements[i].toCloudSpecSyntax(tabs + 1))
         }
 
         return sb.toString()
     }
-
-    class WithExprBuilder {
-        private var statements: List<Statement> = emptyList()
-
-        fun setStatements(statements: List<Statement>): WithExprBuilder {
-            this.statements = statements
-            return this
-        }
-
-        fun build(): WithExpr {
-            return WithExpr(statements)
-        }
-    }
-
-    companion object {
-        fun builder(): WithExprBuilder {
-            return WithExprBuilder()
-        }
-    }
-
 }

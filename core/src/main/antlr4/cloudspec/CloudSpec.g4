@@ -1,20 +1,14 @@
 grammar CloudSpec;
 
-spec: globalConfig* specDecl specConfig* groupDecl+;
+spec: setDecl* moduleDecl+;
 
-globalConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
+setDecl: SET CONFIG_REF EQUAL_SYMBOL configValue;
 
-specConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
+moduleDecl: MODULE STRING setDecl* groupDecl+;
 
-groupConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
+groupDecl: GROUP STRING setDecl* ruleDecl+;
 
-ruleConfig: CONFIG CONFIG_REF EQUAL_SYMBOL configValue;
-
-specDecl: SPEC STRING;
-
-groupDecl: GROUP STRING groupConfig* ruleDecl+;
-
-ruleDecl: RULE STRING onDecl ruleConfig* withDecl? assertDecl;
+ruleDecl: RULE STRING setDecl* onDecl withDecl? assertDecl;
 
 onDecl: ON RESOURCE_DEF_REF;
 
@@ -159,14 +153,14 @@ IS_NOT_AFTER:                     (IS ' ')? NOT ' ' AFTER;
 EQUAL_SYMBOL: '=';
 
 // Vocabulary
-SPEC: [Ss][Pp][Ee][Cc];
+MODULE: [Mm][Oo][Dd][Uu][Ll][Ee];
 GROUP: [Gg][Rr][Oo][Uu][Pp];
 RULE: [Rr][Uu][Ll][Ee];
 ON: [Oo][Nn];
 WITH: [Ww][Ii][Tt][Hh];
 ASSERT: [Aa][Ss][Ss][Ee][Rr][Tt];
 AND: [Aa][Nn][Dd];
-CONFIG: [Cc][Oo][Nn][Ff][Ii][Gg];
+SET: [Ss][Ee][Tt];
 
 fragment STARTING:   [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg];
 fragment ENDING:     [Ee][Nn][Dd][Ii][Nn][Gg];

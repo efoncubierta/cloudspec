@@ -56,7 +56,7 @@ class EC2TransitGatewayLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all(emptySet())
+        val resources = loader.all(emptyList())
         assertNotNull(resources)
         assertEquals(transitGateways.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2TransitGatewayLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(emptySet(), transitGatewayId())
+        val resourceOpt = loader.byId(emptyList(), transitGatewayId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2TransitGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val transitGateway = transitGateways[0]
-        val resourceOpt = loader.byId(emptySet(), transitGateway.transitGatewayId())
+        val resourceOpt = loader.byId(emptyList(), transitGateway.transitGatewayId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -56,7 +56,7 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resources = loader.all(emptySet())
+        val resources = loader.all(emptyList())
         assertNotNull(resources)
         assertEquals(subnets.size, resources.size)
     }
@@ -78,7 +78,7 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
                     .build()
         }
 
-        val resourceOpt = loader.byId(emptySet(), subnetId())
+        val resourceOpt = loader.byId(emptyList(), subnetId())
         assertTrue(resourceOpt is None)
     }
 
@@ -103,7 +103,7 @@ class EC2SubnetLoaderTest : EC2LoaderTest() {
         }
 
         val subnet = subnets[0]
-        val resourceOpt = loader.byId(emptySet(), subnet.subnetId())
+        val resourceOpt = loader.byId(emptyList(), subnet.subnetId())
         assertTrue(resourceOpt is Some<*>)
     }
 }

@@ -17,23 +17,30 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.validator
+package cloudspec.lang
 
-data class CloudSpecValidatorResult(
-        val specName: String,
-        val groupResults: List<GroupResult>
-)
+/**
+ * CloudSpec plan declaration.
+ */
+data class PlanDecl(
+        val configs: List<ConfigDecl>,
+        val modules: List<ModuleDecl>
+): CloudSpecSyntaxProducer {
+    override fun toCloudSpecSyntax(tabs: Int): String {
+        val sb = StringBuilder()
 
-data class GroupResult(
-        val groupName: String,
-        val ruleResults: List<RuleResult>
-)
+        // add configs
+        configs.forEach { config ->
+            sb.append(config.toCloudSpecSyntax(tabs + 1))
+        }
 
-data class RuleResult(
-        val ruleName: String,
-        val resourceValidationResults: List<ResourceValidationResult> = emptyList(),
-        val throwable: Throwable? = null
-) {
-    val isSuccess: Boolean
-        get() = throwable == null && resourceValidationResults.all { it.isSuccess }
+        // add modules
+        modules.forEach { module ->
+            sb.append(module.toCloudSpecSyntax(tabs + 1))
+        }
+
+        sb.appendln()
+
+        return sb.toString()
+    }
 }

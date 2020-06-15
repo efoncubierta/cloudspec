@@ -19,8 +19,6 @@
  */
 package cloudspec.validator
 
-import cloudspec.lang.Statement
-import cloudspec.model.ResourceDefRef
 import cloudspec.util.CloudSpecTestUtils
 import cloudspec.util.ModelTestUtils
 import io.mockk.every
@@ -30,7 +28,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class CloudSpecValidatorTest {
+class ModuleDeclValidatorTest {
     companion object {
         val resourceValidator = mockk<ResourceValidator>()
         val resourceValidationResults = ResourceValidationResult(ModelTestUtils.RESOURCE_REF, emptyList())
@@ -43,21 +41,23 @@ class CloudSpecValidatorTest {
     }
 
     @Test
-    fun shouldValidateCloudSpec() {
+    fun shouldValidatePlan() {
         val validator = CloudSpecValidator(resourceValidator)
-        val (specName, groupResults) = validator.validate(CloudSpecTestUtils.TEST_SPEC)
+        val (moduleResults) = validator.validate(CloudSpecTestUtils.TEST_PLAN)
 
-        assertEquals(CloudSpecTestUtils.TEST_SPEC_NAME, specName)
-        assertEquals(1, groupResults.size)
+        moduleResults.forEach { (moduleName, groupResults) ->
+            assertEquals(CloudSpecTestUtils.TEST_MODULE_NAME, moduleName)
+            assertEquals(1, moduleResults.size)
 
-        groupResults.forEach { (groupName, ruleResults) ->
-            assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupName)
-            assertEquals(1, ruleResults.size)
+            groupResults.forEach { (groupName, ruleResults) ->
+                assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupName)
+                assertEquals(1, ruleResults.size)
 
-            ruleResults.forEach { ruleResult: RuleResult ->
-                assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.ruleName)
-                assertTrue(ruleResult.isSuccess)
-                assertNull(ruleResult.throwable)
+                ruleResults.forEach { ruleResult: RuleResult ->
+                    assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.ruleName)
+                    assertTrue(ruleResult.isSuccess)
+                    assertNull(ruleResult.throwable)
+                }
             }
         }
     }
