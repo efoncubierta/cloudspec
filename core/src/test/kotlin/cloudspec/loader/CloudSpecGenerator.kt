@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec Loader Library
+ * CloudSpec Core Library
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
