@@ -25,6 +25,7 @@ import cloudspec.lang.KeyValueStatement
 import cloudspec.lang.NestedStatement
 import cloudspec.lang.PropertyStatement
 import cloudspec.model.ResourceRef
+import cloudspec.model.toPathString
 import cloudspec.util.ModelTestUtils
 import cloudspec.validator.*
 import org.apache.tinkerpop.gremlin.process.traversal.P
@@ -216,14 +217,14 @@ class GraphResourceValidatorTest {
                                 P.eq("zzz")
                         )
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size)
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertNotFoundError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size)
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -238,14 +239,14 @@ class GraphResourceValidatorTest {
                                 P.eq("zzz")
                         )
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size)
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertNotFoundError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size)
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -260,14 +261,14 @@ class GraphResourceValidatorTest {
                                 P.eq("zzz")
                         )
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size)
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertNotFoundError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size)
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -284,14 +285,14 @@ class GraphResourceValidatorTest {
                                 )
                         ))
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size)
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertNotFoundError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size)
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -308,14 +309,14 @@ class GraphResourceValidatorTest {
                                 )
                         ))
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size.toLong())
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertNotFoundError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size.toLong())
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertNotFoundError)
     }
 
     @Test
@@ -329,14 +330,14 @@ class GraphResourceValidatorTest {
                                 P.eq("zzz")
                         )
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size.toLong())
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertMismatchError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size.toLong())
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertMismatchError)
     }
 
     @Test
@@ -353,14 +354,14 @@ class GraphResourceValidatorTest {
                                 )
                         ))
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size.toLong())
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertMismatchError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size.toLong())
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertMismatchError)
     }
 
     @Test
@@ -375,14 +376,14 @@ class GraphResourceValidatorTest {
                                 P.eq("zzz")
                         )
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size.toLong())
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertMismatchError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size.toLong())
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertMismatchError)
     }
 
     @Test
@@ -396,14 +397,14 @@ class GraphResourceValidatorTest {
                                 P.within("zzz")
                         )
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size.toLong())
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertMismatchError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size.toLong())
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertMismatchError)
     }
 
     @Test
@@ -418,14 +419,14 @@ class GraphResourceValidatorTest {
                                 P.within("zzz")
                         )
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertFalse(result.isSuccess)
-        assertEquals(1, result.assertResults.size.toLong())
-        assertFalse(result.assertResults[0].success)
-        assertNotNull(result.assertResults[0].error)
-        assertTrue(result.assertResults[0].error is AssertMismatchError)
+        assertFalse(result.success)
+        assertEquals(1, result.results.size.toLong())
+        assertFalse(result.results[0].success)
+        assertNotNull(result.results[0].error)
+        assertTrue(result.results[0].error is AssertMismatchError)
     }
 
     @Test
@@ -445,16 +446,16 @@ class GraphResourceValidatorTest {
                                         )
                                 ))
                 ))
-        assertTrue(resultOpt is Some<ResourceValidationResult>)
+        assertTrue(resultOpt is Some<ResourceResult>)
 
         val result = resultOpt.t
-        assertTrue(result.isSuccess)
+        assertTrue(result.success)
         assertEquals(ModelTestUtils.RESOURCE_REF, result.ref)
-        assertEquals(1, result.assertResults.size)
-        assertTrue(result.assertResults[0].success)
+        assertEquals(1, result.results.size)
+        assertTrue(result.results[0].success)
         assertEquals(
                 ".${ModelTestUtils.PROP_NESTED_NAME}.${ModelTestUtils.PROP_STRING_NAME}",
-                result.assertResults[0].path.toPathString()
+                result.results[0].path.toPathString()
         )
     }
 
@@ -478,13 +479,13 @@ class GraphResourceValidatorTest {
 
         assertTrue(results.isNotEmpty())
         results.forEach { r ->
-            assertTrue(r.isSuccess)
+            assertTrue(r.success)
             assertEquals(ModelTestUtils.RESOURCE_REF, r.ref)
-            assertEquals(1, r.assertResults.size)
-            assertTrue(r.assertResults[0].success)
+            assertEquals(1, r.results.size)
+            assertTrue(r.results[0].success)
             assertEquals(
                     ".${ModelTestUtils.PROP_NESTED_NAME}.${ModelTestUtils.PROP_STRING_NAME}",
-                    r.assertResults[0].path.toPathString()
+                    r.results[0].path.toPathString()
             )
         }
     }
@@ -506,13 +507,13 @@ class GraphResourceValidatorTest {
 
         assertTrue(results.isNotEmpty())
         results.forEach(Consumer { r ->
-            assertTrue(r.isSuccess)
+            assertTrue(r.success)
             assertEquals(ModelTestUtils.RESOURCE_REF, r.ref)
-            assertEquals(1, r.assertResults.size)
-            assertTrue(r.assertResults[0].success)
+            assertEquals(1, r.results.size)
+            assertTrue(r.results[0].success)
             assertEquals(
                     ">${ModelTestUtils.ASSOC_NAME}[${ModelTestUtils.TARGET_RESOURCE_REF.id}].${ModelTestUtils.PROP_STRING_NAME}",
-                    r.assertResults[0].path.toPathString()
+                    r.results[0].path.toPathString()
             )
         })
     }

@@ -17,27 +17,12 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.validator
+package cloudspec.model
 
-sealed class AssertError
-
-data class AssertNotFoundError(
-        val message: String
-) : AssertError()
-
-data class AssertMismatchError(
-        val condition: String,
-        val expected: Any,
-        val actual: Any
-) : AssertError()
-
-data class AssertRangeError(
-        val condition: String,
-        val expectedLeft: Any,
-        val expectedRight: Any,
-        val actual: Any
-) : AssertError()
-
-class AssertUnknownError(
-        val message: String
-) : AssertError()
+/**
+ * CloudSpec plan.
+ */
+data class Plan(
+        val name: String,
+        val modules: List<Module>
+)

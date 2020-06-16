@@ -19,11 +19,10 @@
  */
 package cloudspec
 
-import cloudspec.loader.CloudSpecLoader
+import cloudspec.loader.CloudSpecPlanLoader
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
 import java.io.File
-import java.io.FileInputStream
 import java.util.concurrent.Callable
 
 @CommandLine.Command(name = "run",
@@ -31,22 +30,18 @@ import java.util.concurrent.Callable
 class CloudSpecRunCommand : Callable<Int> {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @CommandLine.Option(names = ["-s", "--spec"],
-                        paramLabel = "<spec file>",
-                        description = ["CloudSpec file"],
+    @CommandLine.Option(names = ["-p", "--plan"],
+                        paramLabel = "<plan file>",
+                        description = ["CloudSpec plan file"],
                         required = true)
-    private lateinit var specFile: File
+    private lateinit var planFile: File
 
     override fun call(): Int {
         logger.info("Starting CloudSpec Runner")
 
-        val inputStream = FileInputStream(specFile)
+        // load plan
+        val plan = CloudSpecPlanLoader.loadFromFile(planFile)
 
-        // create loader
-        val loader = CloudSpecLoader()
-
-        // load spec
-        val plan = loader.load(inputStream)
         // run spec
         val runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner()
         runner.validate(plan)

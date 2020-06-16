@@ -20,7 +20,7 @@
 package cloudspec.lang
 
 /**
- * CloudSpec with declaration.
+ * CloudSpec 'with' declaration.
  */
 data class WithDecl(val statements: List<Statement>) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {

@@ -227,7 +227,7 @@ object ModelGenerator {
         return (0..n).map { randomConfigDef() }.toSet()
     }
 
-    fun randomConfigValue(configDef: ConfigDef): ConfigValue<*> {
+    fun randomConfigValue(configDef: ConfigDef = randomConfigDef()): ConfigValue<*> {
         return when (configDef.type) {
             ConfigValueType.NUMBER -> NumberConfigValue(
                     configDef.ref,

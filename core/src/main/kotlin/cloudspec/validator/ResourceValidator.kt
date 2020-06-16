@@ -56,7 +56,7 @@ interface ResourceValidator {
      */
     fun validate(ref: ResourceRef,
                  filterStatements: List<Statement>,
-                 assertStatements: List<Statement>): Option<ResourceValidationResult>
+                 assertStatements: List<Statement>): Option<ResourceResult>
 
     /**
      * Validate all resources of a kind.
@@ -68,5 +68,5 @@ interface ResourceValidator {
      */
     fun validateAll(defRef: ResourceDefRef,
                     filterStatements: List<Statement>,
-                    assertStatements: List<Statement>): List<ResourceValidationResult>
+                    assertStatements: List<Statement>): List<ResourceResult>
 }

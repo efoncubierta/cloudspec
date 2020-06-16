@@ -35,8 +35,8 @@ import cloudspec.lang.predicate.IPAddressP.Companion.lte
 import cloudspec.lang.predicate.IPAddressP.Companion.neq
 import cloudspec.lang.predicate.IPAddressP.Companion.withinNetwork
 import cloudspec.lang.predicate.IPAddressP.Companion.withoutNetwork
-import cloudspec.model.ConfigValueType
-import cloudspec.model.PropertyType
+import cloudspec.model.*
+import cloudspec.util.ModelGenerator
 import com.github.javafaker.Faker
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.TextP
@@ -47,49 +47,76 @@ import java.util.concurrent.TimeUnit
 object CloudSpecGenerator {
     private val faker = Faker()
 
-    fun fullPlan(): PlanDecl {
-        return PlanDecl(
-                listOf(fullConfig(), fullConfig()),
-                listOf(fullModule(), fullModule())
+    fun randomPlan(): Plan {
+        return Plan(faker.lorem().sentence(),
+                    listOf(randomModule(), randomModule()))
+    }
+
+    fun randomPlanDecl(): PlanDecl {
+        return PlanDecl(faker.lorem().sentence(),
+                        listOf(randomSetDecl(), randomSetDecl()),
+                        listOf(randomUseModuleDecl(), randomUseModuleDecl()))
+    }
+
+    fun randomUseModuleDecl(): UseModuleDecl {
+        return UseModuleDecl(faker.file().fileName())
+    }
+
+    fun randomModule(): Module {
+        return Module(faker.lorem().sentence(),
+                      listOf(randomGroup(), randomGroup()))
+    }
+
+    fun randomModuleDecl(): ModuleDecl {
+        return ModuleDecl(faker.lorem().sentence(),
+                          listOf(randomSetDecl(), randomSetDecl()),
+                          listOf(randomGroupDecl(), randomGroupDecl()))
+    }
+
+    fun randomGroup(): Group {
+        return Group(faker.lorem().sentence(),
+                     listOf(randomRule(), randomRule()))
+    }
+
+    fun randomGroupDecl(): GroupDecl {
+        return GroupDecl(faker.lorem().sentence(),
+                         listOf(randomSetDecl(), randomSetDecl()),
+                         listOf(randomRuleDecl(), randomRuleDecl()))
+    }
+
+    fun randomRule(): Rule {
+        return Rule(faker.lorem().sentence(),
+                    ModelGenerator.randomResourceDefRef(),
+                    randomFullStatements(includeNested = true, includeAssociation = true),
+                    randomFullStatements(includeNested = true, includeAssociation = true),
+                    listOf(randomConfigValue(), randomConfigValue())
         )
     }
 
-    fun fullModule(): ModuleDecl {
-        return ModuleDecl(faker.lorem().sentence(),
-                          listOf(fullConfig(), fullConfig()),
-                          listOf(fullGroup(), fullGroup()))
-    }
-
-    fun fullGroup(): GroupDecl {
-        return GroupDecl(faker.lorem().sentence(),
-                         listOf(fullConfig(), fullConfig()),
-                         listOf(fullRule(), fullRule()))
-    }
-
-    fun fullRule(): RuleDecl {
+    fun randomRuleDecl(): RuleDecl {
         return RuleDecl(faker.lorem().sentence(),
                         "${faker.lorem().word()}:${faker.lorem().word()}:${faker.lorem().word()}",
-                        listOf(fullConfig(), fullConfig()),
-                        fullWith(),
-                        fullAssert())
+                        listOf(randomSetDecl(), randomSetDecl()),
+                        randomWithDecl(),
+                        randomAssertDecl())
     }
 
-    fun fullConfig(): ConfigDecl {
-        return ConfigDecl(
+    fun randomSetDecl(): SetDecl {
+        return SetDecl(
                 "${faker.lorem().word()}:${faker.lorem().word()}",
-                randomConfigValue()
+                randomValueForConfig()
         )
     }
 
-    fun fullWith(): WithDecl {
-        return WithDecl(fullStatements(includeNested = true, includeAssociation = true))
+    fun randomWithDecl(): WithDecl {
+        return WithDecl(randomFullStatements(includeNested = true, includeAssociation = true))
     }
 
-    fun fullAssert(): AssertDecl {
-        return AssertDecl(fullStatements(includeNested = true, includeAssociation = true))
+    fun randomAssertDecl(): AssertDecl {
+        return AssertDecl(randomFullStatements(includeNested = true, includeAssociation = true))
     }
 
-    fun fullStatements(includeNested: Boolean, includeAssociation: Boolean): List<Statement> {
+    fun randomFullStatements(includeNested: Boolean, includeAssociation: Boolean): List<Statement> {
         val statements = mutableListOf<Statement>()
         statements.add(randomValueNullPredicateStatement())
         statements.add(randomValueNotNullPredicateStatement())
@@ -158,28 +185,28 @@ object CloudSpecGenerator {
     fun randomValueEqualPredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                P.eq(randomValue())
+                P.eq(randomValueForProperty())
         )
     }
 
     fun randomValueNotEqualPredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                P.neq(randomValue())
+                P.neq(randomValueForProperty())
         )
     }
 
     fun randomValueWithinPredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                P.within(randomValues())
+                P.within(randomValuesForProperty())
         )
     }
 
     fun randomValueNotWithinPredicateStatement(): PropertyStatement {
         return PropertyStatement(
                 faker.lorem().word(),
-                P.without(randomValues())
+                P.without(randomValuesForProperty())
         )
     }
 
@@ -383,7 +410,7 @@ object CloudSpecGenerator {
         return KeyValueStatement(
                 faker.lorem().word(),
                 faker.lorem().word(),
-                P.eq(randomValue())
+                P.eq(randomValueForProperty())
         )
     }
 
@@ -391,7 +418,7 @@ object CloudSpecGenerator {
         return KeyValueStatement(
                 faker.lorem().word(),
                 faker.lorem().word(),
-                P.neq(randomValue())
+                P.neq(randomValueForProperty())
         )
     }
 
@@ -399,7 +426,7 @@ object CloudSpecGenerator {
         return KeyValueStatement(
                 faker.lorem().word(),
                 faker.lorem().word(),
-                P.within(randomValues())
+                P.within(randomValuesForProperty())
         )
     }
 
@@ -407,21 +434,21 @@ object CloudSpecGenerator {
         return KeyValueStatement(
                 faker.lorem().word(),
                 faker.lorem().word(),
-                P.without(randomValues())
+                P.without(randomValuesForProperty())
         )
     }
 
     fun fullNestedStatement(): NestedStatement {
         return NestedStatement(
                 faker.lorem().word(),
-                fullStatements(includeNested = false, includeAssociation = false)
+                randomFullStatements(includeNested = false, includeAssociation = false)
         )
     }
 
     fun fullAssociationStatement(): AssociationStatement {
         return AssociationStatement(
                 faker.lorem().word(),
-                fullStatements(includeNested = false, includeAssociation = false)
+                randomFullStatements(includeNested = false, includeAssociation = false)
         )
     }
 
@@ -458,10 +485,10 @@ object CloudSpecGenerator {
     }
 
     fun randomNumber(): Any {
-        return randomValue(PropertyType.NUMBER)
+        return randomValueForProperty(PropertyType.NUMBER)
     }
 
-    fun randomValue(propertyType: PropertyType = randomPropertyType()): Any {
+    fun randomValueForProperty(propertyType: PropertyType = randomPropertyType()): Any {
         return when (propertyType) {
             PropertyType.NUMBER -> {
                 if (faker.random().nextBoolean()) {
@@ -477,8 +504,8 @@ object CloudSpecGenerator {
         }
     }
 
-    fun randomValues(propertyType: PropertyType = randomPropertyType()): List<Any> {
-        return (0..5).map { randomValue(propertyType) }
+    fun randomValuesForProperty(propertyType: PropertyType = randomPropertyType()): List<Any> {
+        return (0..5).map { randomValueForProperty(propertyType) }
     }
 
     fun randomConfigValueType(): ConfigValueType {
@@ -489,7 +516,18 @@ object CloudSpecGenerator {
         )[faker.random().nextInt(0, 2)]
     }
 
-    fun randomConfigValue(configValueType: ConfigValueType = randomConfigValueType()): Any {
+    fun randomConfigValue(configValueType: ConfigValueType = randomConfigValueType()): ConfigValue<*> {
+        return when (configValueType) {
+            ConfigValueType.NUMBER -> NumberConfigValue(ModelGenerator.randomConfigRef(),
+                                                        randomValueForConfig(configValueType) as Number)
+            ConfigValueType.BOOLEAN -> BooleanConfigValue(ModelGenerator.randomConfigRef(),
+                                                          randomValueForConfig(configValueType) as Boolean)
+            ConfigValueType.STRING -> StringConfigValue(ModelGenerator.randomConfigRef(),
+                                                        randomValueForConfig(configValueType) as String)
+        }
+    }
+
+    fun randomValueForConfig(configValueType: ConfigValueType = randomConfigValueType()): Any {
         return when (configValueType) {
             ConfigValueType.NUMBER -> {
                 if (faker.random().nextBoolean()) {

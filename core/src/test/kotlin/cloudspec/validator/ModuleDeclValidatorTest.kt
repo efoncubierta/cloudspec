@@ -31,7 +31,7 @@ import kotlin.test.assertTrue
 class ModuleDeclValidatorTest {
     companion object {
         val resourceValidator = mockk<ResourceValidator>()
-        val resourceValidationResults = ResourceValidationResult(ModelTestUtils.RESOURCE_REF, emptyList())
+        val resourceValidationResults = ResourceResult(ModelTestUtils.RESOURCE_REF, emptyList())
 
         init {
             every {
@@ -43,20 +43,23 @@ class ModuleDeclValidatorTest {
     @Test
     fun shouldValidatePlan() {
         val validator = CloudSpecValidator(resourceValidator)
-        val (moduleResults) = validator.validate(CloudSpecTestUtils.TEST_PLAN)
+        val (planName, moduleResults) = validator.validate(CloudSpecTestUtils.TEST_PLAN)
+
+        assertEquals(CloudSpecTestUtils.TEST_PLAN_NAME, planName)
+        assertEquals(1, moduleResults.size)
 
         moduleResults.forEach { (moduleName, groupResults) ->
             assertEquals(CloudSpecTestUtils.TEST_MODULE_NAME, moduleName)
-            assertEquals(1, moduleResults.size)
+            assertEquals(1, groupResults.size)
 
             groupResults.forEach { (groupName, ruleResults) ->
                 assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupName)
                 assertEquals(1, ruleResults.size)
 
                 ruleResults.forEach { ruleResult: RuleResult ->
-                    assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.ruleName)
-                    assertTrue(ruleResult.isSuccess)
-                    assertNull(ruleResult.throwable)
+                    assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.name)
+                    assertTrue(ruleResult.success)
+                    assertNull(ruleResult.error)
                 }
             }
         }

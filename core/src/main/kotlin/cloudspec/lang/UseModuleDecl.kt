@@ -20,30 +20,15 @@
 package cloudspec.lang
 
 /**
- * CloudSpec 'rule' declaration.
+ * CloudSpec 'use module' declaration.
  */
-data class RuleDecl(
-        val name: String,
-        val defRef: String,
-        val sets: List<SetDecl>,
-        val withs: WithDecl,
-        val asserts: AssertDecl
+data class UseModuleDecl(
+        val path: String
 ) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
-        sb.appendln("${printTabs(tabs)}Rule \"${name}\"")
-
-        // add configs
-        sets.forEach { sb.append(it.toCloudSpecSyntax(tabs + 1)) }
-
-        sb.appendln("${printTabs(tabs)}On $defRef")
-
-        // add withs
-        sb.append(withs.toCloudSpecSyntax(tabs + 1))
-
-        // add asserts
-        sb.append(asserts.toCloudSpecSyntax(tabs + 1))
+        sb.appendln("${printTabs(tabs)}Use Module \"${path}\"")
 
         return sb.toString()
     }

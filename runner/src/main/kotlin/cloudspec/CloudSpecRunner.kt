@@ -19,7 +19,8 @@
  */
 package cloudspec
 
-import cloudspec.lang.PlanDecl
+import cloudspec.model.Plan
+import cloudspec.model.toPathString
 import cloudspec.validator.*
 import com.diogonunes.jcdp.color.ColoredPrinter
 import com.diogonunes.jcdp.color.api.Ansi
@@ -33,11 +34,11 @@ class CloudSpecRunner @Inject constructor(private val version: String,
 
     private val errors = mutableListOf<RuleResult>()
 
-    fun validate(plan: PlanDecl) {
+    fun validate(plan: Plan) {
         // init manager
         cloudSpecManager.init()
 
-        // preflight spec
+        // load plan
         cloudSpecManager.preflight(plan)
 
         // load resources
@@ -47,35 +48,112 @@ class CloudSpecRunner @Inject constructor(private val version: String,
         printResult(cloudSpecManager.validate(plan))
     }
 
+    private fun print(str: String, error: Boolean? = null) {
+        when {
+            error == null -> cp.print(str, Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
+            error -> cp.print(str, Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
+            else -> cp.print(str, Ansi.Attribute.NONE, Ansi.FColor.GREEN, Ansi.BColor.NONE)
+        }
+    }
+
+    private fun printRow(item: String, stats: Stats) {
+        val max = itemsWidth() - 6
+        // item cell
+        print("| ")
+        print("%-${itemsWidth()}s".format(if (item.length > max) item.subSequence(0, max) else item).padEnd(itemsWidth(), '.'),
+              error = stats.resourcesFailed > 0)
+        print(" |")
+
+        // stats cells
+        print(" %${statWidth()}s ".format(stats.resourcesTotal))
+        print("|")
+        print(" %${statWidth()}s ".format(stats.resourcesSuccess), error = stats.resourcesFailed == 0)
+        print("|")
+        print(" %${statWidth()}s ".format(stats.resourcesFailed), error = stats.resourcesFailed > 0)
+        print("|")
+        print(" %${statWidth()}s ".format(stats.validationsTotal))
+        print("|")
+        print(" %${statWidth()}s ".format(stats.validationsSuccess), error = stats.validationsFailed == 0)
+        print("|")
+        print(" %${statWidth()}s ".format(stats.validationsFailed), error = stats.validationsFailed > 0)
+        print("|")
+        println("")
+    }
+
+    private fun itemsWidth(): Int {
+        return TABLE_WIDTH - (CELL_STAT_WIDTH + 3) * TABLE_HEADERS.size - 4;
+    }
+
+    private fun statWidth(): Int {
+        return CELL_STAT_WIDTH
+    }
+
+    private fun printHeader() {
+        cp.println(("| %-${itemsWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |").format(*TABLE_HEADERS.toTypedArray()))
+        cp.println(("| %-${itemsWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |" +
+                " %${statWidth()}s |").format("".padEnd(itemsWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-')))
+    }
+
+    private fun printFooter() {
+        cp.println(("|-%-${itemsWidth()}s-|" +
+                "-%${statWidth()}s-|" +
+                "-%${statWidth()}s-|" +
+                "-%${statWidth()}s-|" +
+                "-%${statWidth()}s-|" +
+                "-%${statWidth()}s-|" +
+                "-%${statWidth()}s-|").format("".padEnd(itemsWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-'),
+                                              "".padEnd(statWidth(), '-')))
+    }
+
     private fun printResult(planResult: PlanResult) {
         logger.info("Generating report")
 
         println()
-        planResult.moduleResults.forEach { printModuleResult(it) }
+        printHeader()
+        printRow("${margin(0)}${planResult.name}", planResult.stats)
+        planResult.results.forEach { printModuleResult(it) }
+        printFooter()
         printErrors()
     }
 
     private fun printModuleResult(moduleResult: ModuleResult) {
-        cp.println("${margin(1)}${moduleResult.moduleName}",
-                   Ansi.Attribute.NONE, Ansi.FColor.BLUE, Ansi.BColor.NONE)
-        moduleResult.groupResults.forEach { printGroupResult(it) }
+        printRow("${margin(1)}${moduleResult.name}", moduleResult.stats)
+        moduleResult.results.forEach { printGroupResult(it) }
     }
 
     private fun printGroupResult(groupResult: GroupResult) {
-        cp.println("${margin(2)}${groupResult.groupName}",
-                   Ansi.Attribute.NONE, Ansi.FColor.YELLOW, Ansi.BColor.NONE)
-        groupResult.ruleResults.forEach { printRuleResult(it) }
+        printRow("${margin(2)}${groupResult.name}", groupResult.stats)
+        groupResult.results.forEach { printRuleResult(it) }
     }
 
     private fun printRuleResult(ruleResult: RuleResult) {
         when {
-            ruleResult.isSuccess ->
-                cp.println("${margin(3)}✓ ${ruleResult.ruleName}",
-                           Ansi.Attribute.NONE, Ansi.FColor.GREEN, Ansi.BColor.NONE)
+            ruleResult.success ->
+                printRow("${margin(3)}${ruleResult.name}", ruleResult.stats)
             else -> {
-                cp.println("${margin(3)}✗ ${ruleResult.ruleName} [${errors.size + 1}]",
-                           Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
-
+                printRow("${margin(3)}${ruleResult.name} [${errors.size + 1}]", ruleResult.stats)
                 errors.add(ruleResult)
             }
         }
@@ -84,7 +162,7 @@ class CloudSpecRunner @Inject constructor(private val version: String,
     private fun printErrors() {
         (errors.indices).forEach {
             println()
-            cp.println("[${it + 1}] ${errors[it].ruleName}",
+            cp.println("[${it + 1}] ${errors[it].name}",
                        Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
 
             printErrors(errors[it])
@@ -93,21 +171,21 @@ class CloudSpecRunner @Inject constructor(private val version: String,
 
     private fun printErrors(ruleResult: RuleResult) {
         when {
-            ruleResult.throwable != null ->
-                cp.println(ruleResult.throwable?.message,
+            ruleResult.error != null ->
+                cp.println(ruleResult.error?.message,
                            Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
             else -> {
-                ruleResult.resourceValidationResults
-                    .filter { !it.isSuccess }
+                ruleResult.results
+                    .filter { !it.success }
                     .onEach {
                         cp.print("On resource ",
                                  Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                         cp.println(it.ref,
                                    Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                     }
-                    .flatMap { it.assertResults }
+                    .flatMap { it.results }
                     .filter { !it.success }
-                    .forEach { (path, _, assertError) ->
+                    .forEach { (path, assertError) ->
                         println()
                         cp.println("${margin(1)}${path.toPathString()}",
                                    Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.NONE)
@@ -171,7 +249,11 @@ class CloudSpecRunner @Inject constructor(private val version: String,
     }
 
     companion object {
-        private const val MARGIN_SIZE = 2
+        private val TABLE_WIDTH = 120
+        private val CELL_STAT_WIDTH = 3;
+        private val TABLE_HEADERS = listOf("Test", "TR", "SR", "FR", "TV", "SV", "FV")
+        private val MARGIN_SIZE = 1
+
         private val cp = ColoredPrinter.Builder(1, false).build()
     }
 }

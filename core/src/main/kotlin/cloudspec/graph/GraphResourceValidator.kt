@@ -26,10 +26,9 @@ import arrow.syntax.collections.flatten
 import cloudspec.lang.*
 import cloudspec.lang.predicate.DateCompare
 import cloudspec.lang.predicate.IPAddress
-import cloudspec.model.ResourceDefRef
-import cloudspec.model.ResourceRef
+import cloudspec.model.*
+import cloudspec.model.Path
 import cloudspec.validator.*
-import cloudspec.validator.Path
 import org.apache.tinkerpop.gremlin.process.traversal.*
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
@@ -39,7 +38,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.slf4j.LoggerFactory
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.`__` as underscore
 
-typealias PathToAssertTraversalF = (path: List<Path>) -> GraphTraversal<Vertex, AssertValidationResult>
+typealias PathToAssertTraversalF = (path: List<Path>) -> GraphTraversal<Vertex, ValidationResult>
 typealias ListOfPathToAssertTraversalF = List<PathToAssertTraversalF>
 
 /**
@@ -63,7 +62,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
 
     override fun validate(ref: ResourceRef,
                           filterStatements: List<Statement>,
-                          assertStatements: List<Statement>): Option<ResourceValidationResult> {
+                          assertStatements: List<Statement>): Option<ResourceResult> {
         return buildResourceFilteringTraversal(ref, filterStatements)
             .tryNext()
             .orElse(null)
@@ -76,7 +75,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
 
     override fun validateAll(defRef: ResourceDefRef,
                              filterStatements: List<Statement>,
-                             assertStatements: List<Statement>): List<ResourceValidationResult> {
+                             assertStatements: List<Statement>): List<ResourceResult> {
         return buildResourcesFilteringTraversal(defRef, filterStatements)
             .toList()
             .map { resourceV ->
@@ -87,7 +86,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
     }
 
     private fun validateResource(ref: ResourceRef,
-                                 assertStatements: List<Statement>): Option<ResourceValidationResult> {
+                                 assertStatements: List<Statement>): Option<ResourceResult> {
         // validate resource exists
         if (!exist(ref)) {
             logger.error(
@@ -108,14 +107,14 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
             }
 
         // build resource validation result
-        return ResourceValidationResult(ref, assertValidationResults).toOption()
+        return ResourceResult(ref, assertValidationResults).toOption()
     }
 
     private fun validateResourceByAssertTraversal(ref: ResourceRef,
-                                                  assertTraversal: GraphTraversal<*, AssertValidationResult>): AssertValidationResult {
+                                                  traversal: GraphTraversal<*, ValidationResult>): ValidationResult {
         // get resource and apply assert traversal
         return buildResourceTraversal(ref)
-            .flatMap(assertTraversal)
+            .flatMap(traversal)
             .next()
     }
 
@@ -205,7 +204,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
 
     private fun buildPropertyAssertionTraversal(statement: PropertyStatement): ListOfPathToAssertTraversalF {
         return listOf(
-                fun (path: List<Path>) = run {
+                fun(path: List<Path>) = run {
                     // add property element to the path
                     val propertyPath = path.plus(PropertyPath(statement.propertyName))
 
@@ -219,22 +218,20 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                                     // check whether property value matches predicate, or return mismatch error
                                     .coalesce(
                                             underscore.has<Any>(GraphResourceStore.PROPERTY_VALUE, statement.predicate)
-                                                .constant (
-                                                    AssertValidationResult(propertyPath, true)
+                                                .constant(
+                                                        ValidationResult(propertyPath)
                                                 ),
                                             underscore.map { propertyValueV: Traverser<Vertex> ->
-                                                AssertValidationResult(
+                                                ValidationResult(
                                                         propertyPath,
-                                                        false,
                                                         buildAssertionError(statement.predicate,
                                                                             propertyValueV.get()
                                                                                 .value(GraphResourceStore.PROPERTY_VALUE)))
                                             }
                                     ),
                                 underscore.constant(
-                                        AssertValidationResult(propertyPath,
-                                                               false,
-                                                               AssertNotFoundError("Property does not exist"))
+                                        ValidationResult(propertyPath,
+                                                         AssertNotFoundError("Property does not exist"))
                                 )
                         )
                 }
@@ -258,25 +255,22 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                                                 .coalesce(
                                                         underscore.has<Any>(GraphResourceStore.PROPERTY_VALUE, statement.predicate)
                                                             .constant(
-                                                                    AssertValidationResult(propertyPath, true)
+                                                                    ValidationResult(propertyPath)
                                                             ),
                                                         underscore.map { propertyValueV: Traverser<Vertex> ->
-                                                            AssertValidationResult(propertyPath,
-                                                                                   false,
-                                                                                   buildAssertionError(statement.predicate,
-                                                                                                       propertyValueV.get().value(GraphResourceStore.PROPERTY_VALUE)))
+                                                            ValidationResult(propertyPath,
+                                                                             buildAssertionError(statement.predicate,
+                                                                                                 propertyValueV.get().value(GraphResourceStore.PROPERTY_VALUE)))
                                                         }
                                                 ),
                                             underscore.constant(
-                                                    AssertValidationResult(propertyPath,
-                                                                           false,
-                                                                           AssertNotFoundError("Key ${statement.key} does not exist"))
+                                                    ValidationResult(propertyPath,
+                                                                     AssertNotFoundError("Key ${statement.key} does not exist"))
                                             )
                                     ),
                                 underscore.constant(
-                                        AssertValidationResult(propertyPath,
-                                                               false,
-                                                               AssertNotFoundError("Property does not exist"))
+                                        ValidationResult(propertyPath,
+                                                         AssertNotFoundError("Property does not exist"))
                                 )
                         )
                 }
@@ -311,11 +305,10 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                                 underscore.unfold<Any>()
                                     .has(GraphResourceStore.PROPERTY_NAME, statement.propertyName)
                                     .out(GraphResourceStore.LABEL_HAS_PROPERTY_VALUE)
-                                    .flatMap (assertionTraversal(nestedPath)),
+                                    .flatMap(assertionTraversal(nestedPath)),
                                 underscore.constant(
-                                        AssertValidationResult(nestedPath,
-                                                               false,
-                                                               AssertNotFoundError("Property does not exist"))
+                                        ValidationResult(nestedPath,
+                                                         AssertNotFoundError("Property does not exist"))
                                 )
                         )
                 }
@@ -340,7 +333,7 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
     private fun buildAssociationAssertionTraversal(statement: AssociationStatement): ListOfPathToAssertTraversalF {
         return statement.statements
             .flatMap { buildAssertionTraversals(it) }
-            .map {assertionTraversal ->
+            .map { assertionTraversal ->
                 fun(path: List<Path>) = run {
                     underscore.outE(GraphResourceStore.LABEL_HAS_ASSOCIATION)
                         .fold()
@@ -353,12 +346,11 @@ class GraphResourceValidator(val graph: Graph) : ResourceValidator {
                                     .flatMap { resourceV ->
                                         val resourceId = resourceV.get().value<ResourceRef>(GraphResourceStore.PROPERTY_RESOURCE_REF).id
                                         val associationPath = path.plus(AssociationPath(statement.associationName, resourceId))
-                                       graphTraversal.V(resourceV.get().id()).map(assertionTraversal(associationPath))
+                                        graphTraversal.V(resourceV.get().id()).map(assertionTraversal(associationPath))
                                     },
                                 underscore.constant(
-                                        AssertValidationResult(path.plus(AssociationPath(statement.associationName)),
-                                                               false,
-                                                               AssertNotFoundError("Association does not exist"))
+                                        ValidationResult(path.plus(AssociationPath(statement.associationName)),
+                                                         AssertNotFoundError("Association does not exist"))
                                 )
                         )
                 }

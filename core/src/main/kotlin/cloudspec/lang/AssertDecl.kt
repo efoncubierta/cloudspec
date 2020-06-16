@@ -20,7 +20,7 @@
 package cloudspec.lang
 
 /**
- * CloudSpec assert declaration.
+ * CloudSpec 'assert' declaration.
  */
 data class AssertDecl(val statements: List<Statement>) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {

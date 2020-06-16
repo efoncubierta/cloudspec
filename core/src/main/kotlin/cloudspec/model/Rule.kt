@@ -17,14 +17,14 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.validator
+package cloudspec.model
 
-import cloudspec.model.ResourceRef
+import cloudspec.lang.Statement
 
-data class ResourceValidationResult(
-        val ref: ResourceRef,
-        val assertResults: List<AssertValidationResult>
-) {
-    val isSuccess: Boolean
-        get() = assertResults.all { it.success }
-}
+data class Rule(
+        val name: String,
+        val defRef: ResourceDefRef,
+        val filters: List<Statement>,
+        val validations: List<Statement>,
+        val configs: ConfigValues
+)

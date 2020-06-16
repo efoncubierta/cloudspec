@@ -20,22 +20,25 @@
 package cloudspec.lang
 
 /**
- * CloudSpec plan declaration.
+ * CloudSpec 'plan' declaration.
  */
 data class PlanDecl(
-        val configs: List<ConfigDecl>,
-        val modules: List<ModuleDecl>
+        val name: String,
+        val sets: List<SetDecl>,
+        val useModules: List<UseModuleDecl>
 ): CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
+        sb.appendln("${printTabs(tabs)}Plan \"${name}\"")
+
         // add configs
-        configs.forEach { config ->
+        sets.forEach { config ->
             sb.append(config.toCloudSpecSyntax(tabs + 1))
         }
 
-        // add modules
-        modules.forEach { module ->
+        // add use modules
+        useModules.forEach { module ->
             sb.append(module.toCloudSpecSyntax(tabs + 1))
         }
 

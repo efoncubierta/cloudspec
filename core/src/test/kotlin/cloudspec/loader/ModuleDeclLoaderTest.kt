@@ -21,39 +21,26 @@ package cloudspec.loader
 
 import cloudspec.lang.GroupDecl
 import cloudspec.lang.ModuleDecl
-import cloudspec.lang.PlanDecl
 import cloudspec.lang.RuleDecl
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import kotlin.test.assertEquals
 
 class ModuleDeclLoaderTest {
-    private val cloudSpecLoader = CloudSpecLoader()
-
     @Test
     fun shouldLoadFullSpec() {
-        val planOriginal = CloudSpecGenerator.fullPlan()
+        val moduleOriginal = CloudSpecGenerator.randomModuleDecl()
 
-        val planLoaded = cloudSpecLoader.load(
-                ByteArrayInputStream(planOriginal.toCloudSpecSyntax().toByteArray())
+        val moduleLoaded = CloudSpecModuleLoader.loadDeclFromInputStream(
+                ByteArrayInputStream(moduleOriginal.toCloudSpecSyntax().toByteArray())
         )
 
-        comparePlans(planOriginal, planLoaded)
-    }
-
-    private fun comparePlans(expected: PlanDecl, actual: PlanDecl) {
-        assertEquals(expected.configs, actual.configs)
-        assertEquals(expected.modules.size, actual.modules.size)
-        val expectedS = expected.modules.sortedBy { it.name }
-        val actualS = actual.modules.sortedBy { it.name }
-        for (i in expectedS.indices) {
-            compareModules(expectedS[i], actualS[i])
-        }
+        compareModules(moduleOriginal, moduleLoaded)
     }
 
     private fun compareModules(expected: ModuleDecl, actual: ModuleDecl) {
         assertEquals(expected.name, actual.name)
-        assertEquals(expected.configs, actual.configs)
+        assertEquals(expected.sets, actual.sets)
         assertEquals(expected.groups.size, actual.groups.size)
         val expectedS = expected.groups.sortedBy { it.name }
         val actualS = actual.groups.sortedBy { it.name }
@@ -64,7 +51,7 @@ class ModuleDeclLoaderTest {
 
     private fun compareGroups(expected: GroupDecl, actual: GroupDecl) {
         assertEquals(expected.name, actual.name)
-        assertEquals(expected.configs, actual.configs)
+        assertEquals(expected.sets, actual.sets)
         assertEquals(expected.rules.size, actual.rules.size)
         val expectedS = expected.rules.sortedBy { it.name }
         val actualS = actual.rules.sortedBy { it.name }
@@ -76,7 +63,7 @@ class ModuleDeclLoaderTest {
     private fun compareRules(expected: RuleDecl, actual: RuleDecl) {
         assertEquals(expected.name, actual.name)
         assertEquals(expected.defRef, actual.defRef)
-        assertEquals(expected.configs, actual.configs)
+        assertEquals(expected.sets, actual.sets)
         for (i in expected.withs.statements.indices) {
             assertEquals(expected.withs.statements[i], actual.withs.statements[i])
         }

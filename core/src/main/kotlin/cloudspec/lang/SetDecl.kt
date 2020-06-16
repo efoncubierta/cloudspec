@@ -20,9 +20,9 @@
 package cloudspec.lang
 
 /**
- * Define a config expression.
+ * CloudSpec 'set' declaration.
  */
-data class ConfigDecl(
+data class SetDecl(
         val configRef: String,
         val value: Any
 ) : CloudSpecSyntaxProducer {

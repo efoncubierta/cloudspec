@@ -20,11 +20,11 @@
 package cloudspec.lang
 
 /**
- * CloudSpec group declaration.
+ * CloudSpec 'group' declaration.
  */
 data class GroupDecl(
         val name: String,
-        val configs: List<ConfigDecl>,
+        val sets: List<SetDecl>,
         val rules: List<RuleDecl>
 ) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {
@@ -33,7 +33,7 @@ data class GroupDecl(
         sb.appendln("${printTabs(tabs)}Group \"${name}\"")
 
         // add config
-        configs.forEach { sb.append(it.toCloudSpecSyntax(tabs + 1)) }
+        sets.forEach { sb.append(it.toCloudSpecSyntax(tabs + 1)) }
 
         // add rules
         rules.forEach { sb.append(it.toCloudSpecSyntax(tabs + 1)) }

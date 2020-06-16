@@ -19,8 +19,8 @@
  */
 package cloudspec.loader
 
-import cloudspec.CloudSpecBaseListener
-import cloudspec.CloudSpecParser.*
+import cloudspec.CloudSpecModuleBaseListener
+import cloudspec.CloudSpecModuleParser.*
 import cloudspec.lang.*
 import cloudspec.lang.predicate.DateP.Companion.after
 import cloudspec.lang.predicate.DateP.Companion.before
@@ -43,11 +43,9 @@ import org.apache.tinkerpop.gremlin.process.traversal.TextP
 import java.text.ParseException
 import java.util.*
 
-class CloudSpecLoaderListener : CloudSpecBaseListener() {
-    // evaluator
+class CloudSpecModuleListener : CloudSpecModuleBaseListener() {
     private val currentDefRef = Stack<String>()
-    private val currentConfigs = Stack<Stack<ConfigDecl>>()
-    private val currentPlans = Stack<PlanDecl>()
+    private val currentSets = Stack<Stack<SetDecl>>()
     private val currentModules = Stack<ModuleDecl>()
     private val currentGroups = Stack<GroupDecl>()
     private val currentRules = Stack<RuleDecl>()
@@ -59,48 +57,47 @@ class CloudSpecLoaderListener : CloudSpecBaseListener() {
     private var currentPredicate: P<*>? = null
 
     init {
-        currentConfigs.push(Stack()) // plan configs
+        currentSets.push(Stack()) // plan configs
     }
 
-    val plan: PlanDecl
-        get() = PlanDecl(currentConfigs.pop().toList(),
-                         currentModules.toList())
+    val module: ModuleDecl
+        get() = currentModules.pop()
 
     override fun exitSetDecl(ctx: SetDeclContext) {
-        currentConfigs.peek().push(ConfigDecl(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+        currentSets.peek().push(SetDecl(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
     }
 
     override fun enterModuleDecl(ctx: ModuleDeclContext) {
-        currentConfigs.push(Stack())
+        currentSets.push(Stack())
     }
 
     override fun exitModuleDecl(ctx: ModuleDeclContext) {
         currentModules.push(ModuleDecl(stripQuotes(ctx.STRING().text),
-                                       currentConfigs.pop().toList(),
+                                       currentSets.pop().toList(),
                                        currentGroups.toList()))
         currentGroups.clear()
     }
 
     override fun enterGroupDecl(ctx: GroupDeclContext) {
-        currentConfigs.push(Stack())
+        currentSets.push(Stack())
     }
 
     override fun exitGroupDecl(ctx: GroupDeclContext) {
         currentGroups.push(GroupDecl(stripQuotes(ctx.STRING().text),
-                                     currentConfigs.pop().toList(),
+                                     currentSets.pop().toList(),
                                      currentRules.toList()))
         currentRules.clear()
     }
 
     override fun enterRuleDecl(ctx: RuleDeclContext) {
-        currentConfigs.push(Stack())
+        currentSets.push(Stack())
         currentDefRef.push(stripQuotes(ctx.STRING().text))
     }
 
     override fun exitRuleDecl(ctx: RuleDeclContext) {
         currentRules.push(RuleDecl(stripQuotes(ctx.STRING().text),
                                    currentDefRef.pop(),
-                                   currentConfigs.pop().toList(),
+                                   currentSets.pop().toList(),
                                    if (!currentWiths.empty()) currentWiths.pop() else WithDecl(emptyList()),
                                    currentAsserts.pop()))
     }

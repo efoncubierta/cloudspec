@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.validator
+package cloudspec.model
 
 sealed class Path {
     fun toPathString(): String {
@@ -44,9 +44,3 @@ data class PropertyPath(val name: String) : Path()
 data class NestedPropertyPath(val name: String) : Path()
 data class KeyValuePropertyPath(val name: String, val key: String) : Path()
 data class AssociationPath(val name: String, val id: String? = null) : Path()
-
-data class AssertValidationResult(
-        val path: List<Path>,
-        val success: Boolean,
-        val error: AssertError? = null
-)

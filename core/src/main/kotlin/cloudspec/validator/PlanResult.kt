@@ -19,25 +19,93 @@
  */
 package cloudspec.validator
 
-data class PlanResult(
-        val moduleResults: List<ModuleResult>
-)
+import cloudspec.model.Path
+import cloudspec.model.ResourceRef
 
-data class ModuleResult(
-        val moduleName: String,
-        val groupResults: List<GroupResult>
-)
+data class PlanResult(val name: String,
+                      val results: List<ModuleResult>) {
+    val success
+        get() = results.all { it.success }
 
-data class GroupResult(
-        val groupName: String,
-        val ruleResults: List<RuleResult>
-)
+    val stats
+        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
+}
 
-data class RuleResult(
-        val ruleName: String,
-        val resourceValidationResults: List<ResourceValidationResult> = emptyList(),
-        val throwable: Throwable? = null
-) {
-    val isSuccess: Boolean
-        get() = throwable == null && resourceValidationResults.all { it.isSuccess }
+data class ModuleResult(val name: String,
+                        val results: List<GroupResult>) {
+    val success
+        get() = results.all { it.success }
+
+    val stats
+        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
+}
+
+data class GroupResult(val name: String,
+                       val results: List<RuleResult>) {
+    val success
+        get() = results.all { it.success }
+
+    val stats
+        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
+}
+
+data class RuleResult(val name: String,
+                      val results: List<ResourceResult> = emptyList(),
+                      val error: Throwable? = null) {
+    val success
+        get() = error == null && results.all { it.success }
+
+    val stats
+        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
+}
+
+data class ResourceResult(val ref: ResourceRef,
+                          val results: List<ValidationResult>) {
+    val success
+        get() = results.all { it.success }
+
+    val stats
+        get() = Stats(1,
+                      if (success) 1 else 0,
+                      if (!success) 1 else 0,
+                      results.size,
+                      results.count { it.success },
+                      results.count { !it.success })
+}
+
+data class ValidationResult(val path: List<Path>,
+                            val error: AssertError? = null) {
+    val success
+        get() = error == null
+}
+
+sealed class AssertError
+
+data class AssertNotFoundError(val message: String) : AssertError()
+
+data class AssertMismatchError(val condition: String,
+                               val expected: Any,
+                               val actual: Any) : AssertError()
+
+data class AssertRangeError(val condition: String,
+                            val expectedLeft: Any,
+                            val expectedRight: Any,
+                            val actual: Any) : AssertError()
+
+data class AssertUnknownError(val message: String) : AssertError()
+
+data class Stats(val resourcesTotal: Int = 0,
+                 val resourcesSuccess: Int = 0,
+                 val resourcesFailed: Int = 0,
+                 val validationsTotal: Int = 0,
+                 val validationsSuccess: Int = 0,
+                 val validationsFailed: Int = 0) {
+    fun sum(stats: Stats): Stats {
+        return Stats(resourcesTotal + stats.resourcesTotal,
+                     resourcesSuccess + stats.resourcesSuccess,
+                     resourcesFailed + stats.resourcesFailed,
+                     validationsTotal + stats.validationsTotal,
+                     validationsSuccess + stats.validationsSuccess,
+                     validationsFailed + stats.validationsFailed)
+    }
 }

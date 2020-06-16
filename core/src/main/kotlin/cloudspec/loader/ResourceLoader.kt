@@ -25,7 +25,9 @@ import arrow.core.getOrElse
 import arrow.syntax.collections.flatten
 import cloudspec.ProvidersRegistry
 import cloudspec.annotation.ResourceReflectionUtil
-import cloudspec.lang.*
+import cloudspec.lang.AssociationStatement
+import cloudspec.lang.NestedStatement
+import cloudspec.lang.Statement
 import cloudspec.model.*
 import cloudspec.store.ResourceStore
 import org.slf4j.LoggerFactory
@@ -36,49 +38,36 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
     private val loadedResourceDefs = mutableSetOf<ResourceDefRef>()
 
-    fun load(plan: PlanDecl) {
+    fun load(plan: Plan) {
         logger.info("Loading resources required to run this test")
 
         plan.modules
-            .map { (_, moduleConfigs, groups) -> Pair(plan.configs.plus(moduleConfigs), groups) }
-            .forEach { pair ->
-                pair.second.forEach { group ->
-                    loadFromGroup(pair.first, group)
-                }
+            .flatMap { (_, groups) -> groups }
+            .forEach {
+                loadFromGroup(it)
             }
     }
 
-    private fun loadFromGroup(configs: List<ConfigDecl>, group: GroupDecl) {
-        group.rules
-            .forEach { rule ->
-                loadFromRule(configs.plus(group.configs), rule)
-            }
+    private fun loadFromGroup(group: Group) {
+        group.rules.forEach { loadFromRule(it) }
     }
 
-    private fun loadFromRule(configs: List<ConfigDecl>, ruleDecl: RuleDecl) {
-        val ruleConfigs = toConfigValue(configs.plus(ruleDecl.configs))
-        when (val resourceDefRefOpt = ResourceDefRef.fromString(ruleDecl.defRef)) {
-            is Some -> {
-                // Load all resource definitions to the plan
-                getAllResources(ruleConfigs, resourceDefRefOpt.t)
-                    .forEach { resource ->
-                        // load dependent resources from each statement
-                        ruleDecl.withs
-                            .statements
-                            .forEach {
-                                loadFromStatement(ruleConfigs, resource, it, emptyList())
-                            }
+    private fun loadFromRule(rule: Rule) {
+        // Load all resource definitions to the plan
+        getAllResources(rule.configs, rule.defRef)
+            .forEach { resource ->
+                // load dependent resources from each statement
+                rule.filters
+                    .forEach {
+                        loadFromStatement(rule.configs, resource, it, emptyList())
+                    }
 
-                        // load dependent resources from each statement
-                        ruleDecl.asserts
-                            .statements
-                            .forEach {
-                                loadFromStatement(ruleConfigs, resource, it, emptyList())
-                            }
+                // load dependent resources from each statement
+                rule.validations
+                    .forEach {
+                        loadFromStatement(rule.configs, resource, it, emptyList())
                     }
             }
-            else -> logger.error("Malformed resource definition '${ruleDecl.defRef}'. Ignoring it.")
-        }
     }
 
     private fun loadFromStatement(config: ConfigValues, resource: Resource, statement: Statement, path: List<String>) {
@@ -174,27 +163,6 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
         //        }
 //        return resourceOpt;
-    }
-
-    private fun toConfigValue(config: List<ConfigDecl>): ConfigValues {
-        return config.mapNotNull { c ->
-            when (val configRefOpt = ConfigRef.fromString(c.configRef)) {
-                is Some ->
-                    when (c.value) {
-                        is Number -> NumberConfigValue(configRefOpt.t, c.value)
-                        is String -> StringConfigValue(configRefOpt.t, c.value)
-                        is Boolean -> BooleanConfigValue(configRefOpt.t, c.value)
-                        else -> {
-                            logger.error("Unsupported type of config '${c.configRef}'. Ignoring it.")
-                            null
-                        }
-                    }
-                else -> {
-                    logger.error("Malformed config definition '${c.configRef}'. Ignoring it.")
-                    null
-                }
-            }
-        }
     }
 
 }

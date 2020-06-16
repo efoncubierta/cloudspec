@@ -19,8 +19,8 @@
  */
 package cloudspec
 
-import cloudspec.lang.PlanDecl
 import cloudspec.loader.ResourceLoader
+import cloudspec.model.Plan
 import cloudspec.preflight.CloudSpecPreflight
 import cloudspec.store.ResourceDefStore
 import cloudspec.store.ResourceStore
@@ -51,17 +51,17 @@ class CloudSpecManager(
         logger.info("Initiating CloudSpec")
 
         providersRegistry.getProviders()
-                .onEach {
-                    logger.debug("Importing provider '{}'", it.name)
-                    logger.debug("- Found {} resource definitions", it.resourceDefs.size)
-                }
-                .flatMap { it.resourceDefs }
-                .forEach { resourceDefStore.saveResourceDef(it) }
+            .onEach {
+                logger.debug("Importing provider '{}'", it.name)
+                logger.debug("- Found {} resource definitions", it.resourceDefs.size)
+            }
+            .flatMap { it.resourceDefs }
+            .forEach { resourceDefStore.saveResourceDef(it) }
 
         initiated = true
     }
 
-    fun preflight(plan: PlanDecl) {
+    fun preflight(plan: Plan) {
         mustBeInitiated()
         cloudSpecPreflight.preflight(plan)
     }
@@ -72,12 +72,12 @@ class CloudSpecManager(
         }
     }
 
-    fun loadResources(plan: PlanDecl) {
+    fun loadResources(plan: Plan) {
         mustBeInitiated()
         resourceLoader.load(plan)
     }
 
-    fun validate(plan: PlanDecl): PlanResult {
+    fun validate(plan: Plan): PlanResult {
         mustBeInitiated()
         return cloudSpecValidator.validate(plan)
     }

@@ -17,33 +17,9 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.lang
+package cloudspec.model
 
-/**
- * CloudSpec 'module' declaration.
- */
-data class ModuleDecl(
+data class Module(
         val name: String,
-        val sets: List<SetDecl>,
-        val groups: List<GroupDecl>
-) : CloudSpecSyntaxProducer {
-    override fun toCloudSpecSyntax(tabs: Int): String {
-        val sb = StringBuilder()
-
-        sb.appendln("${printTabs(tabs)}Module \"${name}\"")
-
-        // add configs
-        sets.forEach { config ->
-            sb.append(config.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add groups
-        groups.forEach { group ->
-            sb.append(group.toCloudSpecSyntax(tabs + 1))
-        }
-
-        sb.appendln()
-
-        return sb.toString()
-    }
-}
+        val groups: List<Group>
+)
