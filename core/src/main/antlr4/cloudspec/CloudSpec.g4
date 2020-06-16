@@ -218,4 +218,4 @@ fragment CONFIG_NAME: LETTER [a-zA-Z0-9_]*;
 MEMBER_NAME: LETTER [a-zA-Z0-9_]*;
 
 WS: [ \t\r\n]+ -> skip;
-SL_COMMENT: '//' .*? '\n' -> skip;
+SL_COMMENT: '#' .*? '\n' -> skip;
