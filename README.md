@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.com/efoncubierta/cloudspec.svg?branch=master)](https://travis-ci.com/efoncubierta/cloudspec)
 [![codecov](https://codecov.io/gh/efoncubierta/cloudspec/branch/master/graph/badge.svg)](https://codecov.io/gh/efoncubierta/cloudspec)
+[![docker](https://img.shields.io/docker/v/efoncubierta/cloudspec?color=blue&label=docker&sort=semver)](https://hub.docker.com/r/efoncubierta/cloudspec)
+[![license](https://img.shields.io/github/license/efoncubierta/cloudspec)](https://github.com/efoncubierta/cloudspec/blob/master/LICENSE)
 
 # CloudSpec
 
@@ -153,29 +155,51 @@ actually validate the resources in the scope.
 
 You can find more information in the [CloudSpec Reference](/doc/index.md) documentation.
 
-## Build and run CloudSpec
+## Running CloudSpec docker image
+
+You can either build and run the CloudSpec jar yourself, or you can run the latest docker image straight from the
+Docker Hub registry.
+
+To use the Docker image, you first need to put your spec files (e.g. `specs`) in a directory to mount it in the Docker 
+container. Otherwise, the CloudSpec will not be able to open the spec files outside the container. 
+
+```$bash
+export AWS_ACCESS_KEY_ID=***
+export AWS_SECRET_ACCESS_KEY=***
+export AWS_REGION=eu-west-1
+docker run -v "/my/specs:/specs" -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_REGION efoncubierta/cloudspec run -p specs/my.csplan
+```
+
+If you are running the docker container in AWS with a dedicated IAM role attached, you can omit the AWS environment 
+variables.
+
+For more options of the CloudSpec command, see help:
+
+```$bash
+docker run efoncubierta/cloudspec -h
+```
+
+## Build CloudSpec
+
+If you want to build CloudSpec yourself, follow these instructions.
 
 Requirements:
 
-- Maven 3 or higher
-- OpenJDK 8 or higher
+- Git
+- Maven 3
+- OpenJDK 8
+- Docker
 
-To build the executable jar, run the following command:
-
-```$bash
-mvn clean package
-```
-
-Run CloudSpec on your specification file:
-
-```
-java -jar runner/target/cloudspec-runner-0.0.1-SNAPSHOT-exec.jar -s my.cloudspec
-```
-
-For more options, check the command's help:
+Pull the source code and build CloudSpec:
 
 ```$bash
-java -jar runner/target/cloudspec-runner-0.0.1-SNAPSHOT-exec.jar -h
+# Clone git repo
+git clone https://github.com/efoncubierta/cloudspec
+cd cloudspec
+# Build CloudSpec
+mvn clean install
+# Run CloudSpec
+java -jar runner/target/cloudspec-${VERSION}.jar -h
 ```
 
 ## Collaborations
