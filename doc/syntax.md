@@ -2,13 +2,13 @@
 
 At a high-level, it all starts with a `plan`. A `plan` contains one or more `module`, `group` or `rule`. Each `module` 
 contains one or more `group` or `rule`. Each `group` contains one or more validation `rule`. `plan` and `module` can 
-define `input` variables. `module`, `group` and `rule` can be imported from other files (i.e. `use (module|group|rule)`,
-or defined in-line. `plan`, `module` and `group` can `set` configuration parameters. `rule` defines a validation scope 
+define `input` variables. `module`, `group` and `rule` can be imported from other files (i.e. `use (module|group|rule)`)
+,or defined in-line. `plan`, `module` and `group` can `set` configuration parameters. `rule` defines a validation scope 
 using `on` and `with`. `rule` defines validations using `assert`.
 
 All keywords are case-insensitive (e.g. both `plan` and `PLAN` are valid).
 
-## Plan declaration
+## `plan` declaration
 
 To validate your resources you need one `plan`, and only one `plan`. Everything in CloudSpec is declared within a 
 `plan`. A `plan` is declared in a file with `.csp` extension. 
@@ -20,6 +20,7 @@ plan :plan_name
     (use module|group|rule ...)*
     (group ...)*
     (rule ...)*
+end plan
 ```
 
 Where `:plan_name` is a quoted `"string"`. For example, `"My plan"`.
@@ -34,7 +35,7 @@ Within a `plan` you can declare the following:
 
 A plan must have at least one `rule` declared either in-line, within a group, within a module or imported.
 
-## Module declaration
+## `module` declaration
 
 Modules are like plan, but reusable. Different plans can import the same module. A `module` is declared in a file
 with the `.csm` extension.
@@ -46,6 +47,7 @@ module :module_name
     (use module|group|rule ...)*
     (group ...)*
     (rule ...)*
+end module
 ```
 
 Where `:module_name` is a quoted `"string"`. For example, `"My module"`.
@@ -60,7 +62,7 @@ Within a `module` you can declare the following:
 
 A module must have at least one `rule` declared either in-line, within a group, within another module or imported.
 
-## Group declaration
+## `group` declaration
 
 Rules that are alike or share the same configuration parameters can be grouped. A `group` can be declared in-line or its
 own file with the `.csg` extension.
@@ -70,6 +72,7 @@ group :group_name
     (set ...)*
     (use rule ...)*
     (rule ...)*
+end group
 ```
 
 Where `:module_name` is a quoted `"string"`. For example, `"My group"`.
@@ -82,7 +85,7 @@ Within a `group` you can declare the following:
 
 A group must have at least one `rule` declared either in-line or imported.
 
-## Rule declaration
+## `rule` declaration
 
 Validation rules are the essential ingredient of CloudSpec. At least one rule must exist in a `plan`, `module` or
 `group`. Without rules there are not validations. A `rule` can be declared in-line or its own file with the `.csr`
@@ -93,6 +96,7 @@ rule :rule_name
     on :resource_reference
     (with ...)?
     assert ...
+end rule
 ```
 
 Where `:rule_name` is a quoted `"string"`. for example `"My rule"`, and `:resource_reference` is a unique
@@ -112,7 +116,7 @@ Within a `rule` you can declare the following:
 - Zero or more `with`: filters to narrow down the scope (see: [with declaration](#with-declaration))
 - Zero or more `assert`: validations (see: [assert declaration](#assert-declaration))
 
-## With declaration
+## `with` declaration
 
 A `with` statement narrows down the scope of the rule. It is similar in essence to the `WHERE` clause in SQL.
 
@@ -127,7 +131,7 @@ resource, the resource would be added to the validation scope.
 
 Multiple `with` declarations can be concatenated with `and`.
 
-## Assert declaration
+## `assert` declaration
 
 An `assert` statement does the actual validation of the resources in the scope. Its syntax is similar to `with`, but its
 purpose is completely different. While `with` narrows down the validation scope, `assert` validates that the resources 
@@ -325,6 +329,30 @@ A property can be of one of the following types:
 - A date time in ISO-8601 format (e.g. `"2020-05-27 00:00:00"`)
 - A key value (e.g. `key="foo", value="bar"`).
 - A container for nested properties (e.g. `{prop1=1, prop2="foo"}`).
+
+## `use` declaration
+
+TBC
+
+```
+use (module|group|rule) :file_path
+```
+
+## `input` declaration
+
+*Not yet supported.*
+
+```
+input :input_name as :input_def
+```
+
+## `set` declaration
+
+TBC
+
+```
+set :config_ref = :value
+```
 
 ## Examples
 
