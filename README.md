@@ -9,6 +9,36 @@ CloudSpec is an open source tool for validating your resources in your cloud pro
 everybody can understand. With its reasonably simple syntax, you can validate the configuration of your cloud resources,
 avoiding mistakes that can lead to availability or confidentiality issues.
 
+```
+plan "Production environment"
+    set aws:regions = ["us-east-1", "eu-west-1"]
+
+    use module "my_module.csm"
+
+    group "S3 validations"
+        use rule "my_s3_rule.csr"
+
+        rule "Buckets must have access logs enabled"
+        on aws:s3:bucket
+        assert access_logs is enabled
+    end group
+
+    group "EC2 validations"
+        use rule "my_ec2_rule.csr"
+
+        rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
+        on aws:ec2:instance
+        with tags["environment"] equal to "production"
+        assert devices (
+            > volume (
+                type equal to "gp2" and
+                size gte 50
+            )
+        )
+    end group
+end plan
+```
+
 ## Introduction
 
 With CloudSpec you validate resources in your cloud provider. A resource can be anything, from an EC2 Instance to an SES
@@ -26,6 +56,8 @@ or associated resources to its associated resources, and so on. You follow me.
 Your cloud resources are entangled together, creating a graph. A graph that you can traverse and validate as you see fit
 according to your best practices or compliance policies. That ability, plus its logical language, is the beauty of
 CloudSpec.
+
+You can find the full syntax in the [CloudSpec Reference](/doc/index.md) documentation.
  
 ## Providers
 
@@ -36,124 +68,6 @@ each different type of resource.
 A provider defines the shape of each resource type, properties and associations, and the logic to load those resources.
 
 You can find the available providers and resources they provide in the [CloudSpec Reference](/doc/index.md) documentation.
-
-## CloudSpec Syntax
-
-This is what a simple CloudSpec file looks like:
-
-```
-Spec "Production environment"
-
-Group "S3 validations"
-  Rule "Buckets must have access logs enabled"
-  On aws:s3:bucket
-  Assert
-    access_logs is enabled
-
-Group "EC2 validations"
-  Rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
-    On aws:ec2:instance
-    With
-      tags["environment"] equal to "production"
-    Assert
-      devices (
-        > volume (
-            type equal to "gp2" and
-            size gte 50
-        )
-      )
-```
-
-A CloudSpec file starts with a `Spec` declaration followed by `Group`'s and `Rule`'s declarations.
-
-With `Rule`, you implement the validation logic for one kind of resource (e.g. S3 bucket):
-
-```
-Rule "My validation rule"
-On aws:ec2:instance
-...
-```
-
-Rules has titles to describe what the rule is about, for reporting purposes. The `On` clause defines the scope, or
-type of resource this rule will apply to. A resource definition reference is made of three parts
-PROVIDER:GROUP:RESOURCE_NAME. For example, `aws:s3:bucket`, where `aws` is the provider, `s3` is the group and `bucket`
-the resource name. Resource definition references avoids naming collision on resources with the same name but different
-providers.
-
-For a complete list of supported providers and resources, check the [CloudSpec Reference](/doc/index.md) documentation.
-
-When the scope (i.e. resource type) of the rule is defined, you can then filter out resources using `With` statements.
-A `With` statement is used to narrow down the resource the rule is applied to, like `WHERE` clauses in SQL. `With`
-statements are optional. If missing, all resources in the scope are validated.
-
-```
-Rule "My validation rule"
-On aws:ec2:instance
-With :member_path :predicate
-...
-```
-
-A `:member_path` can be a property or an association. For example:
-
-- Single property: `my_property :predicate`
-- Nested property: `my_nested ( property :predicate )`
-- Single property in an associated resource: `>my_association ( my_property :predicate )`
-
-You can see all member paths currently supported in the [CloudSpec Syntax](/doc/syntax.md#members-paths) documentation.
-
-A property can be of one of the following types:
-
-- An integer (e.g `1`).
-- A double (e.g. `3.1415`).
-- A string (e.g. `"foo"`).
-- A boolean (e.g. `true`).
-- A date in ISO-8601 format (e.g. `"2020-05-27"`)
-- A date time in ISO-8601 format (e.g. `"2020-05-27 00:00:00"`)
-- A key value (e.g. `key="foo", value="bar"`).
-- A container for nested properties (e.g. `{prop1=1, prop2="foo"}`).
-
-Properties can also be multi-valued (e.g. `[1, 2, 3]` or `["foo", "bar"]`).
-
-Predicates are used to validate a property value. For example.
-
-```
-my_property == 1
-my_property is equal to 1
-my_property is not equal to "foo"
-my_property within [1, 2, 3]
-my_property is not within ["foo", "bar"]
-my_property equal to ip address "10.0.0.1"
-my_property is within network "10.0.0.0/24"
-my_property is enabled
-```
-
-You can see all predicates currently supported in the [CloudSpec Syntax](/doc/syntax.md#predicates) documentation.
-
-You can concatenate multiple `With` clauses with `And`.
-
-```
-...
-With my_property is equal to 1
-And my_other_property is enabled
-...
-```
- 
-Finally, when you have the scope of your rule defined, you can then define the assertions.
-
-The `Assert` clause is used to define assertions. An assertion validates whether a resource conforms or not to the rule.
-An `Assert` clause has exactly the same syntax that `With` clauses, but starting with `Assert`.
-
-```
-...
-Assert my_property is equel to 1
-And my_other_property is disabled
-...
-```
-
-The different between `With` and `Assert` is that the first is used to narrow down the scope, while the second is to
-actually validate the resources in the scope.
-
-You can find more information in the [CloudSpec Reference](/doc/index.md) documentation.
 
 ## Running CloudSpec docker image
 
