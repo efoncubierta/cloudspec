@@ -31,10 +31,12 @@ class ModuleDeclLoaderTest {
     fun shouldLoadFullSpec() {
         val moduleOriginal = CloudSpecGenerator.randomModuleDecl()
 
+        println(moduleOriginal.toCloudSpecSyntax())
         val moduleLoaded = CloudSpecModuleLoader.loadDeclFromInputStream(
                 ByteArrayInputStream(moduleOriginal.toCloudSpecSyntax().toByteArray())
         )
 
+        println(moduleLoaded.toCloudSpecSyntax())
         compareModules(moduleOriginal, moduleLoaded)
     }
 

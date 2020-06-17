@@ -29,7 +29,7 @@ data class SetDecl(
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
-        sb.appendln("${printTabs(tabs)}Set $configRef = ${valueToCloudSpecSyntax(value)}")
+        sb.appendln("${printTabs(tabs)}set $configRef = ${valueToCloudSpecSyntax(value)}")
 
         return sb.toString()
     }

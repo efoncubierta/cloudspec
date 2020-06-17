@@ -188,6 +188,12 @@ object CloudSpecTestUtils {
             TEST_ASSERT_DECL
     )
 
+    val TEST_USE_MODULE_DECL = UseModuleDecl("")
+
+    val TEST_USE_GROUP_DECL = UseGroupDecl("")
+
+    val TEST_USE_RULE_DECL = UseRuleDecl("")
+
     val TEST_GROUP = Group(
             TEST_SPEC_GROUP_NAME,
             listOf(TEST_RULE))
@@ -197,23 +203,49 @@ object CloudSpecTestUtils {
             listOf(
                     SetDecl(TEST_CONFIG_REF_STR, TEST_CONFIG_VALUE_RAW)
             ),
+            listOf(
+                    TEST_USE_RULE_DECL
+            ),
             listOf(TEST_RULE_DECL))
 
     val TEST_MODULE = Module(TEST_MODULE_NAME,
                              listOf(TEST_GROUP))
 
     val TEST_MODULE_DECL = ModuleDecl(TEST_MODULE_NAME,
+                                      emptyList(),
                                       listOf(
                                               SetDecl(TEST_CONFIG_REF_STR, TEST_CONFIG_VALUE_RAW)
                                       ),
-                                      listOf(TEST_GROUP_DECL))
+                                      listOf(
+                                              TEST_USE_MODULE_DECL
+                                      ),
+                                      listOf(
+                                              TEST_USE_GROUP_DECL
+                                      ),
+                                      listOf(
+                                              TEST_USE_RULE_DECL
+                                      ),
+                                      listOf(TEST_GROUP_DECL),
+                                      listOf(TEST_RULE_DECL))
 
-    val TEST_USE_MODULE_DECL = UseModuleDecl("")
 
     val TEST_PLAN = Plan(TEST_PLAN_NAME,
                          listOf(TEST_MODULE))
 
     val TEST_PLAN_DECL = PlanDecl(TEST_PLAN_NAME,
-                                  listOf(SetDecl(TEST_CONFIG_REF_STR, TEST_CONFIG_VALUE_RAW)),
-                                  listOf(TEST_USE_MODULE_DECL))
+                                  emptyList(),
+                                  listOf(
+                                          SetDecl(TEST_CONFIG_REF_STR, TEST_CONFIG_VALUE_RAW)
+                                  ),
+                                  listOf(
+                                          TEST_USE_MODULE_DECL
+                                  ),
+                                  listOf(
+                                          TEST_USE_GROUP_DECL
+                                  ),
+                                  listOf(
+                                          TEST_USE_RULE_DECL
+                                  ),
+                                  listOf(TEST_GROUP_DECL),
+                                  listOf(TEST_RULE_DECL))
 }

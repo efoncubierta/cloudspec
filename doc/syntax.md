@@ -1,107 +1,163 @@
 # CloudSpec Syntax
 
-CloudSpec definition files are written in natural English language syntax. Validations of cloud resources are defined
-with rules. Each rule defines a set of widths and assert statements for filtering and asserting the resources. Similar
-rules can also be grouped. The full CloudSpec syntax is defined as follows. Please don't feel too overwhelmed. It is
-simpler than you think.
+At a high-level, it all starts with a `plan`. A `plan` contains one or more `module`, `group` or `rule`. Each `module` 
+contains one or more `group` or `rule`. Each `group` contains one or more validation `rule`. `plan` and `module` can 
+define `input` variables. `module`, `group` and `rule` can be imported from other files (i.e. `use (module|group|rule)`,
+or defined in-line. `plan`, `module` and `group` can `set` configuration parameters. `rule` defines a validation scope 
+using `on` and `with`. `rule` defines validations using `assert`.
+
+All keywords are case-insensitive (e.g. both `plan` and `PLAN` are valid).
+
+## Plan declaration
+
+To validate your resources you need one `plan`, and only one `plan`. Everything in CloudSpec is declared within a 
+`plan`. A `plan` is declared in a file with `.csp` extension. 
 
 ```
-# :comment
-Spec :spec_description
-
-(Group :group_description
-    (Rule :rule_description
-        On :resource_reference
-        (With :member_path :predicate
-            (And :member_path :predicate)*
-        )?
-        Assert :member_path :predicate
-        (And :member_path :predicate)*
-    )+
-)+
+plan :plan_name
+    (input ...)*
+    (set ...)*
+    (use module|group|rule ...)*
+    (group ...)*
+    (rule ...)*
 ```
 
-## Spec clause
+Where `:plan_name` is a quoted `"string"`. For example, `"My plan"`.
 
-All `.cloudspec` files must start with a `Spec` declaration:
+Within a `plan` you can declare the following:
 
-```
-Spec :spec_description
-...
-```
+- Zero or more `input`: an input variable (see: [input declaration](#input-declaration))
+- Zero or more `set`: set a global configuration (see: [set declaration](#set-declaration))
+- Zero or more `use module|group|rule`: import a module, group or rule from a file (see: [use declaration](#use-declaration))
+- Zero or more `group`: a group of rules (see: [group declaration](#group-declaration))
+- Zero or more `rule`: a validation rule (see: [rule declaration](#rule-declaration))
 
-Where `:spec_description` is a quoted `"string"` describing what the specification is about.
+A plan must have at least one `rule` declared either in-line, within a group, within a module or imported.
 
-## Group clause
+## Module declaration
 
-In each specification file there must be at least one `Group` clause.
-
-```
-...
-(Group :group_description
-   ...
-)+
-...
-```
-
-Where `:group_description` is a quoted `"string"` describing what the group is about.
-
-## Rule clause
+Modules are like plan, but reusable. Different plans can import the same module. A `module` is declared in a file
+with the `.csm` extension.
 
 ```
-...
-    (Rule :rule_description
-        On :resource_reference
-        ...
-    )+
-...
+module :module_name
+    (input ...)*
+    (set ...)*
+    (use module|group|rule ...)*
+    (group ...)*
+    (rule ...)*
 ```
 
-Where `:rule_description` is a quote `"string"` describing what the rule is for, and `:resource_reference` is the unique
+Where `:module_name` is a quoted `"string"`. For example, `"My module"`.
+
+Within a `module` you can declare the following:
+
+- Zero or more `input`: an input variable (see: [input declaration](#input-declaration))
+- Zero or more `set`: set a global configuration (see: [set declaration](#set-declaration))
+- Zero or more `use module|group|rule`: import a module|group|rule from a file (see: [use declaration](#use-declaration))
+- Zero or more `group`: a group of rules (see: [group declaration](#group-declaration))
+- Zero or more `rule`: a validation rule (see: [rule declaration](#rule-declaration))
+
+A module must have at least one `rule` declared either in-line, within a group, within another module or imported.
+
+## Group declaration
+
+Rules that are alike or share the same configuration parameters can be grouped. A `group` can be declared in-line or its
+own file with the `.csg` extension.
+
+```
+group :group_name
+    (set ...)*
+    (use rule ...)*
+    (rule ...)*
+```
+
+Where `:module_name` is a quoted `"string"`. For example, `"My group"`.
+
+Within a `group` you can declare the following:
+
+- Zero or more `set`: set a global configuration (see: [set declaration](#set-declaration))
+- Zero or more `use rule`: import a rule from a file (see: [use declaration](#use-declaration))
+- Zero or more `rule`: a validation rule (see: [rule declaration](#rule-declaration))
+
+A group must have at least one `rule` declared either in-line or imported.
+
+## Rule declaration
+
+Validation rules are the essential ingredient of CloudSpec. At least one rule must exist in a `plan`, `module` or
+`group`. Without rules there are not validations. A `rule` can be declared in-line or its own file with the `.csr`
+extension.
+
+```
+rule :rule_name
+    on :resource_reference
+    (with ...)?
+    assert ...
+```
+
+Where `:rule_name` is a quoted `"string"`. for example `"My rule"`, and `:resource_reference` is a unique
 resource definition reference (e.g. aws:ec2:instance).
 
-The `:resource_reference` is used to define the scope of the rule to only one kind of resource.
+Rules are defined within a scope. The scope is the set of resources that will be validated. A scope if defined as
+follows:
 
-## With clause
+- The `on` statement selects all resources of a kind. For example, all EC2 instances.
+- The `with` statements narrow down the selected resources. For example, all EC2 instances of type m5.large.
 
-A `With` clause narrows down the scope of the rule. It is similar to the `WHERE` clause in SQL. `With` clause is
-optional, but if the `With` clause is missing, the scope of the rule would be all resources of a kind.
+`with` statements are optional. If absent, all resources of a kind will be validated. At least one `assert` must be
+declared on each rule.
 
-```
-...
-        (With :member_path :predicate
-            (And :member_path :predicate)*
-        )?
-...
-```
+Within a `rule` you can declare the following:
 
-Multiple `With` clauses can be concatenated with `And`.
+- Zero or more `with`: filters to narrow down the scope (see: [with declaration](#with-declaration))
+- Zero or more `assert`: validations (see: [assert declaration](#assert-declaration))
 
-## Assert clause
+## With declaration
 
-An `Assert` clause does the actual validation of the resources in the scope. Its syntax is similar to the `With`
-clause, but its purpose is completely different. While the `With` clause is used to narrow down the scope, the `Assert`
-clause validates whether a resource in the scope is properly configured. `Assert` clause is mandatory on each rule.
+A `with` statement narrows down the scope of the rule. It is similar in essence to the `WHERE` clause in SQL.
 
 ```
-...
-        Assert :member_path :predicate
-        (And :member_path :predicate)*
-...
+with :member_path :predicate
+(and :member_path :predicate)*
 ```
 
-Multiple `Assert` clauses can be concatenated with `And`.
+Where `:member_path` (see [member paths](#members-paths)) is a path to a property in the resource, and `:predicate` 
+(see [predicates](#predicates)) is the actual validation upon that property. If all `with` statements were true on a
+resource, the resource would be added to the validation scope.
+
+Multiple `with` declarations can be concatenated with `and`.
+
+## Assert declaration
+
+An `assert` statement does the actual validation of the resources in the scope. Its syntax is similar to `with`, but its
+purpose is completely different. While `with` narrows down the validation scope, `assert` validates that the resources 
+in the validation scope are correctly configured, or it will produce an error.
+
+```
+assert :member_path :predicate
+(and :member_path :predicate)*
+```
+
+Where `:member_path` (see [member paths](#members-paths)) is a path to a property in the resource, and `:predicate` 
+(see [predicates](#predicates)) is the actual validation upon that property. If any `assert` statement was true on a
+resource, an error would be produced.
+
+Multiple `assert` declarations can be concatenated with `and`.
 
 ## Members paths
 
 A resource have two types of members: property and association. A property has a value, while an association is a
-reference to another resource. Both `With` and `Assert` clauses works on properties and associations. A property
+reference to another resource. Both `with` and `assert` statements works on properties and associations. A property
 can also hold nested properties. So `:member_path` can have different shapes, but it must always end with a property
 as it is its value what gets validated against the predicate.
 
 **Single property**
 
 `my_property :predicate`
+
+**Key-Value property**
+
+`my_property["my_key"] :predicate`
 
 **Nested property**
 
@@ -143,7 +199,7 @@ my (
 )
 ```
 
-**Property in a associated resource in a nested property**
+**Property in an associated resource in a nested property**
 
 ```
 my (
@@ -163,7 +219,7 @@ my (
         my_property :predicate
         and my_other_property :predicate
         and > my_association (
-            one_property :predicate
+            one_property["key"] :predicate
             and another (
                 nested (
                     property :predicate
@@ -182,10 +238,9 @@ my (
 
 ## Predicates
 
-Predicates are used to validate a property value. The following predicates are currently supported.
-Terms marked with `?` are optional, meaning that can be added only to improve readability of the specification.
-For example, both `is > ip address "10.0.0.1"` and `> ip "10.0.0.1"` are the same predicates. Also, predicates
-are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
+Predicates validate a property value. CloudSpec currently support the following predicates.
+Terms marked with `?` are optional, and can be used improve readability making it feel more natural.
+For example, both `is > ip address "10.0.0.1"` and `> ip "10.0.0.1"` are the same predicates.
 
 **For any value:**
 
@@ -195,10 +250,10 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 - `is? equal to :value`: synonym of `== :value`.
 - `is? != :value`: value is not equal to another value.
 - `is? not equal to :value`: synonym of `!= :value`.
-- `is? within [:value1, :value2...]`: value is in a list of values.
-- `is? not within [:value1, :value2...]`: value is not in a list of values.
+- `is? within [:value1, :value2...]`: value is within a list of values.
+- `is? not within [:value1, :value2...]`: value is not within a list of values.
 
-**For number values (i.e. integer or double):**
+**For numeric values:**
 
 - `is? > :number`: number value is greater than another number.
 - `is? greater than :number`: synonym of `> :number`
@@ -251,6 +306,13 @@ are case-sensitive, meaning that both `equal to` and `EqUaL tO` are valid.
 - `is? enabled`: synonym of `is equal to true`.
 - `is? disabled`: synonym of `is equal to false`.
 
+**For date properties:**
+
+- `is? before :date`: date value is before another date.
+- `is? not before :date`: date value is not before another date.
+- `is? after :date`: date value is after another date.
+- `is? not after :date`: date value is not after another date.
+
 ## Property values
 
 A property can be of one of the following types:
@@ -267,24 +329,21 @@ A property can be of one of the following types:
 ## Examples
 
 ```
-Spec "Production environment"
+plan "Production environment"
 
-Group "S3 validations"
-  Rule "Buckets must have access logs enabled"
-  On aws:s3:bucket
-  Assert
-    access_logs is enabled
+group "S3 validations"
+  rule "Buckets must have access logs enabled"
+  on aws:s3:bucket
+  assert access_logs is enabled
 
-Group "EC2 validations"
-  Rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
-    On aws:ec2:instance
-    With
-      tags["environment"] equal to "production"
-    Assert
-      devices (
+group "EC2 validations"
+  rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
+    on aws:ec2:instance
+    with tags["environment"] equal to "production"
+    assert devices (
         > volume (
             type equal to "gp2" and
             size gte 50
         )
-      )
+    )
 ```

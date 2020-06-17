@@ -1,28 +1,4 @@
-grammar CloudSpecCommon;
-
-setDecl: SET CONFIG_REF EQUAL_SYMBOL configValue;
-
-stringValue: STRING;
-numberValue: (INTEGER | DOUBLE);
-booleanValue: BOOLEAN;
-dateValue: DATE_STRING;
-
-singleValue: numberValue
-           | stringValue
-           | booleanValue
-           | dateValue
-           ;
-
-singleConfigValue: numberValue
-                 | stringValue
-                 | booleanValue
-                 ;
-
-arrayValue: '[' singleValue (',' singleValue)* ']';
-
-arrayConfigValue: '[' singleConfigValue (',' singleConfigValue)* ']';
-
-configValue: singleConfigValue | arrayConfigValue;
+lexer grammar CloudSpecLex;
 
 // Date value
 DATE_STRING: '"' DATE_FORMAT (' ' TIME_FORMAT)? '"';
@@ -88,6 +64,13 @@ IS_NOT_AFTER:                     (IS ' ')? NOT ' ' AFTER;
 EQUAL_SYMBOL: '=';
 
 // Vocabulary
+USE_MODULE: USE ' ' MODULE;
+USE_GROUP: USE ' ' GROUP;
+USE_RULE: USE ' ' RULE;
+END_PLAN: END ' ' PLAN;
+END_MODULE: END ' ' MODULE;
+END_GROUP: END ' ' GROUP;
+END_RULE: END ' ' RULE;
 PLAN: [Pp][Ll][Aa][Nn];
 MODULE: [Mm][Oo][Dd][Uu][Ll][Ee];
 GROUP: [Gg][Rr][Oo][Uu][Pp];
@@ -97,7 +80,10 @@ WITH: [Ww][Ii][Tt][Hh];
 ASSERT: [Aa][Ss][Ss][Ee][Rr][Tt];
 AND: [Aa][Nn][Dd];
 SET: [Ss][Ee][Tt];
-USE: [Uu][Ss][Ee];
+INPUT: [Ii][Nn][Pp][Uu][Tt];
+AS: [Aa][Ss];
+fragment USE: [Uu][Ss][Ee];
+fragment END: [Ee][Nn][Dd];
 
 fragment STARTING:   [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg];
 fragment ENDING:     [Ee][Nn][Dd][Ii][Nn][Gg];
@@ -144,6 +130,12 @@ fragment LETTER: [a-zA-Z];
 fragment LETTERS: [a-zA-Z]+;
 fragment ALPHANUM: [a-zA-Z0-9];
 fragment ALPHANUMS: [a-zA-Z0-9]+;
+
+PROPERTY_REF: LETTER [a-zA-Z0-9_]* ':' PROPERTY_TYPE;
+fragment PROPERTY_TYPE: (NUMBER_TYPE | STRING_TYPE | BOOLEAN_TYPE);
+fragment NUMBER_TYPE: 'number';
+fragment STRING_TYPE: 'string';
+fragment BOOLEAN_TYPE: 'boolean';
 
 // Resource and member references
 RESOURCE_DEF_REF: PROVIDER_NAME ':' GROUP_NAME ':' RESOURCE_NAME;

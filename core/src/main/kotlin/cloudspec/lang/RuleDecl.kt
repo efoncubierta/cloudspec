@@ -32,18 +32,20 @@ data class RuleDecl(
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
-        sb.appendln("${printTabs(tabs)}Rule \"${name}\"")
+        sb.appendln("${printTabs(tabs)}rule \"${name}\"")
 
         // add configs
         sets.forEach { sb.append(it.toCloudSpecSyntax(tabs + 1)) }
 
-        sb.appendln("${printTabs(tabs)}On $defRef")
+        sb.appendln("${printTabs(tabs)}on $defRef")
 
         // add withs
         sb.append(withs.toCloudSpecSyntax(tabs + 1))
 
         // add asserts
         sb.append(asserts.toCloudSpecSyntax(tabs + 1))
+
+        sb.appendln("${printTabs(tabs)}end rule")
 
         return sb.toString()
     }

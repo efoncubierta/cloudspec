@@ -45,7 +45,7 @@ data class AssociationStatement(
         val sb = StringBuilder()
         sb.appendln("${printTabs(tabs)}>${associationName} ( ")
         sb.appendln(
-                statements.joinToString(" And \n") { statement ->
+                statements.joinToString(" and \n") { statement ->
                     statement.toCloudSpecSyntax(tabs + 1)
                 }
         )

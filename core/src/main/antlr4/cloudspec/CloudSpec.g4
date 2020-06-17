@@ -1,14 +1,28 @@
-grammar CloudSpecModule;
+grammar CloudSpec;
 
-import CloudSpecCommon;
+import CloudSpecLex;
 
-module: setDecl* moduleDecl+;
+planDecl: PLAN STRING inputDecl* setDecl*
+          (useModuleDecl | useGroupDecl | useRuleDecl | groupDecl | ruleDecl)+
+          END_PLAN;
 
-moduleDecl: MODULE STRING setDecl* groupDecl+;
+moduleDecl: MODULE STRING inputDecl* setDecl*
+            (useModuleDecl | useGroupDecl | useRuleDecl | groupDecl | ruleDecl)+
+            END_MODULE;
 
-groupDecl: GROUP STRING setDecl* ruleDecl+;
+inputDecl: INPUT STRING AS PROPERTY_REF;
 
-ruleDecl: RULE STRING setDecl* onDecl withDecl? assertDecl;
+setDecl: SET CONFIG_REF EQUAL_SYMBOL configValue;
+
+useModuleDecl: USE_MODULE STRING;
+
+useGroupDecl: USE_GROUP STRING;
+
+useRuleDecl: USE_RULE STRING;
+
+groupDecl: GROUP STRING setDecl* (useRuleDecl | ruleDecl)+ END_GROUP;
+
+ruleDecl: RULE STRING setDecl* onDecl withDecl? assertDecl END_RULE;
 
 onDecl: ON RESOURCE_DEF_REF;
 
@@ -66,3 +80,25 @@ statement: MEMBER_NAME predicate                      # PropertyStatement
          | MEMBER_NAME '('  statement andDecl* ')'    # NestedPropertyStatement
          | '>'MEMBER_NAME '(' statement andDecl* ')'  # AssociationStatement
          ;
+
+stringValue: STRING;
+numberValue: (INTEGER | DOUBLE);
+booleanValue: BOOLEAN;
+dateValue: DATE_STRING;
+
+singleValue: numberValue
+           | stringValue
+           | booleanValue
+           | dateValue
+           ;
+
+singleConfigValue: numberValue
+                 | stringValue
+                 | booleanValue
+                 ;
+
+arrayValue: '[' singleValue (',' singleValue)* ']';
+
+arrayConfigValue: '[' singleConfigValue (',' singleConfigValue)* ']';
+
+configValue: singleConfigValue | arrayConfigValue;

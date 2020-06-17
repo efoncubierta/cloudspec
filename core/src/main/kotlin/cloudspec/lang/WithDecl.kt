@@ -28,9 +28,9 @@ data class WithDecl(val statements: List<Statement>) : CloudSpecSyntaxProducer {
 
         (statements.indices).forEach { i: Int ->
             if (i == 0) {
-                sb.appendln("${printTabs(tabs)}With")
+                sb.appendln("${printTabs(tabs)}with")
             } else {
-                sb.appendln("${printTabs(tabs)}And")
+                sb.appendln("${printTabs(tabs)}and")
             }
             sb.appendln(statements[i].toCloudSpecSyntax(tabs + 1))
         }

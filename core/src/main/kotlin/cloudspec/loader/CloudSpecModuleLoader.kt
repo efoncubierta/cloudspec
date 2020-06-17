@@ -20,8 +20,8 @@
 package cloudspec.loader
 
 import arrow.core.Some
-import cloudspec.CloudSpecModuleLexer
-import cloudspec.CloudSpecModuleParser
+import cloudspec.CloudSpecLexer
+import cloudspec.CloudSpecParser
 import cloudspec.lang.*
 import cloudspec.model.*
 import org.antlr.v4.runtime.ANTLRInputStream
@@ -50,13 +50,13 @@ class CloudSpecModuleLoader {
 
         @Throws(IOException::class)
         fun loadDeclFromInputStream(moduleIs: InputStream): ModuleDecl {
-            val lexer = CloudSpecModuleLexer(ANTLRInputStream(moduleIs))
+            val lexer = CloudSpecLexer(ANTLRInputStream(moduleIs))
             val tokens = CommonTokenStream(lexer)
-            val parser = CloudSpecModuleParser(tokens)
+            val parser = CloudSpecParser(tokens)
             parser.buildParseTree = true
-            val tree: ParseTree = parser.module()
+            val tree: ParseTree = parser.moduleDecl()
             val walker = ParseTreeWalker()
-            val listener = CloudSpecModuleListener()
+            val listener = CloudSpecListener()
             walker.walk(listener, tree)
             return listener.module
         }

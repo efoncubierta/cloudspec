@@ -24,13 +24,23 @@ package cloudspec.lang
  */
 data class PlanDecl(
         val name: String,
+        val inputs: List<InputDecl>,
         val sets: List<SetDecl>,
-        val useModules: List<UseModuleDecl>
-): CloudSpecSyntaxProducer {
+        val useModules: List<UseModuleDecl>,
+        val useGroups: List<UseGroupDecl>,
+        val useRules: List<UseRuleDecl>,
+        val groups: List<GroupDecl>,
+        val rules: List<RuleDecl>
+) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
-        sb.appendln("${printTabs(tabs)}Plan \"${name}\"")
+        sb.appendln("${printTabs(tabs)}plan \"${name}\"")
+
+        // add inputs
+        inputs.forEach { input ->
+            sb.append(input.toCloudSpecSyntax(tabs + 1))
+        }
 
         // add configs
         sets.forEach { config ->
@@ -42,7 +52,27 @@ data class PlanDecl(
             sb.append(module.toCloudSpecSyntax(tabs + 1))
         }
 
-        sb.appendln()
+        // add use groups
+        useGroups.forEach { group ->
+            sb.append(group.toCloudSpecSyntax(tabs + 1))
+        }
+
+        // add use rules
+        useRules.forEach { rule ->
+            sb.append(rule.toCloudSpecSyntax(tabs + 1))
+        }
+
+        // add groups
+        groups.forEach { group ->
+            sb.append(group.toCloudSpecSyntax(tabs + 1))
+        }
+
+        // add rules
+        rules.forEach { rule ->
+            sb.append(rule.toCloudSpecSyntax(tabs + 1))
+        }
+
+        sb.appendln("${printTabs(tabs)}end plan")
 
         return sb.toString()
     }

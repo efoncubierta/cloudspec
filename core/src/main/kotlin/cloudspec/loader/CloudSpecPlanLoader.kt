@@ -19,8 +19,8 @@
  */
 package cloudspec.loader
 
-import cloudspec.CloudSpecPlanLexer
-import cloudspec.CloudSpecPlanParser
+import cloudspec.CloudSpecLexer
+import cloudspec.CloudSpecParser
 import cloudspec.lang.PlanDecl
 import cloudspec.lang.SetDecl
 import cloudspec.lang.UseModuleDecl
@@ -47,13 +47,13 @@ class CloudSpecPlanLoader {
 
         @Throws(IOException::class)
         fun loadFromInputStream(planIs: InputStream, pwd: File = File(".")): Plan {
-            val lexer = CloudSpecPlanLexer(ANTLRInputStream(planIs))
+            val lexer = CloudSpecLexer(ANTLRInputStream(planIs))
             val tokens = CommonTokenStream(lexer)
-            val parser = CloudSpecPlanParser(tokens)
+            val parser = CloudSpecParser(tokens)
             parser.buildParseTree = true
-            val tree: ParseTree = parser.plan()
+            val tree: ParseTree = parser.planDecl()
             val walker = ParseTreeWalker()
-            val listener = CloudSpecPlanListener()
+            val listener = CloudSpecListener()
             walker.walk(listener, tree)
             return loadFromDecl(listener.plan, pwd)
         }

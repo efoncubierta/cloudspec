@@ -19,36 +19,20 @@
  */
 package cloudspec.lang
 
+import cloudspec.model.PropertyType
+
 /**
- * CloudSpec 'group' declaration.
+ * CloudSpec 'input' declaration.
  */
-data class GroupDecl(
+data class InputDecl(
         val name: String,
-        val sets: List<SetDecl>,
-        val useRules: List<UseRuleDecl>,
-        val rules: List<RuleDecl>
+        val ref: String,
+        val type: PropertyType
 ) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
-        sb.appendln("${printTabs(tabs)}group \"${name}\"")
-
-        // add config
-        sets.forEach {
-            sb.append(it.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add use rules
-        useRules.forEach { rule ->
-            sb.append(rule.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add rules
-        rules.forEach {
-            sb.append(it.toCloudSpecSyntax(tabs + 1))
-        }
-
-        sb.appendln("${printTabs(tabs)}end group")
+        sb.appendln("${printTabs(tabs)}input \"$name\" as $ref:$type")
 
         return sb.toString()
     }

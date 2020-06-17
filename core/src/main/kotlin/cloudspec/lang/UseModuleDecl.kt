@@ -28,7 +28,7 @@ data class UseModuleDecl(
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
-        sb.appendln("${printTabs(tabs)}Use Module \"${path}\"")
+        sb.appendln("${printTabs(tabs)}use module \"${path}\"")
 
         return sb.toString()
     }

@@ -54,12 +54,13 @@ object CloudSpecGenerator {
 
     fun randomPlanDecl(): PlanDecl {
         return PlanDecl(faker.lorem().sentence(),
+                        listOf(randomInputDecl(), randomInputDecl()),
                         listOf(randomSetDecl(), randomSetDecl()),
-                        listOf(randomUseModuleDecl(), randomUseModuleDecl()))
-    }
-
-    fun randomUseModuleDecl(): UseModuleDecl {
-        return UseModuleDecl(faker.file().fileName())
+                        listOf(randomUseModuleDecl(), randomUseModuleDecl()),
+                        listOf(randomUseGroupDecl(), randomUseGroupDecl()),
+                        listOf(randomUseRuleDecl(), randomUseRuleDecl()),
+                        listOf(randomGroupDecl(), randomGroupDecl()),
+                        listOf(randomRuleDecl(), randomRuleDecl()))
     }
 
     fun randomModule(): Module {
@@ -69,8 +70,25 @@ object CloudSpecGenerator {
 
     fun randomModuleDecl(): ModuleDecl {
         return ModuleDecl(faker.lorem().sentence(),
+                          listOf(randomInputDecl(), randomInputDecl()),
                           listOf(randomSetDecl(), randomSetDecl()),
-                          listOf(randomGroupDecl(), randomGroupDecl()))
+                          listOf(randomUseModuleDecl(), randomUseModuleDecl()),
+                          listOf(randomUseGroupDecl(), randomUseGroupDecl()),
+                          listOf(randomUseRuleDecl(), randomUseRuleDecl()),
+                          listOf(randomGroupDecl(), randomGroupDecl()),
+                          listOf(randomRuleDecl(), randomRuleDecl()))
+    }
+
+    fun randomUseModuleDecl(): UseModuleDecl {
+        return UseModuleDecl(faker.file().fileName())
+    }
+
+    fun randomUseGroupDecl(): UseGroupDecl {
+        return UseGroupDecl(faker.file().fileName())
+    }
+
+    fun randomUseRuleDecl(): UseRuleDecl {
+        return UseRuleDecl(faker.file().fileName())
     }
 
     fun randomGroup(): Group {
@@ -81,6 +99,7 @@ object CloudSpecGenerator {
     fun randomGroupDecl(): GroupDecl {
         return GroupDecl(faker.lorem().sentence(),
                          listOf(randomSetDecl(), randomSetDecl()),
+                         listOf(randomUseRuleDecl(), randomUseRuleDecl()),
                          listOf(randomRuleDecl(), randomRuleDecl()))
     }
 
@@ -99,6 +118,10 @@ object CloudSpecGenerator {
                         listOf(randomSetDecl(), randomSetDecl()),
                         randomWithDecl(),
                         randomAssertDecl())
+    }
+
+    fun randomInputDecl(): InputDecl {
+        return InputDecl(faker.lorem().sentence(), faker.lorem().word(), randomPropertyType())
     }
 
     fun randomSetDecl(): SetDecl {

@@ -19,36 +19,29 @@
  */
 package cloudspec.loader
 
-import cloudspec.CloudSpecModuleBaseListener
-import cloudspec.CloudSpecModuleParser.*
+import cloudspec.CloudSpecBaseListener
+import cloudspec.CloudSpecParser.*
 import cloudspec.lang.*
-import cloudspec.lang.predicate.DateP.Companion.after
-import cloudspec.lang.predicate.DateP.Companion.before
-import cloudspec.lang.predicate.DateP.Companion.between
-import cloudspec.lang.predicate.DateP.Companion.notAfter
-import cloudspec.lang.predicate.DateP.Companion.notBefore
-import cloudspec.lang.predicate.IPAddressP.Companion.eq
-import cloudspec.lang.predicate.IPAddressP.Companion.gt
-import cloudspec.lang.predicate.IPAddressP.Companion.gte
-import cloudspec.lang.predicate.IPAddressP.Companion.isIpv4
-import cloudspec.lang.predicate.IPAddressP.Companion.isIpv6
-import cloudspec.lang.predicate.IPAddressP.Companion.lt
-import cloudspec.lang.predicate.IPAddressP.Companion.lte
-import cloudspec.lang.predicate.IPAddressP.Companion.neq
-import cloudspec.lang.predicate.IPAddressP.Companion.withinNetwork
-import cloudspec.lang.predicate.IPAddressP.Companion.withoutNetwork
+import cloudspec.lang.predicate.DateP
+import cloudspec.lang.predicate.IPAddressP
+import cloudspec.model.PropertyType
 import org.apache.commons.lang3.time.DateUtils
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.TextP
 import java.text.ParseException
 import java.util.*
 
-class CloudSpecModuleListener : CloudSpecModuleBaseListener() {
-    private val currentDefRef = Stack<String>()
-    private val currentSets = Stack<Stack<SetDecl>>()
+class CloudSpecListener : CloudSpecBaseListener() {
+    private val currentPlans = Stack<PlanDecl>()
     private val currentModules = Stack<ModuleDecl>()
-    private val currentGroups = Stack<GroupDecl>()
-    private val currentRules = Stack<RuleDecl>()
+    private val currentInputs = Stack<Stack<InputDecl>>()
+    private val currentSets = Stack<Stack<SetDecl>>()
+    private val currentDefRef = Stack<String>()
+    private val currentUseModules = Stack<Stack<UseModuleDecl>>()
+    private val currentUseGroups = Stack<Stack<UseGroupDecl>>()
+    private val currentUseRules = Stack<Stack<UseRuleDecl>>()
+    private val currentGroups = Stack<Stack<GroupDecl>>()
+    private val currentRules = Stack<Stack<RuleDecl>>()
     private val currentWiths = Stack<WithDecl>()
     private val currentAsserts = Stack<AssertDecl>()
     private val currentMemberNames = Stack<Stack<String>>()
@@ -56,37 +49,90 @@ class CloudSpecModuleListener : CloudSpecModuleBaseListener() {
     private val currentValues = Stack<Any>()
     private var currentPredicate: P<*>? = null
 
-    init {
-        currentSets.push(Stack()) // plan configs
-    }
+    val plan: PlanDecl
+        get() = currentPlans.pop()
 
     val module: ModuleDecl
         get() = currentModules.pop()
 
-    override fun exitSetDecl(ctx: SetDeclContext) {
-        currentSets.peek().push(SetDecl(stripQuotes(ctx.CONFIG_REF().text), currentValues.pop()))
+    override fun enterPlanDecl(ctx: PlanDeclContext?) {
+        currentInputs.push(Stack())
+        currentSets.push(Stack())
+        currentUseModules.push(Stack())
+        currentUseGroups.push(Stack())
+        currentUseRules.push(Stack())
+        currentGroups.push(Stack())
+        currentRules.push(Stack())
+    }
+
+    override fun exitPlanDecl(ctx: PlanDeclContext) {
+        currentPlans.push(PlanDecl(stripQuotes(ctx.STRING().text),
+                                   currentInputs.pop().toList(),
+                                   currentSets.pop().toList(),
+                                   currentUseModules.pop().toList(),
+                                   currentUseGroups.pop().toList(),
+                                   currentUseRules.pop().toList(),
+                                   currentGroups.pop().toList(),
+                                   currentRules.pop().toList()))
     }
 
     override fun enterModuleDecl(ctx: ModuleDeclContext) {
+        currentInputs.push(Stack())
         currentSets.push(Stack())
+        currentUseModules.push(Stack())
+        currentUseGroups.push(Stack())
+        currentUseRules.push(Stack())
+        currentGroups.push(Stack())
+        currentRules.push(Stack())
     }
 
     override fun exitModuleDecl(ctx: ModuleDeclContext) {
         currentModules.push(ModuleDecl(stripQuotes(ctx.STRING().text),
+                                       currentInputs.pop().toList(),
                                        currentSets.pop().toList(),
-                                       currentGroups.toList()))
-        currentGroups.clear()
+                                       currentUseModules.pop().toList(),
+                                       currentUseGroups.pop().toList(),
+                                       currentUseRules.pop().toList(),
+                                       currentGroups.pop().toList(),
+                                       currentRules.pop().toList()))
+    }
+
+    override fun exitInputDecl(ctx: InputDeclContext) {
+        val propertyRef = stripQuotes(ctx.PROPERTY_REF().text).split(":")
+
+        currentInputs.peek().push(InputDecl(stripQuotes(ctx.STRING().text),
+                                            propertyRef[0],
+                                            PropertyType.valueOf(propertyRef[1].toUpperCase())))
+    }
+
+    override fun exitSetDecl(ctx: SetDeclContext) {
+        currentSets.peek().push(SetDecl(stripQuotes(ctx.CONFIG_REF().text),
+                                        currentValues.pop()))
+    }
+
+    override fun exitUseModuleDecl(ctx: UseModuleDeclContext) {
+        currentUseModules.peek().push(UseModuleDecl(stripQuotes(ctx.STRING().text)))
+    }
+
+    override fun exitUseGroupDecl(ctx: UseGroupDeclContext) {
+        currentUseGroups.peek().push(UseGroupDecl(stripQuotes(ctx.STRING().text)))
+    }
+
+    override fun exitUseRuleDecl(ctx: UseRuleDeclContext) {
+        currentUseRules.peek().push(UseRuleDecl(stripQuotes(ctx.STRING().text)))
     }
 
     override fun enterGroupDecl(ctx: GroupDeclContext) {
         currentSets.push(Stack())
+        currentUseRules.push(Stack())
+        currentRules.push(Stack())
     }
 
     override fun exitGroupDecl(ctx: GroupDeclContext) {
-        currentGroups.push(GroupDecl(stripQuotes(ctx.STRING().text),
-                                     currentSets.pop().toList(),
-                                     currentRules.toList()))
-        currentRules.clear()
+        currentGroups.peek().push(GroupDecl(stripQuotes(ctx.STRING().text),
+                                            currentSets.pop().toList(),
+                                            currentUseRules.pop().toList(),
+                                            currentRules.pop().toList()))
     }
 
     override fun enterRuleDecl(ctx: RuleDeclContext) {
@@ -95,11 +141,11 @@ class CloudSpecModuleListener : CloudSpecModuleBaseListener() {
     }
 
     override fun exitRuleDecl(ctx: RuleDeclContext) {
-        currentRules.push(RuleDecl(stripQuotes(ctx.STRING().text),
-                                   currentDefRef.pop(),
-                                   currentSets.pop().toList(),
-                                   if (!currentWiths.empty()) currentWiths.pop() else WithDecl(emptyList()),
-                                   currentAsserts.pop()))
+        currentRules.peek().push(RuleDecl(stripQuotes(ctx.STRING().text),
+                                          currentDefRef.pop(),
+                                          currentSets.pop().toList(),
+                                          if (!currentWiths.empty()) currentWiths.pop() else WithDecl(emptyList()),
+                                          currentAsserts.pop()))
     }
 
     override fun enterOnDecl(ctx: OnDeclContext) {
@@ -257,43 +303,43 @@ class CloudSpecModuleListener : CloudSpecModuleBaseListener() {
     }
 
     override fun exitIpAddressEqualPredicate(ctx: IpAddressEqualPredicateContext) {
-        currentPredicate = eq(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.eq(currentValues.pop() as String?)
     }
 
     override fun exitIpAddressNotEqualPredicate(ctx: IpAddressNotEqualPredicateContext) {
-        currentPredicate = neq(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.neq(currentValues.pop() as String?)
     }
 
     override fun exitIpAddressLessThanPredicate(ctx: IpAddressLessThanPredicateContext) {
-        currentPredicate = lt(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.lt(currentValues.pop() as String?)
     }
 
     override fun exitIpAddressLessThanEqualPredicate(ctx: IpAddressLessThanEqualPredicateContext) {
-        currentPredicate = lte(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.lte(currentValues.pop() as String?)
     }
 
     override fun exitIpAddressGreaterThanPredicate(ctx: IpAddressGreaterThanPredicateContext) {
-        currentPredicate = gt(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.gt(currentValues.pop() as String?)
     }
 
     override fun exitIpAddressGreaterThanEqualPredicate(ctx: IpAddressGreaterThanEqualPredicateContext) {
-        currentPredicate = gte(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.gte(currentValues.pop() as String?)
     }
 
     override fun exitIpWithinNetworkPredicate(ctx: IpWithinNetworkPredicateContext) {
-        currentPredicate = withinNetwork(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.withinNetwork(currentValues.pop() as String?)
     }
 
     override fun exitIpNotWithinNetworkPredicate(ctx: IpNotWithinNetworkPredicateContext) {
-        currentPredicate = withoutNetwork(currentValues.pop() as String?)
+        currentPredicate = IPAddressP.withoutNetwork(currentValues.pop() as String?)
     }
 
     override fun exitIpIsIpv4Predicate(ctx: IpIsIpv4PredicateContext) {
-        currentPredicate = isIpv4
+        currentPredicate = IPAddressP.isIpv4
     }
 
     override fun exitIpIsIpv6Predicate(ctx: IpIsIpv6PredicateContext) {
-        currentPredicate = isIpv6
+        currentPredicate = IPAddressP.isIpv6
     }
 
     override fun exitEnabledPredicate(ctx: EnabledPredicateContext) {
@@ -305,23 +351,23 @@ class CloudSpecModuleListener : CloudSpecModuleBaseListener() {
     }
 
     override fun exitDateBeforePredicate(ctx: DateBeforePredicateContext) {
-        currentPredicate = before((currentValues.pop() as Date?)?.toInstant())
+        currentPredicate = DateP.before((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateNotBeforePredicate(ctx: DateNotBeforePredicateContext) {
-        currentPredicate = notBefore((currentValues.pop() as Date?)?.toInstant())
+        currentPredicate = DateP.notBefore((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateAfterPredicate(ctx: DateAfterPredicateContext) {
-        currentPredicate = after((currentValues.pop() as Date?)?.toInstant())
+        currentPredicate = DateP.after((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateNotAfterPredicate(ctx: DateNotAfterPredicateContext) {
-        currentPredicate = notAfter((currentValues.pop() as Date?)?.toInstant())
+        currentPredicate = DateP.notAfter((currentValues.pop() as Date?)?.toInstant())
     }
 
     override fun exitDateBetweenPredicate(ctx: DateBetweenPredicateContext) {
-        currentPredicate = between((currentValues[0] as Date?)?.toInstant(), (currentValues[1] as Date?)?.toInstant())
+        currentPredicate = DateP.between((currentValues[0] as Date?)?.toInstant(), (currentValues[1] as Date?)?.toInstant())
         currentValues.clear()
     }
 

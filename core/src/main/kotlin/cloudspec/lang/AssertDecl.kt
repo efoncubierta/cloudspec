@@ -28,9 +28,9 @@ data class AssertDecl(val statements: List<Statement>) : CloudSpecSyntaxProducer
 
         (statements.indices).forEach { i ->
             if (i == 0) {
-                sb.appendln("${printTabs(tabs)}Assert")
+                sb.appendln("${printTabs(tabs)}assert")
             } else {
-                sb.appendln("${printTabs(tabs)}And")
+                sb.appendln("${printTabs(tabs)}and")
             }
             sb.appendln(statements[i].toCloudSpecSyntax(tabs + 1))
         }
