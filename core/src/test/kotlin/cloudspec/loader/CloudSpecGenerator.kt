@@ -49,7 +49,9 @@ object CloudSpecGenerator {
 
     fun randomPlan(): Plan {
         return Plan(faker.lorem().sentence(),
-                    listOf(randomModule(), randomModule()))
+                    listOf(randomModule(), randomModule()),
+                    listOf(randomGroup(), randomGroup()),
+                    listOf(randomRule(), randomRule()))
     }
 
     fun randomPlanDecl(): PlanDecl {
@@ -65,7 +67,9 @@ object CloudSpecGenerator {
 
     fun randomModule(): Module {
         return Module(faker.lorem().sentence(),
-                      listOf(randomGroup(), randomGroup()))
+                      listOf(randomModule(), randomModule()),
+                      listOf(randomGroup(), randomGroup()),
+                      listOf(randomRule(), randomRule()))
     }
 
     fun randomModuleDecl(): ModuleDecl {

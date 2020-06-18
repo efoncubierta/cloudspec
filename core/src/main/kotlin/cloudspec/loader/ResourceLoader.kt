@@ -41,15 +41,31 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
     fun load(plan: Plan) {
         logger.info("Loading resources required to run this test")
 
-        plan.modules
-            .flatMap { (_, groups) -> groups }
-            .forEach {
-                loadFromGroup(it)
-            }
+        loadFromModules(plan.modules)
+        loadFromGroups(plan.groups)
+        loadFromRules(plan.rules)
+    }
+
+    private fun loadFromModules(modules: List<Module>) {
+        modules.forEach { loadFromModule(it) }
+    }
+
+    private fun loadFromModule(module: Module) {
+        loadFromModules(module.modules)
+        loadFromGroups(module.groups)
+        loadFromRules(module.rules)
+    }
+
+    private fun loadFromGroups(groups: List<Group>) {
+        groups.forEach { loadFromGroup(it) }
     }
 
     private fun loadFromGroup(group: Group) {
-        group.rules.forEach { loadFromRule(it) }
+        loadFromRules(group.rules)
+    }
+
+    private fun loadFromRules(rules: List<Rule>) {
+        rules.forEach { loadFromRule(it) }
     }
 
     private fun loadFromRule(rule: Rule) {

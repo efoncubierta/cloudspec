@@ -24,6 +24,7 @@ import cloudspec.lang.ModuleDecl
 import cloudspec.lang.RuleDecl
 import org.junit.Test
 import java.io.ByteArrayInputStream
+import java.io.File
 import kotlin.test.assertEquals
 
 class ModuleDeclLoaderTest {
@@ -32,7 +33,9 @@ class ModuleDeclLoaderTest {
         val moduleOriginal = CloudSpecGenerator.randomModuleDecl()
 
         val moduleLoaded = CloudSpecModuleLoader.loadDeclFromInputStream(
-                ByteArrayInputStream(moduleOriginal.toCloudSpecSyntax().toByteArray())
+                ByteArrayInputStream(moduleOriginal.toCloudSpecSyntax().toByteArray()),
+                File("."),
+                emptyList()
         )
 
         compareModules(moduleOriginal, moduleLoaded)

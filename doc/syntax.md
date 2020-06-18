@@ -332,11 +332,14 @@ A property can be of one of the following types:
 
 ## `use` declaration
 
-TBC
+This is used to compose a spec with multiple files. Modules, groups and rules can be defined and imported into a plan
+from other files.
 
 ```
 use (module|group|rule) :file_path
 ```
+
+Where `:file_path` is a system path that is either absolute or relative to the file importing it.
 
 ## `input` declaration
 
@@ -348,11 +351,19 @@ input :input_name as :input_def
 
 ## `set` declaration
 
-TBC
+CloudSpec have global configuration parameters, or variables. All configuration parameters have a default value. Each
+provider define its own configuration parameters. For example, the AWS provider defines an `aws:regions` configuration
+parameter that allows you to limit the resource crawling and validation to a set of regions. Its default value is
+_ALL REGIONS_.
 
 ```
 set :config_ref = :value
 ```
+
+Where `:config_ref` is the configuration reference, for example `aws:regions`, and value is either a `number`, a
+`string` or a `boolean` value.
+
+For a complete list of supported configurations, see the CloudSpec [reference documentation](/doc/providers/index.md)
 
 ## Examples
 

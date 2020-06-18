@@ -24,7 +24,6 @@ import cloudspec.validator.*
 import com.diogonunes.jcdp.color.ColoredPrinter
 import com.diogonunes.jcdp.color.api.Ansi
 import org.apache.commons.lang3.StringUtils
-import kotlin.math.round
 
 class ConsoleReporter {
     companion object {
@@ -44,46 +43,58 @@ class ConsoleReporter {
                        ),
                        listOf(
                                PrintTableRow(
-                                       toTableCells("${margin(0)}${planResult.name}", planResult.stats)
+                                       toTableCells("${printMargin(0)}${planResult.name}", planResult.stats)
                                )
                        ).plus(
-                               planResult.results.flatMap { toTableRows(it) }
+                               planResult.results.flatMap { toTableRows(it, 2) }
                        )).print()
 
             printErrors()
         }
 
-        private fun toTableRows(moduleResult: ModuleResult): List<PrintTableRow> {
+        private fun toTableRows(result: Result, margin: Int): List<PrintTableRow> {
+            return when (result) {
+                is ModuleResult -> toTableRows(result, margin)
+                is GroupResult -> toTableRows(result, margin)
+                is RuleResult -> toTableRows(result, margin)
+                else -> emptyList()
+            }
+        }
+
+        private fun toTableRows(moduleResult: ModuleResult, margin: Int): List<PrintTableRow> {
             return listOf(
                     PrintTableRow(
-                            toTableCells("${margin(1)}${moduleResult.name}", moduleResult.stats)
+                            toTableCells("[M]${printMargin(margin)}${moduleResult.name}", moduleResult.stats)
                     )
             ).plus(
-                    moduleResult.results.flatMap { toTableRows(it) }
+                    moduleResult.results.flatMap { toTableRows(it, margin + 2) }
             )
         }
 
-        private fun toTableRows(groupResult: GroupResult): List<PrintTableRow> {
+        private fun toTableRows(groupResult: GroupResult, margin: Int): List<PrintTableRow> {
             return listOf(
                     PrintTableRow(
-                            toTableCells("${margin(2)}${groupResult.name}", groupResult.stats)
+                            toTableCells("[G]${printMargin(margin)}${groupResult.name}", groupResult.stats)
                     )
             ).plus(
-                    groupResult.results.flatMap { toTableRows(it) }
+                    groupResult.results.flatMap { toTableRows(it, margin + 2) }
             )
         }
 
-        private fun toTableRows(ruleResult: RuleResult): List<PrintTableRow> {
+        private fun toTableRows(ruleResult: RuleResult, margin: Int): List<PrintTableRow> {
             if (!ruleResult.success) {
                 errors.add(ruleResult)
             }
 
             return listOf(
                     PrintTableRow(
-                            toTableCells("${margin(3)}${ruleResult.name}", ruleResult.stats)
+                            toTableCells("[R]${printMargin(margin)}${ruleResult.name}",
+                                         ruleResult.stats)
                     )
             )
         }
+
+
 
         private fun printErrors() {
             (errors.indices).forEach {
@@ -113,39 +124,39 @@ class ConsoleReporter {
                         .filter { !it.success }
                         .forEach { (path, assertError) ->
                             println()
-                            cp.println("${margin(1)}${path.toPathString()}",
+                            cp.println("${printMargin(1)}${path.toPathString()}",
                                        Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                             when (assertError) {
                                 is AssertMismatchError -> {
                                     val (condition, expected, actual) = assertError
-                                    cp.print("${margin(2)}Expected: ",
+                                    cp.print("${printMargin(2)}Expected: ",
                                              Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
                                     cp.println("$condition ${valueToCloudSpecSyntax(expected)}",
                                                Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
-                                    cp.print("${margin(2)}Actual: ",
+                                    cp.print("${printMargin(2)}Actual: ",
                                              Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
                                     cp.println(valueToCloudSpecSyntax(actual),
                                                Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                                 }
                                 is AssertRangeError -> {
                                     val (condition, expectedLeft, expectedRight, actual) = assertError
-                                    cp.print("${margin(2)}Expected: ",
+                                    cp.print("${printMargin(2)}Expected: ",
                                              Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
                                     cp.println("$condition ${valueToCloudSpecSyntax(expectedLeft)} and ${valueToCloudSpecSyntax(expectedRight)}",
                                                Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
-                                    cp.print("${margin(2)}Actual: ",
+                                    cp.print("${printMargin(2)}Actual: ",
                                              Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.NONE)
                                     cp.println(valueToCloudSpecSyntax(actual),
                                                Ansi.Attribute.NONE, Ansi.FColor.WHITE, Ansi.BColor.NONE)
                                 }
                                 is AssertNotFoundError -> {
-                                    cp.print("${margin(2)}Error: ",
+                                    cp.print("${printMargin(2)}Error: ",
                                              Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
                                     cp.println(assertError.message,
                                                Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
                                 }
                                 is AssertUnknownError -> {
-                                    cp.print("${margin(2)}Error: ",
+                                    cp.print("${printMargin(2)}Error: ",
                                              Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE)
                                     cp.println(assertError.message,
                                                Ansi.Attribute.NONE, Ansi.FColor.RED, Ansi.BColor.NONE)
@@ -185,7 +196,7 @@ class ConsoleReporter {
             }
         }
 
-        private fun margin(n: Int): String {
+        private fun printMargin(n: Int): String {
             return " ".repeat(n)
         }
     }
@@ -233,7 +244,7 @@ data class PrintTable(val cp: ColoredPrinter,
     private fun printRow(row: PrintTableRow) {
         printSep()
         (columns.indices).forEach { i ->
-            printCell(row.cells[i].value, columns[i].width, row.cells[i].centered, row.cells[i].fcolor)
+            printCell(row.cells[i].value, columns[i].width, row.cells[i].centered, row.cells[i].fcolor, i == 0)
             printSep()
         }
         println()
@@ -243,14 +254,23 @@ data class PrintTable(val cp: ColoredPrinter,
         cp.print(separator)
     }
 
-    private fun printCell(value: String, width: Int, centered: Boolean = false, fcolor: Ansi.FColor = Ansi.FColor.WHITE) {
-        val strValue = if(centered) StringUtils.center(value, width) else value
-        cp.print("${margin()}%-${width}s${margin()}".format(strValue),
+    private fun printCell(value: String, width: Int, centered: Boolean = false,
+                          fcolor: Ansi.FColor = Ansi.FColor.WHITE, trim: Boolean = false) {
+        val strValue = if (centered) StringUtils.center(value, width) else value
+        cp.print("${margin()}%-${width}s${margin()}".format(if(trim) trimAndPad(strValue, width) else strValue),
                  Ansi.Attribute.NONE, fcolor, Ansi.BColor.NONE)
     }
 
     private fun margin(): String {
         return " ".repeat(cellMargin)
+    }
+
+    private fun trimAndPad(str: String, width: Int): String {
+        if (str.length > (width - 3)) {
+            return str.substring(0, width - 3).padEnd(width, '.')
+        }
+
+        return str
     }
 }
 

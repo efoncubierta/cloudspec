@@ -24,5 +24,7 @@ package cloudspec.model
  */
 data class Plan(
         val name: String,
-        val modules: List<Module>
+        val modules: List<Module>,
+        val groups: List<Group>,
+        val rules: List<Rule>
 )

@@ -60,6 +60,7 @@ class CloudSpecPreflightTest {
         val plan = Plan(randomName(),
                         listOf(
                                 Module(randomName(),
+                                       emptyList(),
                                        listOf(
                                                Group(randomName(),
                                                      listOf(
@@ -69,8 +70,11 @@ class CloudSpecPreflightTest {
                                                                   emptyList(),
                                                                   listOf(randomConfigValue()))
                                                      ))
-                                       ))
-                        ))
+                                       ),
+                                       emptyList())
+                        ),
+                        emptyList(),
+                        emptyList())
 
         assertFails {
             preflight.preflight(plan)
@@ -82,6 +86,7 @@ class CloudSpecPreflightTest {
         val plan = Plan(randomName(),
                         listOf(
                                 Module(randomName(),
+                                       emptyList(),
                                        listOf(
                                                Group(randomName(),
                                                      listOf(
@@ -91,8 +96,11 @@ class CloudSpecPreflightTest {
                                                                   emptyList(),
                                                                   emptyList())
                                                      ))
-                                       ))
-                        ))
+                                       ),
+                                       emptyList())
+                        ),
+                        emptyList(),
+                        emptyList())
 
         assertFails {
             preflight.preflight(plan)
@@ -107,6 +115,7 @@ class CloudSpecPreflightTest {
         val plan = Plan(randomName(),
                         listOf(
                                 Module(randomName(),
+                                       emptyList(),
                                        listOf(
                                                Group(randomName(),
                                                      listOf(
@@ -119,8 +128,11 @@ class CloudSpecPreflightTest {
                                                                   emptyList(),
                                                                   emptyList())
                                                      ))
-                                       ))
-                        ))
+                                       ),
+                                       emptyList())
+                        ),
+                        emptyList(),
+                        emptyList())
 
         assertFails {
             preflight.preflight(plan)
@@ -135,6 +147,7 @@ class CloudSpecPreflightTest {
         val plan = Plan(randomName(),
                         listOf(
                                 Module(randomName(),
+                                       emptyList(),
                                        listOf(
                                                Group(randomName(),
                                                      listOf(
@@ -148,8 +161,11 @@ class CloudSpecPreflightTest {
                                                                   emptyList(),
                                                                   emptyList())
                                                      ))
-                                       ))
-                        ))
+                                       ),
+                                       emptyList())
+                        ),
+                        emptyList(),
+                        emptyList())
 
         assertFails {
             preflight.preflight(plan)
@@ -164,6 +180,7 @@ class CloudSpecPreflightTest {
         val plan = Plan(randomName(),
                         listOf(
                                 Module(randomName(),
+                                       emptyList(),
                                        listOf(
                                                Group(randomName(),
                                                      listOf(
@@ -179,10 +196,12 @@ class CloudSpecPreflightTest {
                                                                   emptyList(),
                                                                   emptyList()
                                                              ))
-                                               ))
-                                )
-                        )
-        )
+                                               )
+                                       ),
+                                       emptyList())
+                        ),
+                        emptyList(),
+                        emptyList())
 
         assertFails {
             preflight.preflight(plan)
@@ -197,6 +216,7 @@ class CloudSpecPreflightTest {
         val plan = Plan(randomName(),
                         listOf(
                                 Module(randomName(),
+                                       emptyList(),
                                        listOf(
                                                Group(randomName(),
                                                      listOf(
@@ -209,8 +229,11 @@ class CloudSpecPreflightTest {
                                                                   emptyList(),
                                                                   emptyList())
                                                      ))
-                                       ))
-                        ))
+                                       ),
+                                       emptyList())
+                        ),
+                        emptyList(),
+                        emptyList())
 
         assertFails {
             preflight.preflight(plan)

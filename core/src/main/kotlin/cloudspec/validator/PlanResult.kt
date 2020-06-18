@@ -22,40 +22,45 @@ package cloudspec.validator
 import cloudspec.model.Path
 import cloudspec.model.ResourceRef
 
-data class PlanResult(val name: String,
-                      val results: List<ModuleResult>) {
-    val success
+sealed class Result(open val name: String) {
+    abstract val success: Boolean
+    abstract val stats: Stats
+}
+
+data class PlanResult(override val name: String,
+                      val results: List<Result>) : Result(name) {
+    override val success
         get() = results.all { it.success }
 
-    val stats
+    override val stats
         get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
 }
 
-data class ModuleResult(val name: String,
-                        val results: List<GroupResult>) {
-    val success
+data class ModuleResult(override val name: String,
+                        val results: List<Result>) : Result(name) {
+    override val success
         get() = results.all { it.success }
 
-    val stats
+    override val stats
         get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
 }
 
-data class GroupResult(val name: String,
-                       val results: List<RuleResult>) {
-    val success
+data class GroupResult(override val name: String,
+                       val results: List<RuleResult>) : Result(name) {
+    override val success
         get() = results.all { it.success }
 
-    val stats
+    override val stats
         get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
 }
 
-data class RuleResult(val name: String,
+data class RuleResult(override val name: String,
                       val results: List<ResourceResult> = emptyList(),
-                      val error: Throwable? = null) {
-    val success
+                      val error: Throwable? = null) : Result(name) {
+    override val success
         get() = error == null && results.all { it.success }
 
-    val stats
+    override val stats
         get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
 }
 

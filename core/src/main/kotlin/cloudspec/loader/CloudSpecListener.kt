@@ -55,6 +55,12 @@ class CloudSpecListener : CloudSpecBaseListener() {
     val module: ModuleDecl
         get() = currentModules.pop()
 
+    val group: GroupDecl
+        get() = currentGroups.pop().pop()
+
+    val rule: RuleDecl
+        get() = currentRules.pop().pop()
+
     override fun enterPlanDecl(ctx: PlanDeclContext?) {
         currentInputs.push(Stack())
         currentSets.push(Stack())

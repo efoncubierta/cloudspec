@@ -22,9 +22,6 @@ package cloudspec.loader
 import cloudspec.CloudSpecLexer
 import cloudspec.CloudSpecParser
 import cloudspec.lang.PlanDecl
-import cloudspec.lang.SetDecl
-import cloudspec.lang.UseModuleDecl
-import cloudspec.model.Module
 import cloudspec.model.Plan
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
@@ -46,7 +43,7 @@ class CloudSpecPlanLoader {
         }
 
         @Throws(IOException::class)
-        fun loadFromInputStream(planIs: InputStream, pwd: File = File(".")): Plan {
+        fun loadFromInputStream(planIs: InputStream, parentDir: File): Plan {
             val lexer = CloudSpecLexer(ANTLRInputStream(planIs))
             val tokens = CommonTokenStream(lexer)
             val parser = CloudSpecParser(tokens)
@@ -55,24 +52,26 @@ class CloudSpecPlanLoader {
             val walker = ParseTreeWalker()
             val listener = CloudSpecListener()
             walker.walk(listener, tree)
-            return loadFromDecl(listener.plan, pwd)
+            return loadFromDecl(listener.plan, parentDir)
         }
 
         @Throws(IOException::class)
-        fun loadFromDecl(planDecl: PlanDecl, pwd: File = File(".")): Plan {
+        fun loadFromDecl(planDecl: PlanDecl, parentDir: File): Plan {
             return Plan(planDecl.name,
-                        planDecl.useModules.map { loadUseModule(it, planDecl.sets, pwd) })
+                        planDecl.useModules.map {
+                            CloudSpecModuleLoader.loadUseModule(it, parentDir, planDecl.sets)
+                        },
+                        planDecl.useGroups.map {
+                            CloudSpecGroupLoader.loadUseGroup(it, parentDir, planDecl.sets)
+                        }.plus(planDecl.groups.map {
+                            CloudSpecGroupLoader.loadFromDecl(it, parentDir, planDecl.sets)
+                        }),
+                        planDecl.useRules.map {
+                            CloudSpecRuleLoader.loadUseRule(it, parentDir, planDecl.sets)
+                        }.plus(planDecl.rules.map {
+                            CloudSpecRuleLoader.loadFromDecl(it, planDecl.sets)
+                        }))
 
-        }
-
-        private fun loadUseModule(useModuleDecl: UseModuleDecl, planSets: List<SetDecl>, pwd: File): Module {
-            try {
-                val moduleFile = File(pwd, useModuleDecl.path)
-                return CloudSpecModuleLoader.loadFromFile(moduleFile, planSets)
-            } catch (e: IOException) {
-                logger.error("Error loading module ${useModuleDecl.path}: ${e.message}")
-                throw e
-            }
         }
     }
 }

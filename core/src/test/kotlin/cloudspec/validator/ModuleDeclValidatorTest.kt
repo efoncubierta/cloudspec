@@ -43,25 +43,43 @@ class ModuleDeclValidatorTest {
     @Test
     fun shouldValidatePlan() {
         val validator = CloudSpecValidator(resourceValidator)
-        val (planName, moduleResults) = validator.validate(CloudSpecTestUtils.TEST_PLAN)
+        val result = validator.validate(CloudSpecTestUtils.TEST_PLAN)
+        validateResult(result)
+    }
 
-        assertEquals(CloudSpecTestUtils.TEST_PLAN_NAME, planName)
-        assertEquals(1, moduleResults.size)
-
-        moduleResults.forEach { (moduleName, groupResults) ->
-            assertEquals(CloudSpecTestUtils.TEST_MODULE_NAME, moduleName)
-            assertEquals(1, groupResults.size)
-
-            groupResults.forEach { (groupName, ruleResults) ->
-                assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupName)
-                assertEquals(1, ruleResults.size)
-
-                ruleResults.forEach { ruleResult: RuleResult ->
-                    assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.name)
-                    assertTrue(ruleResult.success)
-                    assertNull(ruleResult.error)
-                }
-            }
+    private fun validateResult(result: Result) {
+        when (result) {
+            is PlanResult -> validateResult(result)
+            is ModuleResult -> validateResult(result)
+            is GroupResult -> validateResult(result)
+            is RuleResult -> validateResult(result)
         }
+    }
+
+    private fun validateResult(planResult: PlanResult) {
+        assertEquals(CloudSpecTestUtils.TEST_PLAN_NAME, planResult.name)
+        assertEquals(3, planResult.results.size)
+
+        planResult.results.forEach { validateResult(it) }
+    }
+
+    private fun validateResult(moduleResult: ModuleResult) {
+        assertEquals(CloudSpecTestUtils.TEST_MODULE_NAME, moduleResult.name)
+        assertEquals(2, moduleResult.results.size)
+
+        moduleResult.results.forEach { validateResult(it) }
+    }
+
+    private fun validateResult(groupResult: GroupResult) {
+        assertEquals(CloudSpecTestUtils.TEST_SPEC_GROUP_NAME, groupResult.name)
+        assertEquals(1, groupResult.results.size)
+
+        groupResult.results.forEach { validateResult(it) }
+    }
+
+    private fun validateResult(ruleResult: RuleResult) {
+        assertEquals(CloudSpecTestUtils.TEST_SPEC_RULE_NAME, ruleResult.name)
+        assertTrue(ruleResult.success)
+        assertNull(ruleResult.error)
     }
 }

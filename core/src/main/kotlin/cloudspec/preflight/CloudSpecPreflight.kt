@@ -37,6 +37,8 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
     fun preflight(plan: Plan) {
         logger.info("Validating CloudSpec input")
         preflightModules(plan.modules)
+        preflightGroups(plan.groups)
+        preflightRules(plan.rules)
     }
 
     private fun preflightModules(modules: List<Module>) {
@@ -46,6 +48,8 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
     private fun preflightModule(module: Module) {
         logger.debug("Preflight of module {}", module.name)
         preflightGroups(module.groups)
+        preflightGroups(module.groups)
+        preflightRules(module.rules)
     }
 
     private fun preflightGroups(groups: List<Group>) {

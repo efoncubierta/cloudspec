@@ -209,7 +209,9 @@ object CloudSpecTestUtils {
             listOf(TEST_RULE_DECL))
 
     val TEST_MODULE = Module(TEST_MODULE_NAME,
-                             listOf(TEST_GROUP))
+                             emptyList(),
+                             listOf(TEST_GROUP),
+                             listOf(TEST_RULE))
 
     val TEST_MODULE_DECL = ModuleDecl(TEST_MODULE_NAME,
                                       emptyList(),
@@ -230,7 +232,9 @@ object CloudSpecTestUtils {
 
 
     val TEST_PLAN = Plan(TEST_PLAN_NAME,
-                         listOf(TEST_MODULE))
+                         listOf(TEST_MODULE),
+                         listOf(TEST_GROUP),
+                         listOf(TEST_RULE))
 
     val TEST_PLAN_DECL = PlanDecl(TEST_PLAN_NAME,
                                   emptyList(),

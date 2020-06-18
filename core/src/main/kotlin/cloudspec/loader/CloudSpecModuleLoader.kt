@@ -19,11 +19,12 @@
  */
 package cloudspec.loader
 
-import arrow.core.Some
 import cloudspec.CloudSpecLexer
 import cloudspec.CloudSpecParser
-import cloudspec.lang.*
-import cloudspec.model.*
+import cloudspec.lang.ModuleDecl
+import cloudspec.lang.SetDecl
+import cloudspec.lang.UseModuleDecl
+import cloudspec.model.Module
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
@@ -39,17 +40,18 @@ class CloudSpecModuleLoader {
         private val logger = LoggerFactory.getLogger(CloudSpecModuleLoader::class.java)
 
         @Throws(IOException::class)
-        fun loadFromFile(moduleFile: File, planSets: List<SetDecl> = emptyList()): Module {
-            return loadFromInputStream(FileInputStream(moduleFile), planSets)
+        fun loadFromFile(moduleFile: File, parentSets: List<SetDecl>): Module {
+            return loadFromInputStream(FileInputStream(moduleFile), moduleFile.parentFile, parentSets)
         }
 
         @Throws(IOException::class)
-        fun loadDeclFromFile(moduleFile: File): ModuleDecl {
-            return loadDeclFromInputStream(FileInputStream(moduleFile))
+        fun loadFromInputStream(moduleIs: InputStream, parentDir: File, parentSets: List<SetDecl>): Module {
+            return loadFromDecl(loadDeclFromInputStream(moduleIs, parentDir, parentSets),
+                                parentDir, parentSets)
         }
 
         @Throws(IOException::class)
-        fun loadDeclFromInputStream(moduleIs: InputStream): ModuleDecl {
+        fun loadDeclFromInputStream(moduleIs: InputStream, parentDir: File, parentSets: List<SetDecl>): ModuleDecl {
             val lexer = CloudSpecLexer(ANTLRInputStream(moduleIs))
             val tokens = CommonTokenStream(lexer)
             val parser = CloudSpecParser(tokens)
@@ -61,61 +63,38 @@ class CloudSpecModuleLoader {
             return listener.module
         }
 
-        @Throws(IOException::class)
-        fun loadFromInputStream(moduleIs: InputStream, planSets: List<SetDecl> = emptyList()): Module {
-            return loadFromDecl(loadDeclFromInputStream(moduleIs), planSets)
-        }
 
         @Throws(IOException::class)
-        private fun loadFromDecl(moduleDecl: ModuleDecl, planSets: List<SetDecl> = emptyList()): Module {
+        fun loadFromDecl(moduleDecl: ModuleDecl, parentDir: File, parentSets: List<SetDecl>): Module {
+            val moduleSets = parentSets.plus(moduleDecl.sets)
             return Module(moduleDecl.name,
-                          moduleDecl.groups.map { loadGroup(it, planSets.plus(moduleDecl.sets)) })
+                          moduleDecl.useModules.map {
+                              loadUseModule(it, parentDir, moduleSets)
+                          },
+                          moduleDecl.useGroups.map {
+                              CloudSpecGroupLoader.loadUseGroup(it, parentDir, moduleSets)
+                          }.plus(moduleDecl.groups.map {
+                              CloudSpecGroupLoader.loadFromDecl(it, parentDir, moduleSets)
+                          }),
+                          moduleDecl.useRules.map {
+                              CloudSpecRuleLoader.loadUseRule(it, parentDir, moduleSets)
+                          }.plus(moduleDecl.rules.map {
+                              CloudSpecRuleLoader.loadFromDecl(it, moduleSets)
+                          }))
         }
 
-        private fun loadGroup(groupDecl: GroupDecl, moduleSets: List<SetDecl>): Group {
-            return Group(groupDecl.name,
-                         groupDecl.rules.map { loadRule(it, moduleSets.plus(groupDecl.sets)) })
-        }
-
-        private fun loadRule(ruleDecl: RuleDecl, groupSets: List<SetDecl>): Rule {
-            when (val resourceDefRefOpt = ResourceDefRef.fromString(ruleDecl.defRef)) {
-                is Some ->
-                    return Rule(ruleDecl.name,
-                                resourceDefRefOpt.t,
-                                loadWiths(ruleDecl.withs),
-                                loadAsserts(ruleDecl.asserts),
-                                loadSets(groupSets.plus(ruleDecl.sets)))
-                else ->
-                    throw Exception("Malformed resource definition reference ${ruleDecl.defRef}")
-            }
-        }
-
-        private fun loadWiths(withDecl: WithDecl): List<Statement> {
-            return withDecl.statements
-        }
-
-        private fun loadAsserts(assertDecl: AssertDecl): List<Statement> {
-            return assertDecl.statements
-        }
-
-        private fun loadSets(set: List<SetDecl>): ConfigValues {
-            return set.mapNotNull { c ->
-                when (val configRefOpt = ConfigRef.fromString(c.configRef)) {
-                    is Some ->
-                        when (c.value) {
-                            is Number -> NumberConfigValue(configRefOpt.t, c.value)
-                            is String -> StringConfigValue(configRefOpt.t, c.value)
-                            is Boolean -> BooleanConfigValue(configRefOpt.t, c.value)
-                            else -> {
-                                logger.error("Unsupported type of config '${c.configRef}'. Ignoring it.")
-                                null
-                            }
-                        }
-                    else -> {
-                        logger.error("Malformed config definition '${c.configRef}'. Ignoring it.")
-                        null
-                    }
+        @Throws(IOException::class)
+        fun loadUseModule(useModuleDecl: UseModuleDecl, parentDir: File, parentSets: List<SetDecl>): Module {
+            try {
+                val moduleFile = if (useModuleDecl.path.startsWith("/")) {
+                    File(useModuleDecl.path)
+                } else {
+                    File(parentDir.absolutePath, useModuleDecl.path)
                 }
+                return loadFromFile(moduleFile, parentSets)
+            } catch (e: IOException) {
+                logger.error("Error loading module ${useModuleDecl.path}: ${e.message}")
+                throw e
             }
         }
     }
