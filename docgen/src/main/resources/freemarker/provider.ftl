@@ -1,7 +1,7 @@
-# CloudSpec Provider: ${provider.description}
-
-## Resource definitions
-
-<#list provider.resourceDefs as resourceDef>
-* [${resourceDef.ref}](${resourceDef.ref.groupName}/${resourceDef.ref.resourceName}.md): ${resourceDef.description}
-</#list>
+---
+title: "${provider.description}"
+linkTitle: "${provider.description}"
+weight: 12
+description: >
+  ${provider.description} provider.
+---

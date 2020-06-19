@@ -59,7 +59,7 @@ Your cloud resources are entangled together, creating a graph. A graph that you 
 according to your best practices or compliance policies. That ability, plus its logical language, is the beauty of
 CloudSpec.
 
-You can find the full syntax in the [CloudSpec Reference](/doc/index.md) documentation.
+You can find the full syntax in the [CloudSpec Reference](https://cloudspec.pro/docs) documentation.
  
 ## Providers
 
@@ -69,7 +69,8 @@ each different type of resource.
 
 A provider defines the shape of each resource type, properties and associations, and the logic to load those resources.
 
-You can find the available providers and resources they provide in the [CloudSpec Reference](/doc/index.md) documentation.
+You can find the available providers and resources they provide in the [CloudSpec Reference](https://cloudspec.pro/docs/)
+ documentation.
 
 ## Running CloudSpec docker image
 

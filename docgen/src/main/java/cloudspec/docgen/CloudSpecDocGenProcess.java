@@ -141,13 +141,13 @@ public class CloudSpecDocGenProcess {
 
     private void writeResourceInMarkdown(File providerDir, ResourceDef resourceDef) throws IOException, TemplateException {
         // create group directory
-        File groupDir = new File(providerDir, resourceDef.getRef().getGroupName());
-        if (!groupDir.exists() && !groupDir.mkdirs()) {
-            throw new RuntimeException("Cannot create group directory " + groupDir.getAbsolutePath());
-        }
+//        File groupDir = new File(providerDir, resourceDef.getRef().getGroupName());
+//        if (!groupDir.exists() && !groupDir.mkdirs()) {
+//            throw new RuntimeException("Cannot create group directory " + groupDir.getAbsolutePath());
+//        }
 
         // create resource file
-        File resourceFile = new File(groupDir, resourceDef.getRef().getResourceName() + ".md");
+        File resourceFile = new File(providerDir, resourceDef.getRef().getGroupName() + "_" + resourceDef.getRef().getResourceName() + ".md");
         try (Writer out = new OutputStreamWriter(new FileOutputStream(resourceFile))) {
             // create data dictionary
             Map<String, Object> data = new HashMap<>();

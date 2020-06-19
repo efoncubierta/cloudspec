@@ -1,4 +1,9 @@
-# CloudSpec Resource Definition: ${resourceDef.ref}
+---
+title: "${resourceDef.description}"
+linkTitle: "${resourceDef.description}"
+description: >
+  All about resource ${resourceDef.ref}.
+---
 
 <#macro propertyDefinitionsList propertyDefs spaces=0>
   <#list propertyDefs as propertyDef>
