@@ -86,7 +86,7 @@ public class CloudSpecDocGenProcess {
 
     private void writeIndexInMarkdown(File outputDir) throws IOException, TemplateException {
         // create index file
-        File indexFile = new File(outputDir, "index.md");
+        File indexFile = new File(outputDir, "_index.md");
         try (Writer out = new OutputStreamWriter(new FileOutputStream(indexFile))) {
             // create data dictionary
             Map<String, Object> data = new HashMap<>();
@@ -108,7 +108,7 @@ public class CloudSpecDocGenProcess {
             throw new RuntimeException("Cannot create provider directory " + providerDir.getAbsolutePath());
         }
 
-        File providerFile = new File(providerDir, "index.md");
+        File providerFile = new File(providerDir, "_index.md");
         try (Writer out = new OutputStreamWriter(new FileOutputStream(providerFile))) {
             // create data dictionary
             Map<String, Object> data = new HashMap<>();
