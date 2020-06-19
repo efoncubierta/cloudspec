@@ -3,6 +3,8 @@
 [![docker](https://img.shields.io/docker/v/efoncubierta/cloudspec?color=blue&label=docker&sort=semver)](https://hub.docker.com/r/efoncubierta/cloudspec)
 [![license](https://img.shields.io/github/license/efoncubierta/cloudspec)](https://github.com/efoncubierta/cloudspec/blob/master/LICENSE)
 
+![CloudSpec Logo](/doc/images/logo.png)
+
 # CloudSpec
 
 CloudSpec is an open source tool for validating your resources in your cloud providers using a logical language that
