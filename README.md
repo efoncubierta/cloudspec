@@ -11,6 +11,26 @@ CloudSpec is an open source tool for validating your resources in your cloud pro
 everybody can understand. With its reasonably simple syntax, you can validate the configuration of your cloud resources,
 avoiding mistakes that can lead to availability or confidentiality issues.
 
+<p align="center"><img src="/doc/images/demo.gif?raw=true"/></p>
+
+## Introduction
+
+With CloudSpec you validate resources in your cloud provider. A resource can be anything, from an EC2 Instance to an SES
+rule. Anything that a CloudSpec provider implements.
+
+Resources have properties and associations. Properties define the shape, or configuration, of the resource, while
+associations define its relationships with other resources. With CloudSpec, you not only can validate the configuration
+of the resource, but also the configuration of its associated resources. For example, let's take an EC2 Instance. It has
+properties defining its shape, like its unique instance ID, its name, its type, and the such. But it also has
+associations like the subnet it belongs to, the EBS volumes attached to it, the AMI it uses, and the such. You not only
+can validate whether an EC2 Instance is of a particular instance type, or has the delete termination flag enabled, but
+also the size of its attached volumes, the CIDR block of its subnet, or any other property in its associated resources,
+or associated resources to its associated resources, and so on. You follow me.
+
+Your cloud resources are entangled together, creating a graph. A graph that you can traverse and validate as you see fit
+according to your best practices or compliance policies. That ability, plus its logical language, is the beauty of
+CloudSpec.
+
 ```
 plan "Production environment"
     set aws:regions = ["us-east-1", "eu-west-1"]
@@ -42,24 +62,6 @@ plan "Production environment"
     end group
 end plan
 ```
-
-## Introduction
-
-With CloudSpec you validate resources in your cloud provider. A resource can be anything, from an EC2 Instance to an SES
-rule. Anything that a CloudSpec provider implements.
-
-Resources have properties and associations. Properties define the shape, or configuration, of the resource, while
-associations define its relationships with other resources. With CloudSpec, you not only can validate the configuration
-of the resource, but also the configuration of its associated resources. For example, let's take an EC2 Instance. It has
-properties defining its shape, like its unique instance ID, its name, its type, and the such. But it also has
-associations like the subnet it belongs to, the EBS volumes attached to it, the AMI it uses, and the such. You not only
-can validate whether an EC2 Instance is of a particular instance type, or has the delete termination flag enabled, but
-also the size of its attached volumes, the CIDR block of its subnet, or any other property in its associated resources,
-or associated resources to its associated resources, and so on. You follow me.
-
-Your cloud resources are entangled together, creating a graph. A graph that you can traverse and validate as you see fit
-according to your best practices or compliance policies. That ability, plus its logical language, is the beauty of
-CloudSpec.
 
 You can find the full syntax in the [CloudSpec Reference](https://cloudspec.pro/docs) documentation.
  
