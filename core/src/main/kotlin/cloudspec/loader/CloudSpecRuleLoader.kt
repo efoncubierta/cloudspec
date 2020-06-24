@@ -20,7 +20,6 @@
 package cloudspec.loader
 
 import arrow.core.Some
-import cloudspec.CloudSpecLexer
 import cloudspec.CloudSpecParser
 import cloudspec.lang.*
 import cloudspec.model.*
@@ -45,9 +44,10 @@ class CloudSpecRuleLoader {
 
         @Throws(IOException::class)
         fun loadFromInputStream(ruleIs: InputStream, parentSets: List<SetDecl>): Rule {
-            val lexer = CloudSpecLexer(ANTLRInputStream(ruleIs))
+            val lexer = BailCloudSpecLexer(ANTLRInputStream(ruleIs))
             val tokens = CommonTokenStream(lexer)
             val parser = CloudSpecParser(tokens)
+            parser.errorHandler = BailErrorStrategy()
             parser.buildParseTree = true
             val tree: ParseTree = parser.ruleDecl()
             val walker = ParseTreeWalker()

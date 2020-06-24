@@ -19,7 +19,6 @@
  */
 package cloudspec.loader
 
-import cloudspec.CloudSpecLexer
 import cloudspec.CloudSpecParser
 import cloudspec.lang.GroupDecl
 import cloudspec.lang.SetDecl
@@ -47,9 +46,10 @@ class CloudSpecGroupLoader {
 
         @Throws(IOException::class)
         fun loadFromInputStream(groupIs: InputStream, parentDir: File, parentSets: List<SetDecl>): Group {
-            val lexer = CloudSpecLexer(ANTLRInputStream(groupIs))
+            val lexer = BailCloudSpecLexer(ANTLRInputStream(groupIs))
             val tokens = CommonTokenStream(lexer)
             val parser = CloudSpecParser(tokens)
+            parser.errorHandler = BailErrorStrategy()
             parser.buildParseTree = true
             val tree: ParseTree = parser.groupDecl()
             val walker = ParseTreeWalker()

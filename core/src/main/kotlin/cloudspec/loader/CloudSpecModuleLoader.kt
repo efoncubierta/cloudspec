@@ -19,7 +19,6 @@
  */
 package cloudspec.loader
 
-import cloudspec.CloudSpecLexer
 import cloudspec.CloudSpecParser
 import cloudspec.lang.ModuleDecl
 import cloudspec.lang.SetDecl
@@ -52,9 +51,10 @@ class CloudSpecModuleLoader {
 
         @Throws(IOException::class)
         fun loadDeclFromInputStream(moduleIs: InputStream, parentDir: File, parentSets: List<SetDecl>): ModuleDecl {
-            val lexer = CloudSpecLexer(ANTLRInputStream(moduleIs))
+            val lexer = BailCloudSpecLexer(ANTLRInputStream(moduleIs))
             val tokens = CommonTokenStream(lexer)
             val parser = CloudSpecParser(tokens)
+            parser.errorHandler = BailErrorStrategy()
             parser.buildParseTree = true
             val tree: ParseTree = parser.moduleDecl()
             val walker = ParseTreeWalker()

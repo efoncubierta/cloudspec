@@ -32,12 +32,12 @@ assertDecl: ASSERT statement andDecl*;
 
 andDecl: AND statement;
 
-predicate: IS_NULL                        # ValueNullPredicate
-         | IS_NOT_NULL                    # ValueNotNullPredicate
+predicate: IS_NULL                              # ValueNullPredicate
+         | IS_NOT_NULL                          # ValueNotNullPredicate
          | IS_EQUAL_TO singleValue              # ValueEqualPredicate
          | IS_NOT_EQUAL_TO singleValue          # ValueNotEqualPredicate
-         | IS_WITHIN arrayValue                # ValueWithinPredicate
-         | IS_NOT_WITHIN arrayValue            # ValueNotWithinPredicate
+         | IS_WITHIN arrayValue                 # ValueWithinPredicate
+         | IS_NOT_WITHIN arrayValue             # ValueNotWithinPredicate
          // number predicates
          | IS_LESS_THAN numberValue                # NumberLessThanPredicate
          | IS_LESS_THAN_EQUAL numberValue          # NumberLessThanEqualPredicate

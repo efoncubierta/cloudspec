@@ -2,7 +2,7 @@ lexer grammar CloudSpecLex;
 
 // Date value
 DATE_STRING: '"' DATE_FORMAT (' ' TIME_FORMAT)? '"';
-STRING: '"' ('\\"'|.)*? '"';
+STRING: '"' (~["\\\r\n] | '\\' (. | EOF))* '"';
 BOOLEAN: (TRUE | FALSE);
 DOUBLE: NEGATIVE? DIGIT+ DOT DIGIT+;
 INTEGER: NEGATIVE? DIGIT+;
