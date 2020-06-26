@@ -33,7 +33,7 @@ class CloudSpecRunner @Inject constructor(private val version: String,
         // init manager
         cloudSpecManager.init()
 
-        // load plan
+        // load module
         cloudSpecManager.preflight(module)
 
         // load resources

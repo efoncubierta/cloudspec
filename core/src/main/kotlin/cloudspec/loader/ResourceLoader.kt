@@ -58,7 +58,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
     }
 
     private fun loadFromRule(rule: Rule) {
-        // Load all resource definitions to the plan
+        // Load all resource definitions
         getAllResources(rule.configs, rule.defRef)
             .forEach { resource ->
                 // load dependent resources from each statement

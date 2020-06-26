@@ -27,9 +27,7 @@ import cloudspec.model.StringSetValue
 import org.apache.tinkerpop.gremlin.process.traversal.P
 
 object CloudSpecTestUtils {
-    val TEST_PLAN_NAME = "plan"
     val TEST_MODULE_NAME = "myspec"
-    val TEST_SPEC_GROUP_NAME = "mygroup"
     val TEST_SPEC_RULE_NAME = "myrule"
 
     val TEST_CONFIG_REF = ConfigRef(ProviderDataUtil.PROVIDER_NAME, "myconfig")
