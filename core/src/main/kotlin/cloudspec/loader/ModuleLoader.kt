@@ -27,7 +27,6 @@ import cloudspec.lang.*
 import cloudspec.model.*
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.slf4j.LoggerFactory
@@ -49,11 +48,19 @@ class ModuleLoader {
          * @param moduleDir Module directory
          * @param moduleName Module name (default: main)
          * @param inheritedSets List of inherited sets (default: empty list)
+         * @param moduleDirsStack List of module directories in the stack for validating cyclic references.
          * @return Either an error or a module.
          */
-        fun loadFromDir(moduleDir: File, moduleName: String = DEFAULT_MODULE_NAME,
-                        inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS): Either<ModuleLoaderError, Module> {
+        fun loadFromDir(moduleDir: File,
+                        moduleName: String = DEFAULT_MODULE_NAME,
+                        inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS,
+                        moduleDirsStack: List<String> = emptyList()): Either<ModuleLoaderError, Module> {
             logger.debug("Loading module '${moduleName}' from directory '${moduleDir}'")
+
+            // directory shouldn't be in the stack
+            if (moduleDirsStack.contains(moduleDir.absolutePath)) {
+                return Left(ModuleLoaderError.ModuleCyclicUseFound(moduleDir.path, moduleDirsStack))
+            }
 
             // directory must exists
             if (!moduleDir.exists()) {
@@ -78,7 +85,7 @@ class ModuleLoader {
                 .joinToString("\n")
 
             // load module from string
-            return loadFromString(moduleStr, moduleDir, moduleName, inheritedSets)
+            return loadFromString(moduleStr, moduleDir, moduleName, inheritedSets, moduleDirsStack.plus(moduleDir.absolutePath))
         }
 
         /**
@@ -88,12 +95,17 @@ class ModuleLoader {
          * @param moduleDir Module directory. Needed to lookup dependencies.
          * @param moduleName Module name (default: main)
          * @param inheritedSets List of inherited sets (default: empty list)
+         * @param moduleDirsStack List of module directories in the stack for validating cyclic references.
          * @return Either an error or a module.
          */
-        fun loadFromString(moduleStr: String, moduleDir: File, moduleName: String = DEFAULT_MODULE_NAME,
-                           inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS): Either<ModuleLoaderError, Module> {
+        fun loadFromString(moduleStr: String, moduleDir: File,
+                           moduleName: String = DEFAULT_MODULE_NAME,
+                           inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS,
+                           moduleDirsStack: List<String> = emptyList()): Either<ModuleLoaderError, Module> {
             // load module declaration from string and map it to module
-            return loadDeclFromString(moduleStr).flatMap { loadFromDecl(it, moduleDir, moduleName, inheritedSets) }
+            return loadDeclFromString(moduleStr).flatMap {
+                loadFromDecl(it, moduleDir, moduleName, inheritedSets, moduleDirsStack)
+            }
         }
 
         /**
@@ -103,7 +115,7 @@ class ModuleLoader {
          * @return Either an error or a module declaration.
          */
         fun loadDeclFromString(moduleStr: String): Either<ModuleLoaderError, ModuleDecl> {
-            try {
+            return try {
                 val lexer = CloudSpecLexer(CharStreams.fromString(moduleStr))
                 val tokens = CommonTokenStream(lexer)
                 val parser = CloudSpecParser(tokens)
@@ -113,9 +125,9 @@ class ModuleLoader {
                 val walker = ParseTreeWalker()
                 val listener = CloudSpecListener()
                 walker.walk(listener, tree)
-                return Right(listener.module)
+                Right(listener.module)
             } catch (e: CloudSpecListenerException) {
-                return Left(ModuleLoaderError.SyntaxError(e.message!!))
+                Left(ModuleLoaderError.SyntaxError(e.message!!))
             }
         }
 
@@ -126,11 +138,15 @@ class ModuleLoader {
          * @param moduleDir Module directory. Needed to lookup dependencies.
          * @param moduleName Module name (default: main)
          * @param inheritedSets List of inherited sets (default: empty list)
+         * @param moduleDirsStack List of module directories in the stack for validating cyclic references.
          * @return Either an error or a module.
          */
-        fun loadFromDecl(moduleDecl: ModuleDecl, moduleDir: File, moduleName: String = DEFAULT_MODULE_NAME,
-                         inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS): Either<ModuleLoaderError, Module> {
-            // join inherited and module sets
+        fun loadFromDecl(moduleDecl: ModuleDecl,
+                         moduleDir: File,
+                         moduleName: String = DEFAULT_MODULE_NAME,
+                         inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS,
+                         moduleDirsStack: List<String> = emptyList()): Either<ModuleLoaderError, Module> {
+            // join inherited with module sets
             val moduleSets = inheritedSets.plus(moduleDecl.sets)
 
             return Either.fx {
@@ -140,7 +156,8 @@ class ModuleLoader {
                 // iterate and load uses. If any iteration fails, the first error encountered is returned
                 val (modules) = moduleDecl.uses.fold(initialModules) { acc, useDecl ->
                     when (acc) {
-                        is Either.Right -> loadFromUseDecl(useDecl, moduleDir, moduleSets).map { acc.b.plus(it) }
+                        is Either.Right -> loadFromUseDecl(useDecl, moduleDir,
+                                                           moduleSets, moduleDirsStack).map { acc.b.plus(it) }
                         else -> acc
                     }
                 }
@@ -154,9 +171,7 @@ class ModuleLoader {
                 }
 
                 // return module
-                Module(moduleName,
-                       modules,
-                       rules)
+                Module(moduleName, modules, rules)
             }
         }
 
@@ -166,16 +181,19 @@ class ModuleLoader {
          * @param useDecl Use declaration.
          * @param moduleDir Module directory. Needed to lookup dependencies.
          * @param inheritedSets List of inherited sets (default: empty list)
+         * @param moduleDirsStack List of module directories in the stack for validating cyclic references.
          * @return Either an error or a module.
          */
-        fun loadFromUseDecl(useDecl: UseDecl, moduleDir: File,
-                            inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS): Either<ModuleLoaderError, Module> {
+        private fun loadFromUseDecl(useDecl: UseDecl,
+                                    moduleDir: File,
+                                    inheritedSets: List<SetDecl> = DEFAULT_INHERITED_SETS,
+                                    moduleDirsStack: List<String> = emptyList()): Either<ModuleLoaderError, Module> {
             try {
                 val moduleFile = when {
                     useDecl.path.startsWith("/") -> File(useDecl.path)
                     else -> File(moduleDir.absolutePath).resolve(useDecl.path).normalize()
                 }
-                return loadFromDir(moduleFile, useDecl.name, inheritedSets)
+                return loadFromDir(moduleFile, useDecl.name, inheritedSets, moduleDirsStack)
             } catch (e: IOException) {
                 logger.error("Error loading module ${useDecl.path}: ${e.message}")
                 throw e
