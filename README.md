@@ -32,35 +32,25 @@ according to your best practices or compliance policies. That ability, plus its 
 CloudSpec.
 
 ```
-plan "Production environment"
-    set aws:regions = ["us-east-1", "eu-west-1"]
+set aws:regions = ["us-east-1", "eu-west-1"]
 
-    use module "my_module.csm"
+use "./my_module" as my_module
 
-    group "S3 validations"
-        use rule "my_s3_rule.csr"
+rule "Buckets must have access logs enabled"
+    on aws:s3:bucket
+    assert access_logs is enabled
+end rule
 
-        rule "Buckets must have access logs enabled"
-            on aws:s3:bucket
-            assert access_logs is enabled
-        end rule
-    end group
-
-    group "EC2 validations"
-        use rule "my_ec2_rule.csr"
-
-        rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
-            on aws:ec2:instance
-            with tags["environment"] equal to "production"
-            assert devices (
-                > volume (
-                    type equal to "gp2" and
-                    size gte 50
-                )
-            )
-        end rule
-    end group
-end plan
+rule "Instances must use 'gp2' volumes and be at least 50GiBs large."
+    on aws:ec2:instance
+    with tags["environment"] equal to "production"
+    assert devices (
+        > volume (
+            type equal to "gp2" and
+            size gte 50
+        )
+    )
+end
 ```
 
 You can find the full syntax in the [CloudSpec Reference](https://cloudspec.pro/docs) documentation.
@@ -81,14 +71,14 @@ You can find the available providers and resources they provide in the [CloudSpe
 You can either build and run the CloudSpec jar yourself, or you can run the latest docker image straight from the
 Docker Hub registry.
 
-To use the Docker image, you first need to put your spec files (e.g. `specs`) in a directory to mount it in the Docker 
-container. Otherwise, the CloudSpec will not be able to open the spec files outside the container. 
+To use the Docker image, you first need to put your spec files (e.g. `specs/my_module`) in a directory to mount it in 
+the Docker container. Otherwise, the CloudSpec will not be able to open the spec files outside the container. 
 
 ```$bash
 export AWS_ACCESS_KEY_ID=***
 export AWS_SECRET_ACCESS_KEY=***
 export AWS_REGION=eu-west-1
-docker run -v "/my/specs:/specs" -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_REGION efoncubierta/cloudspec run -p specs/my.csplan
+docker run -v "/my_module:/my_module" -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_REGION efoncubierta/cloudspec run -d my_module
 ```
 
 If you are running the docker container in AWS with a dedicated IAM role attached, you can omit the AWS environment 
