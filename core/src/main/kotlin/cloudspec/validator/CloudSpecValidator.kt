@@ -19,17 +19,12 @@
  */
 package cloudspec.validator
 
-import cloudspec.model.Group
 import cloudspec.model.Module
-import cloudspec.model.Plan
 import cloudspec.model.Rule
 
 class CloudSpecValidator(private val resourceValidator: ResourceValidator) {
-    fun validate(plan: Plan): PlanResult {
-        return PlanResult(plan.name,
-                          validateModules(plan.modules)
-                              .plus(validateGroups(plan.groups))
-                              .plus(validateRules(plan.rules)))
+    fun validate(module: Module): ModuleResult {
+        return validateModule(module)
     }
 
     private fun validateModules(modules: List<Module>): List<ModuleResult> {
@@ -39,16 +34,7 @@ class CloudSpecValidator(private val resourceValidator: ResourceValidator) {
     private fun validateModule(module: Module): ModuleResult {
         return ModuleResult(module.name,
                             validateModules(module.modules)
-                                .plus(validateGroups(module.groups))
                                 .plus(validateRules(module.rules)))
-    }
-
-    private fun validateGroups(groups: List<Group>): List<GroupResult> {
-        return groups.map { validateGroup(it) }
-    }
-
-    private fun validateGroup(group: Group): GroupResult {
-        return GroupResult(group.name, validateRules(group.rules))
     }
 
     private fun validateRules(rules: List<Rule>): List<RuleResult> {

@@ -20,30 +20,27 @@
 package cloudspec.aws.ec2
 
 import arrow.core.Option
-import arrow.core.extensions.list.alternative.orElse
 import arrow.core.firstOrNone
 import cloudspec.aws.AWSConfig
-import cloudspec.aws.AWSProvider
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
-import cloudspec.model.ConfigValues
-import cloudspec.model.StringConfigValue
+import cloudspec.model.SetValues
 import cloudspec.model.getStrings
 import kotlinx.coroutines.*
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.Filter
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
-    override fun byId(config: ConfigValues, id: String): Option<T> = runBlocking {
-        resources(config, listOf(id)).firstOrNone()
+    override fun byId(sets: SetValues, id: String): Option<T> = runBlocking {
+        resources(sets, listOf(id)).firstOrNone()
     }
 
-    override fun all(config: ConfigValues): List<T> = runBlocking { resources(config) }
+    override fun all(sets: SetValues): List<T> = runBlocking { resources(sets) }
 
-    private suspend fun resources(config: ConfigValues,
+    private suspend fun resources(sets: SetValues,
                                   ids: List<String> = emptyList()): List<T> = coroutineScope {
-        config.getStrings(AWSConfig.REGIONS_REF)
-            .let { if (it.isEmpty()) availableRegions(config) else it }
+        sets.getStrings(AWSConfig.REGIONS_REF)
+            .let { if (it.isEmpty()) availableRegions(sets) else it }
             .map { async { resourcesInRegion(it, ids) } }
             .awaitAll()
             .flatten()
@@ -60,7 +57,7 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
         }
     }
 
-    protected suspend fun availableRegions(config: ConfigValues): List<String> = coroutineScope {
+    protected suspend fun availableRegions(sets: SetValues): List<String> = coroutineScope {
         clientsProvider.ec2Client.use { ec2Client ->
             withContext(Dispatchers.Default) {
                 ec2Client.describeRegions()

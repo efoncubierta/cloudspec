@@ -30,9 +30,7 @@ class ConsoleReporter {
         private val cp = ColoredPrinter.Builder(1, false).build()
         private val errors = mutableListOf<RuleResult>()
 
-        fun report(planResult: PlanResult) {
-            println()
-
+        fun report(moduleResult: ModuleResult) {
             PrintTable(cp,
                        listOf(
                                PrintTableColumn("Test", 50),
@@ -43,10 +41,11 @@ class ConsoleReporter {
                        ),
                        listOf(
                                PrintTableRow(
-                                       toTableCells("${printMargin(0)}${planResult.name}", planResult.stats)
+                                       toTableCells("${printMargin(0)}${moduleResult.name}",
+                                                    moduleResult.stats)
                                )
                        ).plus(
-                               planResult.results.flatMap { toTableRows(it, 2) }
+                               moduleResult.results.flatMap { toTableRows(it, 2) }
                        )).print()
 
             printErrors()
@@ -55,7 +54,6 @@ class ConsoleReporter {
         private fun toTableRows(result: Result, margin: Int): List<PrintTableRow> {
             return when (result) {
                 is ModuleResult -> toTableRows(result, margin)
-                is GroupResult -> toTableRows(result, margin)
                 is RuleResult -> toTableRows(result, margin)
                 else -> emptyList()
             }
@@ -71,16 +69,6 @@ class ConsoleReporter {
             )
         }
 
-        private fun toTableRows(groupResult: GroupResult, margin: Int): List<PrintTableRow> {
-            return listOf(
-                    PrintTableRow(
-                            toTableCells("[G]${printMargin(margin)}${groupResult.name}", groupResult.stats)
-                    )
-            ).plus(
-                    groupResult.results.flatMap { toTableRows(it, margin + 2) }
-            )
-        }
-
         private fun toTableRows(ruleResult: RuleResult, margin: Int): List<PrintTableRow> {
             if (!ruleResult.success) {
                 errors.add(ruleResult)
@@ -93,7 +81,6 @@ class ConsoleReporter {
                     )
             )
         }
-
 
 
         private fun printErrors() {
@@ -257,7 +244,7 @@ data class PrintTable(val cp: ColoredPrinter,
     private fun printCell(value: String, width: Int, centered: Boolean = false,
                           fcolor: Ansi.FColor = Ansi.FColor.WHITE, trim: Boolean = false) {
         val strValue = if (centered) StringUtils.center(value, width) else value
-        cp.print("${margin()}%-${width}s${margin()}".format(if(trim) trimAndPad(strValue, width) else strValue),
+        cp.print("${margin()}%-${width}s${margin()}".format(if (trim) trimAndPad(strValue, width) else strValue),
                  Ansi.Attribute.NONE, fcolor, Ansi.BColor.NONE)
     }
 

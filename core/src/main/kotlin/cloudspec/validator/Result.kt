@@ -27,26 +27,8 @@ sealed class Result(open val name: String) {
     abstract val stats: Stats
 }
 
-data class PlanResult(override val name: String,
-                      val results: List<Result>) : Result(name) {
-    override val success
-        get() = results.all { it.success }
-
-    override val stats
-        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
-}
-
 data class ModuleResult(override val name: String,
                         val results: List<Result>) : Result(name) {
-    override val success
-        get() = results.all { it.success }
-
-    override val stats
-        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
-}
-
-data class GroupResult(override val name: String,
-                       val results: List<RuleResult>) : Result(name) {
     override val success
         get() = results.all { it.success }
 

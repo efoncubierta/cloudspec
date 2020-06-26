@@ -23,19 +23,13 @@ package cloudspec.lang
  * CloudSpec 'module' declaration.
  */
 data class ModuleDecl(
-        val name: String,
         val inputs: List<InputDecl>,
         val sets: List<SetDecl>,
-        val useModules: List<UseModuleDecl>,
-        val useGroups: List<UseGroupDecl>,
-        val useRules: List<UseRuleDecl>,
-        val groups: List<GroupDecl>,
+        val uses: List<UseDecl>,
         val rules: List<RuleDecl>
 ) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
-
-        sb.appendln("${printTabs(tabs)}module \"${name}\"")
 
         // add inputs
         inputs.forEach { input ->
@@ -47,32 +41,15 @@ data class ModuleDecl(
             sb.append(config.toCloudSpecSyntax(tabs + 1))
         }
 
-        // add use modules
-        useModules.forEach { module ->
+        // add uses
+        uses.forEach { module ->
             sb.append(module.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add use groups
-        useGroups.forEach { group ->
-            sb.append(group.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add use rules
-        useRules.forEach { rule ->
-            sb.append(rule.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add groups
-        groups.forEach { group ->
-            sb.append(group.toCloudSpecSyntax(tabs + 1))
         }
 
         // add rules
         rules.forEach { rule ->
             sb.append(rule.toCloudSpecSyntax(tabs + 1))
         }
-
-        sb.appendln("${printTabs(tabs)}end module")
 
         return sb.toString()
     }

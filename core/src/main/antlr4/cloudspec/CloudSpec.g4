@@ -2,27 +2,15 @@ grammar CloudSpec;
 
 import CloudSpecLex;
 
-planDecl: PLAN STRING inputDecl* setDecl*
-          (useModuleDecl | useGroupDecl | useRuleDecl | groupDecl | ruleDecl)+
-          END_PLAN;
-
-moduleDecl: MODULE STRING inputDecl* setDecl*
-            (useModuleDecl | useGroupDecl | useRuleDecl | groupDecl | ruleDecl)+
-            END_MODULE;
+moduleDecl: (inputDecl | setDecl | useDecl | ruleDecl)+;
 
 inputDecl: INPUT STRING AS PROPERTY_REF;
 
 setDecl: SET CONFIG_REF EQUAL_SYMBOL configValue;
 
-useModuleDecl: USE_MODULE STRING;
+useDecl: USE STRING AS LOCAL_IDENTIFIER;
 
-useGroupDecl: USE_GROUP STRING;
-
-useRuleDecl: USE_RULE STRING;
-
-groupDecl: GROUP STRING setDecl* (useRuleDecl | ruleDecl)+ END_GROUP;
-
-ruleDecl: RULE STRING setDecl* onDecl withDecl? assertDecl END_RULE;
+ruleDecl: RULE STRING setDecl* onDecl withDecl? assertDecl END;
 
 onDecl: ON RESOURCE_DEF_REF;
 
@@ -75,10 +63,10 @@ predicate: IS_NULL                              # ValueNullPredicate
          | IS_BETWEEN dateValue AND dateValue       # DateBetweenPredicate
          ;
 
-statement: MEMBER_NAME predicate                      # PropertyStatement
-         | MEMBER_NAME '[' STRING ']' predicate       # KeyValuePropertyStatement
-         | MEMBER_NAME '('  statement andDecl* ')'    # NestedPropertyStatement
-         | '>'MEMBER_NAME '(' statement andDecl* ')'  # AssociationStatement
+statement: LOCAL_IDENTIFIER predicate                      # PropertyStatement
+         | LOCAL_IDENTIFIER '[' STRING ']' predicate       # KeyValuePropertyStatement
+         | LOCAL_IDENTIFIER '('  statement andDecl* ')'    # NestedPropertyStatement
+         | '>'LOCAL_IDENTIFIER '(' statement andDecl* ')'  # AssociationStatement
          ;
 
 stringValue: STRING;

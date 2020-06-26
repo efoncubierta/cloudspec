@@ -34,11 +34,9 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
                          private val resourceDefStore: ResourceDefStore) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun preflight(plan: Plan) {
+    fun preflight(module: Module) {
         logger.info("Validating CloudSpec input")
-        preflightModules(plan.modules)
-        preflightGroups(plan.groups)
-        preflightRules(plan.rules)
+        preflightModule(module)
     }
 
     private fun preflightModules(modules: List<Module>) {
@@ -47,18 +45,8 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
 
     private fun preflightModule(module: Module) {
         logger.debug("Preflight of module {}", module.name)
-        preflightGroups(module.groups)
-        preflightGroups(module.groups)
+        preflightModules(module.modules)
         preflightRules(module.rules)
-    }
-
-    private fun preflightGroups(groups: List<Group>) {
-        groups.forEach { preflightGroup(it) }
-    }
-
-    private fun preflightGroup(group: Group) {
-        logger.debug("Preflight of group {}", group.name)
-        preflightRules(group.rules)
     }
 
     private fun preflightRules(rules: List<Rule>) {
@@ -183,7 +171,7 @@ class CloudSpecPreflight(private val providersRegistry: ProvidersRegistry,
         return propertyDef.propertyType == PropertyType.STRING
     }
 
-    private fun preflightConfig(set: ConfigValues) {
+    private fun preflightConfig(set: SetValues) {
         set.forEach { c ->
             if (!providersRegistry.getProvider(c.ref.provider)
                         .exists {

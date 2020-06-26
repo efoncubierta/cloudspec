@@ -64,16 +64,6 @@ IS_NOT_AFTER:                     (IS ' ')? NOT ' ' AFTER;
 EQUAL_SYMBOL: '=';
 
 // Vocabulary
-USE_MODULE: USE ' ' MODULE;
-USE_GROUP: USE ' ' GROUP;
-USE_RULE: USE ' ' RULE;
-END_PLAN: END ' ' PLAN;
-END_MODULE: END ' ' MODULE;
-END_GROUP: END ' ' GROUP;
-END_RULE: END ' ' RULE;
-PLAN: [Pp][Ll][Aa][Nn];
-MODULE: [Mm][Oo][Dd][Uu][Ll][Ee];
-GROUP: [Gg][Rr][Oo][Uu][Pp];
 RULE: [Rr][Uu][Ll][Ee];
 ON: [Oo][Nn];
 WITH: [Ww][Ii][Tt][Hh];
@@ -82,8 +72,8 @@ AND: [Aa][Nn][Dd];
 SET: [Ss][Ee][Tt];
 INPUT: [Ii][Nn][Pp][Uu][Tt];
 AS: [Aa][Ss];
-fragment USE: [Uu][Ss][Ee];
-fragment END: [Ee][Nn][Dd];
+USE: [Uu][Ss][Ee];
+END: [Ee][Nn][Dd];
 
 fragment STARTING:   [Ss][Tt][Aa][Rr][Tt][Ii][Nn][Gg];
 fragment ENDING:     [Ee][Nn][Dd][Ii][Nn][Gg];
@@ -127,11 +117,9 @@ fragment IPV6: [Ii][Pp][Vv][6];
 
 // Values
 fragment LETTER: [a-zA-Z];
-fragment LETTERS: [a-zA-Z]+;
 fragment ALPHANUM: [a-zA-Z0-9];
-fragment ALPHANUMS: [a-zA-Z0-9]+;
 
-PROPERTY_REF: LETTER [a-zA-Z0-9_]* ':' PROPERTY_TYPE;
+PROPERTY_REF: LOCAL_IDENTIFIER ':' PROPERTY_TYPE;
 fragment PROPERTY_TYPE: (NUMBER_TYPE | STRING_TYPE | BOOLEAN_TYPE);
 fragment NUMBER_TYPE: 'number';
 fragment STRING_TYPE: 'string';
@@ -140,11 +128,11 @@ fragment BOOLEAN_TYPE: 'boolean';
 // Resource and member references
 RESOURCE_DEF_REF: PROVIDER_NAME ':' GROUP_NAME ':' RESOURCE_NAME;
 CONFIG_REF: PROVIDER_NAME ':' CONFIG_NAME;
-fragment PROVIDER_NAME: LETTER [a-zA-Z0-9_]*;
-fragment GROUP_NAME: LETTER [a-zA-Z0-9_]*;
-fragment RESOURCE_NAME: LETTER [a-zA-Z0-9_]*;
-fragment CONFIG_NAME: LETTER [a-zA-Z0-9_]*;
-MEMBER_NAME: LETTER [a-zA-Z0-9_]*;
+fragment PROVIDER_NAME: LOCAL_IDENTIFIER;
+fragment GROUP_NAME: LOCAL_IDENTIFIER;
+fragment RESOURCE_NAME: LOCAL_IDENTIFIER;
+fragment CONFIG_NAME: LOCAL_IDENTIFIER;
+LOCAL_IDENTIFIER: LETTER [a-zA-Z0-9_]*;
 
 WS: [ \t\r\n]+ -> skip;
-SL_COMMENT: '#' .*? '\n' -> skip;
+SL_COMMENT: '#' .*? ('\n'|EOF) -> skip;

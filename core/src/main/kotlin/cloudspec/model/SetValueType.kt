@@ -20,9 +20,9 @@
 package cloudspec.model
 
 /**
- * Config value type.
+ * Set value type.
  */
-enum class ConfigValueType(private val text: String) {
+enum class SetValueType(private val text: String) {
     STRING("string"),
     BOOLEAN("boolean"),
     NUMBER("number");

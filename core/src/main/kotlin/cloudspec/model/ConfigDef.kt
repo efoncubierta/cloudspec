@@ -36,7 +36,7 @@ data class ConfigDef(
         /**
          * Config value type.
          */
-        val type: ConfigValueType,
+        val type: SetValueType,
 
         /**
          * Indicate whether the config is multi-valued.

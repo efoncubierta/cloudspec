@@ -19,41 +19,24 @@
  */
 package cloudspec.loader
 
-import cloudspec.lang.GroupDecl
+import arrow.core.Either
 import cloudspec.lang.ModuleDecl
 import cloudspec.lang.RuleDecl
 import org.junit.Test
-import java.io.ByteArrayInputStream
-import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ModuleDeclLoaderTest {
     @Test
     fun shouldLoadFullSpec() {
         val moduleOriginal = CloudSpecGenerator.randomModuleDecl()
 
-        val moduleLoaded = CloudSpecModuleLoader.loadDeclFromInputStream(
-                ByteArrayInputStream(moduleOriginal.toCloudSpecSyntax().toByteArray()),
-                File("."),
-                emptyList()
-        )
-
-        compareModules(moduleOriginal, moduleLoaded)
+        val moduleLoaded = ModuleLoader.loadDeclFromString(moduleOriginal.toCloudSpecSyntax())
+        assertTrue(moduleLoaded is Either.Right)
+        compareModules(moduleOriginal, moduleLoaded.b)
     }
 
     private fun compareModules(expected: ModuleDecl, actual: ModuleDecl) {
-        assertEquals(expected.name, actual.name)
-        assertEquals(expected.sets, actual.sets)
-        assertEquals(expected.groups.size, actual.groups.size)
-        val expectedS = expected.groups.sortedBy { it.name }
-        val actualS = actual.groups.sortedBy { it.name }
-        for (i in expectedS.indices) {
-            compareGroups(expectedS[i], actualS[i])
-        }
-    }
-
-    private fun compareGroups(expected: GroupDecl, actual: GroupDecl) {
-        assertEquals(expected.name, actual.name)
         assertEquals(expected.sets, actual.sets)
         assertEquals(expected.rules.size, actual.rules.size)
         val expectedS = expected.rules.sortedBy { it.name }

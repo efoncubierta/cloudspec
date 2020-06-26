@@ -19,7 +19,7 @@
  */
 package cloudspec
 
-import cloudspec.model.Plan
+import cloudspec.model.Module
 import cloudspec.reporter.ConsoleReporter
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
@@ -29,18 +29,18 @@ class CloudSpecRunner @Inject constructor(private val version: String,
                                           private val cloudSpecManager: CloudSpecManager) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun validate(plan: Plan) {
+    fun validate(module: Module) {
         // init manager
         cloudSpecManager.init()
 
         // load plan
-        cloudSpecManager.preflight(plan)
+        cloudSpecManager.preflight(module)
 
         // load resources
-        cloudSpecManager.loadResources(plan)
+        cloudSpecManager.loadResources(module)
 
         // validate spec
-        val result = cloudSpecManager.validate(plan)
+        val result = cloudSpecManager.validate(module)
 
         logger.info("Generating report")
         ConsoleReporter.report(result)

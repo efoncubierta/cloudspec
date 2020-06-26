@@ -21,7 +21,7 @@ package cloudspec.aws
 
 import cloudspec.model.ConfigDef
 import cloudspec.model.ConfigRef
-import cloudspec.model.ConfigValueType
+import cloudspec.model.SetValueType
 
 class AWSConfig {
     companion object {
@@ -32,15 +32,15 @@ class AWSConfig {
         val CONFIG_DEFS = setOf(
                 ConfigDef(REGIONS_REF,
                           "AWS Regions",
-                          ConfigValueType.STRING,
+                          SetValueType.STRING,
                           true),
                 ConfigDef(ACCESS_KEY_ID_REF,
                           "AWS Access Key ID",
-                          ConfigValueType.STRING,
+                          SetValueType.STRING,
                           false),
                 ConfigDef(SECRET_ACCESS_KEY_REF,
                           "AWS Secret Access Key",
-                          ConfigValueType.STRING,
+                          SetValueType.STRING,
                           false)
         )
     }

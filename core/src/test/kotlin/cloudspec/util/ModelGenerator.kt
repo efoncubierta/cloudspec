@@ -212,8 +212,8 @@ object ModelGenerator {
         )
     }
 
-    fun randomConfigValueType(): ConfigValueType {
-        return ConfigValueType.values()[faker.random().nextInt(0, ConfigValueType.values().size)]
+    fun randomConfigValueType(): SetValueType {
+        return SetValueType.values()[faker.random().nextInt(0, SetValueType.values().size - 1)]
     }
 
     fun randomConfigDef(): ConfigDef {
@@ -227,24 +227,24 @@ object ModelGenerator {
         return (0..n).map { randomConfigDef() }.toSet()
     }
 
-    fun randomConfigValue(configDef: ConfigDef = randomConfigDef()): ConfigValue<*> {
+    fun randomConfigValue(configDef: ConfigDef = randomConfigDef()): SetValue<*> {
         return when (configDef.type) {
-            ConfigValueType.NUMBER -> NumberConfigValue(
+            SetValueType.NUMBER -> NumberSetValue(
                     configDef.ref,
                     if (faker.random().nextBoolean()) faker.random().nextInt(Int.MAX_VALUE) else faker.random().nextDouble()
             )
-            ConfigValueType.BOOLEAN -> BooleanConfigValue(
+            SetValueType.BOOLEAN -> BooleanSetValue(
                     configDef.ref,
                     faker.random().nextBoolean()
             )
-            ConfigValueType.STRING -> StringConfigValue(
+            SetValueType.STRING -> StringSetValue(
                     configDef.ref,
                     faker.lorem().sentence()
             )
         }
     }
 
-    fun randomConfigValues(n: Int): ConfigValues {
+    fun randomConfigValues(n: Int): SetValues {
         return (0..n).map { randomConfigValue(randomConfigDef()) }
     }
 }

@@ -24,5 +24,5 @@ package cloudspec.model
  */
 data class KeyValue(
         val key: String,
-        val value: Any
+        val value: Any?
 )

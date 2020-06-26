@@ -22,6 +22,5 @@ package cloudspec.model
 data class Module(
         val name: String,
         val modules: List<Module>,
-        val groups: List<Group>,
         val rules: List<Rule>
 )

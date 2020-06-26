@@ -20,35 +20,16 @@
 package cloudspec.lang
 
 /**
- * CloudSpec 'group' declaration.
+ * CloudSpec 'use module' declaration.
  */
-data class GroupDecl(
-        val name: String,
-        val sets: List<SetDecl>,
-        val useRules: List<UseRuleDecl>,
-        val rules: List<RuleDecl>
+data class UseDecl(
+        val path: String,
+        val name: String
 ) : CloudSpecSyntaxProducer {
     override fun toCloudSpecSyntax(tabs: Int): String {
         val sb = StringBuilder()
 
-        sb.appendln("${printTabs(tabs)}group \"${name}\"")
-
-        // add config
-        sets.forEach {
-            sb.append(it.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add use rules
-        useRules.forEach { rule ->
-            sb.append(rule.toCloudSpecSyntax(tabs + 1))
-        }
-
-        // add rules
-        rules.forEach {
-            sb.append(it.toCloudSpecSyntax(tabs + 1))
-        }
-
-        sb.appendln("${printTabs(tabs)}end group")
+        sb.appendln("${printTabs(tabs)}use \"${path}\" as $name")
 
         return sb.toString()
     }

@@ -20,7 +20,10 @@
 package cloudspec.util
 
 import cloudspec.lang.*
-import cloudspec.model.*
+import cloudspec.model.ConfigRef
+import cloudspec.model.Module
+import cloudspec.model.Rule
+import cloudspec.model.StringSetValue
 import org.apache.tinkerpop.gremlin.process.traversal.P
 
 object CloudSpecTestUtils {
@@ -30,7 +33,7 @@ object CloudSpecTestUtils {
     val TEST_SPEC_RULE_NAME = "myrule"
 
     val TEST_CONFIG_REF = ConfigRef(ProviderDataUtil.PROVIDER_NAME, "myconfig")
-    val TEST_CONFIG_VALUE = StringConfigValue(TEST_CONFIG_REF, "foo")
+    val TEST_CONFIG_VALUE = StringSetValue(TEST_CONFIG_REF, "foo")
 
     val TEST_CONFIG_REF_STR = TEST_CONFIG_REF.toString()
     val TEST_CONFIG_VALUE_RAW = "foo"
@@ -188,68 +191,18 @@ object CloudSpecTestUtils {
             TEST_ASSERT_DECL
     )
 
-    val TEST_USE_MODULE_DECL = UseModuleDecl("")
-
-    val TEST_USE_GROUP_DECL = UseGroupDecl("")
-
-    val TEST_USE_RULE_DECL = UseRuleDecl("")
-
-    val TEST_GROUP = Group(
-            TEST_SPEC_GROUP_NAME,
-            listOf(TEST_RULE))
-
-    val TEST_GROUP_DECL = GroupDecl(
-            TEST_SPEC_GROUP_NAME,
-            listOf(
-                    SetDecl(TEST_CONFIG_REF_STR, TEST_CONFIG_VALUE_RAW)
-            ),
-            listOf(
-                    TEST_USE_RULE_DECL
-            ),
-            listOf(TEST_RULE_DECL))
+    val TEST_USE_DECL = UseDecl("", "")
 
     val TEST_MODULE = Module(TEST_MODULE_NAME,
                              emptyList(),
-                             listOf(TEST_GROUP),
                              listOf(TEST_RULE))
 
-    val TEST_MODULE_DECL = ModuleDecl(TEST_MODULE_NAME,
-                                      emptyList(),
+    val TEST_MODULE_DECL = ModuleDecl(emptyList(),
                                       listOf(
                                               SetDecl(TEST_CONFIG_REF_STR, TEST_CONFIG_VALUE_RAW)
                                       ),
                                       listOf(
-                                              TEST_USE_MODULE_DECL
+                                              TEST_USE_DECL
                                       ),
-                                      listOf(
-                                              TEST_USE_GROUP_DECL
-                                      ),
-                                      listOf(
-                                              TEST_USE_RULE_DECL
-                                      ),
-                                      listOf(TEST_GROUP_DECL),
                                       listOf(TEST_RULE_DECL))
-
-
-    val TEST_PLAN = Plan(TEST_PLAN_NAME,
-                         listOf(TEST_MODULE),
-                         listOf(TEST_GROUP),
-                         listOf(TEST_RULE))
-
-    val TEST_PLAN_DECL = PlanDecl(TEST_PLAN_NAME,
-                                  emptyList(),
-                                  listOf(
-                                          SetDecl(TEST_CONFIG_REF_STR, TEST_CONFIG_VALUE_RAW)
-                                  ),
-                                  listOf(
-                                          TEST_USE_MODULE_DECL
-                                  ),
-                                  listOf(
-                                          TEST_USE_GROUP_DECL
-                                  ),
-                                  listOf(
-                                          TEST_USE_RULE_DECL
-                                  ),
-                                  listOf(TEST_GROUP_DECL),
-                                  listOf(TEST_RULE_DECL))
 }

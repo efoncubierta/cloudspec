@@ -17,19 +17,28 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.lang
+package cloudspec.model
 
 /**
- * CloudSpec 'use rule' declaration.
+ * Define a set value.
  */
-data class UseRuleDecl(
-        val path: String
-) : CloudSpecSyntaxProducer {
-    override fun toCloudSpecSyntax(tabs: Int): String {
-        val sb = StringBuilder()
+sealed class SetValue<T> {
+    /**
+     * Config reference.
+     */
+    abstract val ref: ConfigRef
 
-        sb.appendln("${printTabs(tabs)}use rule \"${path}\"")
-
-        return sb.toString()
-    }
+    /**
+     * Value.
+     */
+    abstract val value: T
 }
+
+data class NumberSetValue(override val ref: ConfigRef,
+                          override val value: Number) : SetValue<Number>()
+
+data class StringSetValue(override val ref: ConfigRef,
+                          override val value: String) : SetValue<String>()
+
+data class BooleanSetValue(override val ref: ConfigRef,
+                           override val value: Boolean) : SetValue<Boolean>()

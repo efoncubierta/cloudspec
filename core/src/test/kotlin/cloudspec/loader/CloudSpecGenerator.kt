@@ -47,64 +47,21 @@ import java.util.concurrent.TimeUnit
 object CloudSpecGenerator {
     private val faker = Faker()
 
-    fun randomPlan(): Plan {
-        return Plan(faker.lorem().sentence(),
-                    listOf(randomModule(), randomModule()),
-                    listOf(randomGroup(), randomGroup()),
-                    listOf(randomRule(), randomRule()))
-    }
-
-    fun randomPlanDecl(): PlanDecl {
-        return PlanDecl(faker.lorem().sentence(),
-                        listOf(randomInputDecl(), randomInputDecl()),
-                        listOf(randomSetDecl(), randomSetDecl()),
-                        listOf(randomUseModuleDecl(), randomUseModuleDecl()),
-                        listOf(randomUseGroupDecl(), randomUseGroupDecl()),
-                        listOf(randomUseRuleDecl(), randomUseRuleDecl()),
-                        listOf(randomGroupDecl(), randomGroupDecl()),
-                        listOf(randomRuleDecl(), randomRuleDecl()))
-    }
-
     fun randomModule(): Module {
         return Module(faker.lorem().sentence(),
                       listOf(randomModule(), randomModule()),
-                      listOf(randomGroup(), randomGroup()),
                       listOf(randomRule(), randomRule()))
     }
 
     fun randomModuleDecl(): ModuleDecl {
-        return ModuleDecl(faker.lorem().sentence(),
-                          listOf(randomInputDecl(), randomInputDecl()),
+        return ModuleDecl(listOf(randomInputDecl(), randomInputDecl()),
                           listOf(randomSetDecl(), randomSetDecl()),
-                          listOf(randomUseModuleDecl(), randomUseModuleDecl()),
-                          listOf(randomUseGroupDecl(), randomUseGroupDecl()),
-                          listOf(randomUseRuleDecl(), randomUseRuleDecl()),
-                          listOf(randomGroupDecl(), randomGroupDecl()),
+                          listOf(randomUseDecl(), randomUseDecl()),
                           listOf(randomRuleDecl(), randomRuleDecl()))
     }
 
-    fun randomUseModuleDecl(): UseModuleDecl {
-        return UseModuleDecl(faker.file().fileName())
-    }
-
-    fun randomUseGroupDecl(): UseGroupDecl {
-        return UseGroupDecl(faker.file().fileName())
-    }
-
-    fun randomUseRuleDecl(): UseRuleDecl {
-        return UseRuleDecl(faker.file().fileName())
-    }
-
-    fun randomGroup(): Group {
-        return Group(faker.lorem().sentence(),
-                     listOf(randomRule(), randomRule()))
-    }
-
-    fun randomGroupDecl(): GroupDecl {
-        return GroupDecl(faker.lorem().sentence(),
-                         listOf(randomSetDecl(), randomSetDecl()),
-                         listOf(randomUseRuleDecl(), randomUseRuleDecl()),
-                         listOf(randomRuleDecl(), randomRuleDecl()))
+    fun randomUseDecl(): UseDecl {
+        return UseDecl(faker.file().fileName(), faker.lorem().word())
     }
 
     fun randomRule(): Rule {
@@ -535,36 +492,36 @@ object CloudSpecGenerator {
         return (0..5).map { randomValueForProperty(propertyType) }
     }
 
-    fun randomConfigValueType(): ConfigValueType {
+    fun randomConfigValueType(): SetValueType {
         return listOf(
-                ConfigValueType.NUMBER,
-                ConfigValueType.STRING,
-                ConfigValueType.BOOLEAN
+                SetValueType.NUMBER,
+                SetValueType.STRING,
+                SetValueType.BOOLEAN
         )[faker.random().nextInt(0, 2)]
     }
 
-    fun randomConfigValue(configValueType: ConfigValueType = randomConfigValueType()): ConfigValue<*> {
-        return when (configValueType) {
-            ConfigValueType.NUMBER -> NumberConfigValue(ModelGenerator.randomConfigRef(),
-                                                        randomValueForConfig(configValueType) as Number)
-            ConfigValueType.BOOLEAN -> BooleanConfigValue(ModelGenerator.randomConfigRef(),
-                                                          randomValueForConfig(configValueType) as Boolean)
-            ConfigValueType.STRING -> StringConfigValue(ModelGenerator.randomConfigRef(),
-                                                        randomValueForConfig(configValueType) as String)
+    fun randomConfigValue(setValueType: SetValueType = randomConfigValueType()): SetValue<*> {
+        return when (setValueType) {
+            SetValueType.NUMBER -> NumberSetValue(ModelGenerator.randomConfigRef(),
+                                                  randomValueForConfig(setValueType) as Number)
+            SetValueType.BOOLEAN -> BooleanSetValue(ModelGenerator.randomConfigRef(),
+                                                    randomValueForConfig(setValueType) as Boolean)
+            SetValueType.STRING -> StringSetValue(ModelGenerator.randomConfigRef(),
+                                                  randomValueForConfig(setValueType) as String)
         }
     }
 
-    fun randomValueForConfig(configValueType: ConfigValueType = randomConfigValueType()): Any {
-        return when (configValueType) {
-            ConfigValueType.NUMBER -> {
+    fun randomValueForConfig(setValueType: SetValueType = randomConfigValueType()): Any {
+        return when (setValueType) {
+            SetValueType.NUMBER -> {
                 if (faker.random().nextBoolean()) {
                     faker.random().nextInt(0, 1000)
                 } else {
                     faker.random().nextDouble()
                 }
             }
-            ConfigValueType.BOOLEAN -> faker.random().nextBoolean()
-            ConfigValueType.STRING -> faker.lorem().word()
+            SetValueType.BOOLEAN -> faker.random().nextBoolean()
+            SetValueType.STRING -> faker.lorem().word()
         }
     }
 

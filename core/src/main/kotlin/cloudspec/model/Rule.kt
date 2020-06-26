@@ -26,5 +26,5 @@ data class Rule(
         val defRef: ResourceDefRef,
         val filters: List<Statement>,
         val validations: List<Statement>,
-        val configs: ConfigValues
+        val configs: SetValues
 )

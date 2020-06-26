@@ -64,12 +64,12 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     override val configDefs: ConfigDefs
         get() = AWSConfig.CONFIG_DEFS
 
-    override fun resourcesByRef(config: ConfigValues, ref: ResourceDefRef): List<AWSResource> {
-        return getLoader(ref).map { it.all(config) }.getOrElse { emptyList() }
+    override fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<AWSResource> {
+        return getLoader(ref).map { it.all(sets) }.getOrElse { emptyList() }
     }
 
-    override fun resource(config: ConfigValues, ref: ResourceRef): Option<AWSResource> {
-        return getLoader(ref.defRef).flatMap { it.byId(config, ref.id) }
+    override fun resource(sets: SetValues, ref: ResourceRef): Option<AWSResource> {
+        return getLoader(ref.defRef).flatMap { it.byId(sets, ref.id) }
     }
 
     private fun getLoader(resourceDefRef: ResourceDefRef): Option<AWSResourceLoader<*>> {

@@ -32,16 +32,12 @@ import java.text.ParseException
 import java.util.*
 
 class CloudSpecListener : CloudSpecBaseListener() {
-    private val currentPlans = Stack<PlanDecl>()
     private val currentModules = Stack<ModuleDecl>()
-    private val currentInputs = Stack<Stack<InputDecl>>()
+    private val currentInputs = Stack<InputDecl>()
     private val currentSets = Stack<Stack<SetDecl>>()
     private val currentDefRef = Stack<String>()
-    private val currentUseModules = Stack<Stack<UseModuleDecl>>()
-    private val currentUseGroups = Stack<Stack<UseGroupDecl>>()
-    private val currentUseRules = Stack<Stack<UseRuleDecl>>()
-    private val currentGroups = Stack<Stack<GroupDecl>>()
-    private val currentRules = Stack<Stack<RuleDecl>>()
+    private val currentUses = Stack<UseDecl>()
+    private val currentRules = Stack<RuleDecl>()
     private val currentWiths = Stack<WithDecl>()
     private val currentAsserts = Stack<AssertDecl>()
     private val currentMemberNames = Stack<Stack<String>>()
@@ -49,96 +45,36 @@ class CloudSpecListener : CloudSpecBaseListener() {
     private val currentValues = Stack<Any>()
     private var currentPredicate: P<*>? = null
 
-    val plan: PlanDecl
-        get() = currentPlans.pop()
-
     val module: ModuleDecl
         get() = currentModules.pop()
 
-    val group: GroupDecl
-        get() = currentGroups.pop().pop()
-
-    val rule: RuleDecl
-        get() = currentRules.pop().pop()
-
-    override fun enterPlanDecl(ctx: PlanDeclContext?) {
-        currentInputs.push(Stack())
+    override fun enterModuleDecl(ctx: ModuleDeclContext?) {
         currentSets.push(Stack())
-        currentUseModules.push(Stack())
-        currentUseGroups.push(Stack())
-        currentUseRules.push(Stack())
-        currentGroups.push(Stack())
-        currentRules.push(Stack())
     }
 
-    override fun exitPlanDecl(ctx: PlanDeclContext) {
-        currentPlans.push(PlanDecl(stripQuotes(ctx.STRING().text),
-                                   currentInputs.pop().toList(),
-                                   currentSets.pop().toList(),
-                                   currentUseModules.pop().toList(),
-                                   currentUseGroups.pop().toList(),
-                                   currentUseRules.pop().toList(),
-                                   currentGroups.pop().toList(),
-                                   currentRules.pop().toList()))
-    }
-
-    override fun enterModuleDecl(ctx: ModuleDeclContext) {
-        currentInputs.push(Stack())
-        currentSets.push(Stack())
-        currentUseModules.push(Stack())
-        currentUseGroups.push(Stack())
-        currentUseRules.push(Stack())
-        currentGroups.push(Stack())
-        currentRules.push(Stack())
-    }
-
-    override fun exitModuleDecl(ctx: ModuleDeclContext) {
-        currentModules.push(ModuleDecl(stripQuotes(ctx.STRING().text),
-                                       currentInputs.pop().toList(),
+    override fun exitModuleDecl(ctx: ModuleDeclContext?) {
+        currentModules.push(ModuleDecl(currentInputs.toList(),
                                        currentSets.pop().toList(),
-                                       currentUseModules.pop().toList(),
-                                       currentUseGroups.pop().toList(),
-                                       currentUseRules.pop().toList(),
-                                       currentGroups.pop().toList(),
-                                       currentRules.pop().toList()))
+                                       currentUses.toList(),
+                                       currentRules.toList()))
     }
 
     override fun exitInputDecl(ctx: InputDeclContext) {
-        val propertyRef = stripQuotes(ctx.PROPERTY_REF().text).split(":")
+        val propertyRef = ctx.PROPERTY_REF().text.split(":")
 
-        currentInputs.peek().push(InputDecl(stripQuotes(ctx.STRING().text),
-                                            propertyRef[0],
-                                            PropertyType.valueOf(propertyRef[1].toUpperCase())))
+        currentInputs.push(InputDecl(stripQuotes(ctx.STRING().text),
+                                     propertyRef[0],
+                                     PropertyType.valueOf(propertyRef[1].toUpperCase())))
     }
 
     override fun exitSetDecl(ctx: SetDeclContext) {
-        currentSets.peek().push(SetDecl(stripQuotes(ctx.CONFIG_REF().text),
+        currentSets.peek().push(SetDecl(ctx.CONFIG_REF().text,
                                         currentValues.pop()))
     }
 
-    override fun exitUseModuleDecl(ctx: UseModuleDeclContext) {
-        currentUseModules.peek().push(UseModuleDecl(stripQuotes(ctx.STRING().text)))
-    }
-
-    override fun exitUseGroupDecl(ctx: UseGroupDeclContext) {
-        currentUseGroups.peek().push(UseGroupDecl(stripQuotes(ctx.STRING().text)))
-    }
-
-    override fun exitUseRuleDecl(ctx: UseRuleDeclContext) {
-        currentUseRules.peek().push(UseRuleDecl(stripQuotes(ctx.STRING().text)))
-    }
-
-    override fun enterGroupDecl(ctx: GroupDeclContext) {
-        currentSets.push(Stack())
-        currentUseRules.push(Stack())
-        currentRules.push(Stack())
-    }
-
-    override fun exitGroupDecl(ctx: GroupDeclContext) {
-        currentGroups.peek().push(GroupDecl(stripQuotes(ctx.STRING().text),
-                                            currentSets.pop().toList(),
-                                            currentUseRules.pop().toList(),
-                                            currentRules.pop().toList()))
+    override fun exitUseDecl(ctx: UseDeclContext) {
+        currentUses.push(UseDecl(stripQuotes(ctx.STRING().text),
+                                 ctx.LOCAL_IDENTIFIER().text))
     }
 
     override fun enterRuleDecl(ctx: RuleDeclContext) {
@@ -147,15 +83,15 @@ class CloudSpecListener : CloudSpecBaseListener() {
     }
 
     override fun exitRuleDecl(ctx: RuleDeclContext) {
-        currentRules.peek().push(RuleDecl(stripQuotes(ctx.STRING().text),
-                                          currentDefRef.pop(),
-                                          currentSets.pop().toList(),
-                                          if (!currentWiths.empty()) currentWiths.pop() else WithDecl(emptyList()),
-                                          currentAsserts.pop()))
+        currentRules.push(RuleDecl(stripQuotes(ctx.STRING().text),
+                                   currentDefRef.pop(),
+                                   currentSets.pop().toList(),
+                                   if (!currentWiths.empty()) currentWiths.pop() else WithDecl(emptyList()),
+                                   currentAsserts.pop()))
     }
 
     override fun enterOnDecl(ctx: OnDeclContext) {
-        currentDefRef.push(stripQuotes(ctx.RESOURCE_DEF_REF().text))
+        currentDefRef.push(ctx.RESOURCE_DEF_REF().text)
     }
 
     override fun enterWithDecl(ctx: WithDeclContext) {
@@ -185,7 +121,7 @@ class CloudSpecListener : CloudSpecBaseListener() {
     }
 
     override fun enterPropertyStatement(ctx: PropertyStatementContext) {
-        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().text))
+        currentMemberNames.peek().add(ctx.LOCAL_IDENTIFIER().text)
     }
 
     override fun exitPropertyStatement(ctx: PropertyStatementContext) {
@@ -194,7 +130,7 @@ class CloudSpecListener : CloudSpecBaseListener() {
     }
 
     override fun enterKeyValuePropertyStatement(ctx: KeyValuePropertyStatementContext) {
-        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().text))
+        currentMemberNames.peek().add(ctx.LOCAL_IDENTIFIER().text)
     }
 
     override fun exitKeyValuePropertyStatement(ctx: KeyValuePropertyStatementContext) {
@@ -204,7 +140,7 @@ class CloudSpecListener : CloudSpecBaseListener() {
     }
 
     override fun enterNestedPropertyStatement(ctx: NestedPropertyStatementContext) {
-        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().text))
+        currentMemberNames.peek().add(ctx.LOCAL_IDENTIFIER().text)
         currentMemberNames.push(Stack())
         currentStatements.push(Stack())
     }
@@ -217,7 +153,7 @@ class CloudSpecListener : CloudSpecBaseListener() {
     }
 
     override fun enterAssociationStatement(ctx: AssociationStatementContext) {
-        currentMemberNames.peek().add(stripQuotes(ctx.MEMBER_NAME().text))
+        currentMemberNames.peek().add(ctx.LOCAL_IDENTIFIER().text)
         currentMemberNames.push(Stack())
         currentStatements.push(Stack())
     }

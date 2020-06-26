@@ -45,7 +45,7 @@ data class RuleDecl(
         // add asserts
         sb.append(asserts.toCloudSpecSyntax(tabs + 1))
 
-        sb.appendln("${printTabs(tabs)}end rule")
+        sb.appendln("${printTabs(tabs)}end")
 
         return sb.toString()
     }

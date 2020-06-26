@@ -19,7 +19,8 @@
  */
 package cloudspec
 
-import cloudspec.loader.CloudSpecPlanLoader
+import arrow.core.Either
+import cloudspec.loader.ModuleLoader
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
 import java.io.File
@@ -30,21 +31,27 @@ import java.util.concurrent.Callable
 class CloudSpecRunCommand : Callable<Int> {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @CommandLine.Option(names = ["-p", "--plan"],
-                        paramLabel = "<plan file>",
-                        description = ["CloudSpec plan file"],
+    @CommandLine.Option(names = ["-d", "--directory"],
+                        paramLabel = "<module dir>",
+                        description = ["CloudSpec module directory"],
                         required = true)
-    private lateinit var planFile: File
+    private lateinit var moduleFile: File
 
     override fun call(): Int {
         logger.info("Starting CloudSpec Runner")
 
-        // load plan
-        val plan = CloudSpecPlanLoader.loadFromFile(planFile)
-
-        // run spec
-        val runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner()
-        runner.validate(plan)
-        return 0
+        // load module
+        return when (val moduleE = ModuleLoader.loadFromDir(moduleFile)) {
+            is Either.Right -> {
+                // run spec
+                val runner = DaggerCloudSpecRunnerComponent.create().buildCloudSpecRunner()
+                runner.validate(moduleE.b)
+                0
+            }
+            is Either.Left -> {
+                logger.error(moduleE.a.message())
+                -1
+            }
+        }
     }
 }

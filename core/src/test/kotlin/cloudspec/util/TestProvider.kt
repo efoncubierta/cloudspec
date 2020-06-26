@@ -34,15 +34,15 @@ class TestProvider : Provider() {
         get() = setOf(
                 ConfigDef(ConfigRef(ProviderDataUtil.PROVIDER_NAME, "myconfig"),
                           "My config",
-                          ConfigValueType.STRING,
+                          SetValueType.STRING,
                           false)
         )
 
-    override fun resourcesByRef(config: ConfigValues, ref: ResourceDefRef): List<Any> {
+    override fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Any> {
         return emptyList()
     }
 
-    override fun resource(config: ConfigValues, ref: ResourceRef): Option<Any> {
+    override fun resource(sets: SetValues, ref: ResourceRef): Option<Any> {
         return none()
     }
 }

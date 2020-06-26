@@ -25,7 +25,9 @@ import cloudspec.lang.AssociationStatement
 import cloudspec.lang.KeyValueStatement
 import cloudspec.lang.NestedStatement
 import cloudspec.lang.PropertyStatement
-import cloudspec.model.*
+import cloudspec.model.Module
+import cloudspec.model.ProviderTest
+import cloudspec.model.Rule
 import cloudspec.util.CloudSpecTestUtils
 import cloudspec.util.ModelGenerator.randomConfigValue
 import cloudspec.util.ModelGenerator.randomName
@@ -57,53 +59,35 @@ class CloudSpecPreflightTest {
 
     @Test
     fun shouldFailWithRandomConfigDef() {
-        val plan = Plan(randomName(),
-                        listOf(
-                                Module(randomName(),
-                                       emptyList(),
-                                       listOf(
-                                               Group(randomName(),
-                                                     listOf(
-                                                             Rule(randomName(),
-                                                                  randomResourceDefRef(),
-                                                                  emptyList(),
-                                                                  emptyList(),
-                                                                  listOf(randomConfigValue()))
-                                                     ))
-                                       ),
-                                       emptyList())
-                        ),
-                        emptyList(),
-                        emptyList())
+        val module = Module(randomName(),
+                            emptyList(),
+                            listOf(
+                                    Rule(randomName(),
+                                         randomResourceDefRef(),
+                                         emptyList(),
+                                         emptyList(),
+                                         listOf(randomConfigValue()))
+                            ))
 
         assertFails {
-            preflight.preflight(plan)
+            preflight.preflight(module)
         }
     }
 
     @Test
     fun shouldFailWithRandomResourceDefString() {
-        val plan = Plan(randomName(),
-                        listOf(
-                                Module(randomName(),
-                                       emptyList(),
-                                       listOf(
-                                               Group(randomName(),
-                                                     listOf(
-                                                             Rule(randomName(),
-                                                                  randomResourceDefRef(),
-                                                                  emptyList(),
-                                                                  emptyList(),
-                                                                  emptyList())
-                                                     ))
-                                       ),
-                                       emptyList())
-                        ),
-                        emptyList(),
-                        emptyList())
+        val module = Module(randomName(),
+                            emptyList(),
+                            listOf(
+                                    Rule(randomName(),
+                                         randomResourceDefRef(),
+                                         emptyList(),
+                                         emptyList(),
+                                         emptyList())
+                            ))
 
         assertFails {
-            preflight.preflight(plan)
+            preflight.preflight(module)
         }
     }
 
@@ -112,30 +96,21 @@ class CloudSpecPreflightTest {
         val resourceDef = randomResourceDef()
         resourceDefStore.saveResourceDef(resourceDef)
 
-        val plan = Plan(randomName(),
-                        listOf(
-                                Module(randomName(),
-                                       emptyList(),
-                                       listOf(
-                                               Group(randomName(),
-                                                     listOf(
-                                                             Rule(randomName(),
-                                                                  resourceDef.ref,
-                                                                  listOf(
-                                                                          PropertyStatement(randomName(),
-                                                                                            P.eq(0))
-                                                                  ),
-                                                                  emptyList(),
-                                                                  emptyList())
-                                                     ))
-                                       ),
-                                       emptyList())
-                        ),
-                        emptyList(),
-                        emptyList())
+        val module = Module(randomName(),
+                            emptyList(),
+                            listOf(
+                                    Rule(randomName(),
+                                         resourceDef.ref,
+                                         listOf(
+                                                 PropertyStatement(randomName(),
+                                                                   P.eq(0))
+                                         ),
+                                         emptyList(),
+                                         emptyList())
+                            ))
 
         assertFails {
-            preflight.preflight(plan)
+            preflight.preflight(module)
         }
     }
 
@@ -144,31 +119,22 @@ class CloudSpecPreflightTest {
         val resourceDef = randomResourceDef()
         resourceDefStore.saveResourceDef(resourceDef)
 
-        val plan = Plan(randomName(),
-                        listOf(
-                                Module(randomName(),
-                                       emptyList(),
-                                       listOf(
-                                               Group(randomName(),
-                                                     listOf(
-                                                             Rule(randomName(),
-                                                                  resourceDef.ref,
-                                                                  listOf(
-                                                                          KeyValueStatement(randomName(),
-                                                                                            randomName(),
-                                                                                            P.eq(0))
-                                                                  ),
-                                                                  emptyList(),
-                                                                  emptyList())
-                                                     ))
-                                       ),
-                                       emptyList())
-                        ),
-                        emptyList(),
-                        emptyList())
+        val module = Module(randomName(),
+                            emptyList(),
+                            listOf(
+                                    Rule(randomName(),
+                                         resourceDef.ref,
+                                         listOf(
+                                                 KeyValueStatement(randomName(),
+                                                                   randomName(),
+                                                                   P.eq(0))
+                                         ),
+                                         emptyList(),
+                                         emptyList())
+                            ))
 
         assertFails {
-            preflight.preflight(plan)
+            preflight.preflight(module)
         }
     }
 
@@ -177,34 +143,24 @@ class CloudSpecPreflightTest {
         val resourceDef = randomResourceDef()
         resourceDefStore.saveResourceDef(resourceDef)
 
-        val plan = Plan(randomName(),
-                        listOf(
-                                Module(randomName(),
-                                       emptyList(),
-                                       listOf(
-                                               Group(randomName(),
-                                                     listOf(
-                                                             Rule(randomName(),
-                                                                  resourceDef.ref,
-                                                                  listOf(
-                                                                          NestedStatement(resourceDef.properties.elementAt(0).name,
-                                                                                          listOf(
-                                                                                                  PropertyStatement(randomName(),
-                                                                                                                    P.eq(0))
-                                                                                          ))
-                                                                  ),
-                                                                  emptyList(),
-                                                                  emptyList()
-                                                             ))
-                                               )
-                                       ),
-                                       emptyList())
-                        ),
-                        emptyList(),
-                        emptyList())
+        val module = Module(randomName(),
+                            emptyList(),
+                            listOf(
+                                    Rule(randomName(),
+                                         resourceDef.ref,
+                                         listOf(
+                                                 NestedStatement(resourceDef.properties.elementAt(0).name,
+                                                                 listOf(
+                                                                         PropertyStatement(randomName(),
+                                                                                           P.eq(0))
+                                                                 ))
+                                         ),
+                                         emptyList(),
+                                         emptyList()
+                                    )))
 
         assertFails {
-            preflight.preflight(plan)
+            preflight.preflight(module)
         }
     }
 
@@ -213,30 +169,21 @@ class CloudSpecPreflightTest {
         val resourceDef = randomResourceDef()
         resourceDefStore.saveResourceDef(resourceDef)
 
-        val plan = Plan(randomName(),
-                        listOf(
-                                Module(randomName(),
-                                       emptyList(),
-                                       listOf(
-                                               Group(randomName(),
-                                                     listOf(
-                                                             Rule(randomName(),
-                                                                  resourceDef.ref,
-                                                                  listOf(
-                                                                          AssociationStatement(randomName(),
-                                                                                               emptyList())
-                                                                  ),
-                                                                  emptyList(),
-                                                                  emptyList())
-                                                     ))
-                                       ),
-                                       emptyList())
-                        ),
-                        emptyList(),
-                        emptyList())
+        val module = Module(randomName(),
+                            emptyList(),
+                            listOf(
+                                    Rule(randomName(),
+                                         resourceDef.ref,
+                                         listOf(
+                                                 AssociationStatement(randomName(),
+                                                                      emptyList())
+                                         ),
+                                         emptyList(),
+                                         emptyList())
+                            ))
 
         assertFails {
-            preflight.preflight(plan)
+            preflight.preflight(module)
         }
     }
 
@@ -244,6 +191,6 @@ class CloudSpecPreflightTest {
     fun shouldPassWithValidCloudSpec() {
         resourceDefStore.saveResourceDef(ModelTestUtils.TARGET_RESOURCE_DEF)
         resourceDefStore.saveResourceDef(ModelTestUtils.RESOURCE_DEF)
-        preflight.preflight(CloudSpecTestUtils.TEST_PLAN)
+        preflight.preflight(CloudSpecTestUtils.TEST_MODULE)
     }
 }

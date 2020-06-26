@@ -94,18 +94,18 @@ abstract class Provider {
     /**
      * Get all resources of a particular resource definition.
      *
-     * @param config CloudSpec config.
+     * @param sets CloudSpec config.
      * @param ref Resource definition reference.
      * @return List of resources.
      */
-    abstract fun resourcesByRef(config: ConfigValues, ref: ResourceDefRef): List<Any>
+    abstract fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Any>
 
     /**
      * Get a resource by resource definition and id.
      *
-     * @param config CloudSpec config.
+     * @param sets CloudSpec config.
      * @param ref Resource reference.
      * @return Optional resource.
      */
-    abstract fun resource(config: ConfigValues, ref: ResourceRef): Option<Any>
+    abstract fun resource(sets: SetValues, ref: ResourceRef): Option<Any>
 }

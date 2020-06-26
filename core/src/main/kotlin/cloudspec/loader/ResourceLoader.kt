@@ -38,12 +38,10 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
     private val loadedResourceDefs = mutableSetOf<ResourceDefRef>()
 
-    fun load(plan: Plan) {
+    fun load(module: Module) {
         logger.info("Loading resources required to run this test")
 
-        loadFromModules(plan.modules)
-        loadFromGroups(plan.groups)
-        loadFromRules(plan.rules)
+        loadFromModule(module)
     }
 
     private fun loadFromModules(modules: List<Module>) {
@@ -52,16 +50,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
     private fun loadFromModule(module: Module) {
         loadFromModules(module.modules)
-        loadFromGroups(module.groups)
         loadFromRules(module.rules)
-    }
-
-    private fun loadFromGroups(groups: List<Group>) {
-        groups.forEach { loadFromGroup(it) }
-    }
-
-    private fun loadFromGroup(group: Group) {
-        loadFromRules(group.rules)
     }
 
     private fun loadFromRules(rules: List<Rule>) {
@@ -86,22 +75,22 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
             }
     }
 
-    private fun loadFromStatement(config: ConfigValues, resource: Resource, statement: Statement, path: List<String>) {
+    private fun loadFromStatement(sets: SetValues, resource: Resource, statement: Statement, path: List<String>) {
         when (statement) {
             is NestedStatement -> {
                 statement.statements.forEach {
-                    loadFromStatement(config, resource, it, path.plus(statement.propertyName))
+                    loadFromStatement(sets, resource, it, path.plus(statement.propertyName))
                 }
             }
             is AssociationStatement -> {
-                loadFromAssociationStatement(config, resource, statement, path)
+                loadFromAssociationStatement(sets, resource, statement, path)
             }
             else -> {
             }
         }
     }
 
-    private fun loadFromAssociationStatement(config: ConfigValues,
+    private fun loadFromAssociationStatement(sets: SetValues,
                                              resource: Resource,
                                              statement: AssociationStatement,
                                              path: List<String>) {
@@ -114,11 +103,11 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
             is Some -> {
                 // load associated resource
                 val association = associationOpt.t
-                when (val associatedResourceOpt = getResource(config, association.resourceRef)) {
+                when (val associatedResourceOpt = getResource(sets, association.resourceRef)) {
                     is Some ->
                         // load resources from each sub statement
                         statement.statements.forEach {
-                            loadFromStatement(config, associatedResourceOpt.t, it, emptyList())
+                            loadFromStatement(sets, associatedResourceOpt.t, it, emptyList())
                         }
                     else ->
                         logger.error("Associated resource '${association.resourceRef}' " +
@@ -134,7 +123,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         }
     }
 
-    private fun getAllResources(config: ConfigValues, resourceDefRef: ResourceDefRef): Resources {
+    private fun getAllResources(sets: SetValues, resourceDefRef: ResourceDefRef): Resources {
         return if (!loadedResourceDefs.contains(resourceDefRef)) {
             logger.debug("Loading all resources of type '{}'", resourceDefRef)
 
@@ -142,7 +131,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
             providersRegistry.getProvider(resourceDefRef.providerName)
                 .map { provider ->
-                    provider.resourcesByRef(config, resourceDefRef)
+                    provider.resourcesByRef(sets, resourceDefRef)
                         .map { ResourceReflectionUtil.toResource(it) }
                         .flatten()
                         .onEach { (ref, properties, associations) ->
@@ -158,7 +147,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         }
     }
 
-    private fun getResource(config: ConfigValues, ref: ResourceRef): Option<Resource> {
+    private fun getResource(sets: SetValues, ref: ResourceRef): Option<Resource> {
         // TODO load incomplete resource from store
 //        Optional<Resource> resourceOpt = resourceStore.getResource(resourceDefRef, resourceId);
 //        if (!resourceOpt.isPresent()) {
@@ -166,7 +155,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
         return providersRegistry.getProvider(ref.defRef)
             .flatMap { provider ->
-                provider.resource(config, ref)
+                provider.resource(sets, ref)
                     .flatMap { ResourceReflectionUtil.toResource(it) }
                     .also {
                         if (it is Some) {

@@ -17,14 +17,10 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.loader
+package cloudspec.graph
 
-import cloudspec.CloudSpecLexer
-import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.LexerNoViableAltException
+import org.apache.tinkerpop.gremlin.structure.Vertex
 
-class BailCloudSpecLexer(val input: CharStream) : CloudSpecLexer(input) {
-    override fun recover(e: LexerNoViableAltException) {
-        throw RuntimeException(e)
-    }
+fun <V> Vertex.valueOrNull(name: String): V? {
+    return this.property<V>(name).orElse(null)
 }

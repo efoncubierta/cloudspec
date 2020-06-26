@@ -22,34 +22,34 @@ package cloudspec.model
 import arrow.core.Option
 import arrow.core.firstOrNone
 
-typealias ConfigValues = List<ConfigValue<*>>
+typealias SetValues = List<SetValue<*>>
 
-fun ConfigValues.getNumber(ref: ConfigRef): Option<Number> {
+fun SetValues.getNumber(ref: ConfigRef): Option<Number> {
     return this.getNumbers(ref).firstOrNone()
 }
 
-fun ConfigValues.getNumbers(ref: ConfigRef): List<Number> {
+fun SetValues.getNumbers(ref: ConfigRef): List<Number> {
     return this.filter { it.ref == ref }
-        .filterIsInstance<NumberConfigValue>()
+        .filterIsInstance<NumberSetValue>()
         .map { it.value }
 }
 
-fun ConfigValues.getString(ref: ConfigRef): Option<String> {
+fun SetValues.getString(ref: ConfigRef): Option<String> {
     return this.getStrings(ref).firstOrNone()
 }
 
-fun ConfigValues.getStrings(ref: ConfigRef): List<String> {
+fun SetValues.getStrings(ref: ConfigRef): List<String> {
     return this.filter { it.ref == ref }
-        .filterIsInstance<StringConfigValue>()
+        .filterIsInstance<StringSetValue>()
         .map { it.value }
 }
 
-fun ConfigValues.getBoolean(ref: ConfigRef): Option<Boolean> {
+fun SetValues.getBoolean(ref: ConfigRef): Option<Boolean> {
     return this.getBooleans(ref).firstOrNone()
 }
 
-fun ConfigValues.getBooleans(ref: ConfigRef): List<Boolean> {
+fun SetValues.getBooleans(ref: ConfigRef): List<Boolean> {
     return this.filter { it.ref == ref }
-        .filterIsInstance<BooleanConfigValue>()
+        .filterIsInstance<BooleanSetValue>()
         .map { it.value }
 }

@@ -59,8 +59,8 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
         // get all resource vertices by resource definition reference, and map them to resource objects
         return getResourceVerticesByDefinition(ref)
-                .map { toResourceFromVertex(it) }
-                .flatten()
+            .map { toResourceFromVertex(it) }
+            .flatten()
     }
 
     override fun resourceProperties(ref: ResourceRef): Option<Properties> {
@@ -147,33 +147,33 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
     private fun getResourceVertexById(ref: ResourceRef): Option<Vertex> {
         return graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_REF, ref)
-                .tryNext()
-                .orElse(null)
-                .toOption()
+            .has(LABEL_RESOURCE, PROPERTY_RESOURCE_REF, ref)
+            .tryNext()
+            .orElse(null)
+            .toOption()
     }
 
     private fun getResourceVerticesByDefinition(ref: ResourceDefRef): List<Vertex> {
         return graphTraversal.V()
-                .has(GraphResourceDefStore.LABEL_RESOURCE_DEF,
-                     GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
-                     ref)
-                .`in`()
-                .toList()
+            .has(GraphResourceDefStore.LABEL_RESOURCE_DEF,
+                 GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
+                 ref)
+            .`in`()
+            .toList()
     }
 
     private fun getOrCreateResourceVertexById(ref: ResourceRef): Vertex {
         logger.debug("Getting, or creating, resource vertex for resource '${ref}'")
 
         val resourceV = graphTraversal.V()
-                .has(LABEL_RESOURCE, PROPERTY_RESOURCE_REF, ref)
-                .fold() // check whether the resource vertex exist, or create it otherwise
-                .coalesce(
-                        underscore.unfold(),
-                        underscore.addV<Any>(LABEL_RESOURCE)
-                                .property(PROPERTY_RESOURCE_REF, ref)
-                )
-                .next()
+            .has(LABEL_RESOURCE, PROPERTY_RESOURCE_REF, ref)
+            .fold() // check whether the resource vertex exist, or create it otherwise
+            .coalesce(
+                    underscore.unfold(),
+                    underscore.addV<Any>(LABEL_RESOURCE)
+                        .property(PROPERTY_RESOURCE_REF, ref)
+            )
+            .next()
 
         // new resource vertex must have an edge to its resource definition vertex
         if (!resourceV.edges(Direction.OUT, LABEL_IS_RESOURCE_DEF).hasNext()) {
@@ -181,11 +181,11 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
             // get resource definition vertex
             val resourceDefVOpt = graphTraversal
-                    .V()
-                    .has(GraphResourceDefStore.LABEL_RESOURCE_DEF,
-                         GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
-                         ref.defRef)
-                    .tryNext()
+                .V()
+                .has(GraphResourceDefStore.LABEL_RESOURCE_DEF,
+                     GraphResourceDefStore.PROPERTY_RESOURCE_DEF_REF,
+                     ref.defRef)
+                .tryNext()
 
             // if resource definition vertex doesn't exist, roll back and throw an error
             if (!resourceDefVOpt.isPresent) {
@@ -195,10 +195,10 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
             // create edge between resource and resource definition edges
             graphTraversal.V()
-                    .addE(LABEL_IS_RESOURCE_DEF)
-                    .from(resourceV)
-                    .to(resourceDefVOpt.get())
-                    .next()
+                .addE(LABEL_IS_RESOURCE_DEF)
+                .from(resourceV)
+                .to(resourceDefVOpt.get())
+                .next()
         }
         return resourceV
     }
@@ -209,9 +209,9 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         // source vertex can be a resource or a property value
         // get property vertex by its name
         val propertyVOpt = graphTraversal.V(sourceV.id())
-                .out(LABEL_HAS_PROPERTY)
-                .has(PROPERTY_NAME, property.name)
-                .tryNext()
+            .out(LABEL_HAS_PROPERTY)
+            .has(PROPERTY_NAME, property.name)
+            .tryNext()
 
         // return if exists
         if (propertyVOpt.isPresent) {
@@ -222,19 +222,19 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
         // get property definition vertex
         val propertyDefVOpt = graphTraversal
-                .V(sourceV.id())
-                // attempt to get the resource definition or property definition vertex
-                // depending on whether the source vertex is a resource or a property value
-                .coalesce(
-                        // if source vertex is a resource, this should return a resource definition vertex
-                        underscore.out(LABEL_IS_RESOURCE_DEF),
-                        // otherwise, it should be a property value, so this should return the property property
-                        // definition vertex traversing through its property vertex
-                        underscore.`in`(LABEL_HAS_PROPERTY_VALUE).out(LABEL_IS_PROPERTY_DEF)
-                )
-                .out(GraphResourceDefStore.LABEL_HAS_PROPERTY_DEF)
-                .has(GraphResourceDefStore.PROPERTY_NAME, property.name)
-                .tryNext()
+            .V(sourceV.id())
+            // attempt to get the resource definition or property definition vertex
+            // depending on whether the source vertex is a resource or a property value
+            .coalesce(
+                    // if source vertex is a resource, this should return a resource definition vertex
+                    underscore.out(LABEL_IS_RESOURCE_DEF),
+                    // otherwise, it should be a property value, so this should return the property property
+                    // definition vertex traversing through its property vertex
+                    underscore.`in`(LABEL_HAS_PROPERTY_VALUE).out(LABEL_IS_PROPERTY_DEF)
+            )
+            .out(GraphResourceDefStore.LABEL_HAS_PROPERTY_DEF)
+            .has(GraphResourceDefStore.PROPERTY_NAME, property.name)
+            .tryNext()
 
         // property definition must exists to be able to create the property
         if (!propertyDefVOpt.isPresent) {
@@ -248,25 +248,25 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
         // create property vertex
         val propertyV = graphTraversal
-                .addV(LABEL_PROPERTY)
-                .property(PROPERTY_NAME, property.name)
-                .property(PROPERTY_TYPE, propertyType)
-                .property(PROPERTY_IS_MULTIVALUED, multiValued)
-                .next()
+            .addV(LABEL_PROPERTY)
+            .property(PROPERTY_NAME, property.name)
+            .property(PROPERTY_TYPE, propertyType)
+            .property(PROPERTY_IS_MULTIVALUED, multiValued)
+            .next()
 
         // create edge between source (resource or property value) vertex and property vertex
         graphTraversal
-                .addE(LABEL_HAS_PROPERTY)
-                .from(sourceV)
-                .to(propertyV)
-                .next()
+            .addE(LABEL_HAS_PROPERTY)
+            .from(sourceV)
+            .to(propertyV)
+            .next()
 
         // create edge between property vertex and property definition vertex
         graphTraversal
-                .addE(LABEL_IS_PROPERTY_DEF)
-                .from(propertyV)
-                .to(propertyDefVOpt.get())
-                .next()
+            .addE(LABEL_IS_PROPERTY_DEF)
+            .from(propertyV)
+            .to(propertyDefVOpt.get())
+            .next()
 
         return propertyV
     }
@@ -291,15 +291,15 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
     private fun saveNestedPropertyValueFromVertex(propertyV: Vertex, nestedProperty: NestedPropertyValue?) {
         // nested property values are empty, but with edges to properties and associations
         val propertyValueV = graphTraversal.V(propertyV.id())
-                .addV(LABEL_PROPERTY_VALUE)
-                .next()
+            .addV(LABEL_PROPERTY_VALUE)
+            .next()
 
         // add edge between property and property value edges
         graphTraversal
-                .addE(LABEL_HAS_PROPERTY_VALUE)
-                .from(propertyV)
-                .to(propertyValueV)
-                .next()
+            .addE(LABEL_HAS_PROPERTY_VALUE)
+            .from(propertyV)
+            .to(propertyValueV)
+            .next()
 
         // save nested properties
         savePropertiesFromVertex(propertyValueV, nestedProperty?.properties ?: emptySet())
@@ -311,32 +311,32 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
     private fun saveAtomicPropertyValueFromVertex(propertyV: Vertex, obj: Any?) {
         // atomic property values hold a value
         val propertyValueV = graphTraversal.V(propertyV.id())
-                .addV(LABEL_PROPERTY_VALUE)
-                .property(PROPERTY_VALUE, obj)
-                .next()
+            .addV(LABEL_PROPERTY_VALUE)
+            .property(PROPERTY_VALUE, obj)
+            .next()
 
         // create edge between property and property value edges
         graphTraversal
-                .addE(LABEL_HAS_PROPERTY_VALUE)
-                .from(propertyV)
-                .to(propertyValueV)
-                .next()
+            .addE(LABEL_HAS_PROPERTY_VALUE)
+            .from(propertyV)
+            .to(propertyValueV)
+            .next()
     }
 
     private fun saveKeyValuePropertyValueFromVertex(propertyV: Vertex, keyValue: KeyValue?) {
         // key value property values hold a key and a value properties
         val propertyValueV = graphTraversal.V(propertyV.id())
-                .addV(LABEL_PROPERTY_VALUE)
-                .property(PROPERTY_KEY, keyValue?.key)
-                .property(PROPERTY_VALUE, keyValue?.value)
-                .next()
+            .addV(LABEL_PROPERTY_VALUE)
+            .property(PROPERTY_KEY, keyValue?.key)
+            .property(PROPERTY_VALUE, keyValue?.value)
+            .next()
 
         // create edge between property and property value edges
         graphTraversal
-                .addE(LABEL_HAS_PROPERTY_VALUE)
-                .from(propertyV)
-                .to(propertyValueV)
-                .next()
+            .addE(LABEL_HAS_PROPERTY_VALUE)
+            .from(propertyV)
+            .to(propertyValueV)
+            .next()
     }
 
     private fun saveAssociationsFromVertex(sourceV: Vertex, associations: Associations) {
@@ -354,21 +354,21 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
         // link source resource to target resource
         graphTraversal
-                .V(sourceV.id())
-                .fold()
-                // check whether the association already exists, or create it otherwise
-                .coalesce(
-                        underscore.unfold<Any>()
-                                .outE(LABEL_HAS_ASSOCIATION)
-                                .has(PROPERTY_NAME, association.name)
-                                .inV()
-                                .has(PROPERTY_RESOURCE_REF, association.resourceRef),
-                        underscore.addE<Any>(LABEL_HAS_ASSOCIATION)
-                                .property(PROPERTY_NAME, association.name)
-                                .from(sourceV)
-                                .to(targetV)
-                                .inV()
-                ).next()
+            .V(sourceV.id())
+            .fold()
+            // check whether the association already exists, or create it otherwise
+            .coalesce(
+                    underscore.unfold<Any>()
+                        .outE(LABEL_HAS_ASSOCIATION)
+                        .has(PROPERTY_NAME, association.name)
+                        .inV()
+                        .has(PROPERTY_RESOURCE_REF, association.resourceRef),
+                    underscore.addE<Any>(LABEL_HAS_ASSOCIATION)
+                        .property(PROPERTY_NAME, association.name)
+                        .from(sourceV)
+                        .to(targetV)
+                        .inV()
+            ).next()
     }
 
     private fun toResourceFromVertex(resourceV: Vertex): Option<Resource> {
@@ -395,11 +395,11 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
             LABEL_RESOURCE,
             LABEL_PROPERTY_VALUE -> {
                 graphTraversal
-                        .V(sourceV.id())
-                        .out(LABEL_HAS_PROPERTY)
-                        .toList()
-                        .flatMap { toPropertyValuesFromVertex(it) }
-                        .toSet()
+                    .V(sourceV.id())
+                    .out(LABEL_HAS_PROPERTY)
+                    .toList()
+                    .flatMap { toPropertyValuesFromVertex(it) }
+                    .toSet()
             }
             else -> {
                 logger.error("Vertex is not of type '${LABEL_RESOURCE}' or '${LABEL_PROPERTY_VALUE}'.")
@@ -412,14 +412,14 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         return when (propertyV.label()) {
             LABEL_PROPERTY -> {
                 graphTraversal
-                        .V(propertyV.id())
-                        .out(LABEL_HAS_PROPERTY_VALUE)
-                        .toList()
-                        .map {
-                            toProperty(propertyV.value(PROPERTY_NAME), propertyV.value(PROPERTY_TYPE), it)
-                        }
-                        .flatten()
-                        .toSet()
+                    .V(propertyV.id())
+                    .out(LABEL_HAS_PROPERTY_VALUE)
+                    .toList()
+                    .map {
+                        toProperty(propertyV.value(PROPERTY_NAME), propertyV.value(PROPERTY_TYPE), it)
+                    }
+                    .flatten()
+                    .toSet()
             }
             else -> {
                 logger.error("Vertex is not of type '${LABEL_PROPERTY_VALUE}'.")
@@ -430,13 +430,13 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
 
     private fun toProperty(propertyName: String, type: PropertyType, propertyValueV: Vertex): Option<Property<*>> {
         return when (type) {
-            PropertyType.NUMBER -> NumberProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
-            PropertyType.STRING -> StringProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
-            PropertyType.BOOLEAN -> BooleanProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
-            PropertyType.DATE -> InstantProperty(propertyName, propertyValueV.value(PROPERTY_VALUE))
+            PropertyType.NUMBER -> NumberProperty(propertyName, propertyValueV.valueOrNull(PROPERTY_VALUE))
+            PropertyType.STRING -> StringProperty(propertyName, propertyValueV.valueOrNull(PROPERTY_VALUE))
+            PropertyType.BOOLEAN -> BooleanProperty(propertyName, propertyValueV.valueOrNull(PROPERTY_VALUE))
+            PropertyType.DATE -> InstantProperty(propertyName, propertyValueV.valueOrNull(PROPERTY_VALUE))
             PropertyType.KEY_VALUE -> KeyValueProperty(propertyName,
                                                        KeyValue(propertyValueV.value(PROPERTY_KEY),
-                                                                propertyValueV.value(PROPERTY_VALUE)))
+                                                                propertyValueV.valueOrNull(PROPERTY_VALUE)))
             PropertyType.NESTED -> NestedProperty(propertyName,
                                                   NestedPropertyValue(toPropertiesFromVertex(propertyValueV),
                                                                       toAssociationsFromVertex(propertyValueV)))
@@ -449,23 +449,23 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
             LABEL_PROPERTY_VALUE -> {
                 // get all association edges
                 val associationEdges = graphTraversal
-                        .V(sourceV.id())
-                        .outE(LABEL_HAS_ASSOCIATION)
-                        .toList()
+                    .V(sourceV.id())
+                    .outE(LABEL_HAS_ASSOCIATION)
+                    .toList()
 
                 // map association edges to association objects
                 associationEdges
-                        .flatMap {
-                            graphTraversal
-                                    .E(it.id())
-                                    .inV()
-                                    .map { v ->
-                                        Association(it.value(PROPERTY_NAME),
-                                                    v.get().value(PROPERTY_RESOURCE_REF))
-                                    }
-                                    .toList()
-                        }
-                        .toSet()
+                    .flatMap {
+                        graphTraversal
+                            .E(it.id())
+                            .inV()
+                            .map { v ->
+                                Association(it.value(PROPERTY_NAME),
+                                            v.get().value(PROPERTY_RESOURCE_REF))
+                            }
+                            .toList()
+                    }
+                    .toSet()
             }
             else -> {
                 logger.error("Vertex is not of type '${LABEL_RESOURCE}' or '${LABEL_PROPERTY_VALUE}'.")
@@ -481,15 +481,15 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
             }
             LABEL_PROPERTY_VALUE -> {
                 toMemberPath(graphTraversal
-                                     .V(sourceV.id())
-                                     .`in`(LABEL_HAS_PROPERTY_VALUE)
-                                     .next(),
+                                 .V(sourceV.id())
+                                 .`in`(LABEL_HAS_PROPERTY_VALUE)
+                                 .next(),
                              memberName)
             }
             else -> {
                 toMemberPath(graphTraversal.V(sourceV.id())
-                                     .`in`(LABEL_HAS_PROPERTY)
-                                     .next(),
+                                 .`in`(LABEL_HAS_PROPERTY)
+                                 .next(),
                              sourceV.value(PROPERTY_NAME)).let { "${it}.${memberName}" }
             }
         }
