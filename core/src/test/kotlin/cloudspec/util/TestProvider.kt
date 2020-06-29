@@ -21,15 +21,22 @@ package cloudspec.util
 
 import arrow.core.Option
 import arrow.core.none
-import cloudspec.annotation.ProviderDefinition
+import arrow.syntax.collections.flatten
+import cloudspec.annotation.ResourceDefReflectionUtil
 import cloudspec.model.*
 
-@ProviderDefinition(
-        name = ProviderDataUtil.PROVIDER_NAME,
-        description = ProviderDataUtil.PROVIDER_DESCRIPTION,
-        resources = [TestResource::class]
-)
 class TestProvider : Provider() {
+    override val name
+        get() = ProviderDataUtil.PROVIDER_NAME
+
+    override val description
+        get() = ProviderDataUtil.PROVIDER_DESCRIPTION
+
+    override val resourceDefs
+        get() = listOf(TestResource::class)
+            .map { ResourceDefReflectionUtil.toResourceDef(it) }
+            .flatten()
+
     override val configDefs: ConfigDefs
         get() = setOf(
                 ConfigDef(ConfigRef(ProviderDataUtil.PROVIDER_NAME, "myconfig"),

@@ -20,12 +20,6 @@
 package cloudspec.model
 
 import arrow.core.Option
-import arrow.core.firstOrNone
-import arrow.syntax.collections.flatten
-import cloudspec.annotation.ProviderDefinition
-import cloudspec.annotation.ResourceDefReflectionUtil
-import cloudspec.annotation.ResourceDefinition
-import kotlin.reflect.full.findAnnotation
 
 /**
  * Define a CloudSpec's provider.
@@ -39,19 +33,19 @@ abstract class Provider {
     /**
      * Provider name.
      */
-    val name: String
+    abstract val name: String
 
     /**
      * Provider description.
      */
-    val description: String
+    abstract val description: String
 
     /**
      * Get all resource definitions the provider provides.
      *
      * @return List of resource definitions.
      */
-    val resourceDefs: ResourceDefs
+    abstract val resourceDefs: ResourceDefs
 
     /**
      *  Get all configuration definitions the provider provides.
@@ -59,37 +53,6 @@ abstract class Provider {
      * @return List of configuration definitions.
      */
     abstract val configDefs: ConfigDefs
-
-    /**
-     * Constructor.
-     *
-     * When a instance of a class implementing this class is constructed, all
-     * information related to the provider contained in the annotations are extracted.
-     */
-    init {
-        val providerDefinition = this::class.findAnnotation<ProviderDefinition>()
-                ?: throw RuntimeException("Provider class ${this::class.qualifiedName} " +
-                                                  "is not annotated with @ProviderDefinition")
-        // check the class is annotated
-
-        name = providerDefinition.name
-        description = providerDefinition.description
-        resourceDefs = providerDefinition.resources
-            .filter { it.annotations.any { annotation -> annotation is ResourceDefinition } }
-            .map { ResourceDefReflectionUtil.toResourceDef(it) }
-            .flatten()
-    }
-
-    /**
-     * Get a resource definition by its reference.
-     *
-     * @param config CloudSpec config.
-     * @param ref Resource definition reference.
-     * @return Optional resource definition.
-     */
-    fun resourceDef(ref: ResourceDefRef): Option<ResourceDef> {
-        return resourceDefs.firstOrNone { it.ref == ref }
-    }
 
     /**
      * Get all resources of a particular resource definition.

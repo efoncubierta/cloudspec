@@ -24,7 +24,7 @@ import arrow.core.extensions.fx
 import arrow.core.getOrElse
 import arrow.core.toOption
 import arrow.syntax.collections.flatten
-import cloudspec.annotation.ProviderDefinition
+import cloudspec.annotation.ResourceDefReflectionUtil
 import cloudspec.annotation.ResourceReflectionUtil
 import cloudspec.aws.ec2.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
@@ -33,36 +33,40 @@ import cloudspec.aws.s3.S3BucketResource
 import cloudspec.model.*
 import java.util.*
 
-@ProviderDefinition(
-        name = "aws",
-        description = "Amazon Web Services",
-        resources = [
-            EC2Image::class,
-            EC2CapacityReservation::class,
-            EC2DhcpOptions::class,
-            EC2ElasticGpu::class,
-            EC2FlowLog::class,
-            EC2Instance::class,
-            EC2InternetGateway::class,
-            EC2LocalGateway::class,
-            EC2NatGateway::class,
-            EC2NetworkAcl::class,
-            EC2NetworkInterface::class,
-            EC2ReservedInstances::class,
-            EC2RouteTable::class,
-            EC2SecurityGroup::class,
-            EC2Snapshot::class,
-            EC2Subnet::class,
-            EC2TransitGateway::class,
-            EC2Volume::class,
-            EC2VpcPeeringConnection::class,
-            EC2Vpc::class,
-            IAMInstanceProfileResource::class,
-            S3BucketResource::class
-        ]
-)
 class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     private val loaders: MutableMap<String, AWSResourceLoader<*>> = HashMap()
+
+    override val name
+        get() = "aws"
+
+    override val description
+        get() = "Amazon Web Services"
+
+    override val resourceDefs
+        get() = listOf(EC2Image::class,
+                       EC2CapacityReservation::class,
+                       EC2DhcpOptions::class,
+                       EC2ElasticGpu::class,
+                       EC2FlowLog::class,
+                       EC2Instance::class,
+                       EC2InternetGateway::class,
+                       EC2LocalGateway::class,
+                       EC2NatGateway::class,
+                       EC2NetworkAcl::class,
+                       EC2NetworkInterface::class,
+                       EC2ReservedInstances::class,
+                       EC2RouteTable::class,
+                       EC2SecurityGroup::class,
+                       EC2Snapshot::class,
+                       EC2Subnet::class,
+                       EC2TransitGateway::class,
+                       EC2Volume::class,
+                       EC2VpcPeeringConnection::class,
+                       EC2Vpc::class,
+                       IAMInstanceProfileResource::class,
+                       S3BucketResource::class)
+            .map { ResourceDefReflectionUtil.toResourceDef(it) }
+            .flatten()
 
     override val configDefs: ConfigDefs
         get() = AWSConfig.CONFIG_DEFS
