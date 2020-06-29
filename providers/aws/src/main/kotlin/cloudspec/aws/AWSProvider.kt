@@ -20,9 +20,12 @@
 package cloudspec.aws
 
 import arrow.core.Option
+import arrow.core.extensions.fx
 import arrow.core.getOrElse
 import arrow.core.toOption
+import arrow.syntax.collections.flatten
 import cloudspec.annotation.ProviderDefinition
+import cloudspec.annotation.ResourceReflectionUtil
 import cloudspec.aws.ec2.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
 import cloudspec.aws.s3.S3BucketLoader
@@ -64,12 +67,22 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     override val configDefs: ConfigDefs
         get() = AWSConfig.CONFIG_DEFS
 
-    override fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<AWSResource> {
-        return getLoader(ref).map { it.all(sets) }.getOrElse { emptyList() }
+    override fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Resource> {
+        return getLoader(ref).map { loader ->
+            loader.all(sets).map {
+                ResourceReflectionUtil.toResource(it)
+            }.flatten()
+        }.getOrElse { emptyList() }
     }
 
-    override fun resource(sets: SetValues, ref: ResourceRef): Option<AWSResource> {
-        return getLoader(ref.defRef).flatMap { it.byId(sets, ref.id) }
+    override fun resource(sets: SetValues, ref: ResourceRef): Option<Resource> {
+        return Option.fx {
+            val (loader) = getLoader(ref.defRef)
+            val (awsResource) = loader.byId(sets, ref.id)
+            val (resource) = ResourceReflectionUtil.toResource(awsResource)
+
+            resource
+        }
     }
 
     private fun getLoader(resourceDefRef: ResourceDefRef): Option<AWSResourceLoader<*>> {

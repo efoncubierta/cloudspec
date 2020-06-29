@@ -132,12 +132,8 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
             providersRegistry.getProvider(resourceDefRef.providerName)
                 .map { provider ->
                     provider.resourcesByRef(sets, resourceDefRef)
-                        .map { ResourceReflectionUtil.toResource(it) }
-                        .flatten()
                         .onEach { (ref, properties, associations) ->
-                            resourceStore.saveResource(ref,
-                                                       properties,
-                                                       associations)
+                            resourceStore.saveResource(ref, properties, associations)
                         }
                 }.getOrElse {
                     emptyList()
@@ -156,12 +152,10 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         return providersRegistry.getProvider(ref.defRef)
             .flatMap { provider ->
                 provider.resource(sets, ref)
-                    .flatMap { ResourceReflectionUtil.toResource(it) }
                     .also {
+                        // if resource exists, save it
                         if (it is Some) {
-                            resourceStore.saveResource(ref,
-                                                       it.t.properties,
-                                                       it.t.associations)
+                            resourceStore.saveResource(ref, it.t.properties, it.t.associations)
                         }
                     }
             }

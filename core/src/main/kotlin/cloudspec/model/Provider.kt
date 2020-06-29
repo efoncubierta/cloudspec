@@ -98,7 +98,7 @@ abstract class Provider {
      * @param ref Resource definition reference.
      * @return List of resources.
      */
-    abstract fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Any>
+    abstract fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Resource>
 
     /**
      * Get a resource by resource definition and id.
@@ -107,5 +107,5 @@ abstract class Provider {
      * @param ref Resource reference.
      * @return Optional resource.
      */
-    abstract fun resource(sets: SetValues, ref: ResourceRef): Option<Any>
+    abstract fun resource(sets: SetValues, ref: ResourceRef): Option<Resource>
 }

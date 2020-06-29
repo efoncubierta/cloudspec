@@ -38,11 +38,11 @@ class TestProvider : Provider() {
                           false)
         )
 
-    override fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Any> {
+    override fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Resource> {
         return emptyList()
     }
 
-    override fun resource(sets: SetValues, ref: ResourceRef): Option<Any> {
+    override fun resource(sets: SetValues, ref: ResourceRef): Option<Resource> {
         return none()
     }
 }
