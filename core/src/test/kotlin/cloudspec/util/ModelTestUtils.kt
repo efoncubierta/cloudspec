@@ -111,6 +111,34 @@ object ModelTestUtils {
             PROP_STRING_LIST_EXAMPLE_VALUES
     )
     val PROP_STRING_LIST = StringProperty(PROP_STRING_LIST_NAME, PROP_STRING_VALUE)
+
+    const val PROP_ENUM_NAME = "enum_property"
+    const val PROP_ENUM_DESCRIPTION = "Enum property"
+    const val PROP_ENUM_EXAMPLE_VALUES = "The enum property"
+    val PROP_ENUM_TYPE = PropertyType.STRING
+    val PROP_ENUM_VALUE = TestEnum.TEST_1
+    val PROP_ENUM_DEF = PropertyDef(
+            PROP_ENUM_NAME,
+            PROP_ENUM_DESCRIPTION,
+            PROP_ENUM_TYPE,
+            false,
+            PROP_ENUM_EXAMPLE_VALUES
+    )
+    val PROP_ENUM = StringProperty(PROP_ENUM_NAME, PROP_ENUM_VALUE.toString())
+    const val PROP_ENUM_LIST_NAME = "enum_list_property"
+    const val PROP_ENUM_LIST_DESCRIPTION = "Enum list property"
+    const val PROP_ENUM_LIST_EXAMPLE_VALUES = "The list of enums property"
+    val PROP_ENUM_LIST_TYPE = PropertyType.STRING
+    val PROP_ENUM_LIST_VALUE = listOf(PROP_ENUM_VALUE, PROP_ENUM_VALUE)
+    val PROP_ENUM_LIST_DEF = PropertyDef(
+            PROP_ENUM_LIST_NAME,
+            PROP_ENUM_LIST_DESCRIPTION,
+            PROP_ENUM_LIST_TYPE,
+            true,
+            PROP_ENUM_LIST_EXAMPLE_VALUES
+    )
+    val PROP_ENUM_LIST = StringProperty(PROP_ENUM_LIST_NAME, PROP_ENUM_VALUE.toString())
+
     const val PROP_BOOLEAN_NAME = "boolean_property"
     const val PROP_BOOLEAN_DESCRIPTION = "Boolean property"
     const val PROP_BOOLEAN_EXAMPLE_VALUES = "The boolean property"
@@ -198,6 +226,7 @@ object ModelTestUtils {
             setOf(
                     PROP_NUMBER, PROP_NUMBER_LIST, PROP_NUMBER_LIST,
                     PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
+                    PROP_ENUM, PROP_ENUM_LIST, PROP_ENUM_LIST,
                     PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
                     PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
                     PROP_KEY_VALUE, PROP_KEY_VALUE_LIST, PROP_KEY_VALUE_LIST
@@ -215,6 +244,7 @@ object ModelTestUtils {
             setOf(
                     PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
+                    PROP_ENUM_DEF, PROP_ENUM_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
                     PROP_DATE_DEF, PROP_DATE_LIST_DEF,
                     PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
@@ -238,6 +268,7 @@ object ModelTestUtils {
             setOf(
                     PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
                     PROP_STRING_DEF, PROP_STRING_LIST_DEF,
+                    PROP_ENUM_DEF, PROP_ENUM_LIST_DEF,
                     PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
                     PROP_DATE_DEF, PROP_DATE_LIST_DEF,
                     PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
@@ -252,6 +283,7 @@ object ModelTestUtils {
             PROP_ID,
             PROP_NUMBER, PROP_NUMBER_LIST, PROP_NUMBER_LIST,
             PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
+            PROP_ENUM, PROP_ENUM_LIST, PROP_ENUM_LIST,
             PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
             PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
             PROP_KEY_VALUE, PROP_KEY_VALUE_LIST, PROP_KEY_VALUE_LIST,
@@ -262,6 +294,7 @@ object ModelTestUtils {
             PROP_ID,
             PROP_NUMBER, PROP_NUMBER_LIST, PROP_NUMBER_LIST,
             PROP_STRING, PROP_STRING_LIST, PROP_STRING_LIST,
+            PROP_ENUM, PROP_ENUM_LIST, PROP_ENUM_LIST,
             PROP_BOOLEAN, PROP_BOOLEAN_LIST, PROP_BOOLEAN_LIST,
             PROP_DATE, PROP_DATE_LIST, PROP_DATE_LIST,
             PROP_KEY_VALUE, PROP_KEY_VALUE_LIST, PROP_KEY_VALUE_LIST
@@ -271,6 +304,7 @@ object ModelTestUtils {
             PROP_ID_DEF,
             PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF,
+            PROP_ENUM_DEF, PROP_ENUM_LIST_DEF,
             PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
             PROP_DATE_DEF, PROP_DATE_LIST_DEF,
             PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF,
@@ -281,6 +315,7 @@ object ModelTestUtils {
             PROP_ID_DEF,
             PROP_NUMBER_DEF, PROP_NUMBER_LIST_DEF,
             PROP_STRING_DEF, PROP_STRING_LIST_DEF,
+            PROP_ENUM_DEF, PROP_ENUM_LIST_DEF,
             PROP_BOOLEAN_DEF, PROP_BOOLEAN_LIST_DEF,
             PROP_DATE_DEF, PROP_DATE_LIST_DEF,
             PROP_KEY_VALUE_DEF, PROP_KEY_VALUE_LIST_DEF
@@ -321,6 +356,8 @@ object ModelTestUtils {
             PROP_NUMBER_LIST_VALUE,
             PROP_STRING_VALUE,
             PROP_STRING_LIST_VALUE,
+            PROP_ENUM_VALUE,
+            PROP_ENUM_LIST_VALUE,
             PROP_BOOLEAN_VALUE,
             PROP_BOOLEAN_LIST_VALUE,
             PROP_DATE_VALUE,
@@ -332,6 +369,8 @@ object ModelTestUtils {
                     PROP_NUMBER_LIST_VALUE,
                     PROP_STRING_VALUE,
                     PROP_STRING_LIST_VALUE,
+                    PROP_ENUM_VALUE,
+                    PROP_ENUM_LIST_VALUE,
                     PROP_BOOLEAN_VALUE,
                     PROP_BOOLEAN_LIST_VALUE,
                     PROP_DATE_VALUE,
@@ -346,6 +385,8 @@ object ModelTestUtils {
                             PROP_NUMBER_LIST_VALUE,
                             PROP_STRING_VALUE,
                             PROP_STRING_LIST_VALUE,
+                            PROP_ENUM_VALUE,
+                            PROP_ENUM_LIST_VALUE,
                             PROP_BOOLEAN_VALUE,
                             PROP_BOOLEAN_LIST_VALUE,
                             PROP_DATE_VALUE,

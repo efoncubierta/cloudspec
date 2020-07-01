@@ -70,6 +70,20 @@ data class TestResource(
         val stringListProperty: List<String>?,
 
         @property:PropertyDefinition(
+                name = ModelTestUtils.PROP_ENUM_NAME,
+                description = ModelTestUtils.PROP_ENUM_DESCRIPTION,
+                exampleValues = ModelTestUtils.PROP_ENUM_EXAMPLE_VALUES
+        )
+        val enumProperty: TestEnum?,
+
+        @property:PropertyDefinition(
+                name = ModelTestUtils.PROP_ENUM_LIST_NAME,
+                description = ModelTestUtils.PROP_ENUM_LIST_DESCRIPTION,
+                exampleValues = ModelTestUtils.PROP_ENUM_LIST_EXAMPLE_VALUES
+        )
+        val enumListProperty: List<TestEnum>?,
+
+        @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_BOOLEAN_NAME,
                 description = ModelTestUtils.PROP_BOOLEAN_DESCRIPTION,
                 exampleValues = ModelTestUtils.PROP_BOOLEAN_EXAMPLE_VALUES

@@ -106,9 +106,9 @@ object ResourceDefReflectionUtil {
      */
     fun toPropertyDefs(kclass: KClass<*>): Set<PropertyDef> {
         return kclass.memberProperties
-                .map { toPropertyDef(it) }
-                .flatten()
-                .toSet()
+            .map { toPropertyDef(it) }
+            .flatten()
+            .toSet()
     }
 
     /**
@@ -155,9 +155,9 @@ object ResourceDefReflectionUtil {
      */
     fun toAssociationDefs(kclass: KClass<*>): Set<AssociationDef> {
         return kclass.memberProperties
-                .map { toAssociationDef(kclass, it) }
-                .flatten()
-                .toSet()
+            .map { toAssociationDef(kclass, it) }
+            .flatten()
+            .toSet()
     }
 
     /**
@@ -168,7 +168,7 @@ object ResourceDefReflectionUtil {
      * @return Optional association definition.
      */
     private fun toAssociationDef(kclass: KClass<*>, kprop: KProperty<*>): Option<AssociationDef> {
-        if(kprop.findAnnotation<AssociationDefinition>() == null) {
+        if (kprop.findAnnotation<AssociationDefinition>() == null) {
             return none<AssociationDef>()
         }
 
@@ -211,7 +211,7 @@ object ResourceDefReflectionUtil {
         return when {
             isMultiValued(ktype) -> guessPropertyType(guessContainedType(ktype))
             isNullableNumber(ktype) -> PropertyType.NUMBER.toOption()
-            isNullableString(ktype) -> PropertyType.STRING.toOption()
+            isNullableString(ktype) || isNullableEnum(ktype) -> PropertyType.STRING.toOption()
             isNullableBoolean(ktype) -> PropertyType.BOOLEAN.toOption()
             isNullableDate(ktype) -> PropertyType.DATE.toOption()
             isNullableKeyValue(ktype) -> PropertyType.KEY_VALUE.toOption()
@@ -239,16 +239,16 @@ object ResourceDefReflectionUtil {
      */
     fun hasIdAnnotation(kclass: KClass<*>): Boolean {
         val kprops = kclass.memberProperties
-                .filter {
-                    it.findAnnotation<IdDefinition>() != null
+            .filter {
+                it.findAnnotation<IdDefinition>() != null
+            }
+            .filter {
+                if (it.returnType.isMarkedNullable) {
+                    logger.error("Id '${it.name}' property of class '${kclass.qualifiedName}' cannot be nullable.")
+                    return@filter false
                 }
-                .filter {
-                    if (it.returnType.isMarkedNullable) {
-                        logger.error("Id '${it.name}' property of class '${kclass.qualifiedName}' cannot be nullable.")
-                        return@filter false
-                    }
-                    return@filter true
-                }
+                return@filter true
+            }
 
         return when {
             kprops.isEmpty() ->
@@ -331,6 +331,16 @@ object ResourceDefReflectionUtil {
      */
     fun isNullableString(ktype: KType): Boolean {
         return ktype.isSubtypeOf(String::class.starProjectedType.withNullability(true))
+    }
+
+    /**
+     * Check whether a type is an enum.
+     *
+     * @param ktype Type.
+     * @return True if type is a string. False otherwise.
+     */
+    fun isNullableEnum(ktype: KType): Boolean {
+        return ktype.isSubtypeOf(Enum::class.starProjectedType.withNullability(true))
     }
 
     /**

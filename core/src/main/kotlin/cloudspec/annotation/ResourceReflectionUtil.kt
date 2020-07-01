@@ -75,29 +75,29 @@ object ResourceReflectionUtil {
      */
     fun toResourceId(obj: Any): Option<String> {
         return obj::class.memberProperties
-                .onEach {
-                    if (it.findAnnotation<IdDefinition>() == null || !isString(it.returnType)) {
-                        logger.debug("Cannot produce a resource id from property '${it.name}' " +
-                                             "of object of class '${obj::class.qualifiedName}' " +
-                                             "because it is not annotated with @IdDefinition " +
-                                             "or is not a String")
-                    }
+            .onEach {
+                if (it.findAnnotation<IdDefinition>() == null || !isString(it.returnType)) {
+                    logger.debug("Cannot produce a resource id from property '${it.name}' " +
+                                         "of object of class '${obj::class.qualifiedName}' " +
+                                         "because it is not annotated with @IdDefinition " +
+                                         "or is not a String")
                 }
-                .filter { it.findAnnotation<IdDefinition>() != null && isString(it.returnType) }
-                .map {
-                    if (logger.isDebugEnabled) {
-                        logger.debug("Found @IdDefinition annotation in property '${it.name}' " +
-                                             "of object of class '${obj::class.qualifiedName}'")
-                    }
+            }
+            .filter { it.findAnnotation<IdDefinition>() != null && isString(it.returnType) }
+            .map {
+                if (logger.isDebugEnabled) {
+                    logger.debug("Found @IdDefinition annotation in property '${it.name}' " +
+                                         "of object of class '${obj::class.qualifiedName}'")
+                }
 
-                    try {
-                        return@map it.call(obj) as String
-                    } catch (exception: IllegalAccessException) {
-                        throw RuntimeException("Could not obtain ID from property '${it.name}' " +
-                                                       "of object of class ${obj::class.qualifiedName}'")
-                    }
+                try {
+                    return@map it.call(obj) as String
+                } catch (exception: IllegalAccessException) {
+                    throw RuntimeException("Could not obtain ID from property '${it.name}' " +
+                                                   "of object of class ${obj::class.qualifiedName}'")
                 }
-                .firstOrNone()
+            }
+            .firstOrNone()
     }
 
     /**
@@ -108,65 +108,68 @@ object ResourceReflectionUtil {
      */
     fun toProperties(obj: Any): Set<Property<*>> {
         return obj::class.memberProperties
-                .filter { it.findAnnotation<PropertyDefinition>() != null }
-                .flatMap { kprop ->
-                    val propertyDefAnnotation = kprop.findAnnotation<PropertyDefinition>()!!
+            .filter { it.findAnnotation<PropertyDefinition>() != null }
+            .flatMap { kprop ->
+                val propertyDefAnnotation = kprop.findAnnotation<PropertyDefinition>()!!
 
-                    if (logger.isDebugEnabled) {
-                        logger.debug("Found @PropertyDefinition annotation in property '${kprop.name}' " +
-                                             "of object of class '${kprop.returnType}'")
+                if (logger.isDebugEnabled) {
+                    logger.debug("Found @PropertyDefinition annotation in property '${kprop.name}' " +
+                                         "of object of class '${kprop.returnType}'")
+                }
+
+                try {
+                    // get property value in set form
+                    val values = when (val value = kprop.call(obj)) {
+                        is List<*> -> value.toSet()
+                        is Set<*> -> value
+                        else -> setOf(value)
                     }
 
-                    try {
-                        // get property value in set form
-                        val values = when (val value = kprop.call(obj)) {
-                            is List<*> -> value.toSet()
-                            is Set<*> -> value
-                            else -> setOf(value)
-                        }
-
-                        values.mapNotNull { value ->
-                            when (val propertyType = guessPropertyType(kprop)) {
-                                is Some -> when (propertyType.t) {
-                                    PropertyType.NUMBER ->
-                                        NumberProperty(propertyDefAnnotation.name, (value as Number?))
-                                    PropertyType.STRING ->
-                                        StringProperty(propertyDefAnnotation.name, (value as String?))
-                                    PropertyType.BOOLEAN ->
-                                        BooleanProperty(propertyDefAnnotation.name, (value as Boolean?))
-                                    PropertyType.DATE ->
-                                        InstantProperty(
-                                                propertyDefAnnotation.name,
-                                                when (value) {
-                                                    is Date -> value.toInstant()
-                                                    is Instant -> value
-                                                    else -> null
-                                                }
-                                        )
-                                    PropertyType.KEY_VALUE ->
-                                        KeyValueProperty(propertyDefAnnotation.name, (value as KeyValue?))
-                                    PropertyType.NESTED ->
-                                        NestedProperty(
-                                                propertyDefAnnotation.name,
-                                                value?.let {
-                                                    NestedPropertyValue(toProperties(value), toAssociations(value))
-                                                }
-                                        )
-                                }
-                                else -> {
-                                    val realType = guessContainedType(kprop.returnType)
-                                    logger.warn("Type $realType of property '${kprop.name}' " +
-                                                        "in class ${obj::class.qualifiedName} is not supported")
-                                    null
-                                }
+                    values.mapNotNull { value ->
+                        when (val propertyType = guessPropertyType(kprop)) {
+                            is Some -> when (propertyType.t) {
+                                PropertyType.NUMBER ->
+                                    NumberProperty(propertyDefAnnotation.name, (value as Number?))
+                                PropertyType.STRING ->
+                                    StringProperty(propertyDefAnnotation.name,
+                                                   when (value) {
+                                                       is Enum<*> -> value.toString()
+                                                       else -> value as String
+                                                   })
+                                PropertyType.BOOLEAN ->
+                                    BooleanProperty(propertyDefAnnotation.name, (value as Boolean?))
+                                PropertyType.DATE ->
+                                    InstantProperty(propertyDefAnnotation.name,
+                                                    when (value) {
+                                                        is Date -> value.toInstant()
+                                                        is Instant -> value
+                                                        else -> null
+                                                    }
+                                    )
+                                PropertyType.KEY_VALUE ->
+                                    KeyValueProperty(propertyDefAnnotation.name, (value as KeyValue?))
+                                PropertyType.NESTED ->
+                                    NestedProperty(
+                                            propertyDefAnnotation.name,
+                                            value?.let {
+                                                NestedPropertyValue(toProperties(value), toAssociations(value))
+                                            }
+                                    )
+                            }
+                            else -> {
+                                val realType = guessContainedType(kprop.returnType)
+                                logger.warn("Type $realType of property '${kprop.name}' " +
+                                                    "in class ${obj::class.qualifiedName} is not supported")
+                                null
                             }
                         }
-                    } catch (exception: IllegalAccessException) {
-                        throw RuntimeException("Could not obtain value from property ${kprop.name} " +
-                                                       "in class ${obj::class.qualifiedName}")
                     }
+                } catch (exception: IllegalAccessException) {
+                    throw RuntimeException("Could not obtain value from property ${kprop.name} " +
+                                                   "in class ${obj::class.qualifiedName}")
                 }
-                .toSet()
+            }
+            .toSet()
     }
 
     /**
@@ -177,45 +180,45 @@ object ResourceReflectionUtil {
      */
     fun toAssociations(obj: Any): Set<Association> {
         return obj::class.memberProperties
-                .filter { it.findAnnotation<AssociationDefinition>() != null }
-                .flatMap { kprop ->
-                    val associationDefinitionAnnotation = kprop.findAnnotation<AssociationDefinition>()!!
+            .filter { it.findAnnotation<AssociationDefinition>() != null }
+            .flatMap { kprop ->
+                val associationDefinitionAnnotation = kprop.findAnnotation<AssociationDefinition>()!!
 
-                    // get type
-                    val containedType = guessContainedType(kprop.returnType)
+                // get type
+                val containedType = guessContainedType(kprop.returnType)
 
-                    // only strings are supported
-                    if (!isNullableString(containedType)) {
-                        logger.warn("Type $containedType of association '${kprop.name}' " +
-                                            "in class ${obj::class.qualifiedName} is not supported")
-                        return@flatMap emptyList<Association>()
-                    }
-
-                    when (val resourceDefRefOpt = toResourceDefRef(associationDefinitionAnnotation.targetClass)) {
-                        is Some -> {
-                            // TODO add validation for association name and resourceDefRef
-                            try {
-                                kprop.call(obj)?.let { id ->
-                                    when (id) {
-                                        is List<*> -> id.toSet()
-                                        is Set<*> -> id
-                                        else -> setOf(id)
-                                    }.map { resourceId ->
-                                        Association(associationDefinitionAnnotation.name,
-                                                    ResourceRef(
-                                                            resourceDefRefOpt.t,
-                                                            resourceId as String
-                                                    ))
-                                    }
-                                } ?: emptyList()
-                            } catch (exception: IllegalAccessException) {
-                                throw RuntimeException("Could not obtain value from property ${kprop.name} " +
-                                                               "in class ${obj::class.qualifiedName}")
-                            }
-                        }
-                        else -> emptyList()
-                    }
+                // only strings are supported
+                if (!isNullableString(containedType)) {
+                    logger.warn("Type $containedType of association '${kprop.name}' " +
+                                        "in class ${obj::class.qualifiedName} is not supported")
+                    return@flatMap emptyList<Association>()
                 }
-                .toSet()
+
+                when (val resourceDefRefOpt = toResourceDefRef(associationDefinitionAnnotation.targetClass)) {
+                    is Some -> {
+                        // TODO add validation for association name and resourceDefRef
+                        try {
+                            kprop.call(obj)?.let { id ->
+                                when (id) {
+                                    is List<*> -> id.toSet()
+                                    is Set<*> -> id
+                                    else -> setOf(id)
+                                }.map { resourceId ->
+                                    Association(associationDefinitionAnnotation.name,
+                                                ResourceRef(
+                                                        resourceDefRefOpt.t,
+                                                        resourceId as String
+                                                ))
+                                }
+                            } ?: emptyList()
+                        } catch (exception: IllegalAccessException) {
+                            throw RuntimeException("Could not obtain value from property ${kprop.name} " +
+                                                           "in class ${obj::class.qualifiedName}")
+                        }
+                    }
+                    else -> emptyList()
+                }
+            }
+            .toSet()
     }
 }
