@@ -27,41 +27,56 @@ import java.time.Instant
 
 data class EC2VolumeAttachment(
         @property:PropertyDefinition(
-                name = "attach_time",
-                description = "The time stamp when the attachment initiated"
+                name = PROP_ATTACH_TIME,
+                description = PROP_ATTACH_TIME_D
         )
         val attachTime: Instant?,
 
         @property:PropertyDefinition(
-                name = "device",
-                description = "The device name"
+                name = PROP_DEVICE,
+                description = PROP_DEVICE_D
         )
         val device: String?,
 
         @property:AssociationDefinition(
-                name = "instance",
-                description = "The instance",
+                name = ASSOC_INSTANCE,
+                description = ASSOC_INSTANCE_D,
                 targetClass = EC2Instance::class
         )
         val instanceId: String?,
 
         @property:PropertyDefinition(
-                name = "state",
-                description = "The attachment state of the volume",
+                name = PROP_STATE,
+                description = PROP_STATE_D,
                 exampleValues = "attaching | attached | detaching | detached | busy"
         )
         val state: String?,
 
         @property:AssociationDefinition(
-                name = "volume",
-                description = "The volume",
+                name = ASSOC_VOLUME,
+                description = ASSOC_VOLUME_D,
                 targetClass = EC2Volume::class
         )
         val volumeId: String?,
 
         @property:PropertyDefinition(
-                name = "delete_on_termination",
-                description = "Indicates whether the EBS volume is deleted on instance termination"
+                name = PROP_DELETE_ON_TERMINATION,
+                description = PROP_DELETE_ON_TERMINATION_D
         )
         val deleteOnTermination: Boolean?
-)
+) {
+    companion object {
+        const val PROP_ATTACH_TIME = "attach_time"
+        const val PROP_ATTACH_TIME_D = "The time stamp when the attachment initiated"
+        const val PROP_DEVICE = "device"
+        const val PROP_DEVICE_D = "The device name"
+        const val ASSOC_INSTANCE = "instance"
+        const val ASSOC_INSTANCE_D = "The instance"
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "The attachment state of the volume"
+        const val ASSOC_VOLUME = "volume"
+        const val ASSOC_VOLUME_D = "The volume"
+        const val PROP_DELETE_ON_TERMINATION = "delete_on_termination"
+        const val PROP_DELETE_ON_TERMINATION_D = "Indicates whether the EBS volume is deleted on instance termination"
+    }
+}

@@ -23,21 +23,30 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2BlockDeviceMapping(
         @property:PropertyDefinition(
-                name = "device_name",
-                description = "The device name",
+                name = PROP_DEVICE_NAME,
+                description = PROP_DEVICE_NAME_D,
                 exampleValues = "/dev/sdh"
         )
         val deviceName: String?,
 
         @property:PropertyDefinition(
-                name = "virtual_name",
-                description = "The virtual device name"
+                name = PROP_VIRTUAL_NAME,
+                description = PROP_VIRTUAL_NAME_D
         )
         val virtualName: String?,
 
         @property:PropertyDefinition(
-                name = "ebs",
-                description = "Parameters used to automatically set up EBS volumes when the instance is launched"
+                name = PROP_EBS,
+                description = PROP_EBS_D
         )
         val ebs: EC2EbsBlockDevice?
-)
+) {
+    companion object {
+        const val PROP_DEVICE_NAME = "device_name"
+        const val PROP_DEVICE_NAME_D = "The device name"
+        const val PROP_VIRTUAL_NAME = "virtual_name"
+        const val PROP_VIRTUAL_NAME_D = "The virtual device name"
+        const val PROP_EBS = "ebs"
+        const val PROP_EBS_D = "Parameters used to automatically set up EBS volumes when the instance is launched"
+    }
+}

@@ -21,4 +21,8 @@ package cloudspec.aws.iam
 
 import cloudspec.aws.AWSResource
 
-abstract class IAMResource : AWSResource() 
+abstract class IAMResource : AWSResource() {
+    companion object {
+        const val GROUP_NAME = "iam"
+    }
+}

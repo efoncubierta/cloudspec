@@ -22,20 +22,22 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2VpcCidrBlockAssociation(
-//    @property:AssociationDefinition(
-        //            name = "association",
-        //            description = "The association ID for the IPv4 CIDR block"
-        //    )
-        //    private final String associationId;
         @property:PropertyDefinition(
-                name = "cidr_block",
-                description = "The IPv4 CIDR block"
+                name = PROP_CIDR_BLOCK,
+                description = PROP_CIDR_BLOCK_D
         )
         val cidrBlock: String?,
 
         @property:PropertyDefinition(
-                name = "cidr_block_state",
-                description = "Information about the state of the CIDR block"
+                name = PROP_CIDR_BLOCK_STATE,
+                description = PROP_CIDR_BLOCK_STATE_D
         )
         val cidrBlockState: String?
-)
+) {
+    companion object {
+        const val PROP_CIDR_BLOCK = "cidr_block"
+        const val PROP_CIDR_BLOCK_D = "The IPv4 CIDR block"
+        const val PROP_CIDR_BLOCK_STATE = "cidr_block_state"
+        const val PROP_CIDR_BLOCK_STATE_D = "Information about the state of the CIDR block"
+    }
+}

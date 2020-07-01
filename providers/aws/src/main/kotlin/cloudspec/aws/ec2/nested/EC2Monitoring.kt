@@ -23,9 +23,14 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2Monitoring(
         @property:PropertyDefinition(
-                name = "state",
-                description = "Indicates whether detailed monitoring is enabled. Otherwise, basic monitoring is enabled",
+                name = PROP_STATE,
+                description = PROP_STATE_D,
                 exampleValues = "disabled | disabling | enabled | pending"
         )
         val state: String?
-)
+) {
+    companion object {
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "Indicates whether detailed monitoring is enabled. Otherwise, basic monitoring is enabled"
+    }
+}

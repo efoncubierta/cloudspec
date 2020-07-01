@@ -23,64 +23,87 @@ import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2IpPermission
 import cloudspec.model.KeyValue
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "security_group",
-        description = "Security Group"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2SecurityGroup.RESOURCE_NAME,
+        description = EC2SecurityGroup.RESOURCE_DESCRIPTION
 )
 data class EC2SecurityGroup(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
         @property:PropertyDefinition(
-                name = "group_name",
-                description = "The name of the security group"
+                name = PROP_GROUP_NAME,
+                description = PROP_GROUP_NAME_D
         )
         val groupName: String?,
 
         @property:PropertyDefinition(
-                name = "ip_permissions",
-                description = "The inbound rules associated with the security group"
+                name = PROP_IP_PERMISSIONS,
+                description = PROP_IP_PERMISSIONS_D
         )
         val ipPermissions: List<EC2IpPermission>?,
 
         @property:PropertyDefinition(
-                name = "owner_id",
-                description = "The AWS account ID of the owner of the security group"
+                name = PROP_OWNER_ID,
+                description = PROP_OWNER_ID_D
         )
         val ownerId: String?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "group_id",
-                description = "The ID of the security group"
+                name = PROP_GROUP_ID,
+                description = PROP_GROUP_ID_D
         )
         val groupId: String,
 
         @property:PropertyDefinition(
-                name = "ip_permissions_egress",
-                description = "[VPC only] The outbound rules associated with the security group"
+                name = PROP_IP_PERMISSIONS_EGRESS,
+                description = PROP_IP_PERMISSIONS_EGRESS_D
         )
         val ipPermissionsEgress: List<EC2IpPermission>?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "Any tags assigned to the security group"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?,
 
         @property:AssociationDefinition(
-                name = "vpc",
-                description = "[VPC only] The VPC for the security group",
+                name = ASSOC_VPC,
+                description = ASSOC_VPC_D,
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "security_group"
+        const val RESOURCE_DESCRIPTION = "Security Group"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_GROUP_NAME = "group_name"
+        const val PROP_GROUP_NAME_D = "The name of the security group"
+        const val PROP_IP_PERMISSIONS = "ip_permissions"
+        const val PROP_IP_PERMISSIONS_D = "The inbound rules associated with the security group"
+        const val PROP_OWNER_ID = "owner_id"
+        const val PROP_OWNER_ID_D = "The AWS account ID of the owner of the security group"
+        const val PROP_GROUP_ID = "group_id"
+        const val PROP_GROUP_ID_D = "The ID of the security group"
+        const val PROP_IP_PERMISSIONS_EGRESS = "ip_permissions_egress"
+        const val PROP_IP_PERMISSIONS_EGRESS_D = "[VPC only] The outbound rules associated with the security group"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "Any tags assigned to the security group"
+        const val ASSOC_VPC = "vpc"
+        const val ASSOC_VPC_D = "[VPC only] The VPC for the security group"
+    }
+}

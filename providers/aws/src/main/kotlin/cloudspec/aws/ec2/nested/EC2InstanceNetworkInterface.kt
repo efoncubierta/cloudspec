@@ -28,81 +28,107 @@ import cloudspec.aws.ec2.EC2Vpc
 
 data class EC2InstanceNetworkInterface(
         @property:AssociationDefinition(
-                name = "groups",
-                description = "One or more security groups",
+                name = ASSOC_GROUPS,
+                description = ASSOC_GROUPS_D,
                 targetClass = EC2SecurityGroup::class
         )
         val groupIds: List<String>?,
 
         @property:PropertyDefinition(
-                name = "ipv6_addresses",
-                description = "One or more IPv6 addresses associated with the network interface"
+                name = PROP_IPV6_ADDRESSES,
+                description = PROP_IPV6_ADDRESSES_D
         )
         val ipv6Addresses: List<String>?,
 
         @property:AssociationDefinition(
-                name = "network_interface",
-                description = "The network interface",
+                name = ASSOC_NETWORK_INTERFACE,
+                description = ASSOC_NETWORK_INTERFACE_D,
                 targetClass = EC2NetworkInterface::class
         )
         val networkInterfaceId: String?,
 
         @property:PropertyDefinition(
-                name = "owner_id",
-                description = "The ID of the AWS account that created the network interface"
+                name = PROP_OWNER_ID,
+                description = PROP_OWNER_ID_D
         )
-
         val ownerId: String?,
 
         @property:PropertyDefinition(
-                name = "private_dns_name",
-                description = "The private DNS name"
+                name = PROP_PRIVATE_DNS_NAME,
+                description = PROP_PRIVATE_DNS_NAME_D
         )
         val privateDnsName: String?,
 
         @property:PropertyDefinition(
-                name = "private_ip_address",
-                description = "The IPv4 address of the network interface within the subnet"
+                name = PROP_PRIVATE_IP_ADDRESS,
+                description = PROP_PRIVATE_IP_ADDRESS_D
         )
         val privateIpAddress: String?,
 
         @property:PropertyDefinition(
-                name = "private_ip_addresses",
-                description = "One or more private IPv4 addresses associated with the network interface"
+                name = PROP_PRIVATE_IP_ADDRESSES,
+                description = PROP_PRIVATE_IP_ADDRESSES_D
         )
         val privateIpAddresses: List<EC2InstancePrivateIpAddress>?,
 
         @property:PropertyDefinition(
-                name = "source_dest_check",
-                description = "Indicates whether to validate network traffic to or from this network interface"
+                name = PROP_SOURCE_DEST_CHECK,
+                description = PROP_SOURCE_DEST_CHECK_D
         )
         val sourceDestCheck: Boolean?,
 
         @property:PropertyDefinition(
-                name = "status",
-                description = "The status of the network interface",
+                name = PROP_STATUS,
+                description = PROP_STATUS_D,
                 exampleValues = "available | associated | attached | in-use | detaching"
         )
         val status: String?,
 
         @property:AssociationDefinition(
-                name = "subnet",
-                description = "The subnet",
+                name = ASSOC_SUBNET,
+                description = ASSOC_SUBNET_D,
                 targetClass = EC2Subnet::class
         )
         val subnetId: String?,
 
         @property:AssociationDefinition(
-                name = "vpc",
-                description = "The VPC",
+                name = ASSOC_VPC,
+                description = ASSOC_VPC_D,
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
         @property:PropertyDefinition(
-                name = "interface_type",
-                description = "Describes the type of network interface",
+                name = PROP_INTERFACE_TYPE,
+                description = PROP_INTERFACE_TYPE_D,
                 exampleValues = "interface | efa"
         )
         val interfaceType: String?
-)
+) {
+    companion object {
+        const val ASSOC_GROUPS = "groups"
+        const val ASSOC_GROUPS_D = "One or more security groups"
+        const val PROP_IPV6_ADDRESSES = "ipv6_addresses"
+        const val PROP_IPV6_ADDRESSES_D = "One or more IPv6 addresses associated with the network interface"
+        const val ASSOC_NETWORK_INTERFACE = "network_interface"
+        const val ASSOC_NETWORK_INTERFACE_D = "The network interface"
+        const val PROP_OWNER_ID = "owner_id"
+        const val PROP_OWNER_ID_D = "The ID of the AWS account that created the network interface"
+        const val PROP_PRIVATE_DNS_NAME = "private_dns_name"
+        const val PROP_PRIVATE_DNS_NAME_D = "The private DNS name"
+        const val PROP_PRIVATE_IP_ADDRESS = "private_ip_address"
+        const val PROP_PRIVATE_IP_ADDRESS_D = "The IPv4 address of the network interface within the subnet"
+        const val PROP_PRIVATE_IP_ADDRESSES = "private_ip_addresses"
+        const val PROP_PRIVATE_IP_ADDRESSES_D = "One or more private IPv4 addresses associated with the network interface"
+        const val PROP_SOURCE_DEST_CHECK = "source_dest_check"
+        const val PROP_SOURCE_DEST_CHECK_D = "Indicates whether to validate network traffic to or from this network interface"
+        const val PROP_STATUS = "status"
+        const val PROP_STATUS_D = "The status of the network interface"
+        const val ASSOC_SUBNET = "subnet"
+        const val ASSOC_SUBNET_D = "The subnet"
+        const val ASSOC_VPC = "vpc"
+        const val ASSOC_VPC_D = "The VPC"
+        const val PROP_INTERFACE_TYPE = "interface_type"
+        const val PROP_INTERFACE_TYPE_D = "Describes the type of network interface"
+    }
+}

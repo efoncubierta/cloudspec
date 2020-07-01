@@ -25,26 +25,38 @@ import cloudspec.aws.ec2.EC2NetworkInterface
 
 data class EC2NatGatewayAddress(
         @property:PropertyDefinition(
-                name = "allocation_id",
-                description = "The allocation ID of the Elastic IP address that's associated with the NAT gateway")
+                name = PROP_ALLOCATION_ID,
+                description = PROP_ALLOCATION_ID_D
+        )
         val allocationId: String?,
 
         @property:AssociationDefinition(
-                name = "network_interface",
-                description = "The ID of the network interface associated with the NAT gateway",
+                name = ASSOC_NETWORK_INTERFACE,
+                description = ASSOC_NETWORK_INTERFACE_D,
                 targetClass = EC2NetworkInterface::class
         )
         val networkInterfaceId: String?,
 
         @property:PropertyDefinition(
-                name = "private_ip",
-                description = "The private IP address associated with the Elastic IP address"
+                name = PROP_PRIVATE_IP,
+                description = PROP_PRIVATE_IP_D
         )
         val privateIp: String?,
 
         @property:PropertyDefinition(
-                name = "public_ip",
-                description = "The Elastic IP address associated with the NAT gateway"
+                name = PROP_PUBLIC_IP,
+                description = PROP_PUBLIC_IP_D
         )
         val publicIp: String?
-)
+) {
+    companion object {
+        const val PROP_ALLOCATION_ID = "allocation_id"
+        const val PROP_ALLOCATION_ID_D = "The allocation ID of the Elastic IP address that's associated with the NAT gateway"
+        const val ASSOC_NETWORK_INTERFACE = "network_interface"
+        const val ASSOC_NETWORK_INTERFACE_D = "The ID of the network interface associated with the NAT gateway"
+        const val PROP_PRIVATE_IP = "private_ip"
+        const val PROP_PRIVATE_IP_D = "The private IP address associated with the Elastic IP address"
+        const val PROP_PUBLIC_IP = "public_ip"
+        const val PROP_PUBLIC_IP_D = "The Elastic IP address associated with the NAT gateway"
+    }
+}

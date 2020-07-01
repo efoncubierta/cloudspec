@@ -23,39 +23,46 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2Placement(
         @property:PropertyDefinition(
-                name = "availability_zone",
-                description = "The Availability Zone of the instance"
+                name = PROP_AVAILABILITY_ZONE,
+                description = PROP_AVAILABILITY_ZONE_D
         )
         val availabilityZone: String?,
 
         @property:PropertyDefinition(
-                name = "affinity",
-                description = "The affinity setting for the instance on the Dedicated Host"
+                name = PROP_AFFINITY,
+                description = PROP_AFFINITY_D
         )
         val affinity: String?,
 
         @property:PropertyDefinition(
-                name = "group_name",
-                description = "The name of the placement group the instance is in"
+                name = PROP_GROUP_NAME,
+                description = PROP_GROUP_NAME_D
         )
         val groupName: String?,
 
         @property:PropertyDefinition(
-                name = "partition_number",
-                description = "The number of the partition the instance is in"
+                name = PROP_PARTITION_NUMBER,
+                description = PROP_PARTITION_NUMBER_D
         )
         val partitionNumber: Int?,
 
-        //    @property:AssociationDefinition(
-        //            name = "host",
-        //            description = "The ID of the Dedicated Host on which the instance resides"
-        //    )
-        //    val hostId: String?,
-
         @property:PropertyDefinition(
-                name = "tenancy",
-                description = "The tenancy of the instance (if the instance is running in a VPC)",
+                name = PROP_TENANCY,
+                description = PROP_TENANCY_D,
                 exampleValues = "default | dedicated | host"
         )
         val tenancy: String?
-)
+) {
+    companion object {
+        const val PROP_AVAILABILITY_ZONE = "availability_zone"
+        const val PROP_AVAILABILITY_ZONE_D = "The Availability Zone of the instance"
+        const val PROP_AFFINITY = "affinity"
+        const val PROP_AFFINITY_D = "The affinity setting for the instance on the Dedicated Host"
+        const val PROP_GROUP_NAME = "group_name"
+        const val PROP_GROUP_NAME_D = "The name of the placement group the instance is in"
+        const val PROP_PARTITION_NUMBER = "partition_number"
+        const val PROP_PARTITION_NUMBER_D = "The number of the partition the instance is in"
+        const val PROP_TENANCY = "tenancy"
+        const val PROP_TENANCY_D = "The tenancy of the instance (if the instance is running in a VPC)"
+    }
+}

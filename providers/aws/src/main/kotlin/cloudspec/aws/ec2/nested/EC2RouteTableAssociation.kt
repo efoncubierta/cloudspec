@@ -27,42 +27,57 @@ import cloudspec.aws.ec2.EC2Subnet
 
 data class EC2RouteTableAssociation(
         @property:PropertyDefinition(
-                name = "main",
-                description = "Indicates whether this is the main route table"
+                name = PROP_MAIN,
+                description = PROP_MAIN_D
         )
         val main: Boolean?,
 
         @property:PropertyDefinition(
-                name = "main",
-                description = "The ID of the association"
+                name = PROP_ROUTE_TABLE_ASSOCIATION_ID,
+                description = PROP_ROUTE_TABLE_ASSOCIATION_ID_D
         )
         val routeTableAssociationId: String?,
 
         @property:AssociationDefinition(
-                name = "route_table",
-                description = "The route table",
+                name = ASSOC_ROUTE_TABLE,
+                description = ASSOC_ROUTE_TABLE_D,
                 targetClass = EC2RouteTable::class
         )
         val routeTableId: String?,
 
         @property:AssociationDefinition(
-                name = "subnet",
-                description = "The subnet",
+                name = ASSOC_SUBNET,
+                description = ASSOC_SUBNET_D,
                 targetClass = EC2Subnet::class
         )
         val subnetId: String?,
 
         @property:AssociationDefinition(
-                name = "gateway",
-                description = "The internet gateway or virtual private gateway",
+                name = ASSOC_GATEWAY,
+                description = ASSOC_GATEWAY_D,
                 targetClass = EC2InternetGateway::class
         )
         val gatewayId: String?, // TODO support VPG
 
         @property:PropertyDefinition(
-                name = "state",
-                description = "The state of the association",
+                name = PROP_STATE,
+                description = PROP_STATE_D,
                 exampleValues = "associating | associated | disassociating | disassociated | failed"
         )
         val associationState: String?
-)
+) {
+    companion object {
+        const val PROP_MAIN = "main"
+        const val PROP_MAIN_D = "Indicates whether this is the main route table"
+        const val PROP_ROUTE_TABLE_ASSOCIATION_ID = "route_table_association_id"
+        const val PROP_ROUTE_TABLE_ASSOCIATION_ID_D = "The ID of the association"
+        const val ASSOC_ROUTE_TABLE = "route_table"
+        const val ASSOC_ROUTE_TABLE_D = "The route table"
+        const val ASSOC_SUBNET = "subnet"
+        const val ASSOC_SUBNET_D = "The subnet"
+        const val ASSOC_GATEWAY = "gateway"
+        const val ASSOC_GATEWAY_D = "The internet gateway or virtual private gateway"
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "The state of the association"
+    }
+}

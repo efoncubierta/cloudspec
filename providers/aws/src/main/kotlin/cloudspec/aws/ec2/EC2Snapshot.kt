@@ -23,19 +23,20 @@ import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
 import java.time.Instant
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "snapshot",
-        description = "Snapshot"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2Snapshot.RESOURCE_NAME,
+        description = EC2Snapshot.RESOURCE_DESCRIPTION
 )
 data class EC2Snapshot(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
@@ -43,60 +44,86 @@ data class EC2Snapshot(
         // private final String dataEncryptionKeyId;
 
         @property:PropertyDefinition(
-                name = "encrypted",
-                description = "Indicates whether the snapshot is encrypted"
+                name = PROP_ENCRYPTED,
+                description = PROP_ENCRYPTED_D
         )
         val encrypted: Boolean?,
 
         // private final String kmsKeyId;
 
         @property:PropertyDefinition(
-                name = "owner_id",
-                description = "The AWS account ID of the EBS snapshot owner"
+                name = PROP_OWNER_ID,
+                description = PROP_OWNER_ID_D
         )
         val ownerId: String?,
 
         @property:PropertyDefinition(
-                name = "progress",
-                description = "The progress of the snapshot, as a percentage"
+                name = PROP_PROGRESS,
+                description = PROP_PROGRESS_D
         )
         val progress: String?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "snapshotId",
-                description = "The ID of the snapshot. Each snapshot receives a unique identifier when it is created"
+                name = PROP_SNAPSHOT_ID,
+                description = PROP_SNAPSHOT_ID_D
         )
         val snapshotId: String,
 
         @property:PropertyDefinition(
-                name = "start_time",
-                description = "The time stamp when the snapshot was initiated"
+                name = PROP_START_TIME,
+                description = PROP_START_TIME_D
         )
         val startTime: Instant?,
 
         @property:PropertyDefinition(
-                name = "state",
-                description = "The snapshot state"
+                name = PROP_STATE,
+                description = PROP_STATE_D
         )
         val state: String?,
 
         @property:AssociationDefinition(
-                name = "volume",
-                description = "The volume that was used to create the snapshot",
+                name = ASSOC_VOLUME,
+                description = ASSOC_VOLUME_D,
                 targetClass = EC2Volume::class
         )
         val volumeId: String?,
 
         @property:PropertyDefinition(
-                name = "volume_size",
-                description = " The size of the volume, in GiB"
+                name = PROP_VOLUME_SIZE,
+                description = PROP_VOLUME_SIZE_D
         )
         val volumeSize: Int?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "Any tags assigned to the snapshot"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "snapshot"
+        const val RESOURCE_DESCRIPTION = "Snapshot"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_ENCRYPTED = "encrypted"
+        const val PROP_ENCRYPTED_D = "Indicates whether the snapshot is encrypted"
+        const val PROP_OWNER_ID = "owner_id"
+        const val PROP_OWNER_ID_D = "The AWS account ID of the EBS snapshot owner"
+        const val PROP_PROGRESS = "progress"
+        const val PROP_PROGRESS_D = "The progress of the snapshot, as a percentage"
+        const val PROP_SNAPSHOT_ID = "snapshotId"
+        const val PROP_SNAPSHOT_ID_D = "The ID of the snapshot. Each snapshot receives a unique identifier when it is created"
+        const val PROP_START_TIME = "start_time"
+        const val PROP_START_TIME_D = "The time stamp when the snapshot was initiated"
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "The snapshot state"
+        const val ASSOC_VOLUME = "volume"
+        const val ASSOC_VOLUME_D = "The volume that was used to create the snapshot"
+        const val PROP_VOLUME_SIZE = "volume_size"
+        const val PROP_VOLUME_SIZE_D = "The size of the volume, in GiB"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "Any tags assigned to the snapshot"
+    }
+}

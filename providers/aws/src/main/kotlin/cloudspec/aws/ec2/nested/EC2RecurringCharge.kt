@@ -23,15 +23,22 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2RecurringCharge(
         @property:PropertyDefinition(
-                name = "amount",
-                description = "The amount of the recurring charge"
+                name = PROP_AMOUNT,
+                description = PROP_AMOUNT_D
         )
         val amount: Double?,
 
         @property:PropertyDefinition(
-                name = "frequency",
-                description = "The frequency of the recurring charge",
+                name = PROP_FREQUENCY,
+                description = PROP_FREQUENCY_D,
                 exampleValues = "Hourly"
         )
         val frequency: String?
-)
+) {
+    companion object {
+        const val PROP_AMOUNT = "amount"
+        const val PROP_AMOUNT_D = "The amount of the recurring charge"
+        const val PROP_FREQUENCY = "frequency"
+        const val PROP_FREQUENCY_D = "The frequency of the recurring charge"
+    }
+}

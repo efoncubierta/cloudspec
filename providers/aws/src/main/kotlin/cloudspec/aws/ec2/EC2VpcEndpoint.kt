@@ -23,129 +23,156 @@ import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
 import java.time.Instant
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "vpc_endpoint",
-        description = "VPC Endpoint"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2VpcEndpoint.RESOURCE_NAME,
+        description = EC2VpcEndpoint.RESOURCE_DESCRIPTION
 )
 data class EC2VpcEndpoint(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "vpc_endpoint_id",
-                description = "The ID of the VPC endpoint"
+                name = PROP_VPC_ENDPOINT_ID,
+                description = PROP_VPC_ENDPOINT_ID_D
         )
         val vpcEndpointId: String,
 
         @property:PropertyDefinition(
-                name = "vpc_endpoint_type",
-                description = "The type of endpoint",
+                name = PROP_VPC_ENDPOINT_TYPE,
+                description = PROP_VPC_ENDPOINT_TYPE_D,
                 exampleValues = "Interface | Gateway"
         )
         val vpcEndpointType: String?,
 
         @property:AssociationDefinition(
-                name = "vpc",
-                description = "The VPC to which the endpoint is associated",
+                name = ASSOC_VPC,
+                description = ASSOC_VPC_D,
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
         @property:PropertyDefinition(
-                name = "service_name",
-                description = "The name of the service to which the endpoint is associated"
+                name = PROP_SERVICE_NAME,
+                description = PROP_SERVICE_NAME_D
         )
         val serviceName: String?
         ,
         @property:PropertyDefinition(
-                name = "state",
-                description = "The state of the VPC endpoint"
+                name = PROP_STATE,
+                description = PROP_STATE_D
         )
-        val state: String?, // TODO review
-
-        //    @property:PropertyDefinition(
-        //            name = "policy_document",
-        //            description = "The policy document associated with the endpoint, if applicable"
-        //    )
-        //    private final String policyDocument;
+        val state: String?,
 
         @property:AssociationDefinition(
-                name = "route_tables",
-                description = "(Gateway endpoint) One or more route tables associated with the endpoint",
+                name = ASSOC_ROUTE_TABLES,
+                description = ASSOC_ROUTE_TABLES_D,
                 targetClass = EC2RouteTable::class
         )
         val routeTableIds: List<String>?,
 
         @property:AssociationDefinition(
-                name = "subnets",
-                description = "(Interface endpoint) One or more subnets in which the endpoint is located",
+                name = ASSOC_SUBNETS,
+                description = ASSOC_SUBNETS_D,
                 targetClass = EC2Subnet::class
         )
         val subnetIds: List<String>?,
 
         @property:AssociationDefinition(
-                name = "groups",
-                description = "(Interface endpoint) Information about the security groups that are associated with the network interface",
+                name = ASSOC_GROUPS,
+                description = ASSOC_GROUPS_D,
                 targetClass = EC2SecurityGroup::class
         )
         val groups: List<String>?,
 
         @property:PropertyDefinition(
-                name = "private_dns_enabled",
-                description = "(Interface endpoint) Indicates whether the VPC is associated with a private hosted zone"
+                name = PROP_PRIVATE_DNS_ENABLED,
+                description = PROP_PRIVATE_DNS_ENABLED_D
         )
         val privateDnsEnabled: Boolean?,
 
         @property:PropertyDefinition(
-                name = "requester_managed",
-                description = "Indicates whether the VPC endpoint is being managed by its service"
+                name = PROP_REQUESTER_MANAGED,
+                description = PROP_REQUESTER_MANAGED_D
         )
         val requesterManaged: Boolean?,
 
         @property:AssociationDefinition(
-                name = "network_interfaces",
-                description = "(Interface endpoint) One or more network interfaces for the endpoint",
+                name = ASSOC_NETWORK_INTERFACES,
+                description = ASSOC_NETWORK_INTERFACES_D,
                 targetClass = EC2NetworkInterface::class
         )
-        val networkInterfaceIds: List<String>?, // TODO review
-
-        //    @property:PropertyDefinition(
-        //            name = "dns_entries",
-        //            description = "(Interface endpoint) The DNS entries for the endpoint"
-        //    )
-        //    private final List<DnsEntry> dnsEntries;
+        val networkInterfaceIds: List<String>?,
 
         @property:PropertyDefinition(
-                name = "creation_timestamp",
-                description = "The date and time that the VPC endpoint was created"
+                name = PROP_CREATION_TIMESTAMP,
+                description = PROP_CREATION_TIMESTAMP_D
         )
         val creationTimestamp: Instant?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "Any tags assigned to the VPC endpoint"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?,
 
         @property:PropertyDefinition(
-                name = "owner_id",
-                description = "The ID of the AWS account that owns the VPC endpoint"
+                name = PROP_OWNER_ID,
+                description = PROP_OWNER_ID_D
         )
         val ownerId: String?,
 
         @property:PropertyDefinition(
-                name = "last_error",
-                description = "The last error that occurred for VPC endpoint"
+                name = PROP_LAST_ERROR,
+                description = PROP_LAST_ERROR_D
         )
         val lastError: String?
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "vpc_endpoint"
+        const val RESOURCE_DESCRIPTION = "VPC Endpoint"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_VPC_ENDPOINT_ID = "vpc_endpoint_id"
+        const val PROP_VPC_ENDPOINT_ID_D = "The ID of the VPC endpoint"
+        const val PROP_VPC_ENDPOINT_TYPE = "vpc_endpoint_type"
+        const val PROP_VPC_ENDPOINT_TYPE_D = "The type of endpoint"
+        const val ASSOC_VPC = "vpc"
+        const val ASSOC_VPC_D = "The VPC to which the endpoint is associated"
+        const val PROP_SERVICE_NAME = "service_name"
+        const val PROP_SERVICE_NAME_D = "The name of the service to which the endpoint is associated"
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "The state of the VPC endpoint"
+        const val ASSOC_ROUTE_TABLES = "route_tables"
+        const val ASSOC_ROUTE_TABLES_D = "(Gateway endpoint) One or more route tables associated with the endpoint"
+        const val ASSOC_SUBNETS = "subnets"
+        const val ASSOC_SUBNETS_D = "(Interface endpoint) One or more subnets in which the endpoint is located"
+        const val ASSOC_GROUPS = "groups"
+        const val ASSOC_GROUPS_D = "(Interface endpoint) Information about the security groups that are associated with the network interface"
+        const val PROP_PRIVATE_DNS_ENABLED = "private_dns_enabled"
+        const val PROP_PRIVATE_DNS_ENABLED_D = "(Interface endpoint) Indicates whether the VPC is associated with a private hosted zone"
+        const val PROP_REQUESTER_MANAGED = "requester_managed"
+        const val PROP_REQUESTER_MANAGED_D = "Indicates whether the VPC endpoint is being managed by its service"
+        const val ASSOC_NETWORK_INTERFACES = "network_interfaces"
+        const val ASSOC_NETWORK_INTERFACES_D = "(Interface endpoint) One or more network interfaces for the endpoint"
+        const val PROP_CREATION_TIMESTAMP = "creation_timestamp"
+        const val PROP_CREATION_TIMESTAMP_D = "The date and time that the VPC endpoint was created"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "Any tags assigned to the VPC endpoint"
+        const val PROP_OWNER_ID = "owner_id"
+        const val PROP_OWNER_ID_D = "The ID of the AWS account that owns the VPC endpoint"
+        const val PROP_LAST_ERROR = "last_error"
+        const val PROP_LAST_ERROR_D = "The last error that occurred for VPC endpoint"
+    }
+}

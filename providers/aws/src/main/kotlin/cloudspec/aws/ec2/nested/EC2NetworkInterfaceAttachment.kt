@@ -26,39 +26,46 @@ import java.time.Instant
 
 data class EC2NetworkInterfaceAttachment(
         @property:PropertyDefinition(
-                name = "attach_time",
-                description = "The timestamp indicating when the attachment initiated"
+                name = PROP_ATTACH_TIME,
+                description = PROP_ATTACH_TIME_D
         )
         val attachTime: Instant?,
 
-        //    @property:AssociationDefinition(
-        //            name = "attachment_id",
-        //            description = ""
-        //    )
-        //    private final String attachmentId;
-
         @property:PropertyDefinition(
-                name = "delete_on_termination",
-                description = "Indicates whether the network interface is deleted when the instance is terminated"
+                name = PROP_DELETE_ON_TERMINATION,
+                description = PROP_DELETE_ON_TERMINATION_D
         )
         val deleteOnTermination: Boolean?,
 
         @property:AssociationDefinition(
-                name = "instance",
-                description = "The instance",
+                name = PROP_INSTANCE,
+                description = PROP_INSTANCE_D,
                 targetClass = EC2Instance::class
         )
         val instanceId: String?,
 
         @property:PropertyDefinition(
-                name = "instance_owner_id",
-                description = "The AWS account ID of the owner of the instance"
+                name = PROP_INSTANCE_OWNER_ID,
+                description = PROP_INSTANCE_OWNER_ID_D
         )
         val instanceOwnerId: String?,
 
         @property:PropertyDefinition(
-                name = "status",
-                description = "The attachment state"
+                name = PROP_STATUS,
+                description = PROP_STATUS_D
         )
         val status: String?
-)
+) {
+    companion object {
+        const val PROP_ATTACH_TIME = "attach_time"
+        const val PROP_ATTACH_TIME_D = "The timestamp indicating when the attachment initiated"
+        const val PROP_DELETE_ON_TERMINATION = "delete_on_termination"
+        const val PROP_DELETE_ON_TERMINATION_D = "Indicates whether the network interface is deleted when the instance is terminated"
+        const val PROP_INSTANCE = "instance"
+        const val PROP_INSTANCE_D = "The instance"
+        const val PROP_INSTANCE_OWNER_ID = "instance_owner_id"
+        const val PROP_INSTANCE_OWNER_ID_D = "The AWS account ID of the owner of the instance"
+        const val PROP_STATUS = "status"
+        const val PROP_STATUS_D = "The attachment state"
+    }
+}

@@ -22,32 +22,38 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.PropertyDefinition
 
 data class EC2VpcIpv6CidrBlockAssociation(
-//    @property:AssociationDefinition(
-        //            name = "association",
-        //            description = "The association for the IPv6 CIDR block"
-        //    )
-        //    private final String associationId;
         @property:PropertyDefinition(
-                name = "ipv6_cidr_block",
-                description = "The IPv6 CIDR block"
+                name = PROP_IPV6_CIDR_BLOCK,
+                description = PROP_IPV6_CIDR_BLOCK_D
         )
         val ipv6CidrBlock: String?,
 
         @property:PropertyDefinition(
-                name = "ipv6_cidr_block_state",
-                description = "Information about the state of the CIDR block"
+                name = PROP_IPV6_CIDR_BLOCK_STATE,
+                description = PROP_IPV6_CIDR_BLOCK_STATE_D
         )
         val ipv6CidrBlockState: String?,
 
         @property:PropertyDefinition(
-                name = "network_border_group",
-                description = "The name of the location from which we advertise the IPV6 CIDR block"
+                name = PROP_NETWORK_BORDER_GROUP,
+                description = PROP_NETWORK_BORDER_GROUP_D
         )
         val networkBorderGroup: String?,
 
         @property:PropertyDefinition(
-                name = "ipv6_pool",
-                description = "The ID of the IPv6 address pool from which the IPv6 CIDR block is allocated"
+                name = PROP_IPV6_POOL,
+                description = PROP_IPV6_POOL_D
         )
         val ipv6Pool: String?
-)
+) {
+    companion object {
+        const val PROP_IPV6_CIDR_BLOCK = "ipv6_cidr_block"
+        const val PROP_IPV6_CIDR_BLOCK_D = "The IPv6 CIDR block"
+        const val PROP_IPV6_CIDR_BLOCK_STATE = "ipv6_cidr_block_state"
+        const val PROP_IPV6_CIDR_BLOCK_STATE_D = "Information about the state of the CIDR block"
+        const val PROP_NETWORK_BORDER_GROUP = "network_border_group"
+        const val PROP_NETWORK_BORDER_GROUP_D = "The name of the location from which we advertise the IPV6 CIDR block"
+        const val PROP_IPV6_POOL = "ipv6_pool"
+        const val PROP_IPV6_POOL_D = "The ID of the IPv6 address pool from which the IPv6 CIDR block is allocated"
+    }
+}

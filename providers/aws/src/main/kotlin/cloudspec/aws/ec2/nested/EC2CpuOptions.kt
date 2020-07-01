@@ -23,14 +23,21 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2CpuOptions(
         @property:PropertyDefinition(
-                name = "core_count",
-                description = "The number of CPU cores for the instance"
+                name = PROP_CORE_COUNT,
+                description = PROP_CORE_COUNT_D
         )
         val coreCount: Int?,
 
         @property:PropertyDefinition(
-                name = "threads_per_core",
-                description = "The number of threads per CPU core"
+                name = PROP_THREADS_PER_CORE,
+                description = PROP_THREADS_PER_CORE_D
         )
         val threadsPerCore: Int?
-)
+) {
+    companion object {
+        const val PROP_CORE_COUNT = "core_count"
+        const val PROP_CORE_COUNT_D = "The number of CPU cores for the instance"
+        const val PROP_THREADS_PER_CORE = "threads_per_core"
+        const val PROP_THREADS_PER_CORE_D = "The number of threads per CPU core"
+    }
+}

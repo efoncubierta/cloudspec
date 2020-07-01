@@ -22,59 +22,80 @@ package cloudspec.aws.ec2
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2VpcPeeringConnectionVpcInfo
 import cloudspec.model.KeyValue
 import java.time.Instant
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "vpc_peering_connection",
-        description = "VPC Peering Connection"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2VpcPeeringConnection.RESOURCE_NAME,
+        description = EC2VpcPeeringConnection.RESOURCE_DESCRIPTION
 )
 data class EC2VpcPeeringConnection(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
         @property:PropertyDefinition(
-                name = "accepter_vpc_info",
-                description = "Information about the accepter VP"
+                name = PROP_ACCEPTER_VPC_INFO,
+                description = PROP_ACCEPTER_VPC_INFO_D
         )
         val accepterVpcInfo: EC2VpcPeeringConnectionVpcInfo?,
 
         @property:PropertyDefinition(
-                name = "expiration_time",
-                description = "The time that an unaccepted VPC peering connection will expire"
+                name = PROP_EXPIRATION_TIME,
+                description = PROP_EXPIRATION_TIME_D
         )
         val expirationTime: Instant?,
 
         @property:PropertyDefinition(
-                name = "requester_vpc_info",
-                description = "Information about the requester VPC"
+                name = PROP_REQUESTER_VPC_INFO,
+                description = PROP_REQUESTER_VPC_INFO_D
         )
         val requesterVpcInfo: EC2VpcPeeringConnectionVpcInfo?,
 
         @property:PropertyDefinition(
-                name = "status",
-                description = "The status of the VPC peering connection",
+                name = PROP_STATUS,
+                description = PROP_STATUS_D,
                 exampleValues = "initiating-request | pending-acceptance | active | deleted | rejected | failed | expired | provisioning | deleting"
         )
         val status: String?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "Any tags assigned to the resource"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "vpc_peering_connection_id",
-                description = "The ID of the VPC peering connection"
+                name = PROP_VPC_PEERING_CONNECTION_ID,
+                description = PROP_VPC_PEERING_CONNECTION_ID_D
         )
         val vpcPeeringConnectionId: String
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "vpc_peering_connection"
+        const val RESOURCE_DESCRIPTION = "VPC Peering Connection"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_ACCEPTER_VPC_INFO = "accepter_vpc_info"
+        const val PROP_ACCEPTER_VPC_INFO_D = "Information about the accepter VP"
+        const val PROP_EXPIRATION_TIME = "expiration_time"
+        const val PROP_EXPIRATION_TIME_D = "The time that an unaccepted VPC peering connection will expire"
+        const val PROP_REQUESTER_VPC_INFO = "requester_vpc_info"
+        const val PROP_REQUESTER_VPC_INFO_D = "Information about the requester VPC"
+        const val PROP_STATUS = "status"
+        const val PROP_STATUS_D = "The status of the VPC peering connection"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "Any tags assigned to the resource"
+        const val PROP_VPC_PEERING_CONNECTION_ID = "vpc_peering_connection_id"
+        const val PROP_VPC_PEERING_CONNECTION_ID_D = "The ID of the VPC peering connection"
+    }
+}

@@ -22,12 +22,13 @@ package cloudspec.aws.iam
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "iam",
-        name = "iam_instance_profile",
-        description = "Amazon Machine Image"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = IAMResource.GROUP_NAME,
+        name = IAMInstanceProfileResource.RESOURCE_NAME,
+        description = IAMInstanceProfileResource.RESOURCE_DESCRIPTION
 )
 data class IAMInstanceProfileResource(
         @property:IdDefinition
@@ -55,4 +56,9 @@ data class IAMInstanceProfileResource(
 //            targetClass = IAMRoleResource.class
 //    )
         val roleIds: List<String>?
-) : IAMResource()
+) : IAMResource() {
+    companion object {
+        const val RESOURCE_NAME = "iam_instance_profile"
+        const val RESOURCE_DESCRIPTION = "IAM Instance Profile"
+    }
+}

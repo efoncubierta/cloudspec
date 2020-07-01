@@ -23,44 +23,61 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2IpPermission(
         @property:PropertyDefinition(
-                name = "from_port",
-                description = "The start of port range for the TCP and UDP protocols, or an ICMP/ICMPv6 type number"
+                name = PROP_FROM_PORT,
+                description = PROP_FROM_PORT_D
         )
         val fromPort: Int?,
 
         @property:PropertyDefinition(
-                name = "ip_protocol",
-                description = "The IP protocol name or number"
+                name = PROP_IP_PROTOCOL,
+                description = PROP_IP_PROTOCOL_D
         )
         val ipProtocol: String?,
 
         @property:PropertyDefinition(
-                name = "ip_ranges",
-                description = "The IPv4 ranges"
+                name = PROP_IP_RANGES,
+                description = PROP_IP_RANGES_D
         )
         val ipRanges: List<EC2IpRange>?,
 
         @property:PropertyDefinition(
-                name = "ipv6_ranges",
-                description = "[VPC only] The IPv6 ranges"
+                name = PROP_IPV6_RANGES,
+                description = PROP_IPV6_RANGES_D
         )
         val ipv6Ranges: List<EC2Ipv6Range>?
         ,
         @property:PropertyDefinition(
-                name = "prefix_list_ids",
-                description = "[VPC only] The prefix list IDs for an AWS service"
+                name = PROP_PREFIX_LIST_IDS,
+                description = PROP_PREFIX_LIST_IDS_D
         )
         val prefixListIds: List<String>?,
 
         @property:PropertyDefinition(
-                name = "to_port",
-                description = "The end of port range for the TCP and UDP protocols, or an ICMP/ICMPv6 code"
+                name = PROP_TO_PORT,
+                description = PROP_TO_PORT_D
         )
         val toPort: Int?,
 
         @property:PropertyDefinition(
-                name = "user_groups",
-                description = "The security group and AWS account ID pairs"
+                name = PROP_USER_GROUPS,
+                description = PROP_USER_GROUPS_D
         )
         val userIdGroupPairs: List<EC2UserIdGroupPair>?
-)
+) {
+    companion object {
+        const val PROP_FROM_PORT = "from_port"
+        const val PROP_FROM_PORT_D = "The start of port range for the TCP and UDP protocols, or an ICMP/ICMPv6 type number"
+        const val PROP_IP_PROTOCOL = "ip_protocol"
+        const val PROP_IP_PROTOCOL_D = "The IP protocol name or number"
+        const val PROP_IP_RANGES = "ip_ranges"
+        const val PROP_IP_RANGES_D = "The IPv4 ranges"
+        const val PROP_IPV6_RANGES = "ipv6_ranges"
+        const val PROP_IPV6_RANGES_D = "[VPC only] The IPv6 ranges"
+        const val PROP_PREFIX_LIST_IDS = "prefix_list_ids"
+        const val PROP_PREFIX_LIST_IDS_D = "[VPC only] The prefix list IDs for an AWS service"
+        const val PROP_TO_PORT = "to_port"
+        const val PROP_TO_PORT_D = "The end of port range for the TCP and UDP protocols, or an ICMP/ICMPv6 code"
+        const val PROP_USER_GROUPS = "user_groups"
+        const val PROP_USER_GROUPS_D = "The security group and AWS account ID pairs"
+    }
+}

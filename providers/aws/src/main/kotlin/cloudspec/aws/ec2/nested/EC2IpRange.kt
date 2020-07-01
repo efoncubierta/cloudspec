@@ -23,8 +23,13 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2IpRange(
         @property:PropertyDefinition(
-                name = "cidr_ip",
-                description = "The IPv4 CIDR range"
+                name = PROP_CIDR_IP,
+                description = PROP_CIDR_IP_D
         )
         val cidrIp: String
-)
+) {
+    companion object {
+        const val PROP_CIDR_IP = "cidr_ip"
+        const val PROP_CIDR_IP_D = "The IPv4 CIDR range"
+    }
+}

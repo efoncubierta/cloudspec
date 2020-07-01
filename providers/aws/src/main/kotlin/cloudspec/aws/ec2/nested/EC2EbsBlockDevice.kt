@@ -25,40 +25,55 @@ import cloudspec.aws.ec2.EC2Snapshot
 
 data class EC2EbsBlockDevice(
         @property:PropertyDefinition(
-                name = "delete_on_termination",
-                description = "Indicates whether the EBS volume is deleted on instance termination"
+                name = PROP_DELETE_ON_TERMINATION,
+                description = PROP_DELETE_ON_TERMINATION_D
         )
         val deleteOnTermination: Boolean?,
 
         @property:PropertyDefinition(
-                name = "iops",
-                description = "The number of I/O operations per second (IOPS) that the volume supports"
+                name = PROP_IOPS,
+                description = PROP_IOPS_D
         )
         val iops: Int?,
 
         @property:AssociationDefinition(
-                name = "snapshot",
-                description = "The ID of the snapshot",
+                name = ASSOC_SNAPSHOT,
+                description = ASSOC_SNAPSHOT_D,
                 targetClass = EC2Snapshot::class
         )
         val snapshotId: String?,
 
         @property:PropertyDefinition(
-                name = "volume_size",
-                description = "The size of the volume, in GiB"
+                name = PROP_VOLUME_SIZE,
+                description = PROP_VOLUME_SIZE_D
         )
         val volumeSize: Int?,
 
         @property:PropertyDefinition(
-                name = "volume_type",
-                description = "The volume type",
+                name = PROP_VOLUME_TYPE,
+                description = PROP_VOLUME_TYPE_D,
                 exampleValues = "gp2, st1, sc1, standard"
         )
         val volumeType: String?,
 
         @property:PropertyDefinition(
-                name = "encrypted",
-                description = "Indicates whether the encryption state of an EBS volume is changed while being restored from a backing snapshot"
+                name = PROP_ENCRYPTED,
+                description = PROP_ENCRYPTED_D
         )
         val encrypted: Boolean?
-)
+) {
+    companion object {
+        const val PROP_DELETE_ON_TERMINATION = "delete_on_termination"
+        const val PROP_DELETE_ON_TERMINATION_D = "Indicates whether the EBS volume is deleted on instance termination"
+        const val PROP_IOPS = "iops"
+        const val PROP_IOPS_D = "The number of I/O operations per second (IOPS) that the volume supports"
+        const val ASSOC_SNAPSHOT = "snapshot"
+        const val ASSOC_SNAPSHOT_D = "The ID of the snapshot"
+        const val PROP_VOLUME_SIZE = "volume_size"
+        const val PROP_VOLUME_SIZE_D = "The size of the volume, in GiB"
+        const val PROP_VOLUME_TYPE = "volume_type"
+        const val PROP_VOLUME_TYPE_D = "The volume type"
+        const val PROP_ENCRYPTED = "encrypted"
+        const val PROP_ENCRYPTED_D = "Indicates whether the encryption state of an EBS volume is changed while being restored from a backing snapshot"
+    }
+}

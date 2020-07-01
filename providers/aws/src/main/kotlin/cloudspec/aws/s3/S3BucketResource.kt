@@ -21,12 +21,13 @@ package cloudspec.aws.s3
 
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "s3",
-        name = "bucket",
-        description = "S3 Bucket"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = S3Resource.GROUP_NAME,
+        name = S3BucketResource.RESOURCE_NAME,
+        description = S3BucketResource.RESOURCE_DESCRIPTION
 )
 data class S3BucketResource(
         @property:PropertyDefinition(
@@ -40,4 +41,9 @@ data class S3BucketResource(
                 description = "Bucket name"
         )
         var bucketName: String?
-) : S3Resource()
+) : S3Resource() {
+    companion object {
+        const val RESOURCE_NAME = "bucket"
+        const val RESOURCE_DESCRIPTION = "S3 Bucket"
+    }
+}

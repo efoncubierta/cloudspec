@@ -22,50 +22,69 @@ package cloudspec.aws.ec2
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "local_gateway",
-        description = "Transit Gateway"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2LocalGateway.RESOURCE_NAME,
+        description = EC2LocalGateway.RESOURCE_DESCRIPTION
 )
 data class EC2LocalGateway(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "local_gateway_id",
-                description = "The ID of the local gateway"
+                name = PROP_LOCAL_GATEWAY_ID,
+                description = PROP_LOCAL_GATEWAY_ID_D
         )
         val localGatewayId: String,
 
         @property:PropertyDefinition(
-                name = "outpost_arn",
-                description = "The Amazon Resource Name (ARN) of the Outpost"
+                name = PROP_OUTPOST_ARN,
+                description = PROP_OUTPOST_ARN_D
         )
         val outpostArn: String?,
 
         @property:PropertyDefinition(
-                name = "owner_id",
-                description = "The ID of the AWS account ID that owns the local gateway"
+                name = PROP_OWNER_ID,
+                description = PROP_OWNER_ID_D
         )
         val ownerId: String?,
 
         @property:PropertyDefinition(
-                name = "state",
-                description = "The state of the local gateway"
+                name = PROP_STATE,
+                description = PROP_STATE_D
         )
         val state: String?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "The tags assigned to the local gateway"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "local_gateway"
+        const val RESOURCE_DESCRIPTION = "Local Gateway"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_LOCAL_GATEWAY_ID = "local_gateway_id"
+        const val PROP_LOCAL_GATEWAY_ID_D = "The ID of the local gateway"
+        const val PROP_OUTPOST_ARN = "outpost_arn"
+        const val PROP_OUTPOST_ARN_D = "The Amazon Resource Name (ARN) of the Outpost"
+        const val PROP_OWNER_ID = "owner_id"
+        const val PROP_OWNER_ID_D = "The ID of the AWS account ID that owns the local gateway"
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "The state of the local gateway"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "The tags assigned to the local gateway"
+    }
+}

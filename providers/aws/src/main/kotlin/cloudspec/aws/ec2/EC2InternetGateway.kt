@@ -22,45 +22,62 @@ package cloudspec.aws.ec2
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2InternetGatewayAttachment
 import cloudspec.model.KeyValue
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "internet_gateway",
-        description = "Internet Gateway"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2InternetGateway.RESOURCE_NAME,
+        description = EC2InternetGateway.RESOURCE_DESCRIPTION
 )
 data class EC2InternetGateway(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
         @property:PropertyDefinition(
-                name = "attachments",
-                description = "Any VPCs attached to the internet gateway"
+                name = PROP_ATTACHMENTS,
+                description = PROP_ATTACHMENTS_D
         )
         val attachments: List<EC2InternetGatewayAttachment>?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "internet_gateway_id",
-                description = "The ID of the internet gateway"
+                name = PROP_INTERNET_GATEWAY_ID,
+                description = PROP_INTERNET_GATEWAY_ID_D
         )
         val internetGatewayId: String,
 
         @property:PropertyDefinition(
-                name = "owner_id",
-                description = "The ID of the AWS account that owns the internet gateway"
+                name = PROP_OWNER_ID,
+                description = PROP_OWNER_ID_D
         )
         val ownerId: String?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "Any tags assigned to the internet gateway"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "internet_gateway"
+        const val RESOURCE_DESCRIPTION = "Internet Gateway"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_ATTACHMENTS = "attachments"
+        const val PROP_ATTACHMENTS_D = "Any VPCs attached to the internet gateway"
+        const val PROP_INTERNET_GATEWAY_ID = "internet_gateway_id"
+        const val PROP_INTERNET_GATEWAY_ID_D = "The ID of the internet gateway"
+        const val PROP_OWNER_ID = "owner_id"
+        const val PROP_OWNER_ID_D = "The ID of the AWS account that owns the internet gateway"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "Any tags assigned to the internet gateway"
+    }
+}

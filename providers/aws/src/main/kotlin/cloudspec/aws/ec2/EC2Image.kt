@@ -22,147 +22,197 @@ package cloudspec.aws.ec2
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2BlockDeviceMapping
 import cloudspec.aws.ec2.nested.EC2ProductCode
 import cloudspec.model.KeyValue
 import java.time.Instant
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "image",
-        description = "Amazon Machine Image"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2Image.RESOURCE_NAME,
+        description = EC2Image.RESOURCE_DESCRIPTION
 )
 data class EC2Image(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
         @property:PropertyDefinition(
-                name = "architecture",
-                description = "The architecture of the image",
+                name = PROP_ARCHITECTURE,
+                description = PROP_ARCHITECTURE_D,
                 exampleValues = "i386 | x86_64 | arm64"
         )
         val architecture: String?,
 
         @property:PropertyDefinition(
-                name = "creation_date",
-                description = "The date and time the image was created"
+                name = PROP_CREATION_DATE,
+                description = PROP_CREATION_DATE_D
         )
         val creationDate: Instant?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "image_id",
-                description = "The ID of the AMI"
+                name = PROP_IMAGE_ID,
+                description = PROP_IMAGE_ID_D
         )
         val imageId: String,
 
         @property:PropertyDefinition(
-                name = "image_location",
-                description = "The location of the AMI"
+                name = PROP_IMAGE_LOCATION,
+                description = PROP_IMAGE_LOCATION_D
         )
         val imageLocation: String?,
 
         @property:PropertyDefinition(
-                name = "type",
-                description = "The type of image",
+                name = PROP_TYPE,
+                description = PROP_TYPE_D,
                 exampleValues = "machine | kernel | ramdisk"
         )
         val imageType: String?,
 
         @property:PropertyDefinition(
-                name = "kernel_id",
-                description = "The kernel associated with the image, if any. Only applicable for machine images"
+                name = PROP_KERNEL_ID,
+                description = PROP_KERNEL_ID_D
         )
         val kernelId: String?,
 
         @property:PropertyDefinition(
-                name = "owner_id",
-                description = "The AWS account ID of the image owner"
+                name = PROP_OWNER_ID,
+                description = PROP_OWNER_ID_D
         )
         val ownerId: String?,
 
         @property:PropertyDefinition(
-                name = "platform",
-                description = "This value is set to 'windows' for Windows AMIs; otherwise, it is blank",
+                name = PROP_PLATFORM,
+                description = PROP_PLATFORM_D,
                 exampleValues = "windows"
         )
         val platform: String?,
 
         @property:PropertyDefinition(
-                name = "product_codes",
-                description = "Any product codes associated with the AMI"
+                name = PROP_PRODUCT_CODES,
+                description = PROP_PRODUCT_CODES_D
         )
         val productCodes: List<EC2ProductCode>?,
 
         @property:PropertyDefinition(
-                name = "state",
-                description = "State of the image"
+                name = PROP_STATE,
+                description = PROP_STATE_D
         )
         val state: String?,
 
         @property:PropertyDefinition(
-                name = "block_device_mappings",
-                description = "Any block device mapping entries"
+                name = PROP_BLOCK_DEVICE_MAPPINGS,
+                description = PROP_BLOCK_DEVICE_MAPPINGS_D
         )
         val blockDeviceMappings: List<EC2BlockDeviceMapping>?,
 
         @property:PropertyDefinition(
-                name = "ena_support",
-                description = "Flag indicating ENA support"
+                name = PROP_ENA_SUPPORT,
+                description = PROP_ENA_SUPPORT_D
         )
         val enaSupport: Boolean?,
 
         @property:PropertyDefinition(
-                name = "hypervisor",
-                description = "The hypervisor type of the image"
+                name = PROP_HYPERVISOR,
+                description = PROP_HYPERVISOR_D
         )
         val hypervisor: String?,
 
         @property:PropertyDefinition(
-                name = "name",
-                description = "The name of the AMI that was provided during image creation"
+                name = PROP_NAME,
+                description = PROP_NAME_D
         )
         val name: String?,
 
         @property:PropertyDefinition(
-                name = "root_device_name",
-                description = "The device name of the root device volume"
+                name = PROP_ROOT_DEVICE_NAME,
+                description = PROP_ROOT_DEVICE_NAME_D
         )
         val rootDeviceName: String?,
 
         @property:PropertyDefinition(
-                name = "root_device_type",
-                description = "The type of root device used by the AMI",
+                name = PROP_ROOT_DEVICE_TYPE,
+                description = PROP_ROOT_DEVICE_TYPE_D,
                 exampleValues = "/dev/sda1"
         )
         val rootDeviceType: String?,
 
         @property:PropertyDefinition(
-                name = "sriov_net_support",
-                description = "Specifies whether enhanced networking with the Intel 82599 Virtual Function interface is enabled"
+                name = PROP_SRIOV_NET_SUPPORT,
+                description = PROP_SRIOV_NET_SUPPORT_D
         )
         val sriovNetSupport: String?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "Any tags assigned to the image"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?,
 
         @property:PropertyDefinition(
-                name = "virtualization_type",
-                description = "The type of virtualization of the AMI"
+                name = PROP_VIRTUALIZATION_TYPE,
+                description = PROP_VIRTUALIZATION_TYPE_D
         )
         val virtualizationType: String?,
 
         @property:PropertyDefinition(
-                name = "public_launch_permissions",
-                description = "Indicates whether the image has public launch permissions"
+                name = PROP_PUBLIC_LAUNCH_PERMISSIONS,
+                description = PROP_PUBLIC_LAUNCH_PERMISSIONS_D
         )
         val publicLaunchPermissions: Boolean?
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "image"
+        const val RESOURCE_DESCRIPTION = "Amazon Machine Image"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_ARCHITECTURE = "architecture"
+        const val PROP_ARCHITECTURE_D = "The architecture of the image"
+        const val PROP_CREATION_DATE = "creation_date"
+        const val PROP_CREATION_DATE_D = "The date and time the image was created"
+        const val PROP_IMAGE_ID = "image_id"
+        const val PROP_IMAGE_ID_D = "The ID of the AMI"
+        const val PROP_IMAGE_LOCATION = "image_location"
+        const val PROP_IMAGE_LOCATION_D = "The location of the AMI"
+        const val PROP_TYPE = "type"
+        const val PROP_TYPE_D = "The type of image"
+        const val PROP_KERNEL_ID = "kernel_id"
+        const val PROP_KERNEL_ID_D = "The kernel associated with the image, if any. Only applicable for machine images"
+        const val PROP_OWNER_ID = "owner_id"
+        const val PROP_OWNER_ID_D = "The AWS account ID of the image owner"
+        const val PROP_PLATFORM = "platform"
+        const val PROP_PLATFORM_D = "This value is set to 'windows' for Windows AMIs; otherwise, it is blank"
+        const val PROP_PRODUCT_CODES = "product_codes"
+        const val PROP_PRODUCT_CODES_D = "Any product codes associated with the AMI"
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "State of the image"
+        const val PROP_BLOCK_DEVICE_MAPPINGS = "block_device_mappings"
+        const val PROP_BLOCK_DEVICE_MAPPINGS_D = "Any block device mapping entries"
+        const val PROP_ENA_SUPPORT = "ena_support"
+        const val PROP_ENA_SUPPORT_D = "Flag indicating ENA support"
+        const val PROP_HYPERVISOR = "hypervisor"
+        const val PROP_HYPERVISOR_D = "The hypervisor type of the image"
+        const val PROP_NAME = "name"
+        const val PROP_NAME_D = "The name of the AMI that was provided during image creation"
+        const val PROP_ROOT_DEVICE_NAME = "root_device_name"
+        const val PROP_ROOT_DEVICE_NAME_D = "The device name of the root device volume"
+        const val PROP_ROOT_DEVICE_TYPE = "root_device_type"
+        const val PROP_ROOT_DEVICE_TYPE_D = "The type of root device used by the AMI"
+        const val PROP_SRIOV_NET_SUPPORT = "sriov_net_support"
+        const val PROP_SRIOV_NET_SUPPORT_D = "Specifies whether enhanced networking with the Intel 82599 Virtual Function interface is enabled"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "Any tags assigned to the image"
+        const val PROP_VIRTUALIZATION_TYPE = "virtualization_type"
+        const val PROP_VIRTUALIZATION_TYPE_D = "The type of virtualization of the AMI"
+        const val PROP_PUBLIC_LAUNCH_PERMISSIONS = "public_launch_permissions"
+        const val PROP_PUBLIC_LAUNCH_PERMISSIONS_D = "Indicates whether the image has public launch permissions"
+    }
+}
+

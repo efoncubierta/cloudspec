@@ -25,16 +25,23 @@ import cloudspec.aws.ec2.EC2Vpc
 
 data class EC2InternetGatewayAttachment(
         @property:PropertyDefinition(
-                name = "state",
-                description = "The current state of the attachment",
+                name = PROP_STATE,
+                description = PROP_STATE_D,
                 exampleValues = "attaching | attached | detaching | detached"
         )
         val state: String?,
 
         @property:AssociationDefinition(
-                name = "vpc",
-                description = "The VPC",
+                name = ASSOC_VPC,
+                description = ASSOC_VPC_D,
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?
-)
+) {
+    companion object {
+        const val PROP_STATE = "state"
+        const val PROP_STATE_D = "The current state of the attachment"
+        const val ASSOC_VPC = "vpc"
+        const val ASSOC_VPC_D = "The VPC"
+    }
+}

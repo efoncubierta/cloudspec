@@ -21,4 +21,8 @@ package cloudspec.aws.s3
 
 import cloudspec.aws.AWSResource
 
-abstract class S3Resource : AWSResource() 
+abstract class S3Resource : AWSResource() {
+    companion object {
+        const val GROUP_NAME = "s3"
+    }
+}

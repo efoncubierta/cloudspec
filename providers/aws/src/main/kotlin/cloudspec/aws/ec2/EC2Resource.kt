@@ -21,4 +21,8 @@ package cloudspec.aws.ec2
 
 import cloudspec.aws.AWSResource
 
-abstract class EC2Resource(open val region: String?) : AWSResource()
+abstract class EC2Resource(open val region: String?) : AWSResource() {
+    companion object {
+        const val GROUP_NAME = "ec2"
+    }
+}

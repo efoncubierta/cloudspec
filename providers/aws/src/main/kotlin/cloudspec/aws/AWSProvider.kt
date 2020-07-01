@@ -116,4 +116,8 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
         loaders["aws:ec2:vpc"] = EC2VpcLoader(clientsProvider)
         loaders["aws:s3:bucket"] = S3BucketLoader(clientsProvider)
     }
+
+    companion object {
+        const val PROVIDER_NAME = "aws"
+    }
 }

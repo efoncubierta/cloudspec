@@ -27,41 +27,56 @@ import cloudspec.aws.ec2.EC2VpcPeeringConnection
 
 data class EC2UserIdGroupPair(
         @property:AssociationDefinition(
-                name = "group",
-                description = "The security group",
+                name = ASSOC_GROUP,
+                description = ASSOC_GROUP_D,
                 targetClass = EC2SecurityGroup::class
         )
         val groupId: String?,
 
         @property:PropertyDefinition(
-                name = "group_name",
-                description = "The name of the security group"
+                name = ASSOC_GROUP_NAME,
+                description = ASSOC_GROUP_NAME_D
         )
         val groupName: String?,
 
         @property:PropertyDefinition(
-                name = "peering_status",
-                description = "The status of a VPC peering connection, if applicable"
+                name = PROP_PEERING_STATUS,
+                description = PROP_PEERING_STATUS_D
         )
         val peeringStatus: String?,
 
         @property:PropertyDefinition(
-                name = "userId",
-                description = "The ID of an AWS account"
+                name = PROP_USER_ID,
+                description = PROP_USER_ID_D
         )
         val userId: String?,
 
         @property:AssociationDefinition(
-                name = "vpc",
-                description = "The VPC for the referenced security group, if applicable",
+                name = ASSOC_VPC,
+                description = ASSOC_VPC_D,
                 targetClass = EC2Vpc::class
         )
         val vpcId: String?,
 
         @property:AssociationDefinition(
-                name = "vpc_peering_connection",
-                description = "The VPC peering connection, if applicable",
+                name = ASSOC_VPC_PEERING_CONNECTION,
+                description = ASSOC_VPC_PEERING_CONNECTION_D,
                 targetClass = EC2VpcPeeringConnection::class
         )
         val vpcPeeringConnectionId: String?
-)
+) {
+    companion object {
+        const val ASSOC_GROUP = "group"
+        const val ASSOC_GROUP_D = "The security group"
+        const val ASSOC_GROUP_NAME = "group_name"
+        const val ASSOC_GROUP_NAME_D = "The name of the security group"
+        const val PROP_PEERING_STATUS = "peering_status"
+        const val PROP_PEERING_STATUS_D = "The status of a VPC peering connection, if applicable"
+        const val PROP_USER_ID = "userId"
+        const val PROP_USER_ID_D = "The ID of an AWS account"
+        const val ASSOC_VPC = "vpc"
+        const val ASSOC_VPC_D = "The VPC for the referenced security group, if applicable"
+        const val ASSOC_VPC_PEERING_CONNECTION = "vpc_peering_connection"
+        const val ASSOC_VPC_PEERING_CONNECTION_D = "The VPC peering connection, if applicable"
+    }
+}

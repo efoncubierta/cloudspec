@@ -23,65 +23,88 @@ import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
+import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
 
 @ResourceDefinition(
-        provider = "aws",
-        group = "ec2",
-        name = "elastic_gpu",
-        description = "Elastic Graphics Accelerator"
+        provider = AWSProvider.PROVIDER_NAME,
+        group = EC2Resource.GROUP_NAME,
+        name = EC2ElasticGpu.RESOURCE_NAME,
+        description = EC2ElasticGpu.RESOURCE_DESCRIPTION
 )
 data class EC2ElasticGpu(
         @property:PropertyDefinition(
-                name = "region",
-                description = "The AWS region",
+                name = PROP_REGION,
+                description = PROP_REGION_D,
                 exampleValues = "us-east-1 | eu-west-1"
         )
         override val region: String?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
-                name = "elastic_gpu_id",
-                description = "The ID of the Elastic Graphics accelerator"
+                name = PROP_ELASTIC_GPU_ID,
+                description = PROP_ELASTIC_GPU_ID_D
         )
         val elasticGpuId: String,
 
         @property:PropertyDefinition(
-                name = "availability_zone",
-                description = "The Availability Zone in the which the Elastic Graphics accelerator resides"
+                name = PROP_AVAILABILITY_ZONE,
+                description = PROP_AVAILABILITY_ZONE_D
         )
         val availabilityZone: String?,
 
         @property:PropertyDefinition(
-                name = "elastic_gpu_type",
-                description = "The type of Elastic Graphics accelerator"
+                name = PROP_ELASTIC_GPU_TYPE,
+                description = PROP_ELASTIC_GPU_TYPE_D
         )
         val elasticGpuType: String?,
 
         @property:PropertyDefinition(
-                name = "elastic_gpu_health",
-                description = "The status of the Elastic Graphics accelerator",
+                name = PROP_ELASTIC_GPU_HEALTH,
+                description = PROP_ELASTIC_GPU_HEALTH_D,
                 exampleValues = "OK | IMPAIRED"
         )
         val elasticGpuHealth: String?,
 
         @property:PropertyDefinition(
-                name = "elastic_gpu_state",
-                description = "The state of the Elastic Graphics accelerator",
+                name = PROP_ELASTIC_GPU_STATE,
+                description = PROP_ELASTIC_GPU_STATE_D,
                 exampleValues = "ATTACHED"
         )
         val elasticGpuState: String?,
 
         @property:AssociationDefinition(
-                name = "instance",
-                description = "The instance to which the Elastic Graphics accelerator is attached",
+                name = ASSOC_INSTANCE,
+                description = ASSOC_INSTANCE_D,
                 targetClass = EC2Instance::class
         )
         val instanceId: String?,
 
         @property:PropertyDefinition(
-                name = "tags",
-                description = "The tags assigned to the Elastic Graphics accelerator"
+                name = PROP_TAGS,
+                description = PROP_TAGS_D
         )
         val tags: List<KeyValue>?
-) : EC2Resource(region)
+) : EC2Resource(region) {
+    companion object {
+        const val RESOURCE_NAME = "elastic_gpu"
+        const val RESOURCE_DESCRIPTION = "Elastic Graphics Accelerator"
+
+        const val PROP_REGION = "region"
+        const val PROP_REGION_D = "The AWS region"
+        const val PROP_ELASTIC_GPU_ID = "elastic_gpu_id"
+        const val PROP_ELASTIC_GPU_ID_D = "The ID of the Elastic Graphics accelerator"
+        const val PROP_AVAILABILITY_ZONE = "availability_zone"
+        const val PROP_AVAILABILITY_ZONE_D = "The Availability Zone in the which the Elastic Graphics accelerator resides"
+        const val PROP_ELASTIC_GPU_TYPE = "elastic_gpu_type"
+        const val PROP_ELASTIC_GPU_TYPE_D = "The type of Elastic Graphics accelerator"
+        const val PROP_ELASTIC_GPU_HEALTH = "elastic_gpu_health"
+        const val PROP_ELASTIC_GPU_HEALTH_D = "The status of the Elastic Graphics accelerator"
+        const val PROP_ELASTIC_GPU_STATE = "elastic_gpu_state"
+        const val PROP_ELASTIC_GPU_STATE_D = "The state of the Elastic Graphics accelerator"
+        const val ASSOC_INSTANCE = "instance"
+        const val ASSOC_INSTANCE_D = "The instance to which the Elastic Graphics accelerator is attached"
+        const val PROP_TAGS = "tags"
+        const val PROP_TAGS_D = "The tags assigned to the Elastic Graphics accelerator"
+    }
+}

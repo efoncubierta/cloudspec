@@ -23,14 +23,21 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2PortRange(
         @property:PropertyDefinition(
-                name = "from",
-                description = "The first port in the range"
+                name = PROP_FROM,
+                description = PROP_FROM_D
         )
         val from: Int?,
 
         @property:PropertyDefinition(
-                name = "to",
-                description = "The last port in the range"
+                name = PROP_TO,
+                description = PROP_TO_D
         )
         val to: Int?
-)
+) {
+    companion object {
+        const val PROP_FROM = "from"
+        const val PROP_FROM_D = "The first port in the range"
+        const val PROP_TO = "to"
+        const val PROP_TO_D = "The last port in the range"
+    }
+}

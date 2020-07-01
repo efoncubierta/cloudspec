@@ -23,45 +23,62 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2NetworkAclEntry(
         @property:PropertyDefinition(
-                name = "cidr_block",
-                description = "The IPv4 network range to allow or deny, in CIDR notation"
+                name = PROP_CIDR_BLOCK,
+                description = PROP_CIDR_BLOCK_D
         )
         val cidrBlock: String?,
 
         @property:PropertyDefinition(
-                name = "egress",
-                description = "Indicates whether the rule is an egress rule"
+                name = PROP_EGRESS,
+                description = PROP_EGRESS_D
         )
         val egress: Boolean?,
 
         @property:PropertyDefinition(
-                name = "icmp_type_code",
-                description = "The ICMP code. A value of -1 means all codes for the specified ICMP type"
+                name = PROP_ICMP_TYPE_CODE,
+                description = PROP_ICMP_TYPE_CODE_D
         )
         val icmpTypeCode: Int?,
 
         @property:PropertyDefinition(
-                name = "ipv6_cidr_block",
-                description = "The IPv6 network range to allow or deny, in CIDR notation"
+                name = PROP_IPV6_CIDR_BLOCK,
+                description = PROP_IPV6_CIDR_BLOCK_D
         )
         val ipv6CidrBlock: String?,
 
         @property:PropertyDefinition(
-                name = "port_range",
-                description = "TCP or UDP protocols: The range of ports the rule applies to"
+                name = PROP_PORT_RANGE,
+                description = PROP_PORT_RANGE_D
         )
         val portRange: EC2PortRange?,
 
         @property:PropertyDefinition(
-                name = "protocol",
-                description = "The protocol number. A value of \"-1\" means all protocols"
+                name = PROP_PROTOCOL,
+                description = PROP_PROTOCOL_D
         )
         val protocol: String?,
 
         @property:PropertyDefinition(
-                name = "rule_action",
-                description = "Indicates whether to allow or deny the traffic that matches the rule",
+                name = PROP_RULE_ACTION,
+                description = PROP_RULE_ACTION_D,
                 exampleValues = "allow | deny"
         )
         val ruleAction: String
-)
+) {
+    companion object {
+        const val PROP_CIDR_BLOCK = "cidr_block"
+        const val PROP_CIDR_BLOCK_D = "The IPv4 network range to allow or deny, in CIDR notation"
+        const val PROP_EGRESS = "egress"
+        const val PROP_EGRESS_D = "Indicates whether the rule is an egress rule"
+        const val PROP_ICMP_TYPE_CODE = "icmp_type_code"
+        const val PROP_ICMP_TYPE_CODE_D = "The ICMP code. A value of -1 means all codes for the specified ICMP type"
+        const val PROP_IPV6_CIDR_BLOCK = "ipv6_cidr_block"
+        const val PROP_IPV6_CIDR_BLOCK_D = "The IPv6 network range to allow or deny, in CIDR notation"
+        const val PROP_PORT_RANGE = "port_range"
+        const val PROP_PORT_RANGE_D = "TCP or UDP protocols: The range of ports the rule applies to"
+        const val PROP_PROTOCOL = "protocol"
+        const val PROP_PROTOCOL_D = "The protocol number. A value of \"-1\" means all protocols"
+        const val PROP_RULE_ACTION = "rule_action"
+        const val PROP_RULE_ACTION_D = "Indicates whether to allow or deny the traffic that matches the rule"
+    }
+}

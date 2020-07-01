@@ -23,14 +23,21 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2DhcpConfiguration(
         @property:PropertyDefinition(
-                name = "key",
-                description = "The name of a DHCP option"
+                name = PROP_KEY,
+                description = PROP_KEY_D
         )
         val key: String?,
 
         @property:PropertyDefinition(
-                name = "values",
-                description = "One or more values for the DHCP option"
+                name = PROP_VALUES,
+                description = PROP_VALUES_D
         )
         val values: List<String>?
-)
+) {
+    companion object {
+        const val PROP_KEY = "key"
+        const val PROP_KEY_D = "The name of a DHCP option"
+        const val PROP_VALUES = "values"
+        const val PROP_VALUES_D = "One or more values for the DHCP option"
+    }
+}

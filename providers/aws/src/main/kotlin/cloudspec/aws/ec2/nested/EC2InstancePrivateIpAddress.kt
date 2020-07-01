@@ -23,20 +23,29 @@ import cloudspec.annotation.PropertyDefinition
 
 data class EC2InstancePrivateIpAddress(
         @property:PropertyDefinition(
-                name = "primary",
-                description = "Indicates whether this IPv4 address is the primary private IP address of the network interface"
+                name = PROP_PRIMARY,
+                description = PROP_PRIMARY_D
         )
         val primary: Boolean?,
 
         @property:PropertyDefinition(
-                name = "private_dns_name",
-                description = "The private IPv4 DNS name"
+                name = PROP_PRIVATE_DNS_NAME,
+                description = PROP_PRIVATE_DNS_NAME_D
         )
         val privateDnsName: String?,
 
         @property:PropertyDefinition(
-                name = "private_ip_address",
-                description = "The private IPv4 address of the network interface"
+                name = PROP_PRIVATE_IP_ADDRESS,
+                description = PROP_PRIVATE_IP_ADDRESS_D
         )
         val privateIpAddress: String?
-)
+) {
+    companion object {
+        const val PROP_PRIMARY = "primary"
+        const val PROP_PRIMARY_D = "Indicates whether this IPv4 address is the primary private IP address of the network interface"
+        const val PROP_PRIVATE_DNS_NAME = "private_dns_name"
+        const val PROP_PRIVATE_DNS_NAME_D = "The private IPv4 DNS name"
+        const val PROP_PRIVATE_IP_ADDRESS = "private_ip_address"
+        const val PROP_PRIVATE_IP_ADDRESS_D = "The private IPv4 address of the network interface"
+    }
+}
