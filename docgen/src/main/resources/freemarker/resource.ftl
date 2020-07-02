@@ -10,31 +10,24 @@ description: >
 <#if spaces gt 0>${''?left_pad(spaces, ' ')}</#if>* **${propertyDef.name}**
 (`${propertyDef.propertyType}${propertyDef.isMultiValued()?string('[]', '')}`):
 ${propertyDef.description}.
-    <#if propertyDef.exampleValues != "">
-Example values: `${propertyDef.exampleValues}`
+    <#if propertyDef.allowedValues?has_content>
+Allowed values: `${propertyDef.allowedValues?join("`, `")}`
     </#if>
     <#if propertyDef.propertyType.toString() == "nested">
 <@propertyDefinitionsList propertyDefs=propertyDef.properties spaces=spaces + 4/>
+<@associationDefinitionsList associationDefs=propertyDef.associations spaces=spaces + 4/>
     </#if>
   </#list>
 </#macro>
 
-<#macro associationDefinitionsList associationDefs>
+<#macro associationDefinitionsList associationDefs spaces=0>
   <#list associationDefs as associationDef>
-* **${associationDef.name}**
-(*${associationDef.defRef}*${associationDef.isMany()?string('[]', '')}):
+<#if spaces gt 0>${''?left_pad(spaces, ' ')}</#if>* **&gt;${associationDef.name}**
+([${associationDef.defRef}](../../${associationDef.defRef.providerName}/${associationDef.defRef.groupName}_${associationDef.defRef.resourceName})${associationDef.isMany()?string('[]', '')}):
 ${associationDef.description}
   </#list>
 </#macro>
 
-<#if resourceDef.properties?has_content>
-## Properties
-
+## Members
 <@propertyDefinitionsList propertyDefs=resourceDef.properties/>
-</#if>
-
-<#if resourceDef.associations?has_content>
-## Associations
-
 <@associationDefinitionsList associationDefs=resourceDef.associations/>
-</#if>
