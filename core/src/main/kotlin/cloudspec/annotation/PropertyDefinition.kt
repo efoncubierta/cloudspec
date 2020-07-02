@@ -23,6 +23,5 @@ package cloudspec.annotation
 @Retention(AnnotationRetention.RUNTIME)
 annotation class PropertyDefinition(
         val name: String,
-        val description: String = "",
-        val exampleValues: String = ""
+        val description: String = ""
 )

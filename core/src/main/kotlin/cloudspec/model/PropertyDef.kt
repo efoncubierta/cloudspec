@@ -24,7 +24,7 @@ package cloudspec.model
  *
  * Properties must be defined so resources integrity can be validated.
  */
-data class PropertyDef (
+data class PropertyDef(
         /**
          * Property name.
          */
@@ -46,9 +46,9 @@ data class PropertyDef (
         val isMultiValued: Boolean,
 
         /**
-         * Example values, for documentation.
+         * Allowed values, for documentation purposes.
          */
-        val exampleValues: String,
+        val allowedValues: Set<String> = emptySet(),
 
         /**
          * Nested properties.

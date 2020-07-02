@@ -49,7 +49,7 @@ object ModelGenerator {
                     randomDescription(),
                     PropertyType.NESTED,
                     faker.random().nextBoolean(),
-                    faker.lorem().word(),
+                    emptySet(),
                     randomPropertyDefs(3, true),
                     randomAssociationDefs(3)
             )
@@ -57,15 +57,13 @@ object ModelGenerator {
                     randomName(),
                     randomDescription(),
                     propertyType,
-                    faker.random().nextBoolean(),
-                    faker.lorem().word()
+                    faker.random().nextBoolean()
             )
             else -> PropertyDef(
                     randomName(),
                     randomDescription(),
                     propertyType,
-                    faker.random().nextBoolean(),
-                    faker.lorem().word()
+                    faker.random().nextBoolean()
             )
         }
     }

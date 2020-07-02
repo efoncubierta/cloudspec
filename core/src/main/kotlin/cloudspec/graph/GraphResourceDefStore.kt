@@ -118,7 +118,7 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                                               propertyDefV.value(PROPERTY_DESCRIPTION),
                                               propertyDefV.value(PROPERTY_TYPE),
                                               propertyDefV.value(PROPERTY_IS_MULTIVALUED),
-                                              propertyDefV.value(PROPERTY_EXAMPLE_VALUES),
+                                              propertyDefV.value(PROPERTY_ALLOWED_VALUES),
                                               getPropertyDefs(propertyDefV),
                                               getAssociationDefs(propertyDefV)).toOption()
             else -> {
@@ -184,7 +184,7 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
                 .property(PROPERTY_DESCRIPTION, propertyDef.description)
                 .property(PROPERTY_TYPE, propertyDef.propertyType)
                 .property(PROPERTY_IS_MULTIVALUED, propertyDef.isMultiValued)
-                .property(PROPERTY_EXAMPLE_VALUES, propertyDef.exampleValues)
+                .property(PROPERTY_ALLOWED_VALUES, propertyDef.allowedValues)
                 .next()
 
         // create edge between source (resource or property def) and property definition vertices
@@ -246,7 +246,7 @@ class GraphResourceDefStore(val graph: Graph) : ResourceDefStore {
         const val PROPERTY_PROVIDER_NAME = "providerName"
         const val PROPERTY_GROUP_NAME = "groupName"
         const val PROPERTY_NAME = "name"
-        const val PROPERTY_EXAMPLE_VALUES = "exampleValues"
+        const val PROPERTY_ALLOWED_VALUES = "allowedValues"
         const val PROPERTY_DESCRIPTION = "description"
         const val PROPERTY_TYPE = "type"
         const val PROPERTY_IS_MULTIVALUED = "isMultivalued"

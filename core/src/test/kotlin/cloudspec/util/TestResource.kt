@@ -36,106 +36,91 @@ data class TestResource(
         @property:IdDefinition
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_ID_NAME,
-                description = ModelTestUtils.PROP_ID_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_ID_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_ID_DESCRIPTION
         )
         val id: String,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_NUMBER_NAME,
-                description = ModelTestUtils.PROP_NUMBER_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_NUMBER_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_NUMBER_DESCRIPTION
         )
         val numberProperty: Number?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_NUMBER_LIST_NAME,
-                description = ModelTestUtils.PROP_NUMBER_LIST_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_NUMBER_LIST_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_NUMBER_LIST_DESCRIPTION
         )
         val numberListProperty: List<Number>?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_STRING_NAME,
-                description = ModelTestUtils.PROP_STRING_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_STRING_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_STRING_DESCRIPTION
         )
         val stringProperty: String?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_STRING_LIST_NAME,
-                description = ModelTestUtils.PROP_STRING_LIST_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_STRING_LIST_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_STRING_LIST_DESCRIPTION
         )
         val stringListProperty: List<String>?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_ENUM_NAME,
-                description = ModelTestUtils.PROP_ENUM_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_ENUM_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_ENUM_DESCRIPTION
         )
         val enumProperty: TestEnum?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_ENUM_LIST_NAME,
-                description = ModelTestUtils.PROP_ENUM_LIST_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_ENUM_LIST_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_ENUM_LIST_DESCRIPTION
         )
         val enumListProperty: List<TestEnum>?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_BOOLEAN_NAME,
-                description = ModelTestUtils.PROP_BOOLEAN_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_BOOLEAN_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_BOOLEAN_DESCRIPTION
         )
         val booleanProperty: Boolean?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_BOOLEAN_LIST_NAME,
-                description = ModelTestUtils.PROP_BOOLEAN_LIST_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_BOOLEAN_LIST_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_BOOLEAN_LIST_DESCRIPTION
         )
         val booleanListProperty: List<Boolean>?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_DATE_NAME,
-                description = ModelTestUtils.PROP_DATE_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_DATE_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_DATE_DESCRIPTION
         )
         val dateProperty: Date?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_DATE_LIST_NAME,
-                description = ModelTestUtils.PROP_DATE_LIST_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_DATE_LIST_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_DATE_LIST_DESCRIPTION
         )
         val dateListProperty: List<Date>?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_KEY_VALUE_NAME,
-                description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_KEY_VALUE_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_KEY_VALUE_DESCRIPTION
         )
         val keyValueProperty: KeyValue?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_KEY_VALUE_LIST_NAME,
-                description = ModelTestUtils.PROP_KEY_VALUE_LIST_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_KEY_VALUE_LIST_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_KEY_VALUE_LIST_DESCRIPTION
         )
         val keyValueListProperty: List<KeyValue>?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_NESTED_NAME,
-                description = ModelTestUtils.PROP_NESTED_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_NESTED_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_NESTED_DESCRIPTION
         )
         val nestedProperty: TestNestedProperty?,
 
         @property:PropertyDefinition(
                 name = ModelTestUtils.PROP_NESTED_LIST_NAME,
-                description = ModelTestUtils.PROP_NESTED_LIST_DESCRIPTION,
-                exampleValues = ModelTestUtils.PROP_NESTED_LIST_EXAMPLE_VALUES
+                description = ModelTestUtils.PROP_NESTED_LIST_DESCRIPTION
         )
         val nestedListProperty: List<TestNestedProperty>?,
 

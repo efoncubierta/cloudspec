@@ -134,7 +134,7 @@ object ResourceReflectionUtil {
                                     StringProperty(propertyDefAnnotation.name,
                                                    when (value) {
                                                        is Enum<*> -> value.toString()
-                                                       else -> value as String
+                                                       else -> value as String?
                                                    })
                                 PropertyType.BOOLEAN ->
                                     BooleanProperty(propertyDefAnnotation.name, (value as Boolean?))

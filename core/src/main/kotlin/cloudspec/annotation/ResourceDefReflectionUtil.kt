@@ -122,24 +122,36 @@ object ResourceDefReflectionUtil {
             val (annotation) = kprop.findAnnotation<PropertyDefinition>().toOption()
             val (propertyType) = guessPropertyType(kprop)
 
+            val containedType = guessContainedType(kprop.returnType)
+
             when (propertyType) {
                 PropertyType.KEY_VALUE,
                 PropertyType.NUMBER,
-                PropertyType.STRING,
                 PropertyType.BOOLEAN,
                 PropertyType.DATE ->
                     PropertyDef(annotation.name,
                                 annotation.description,
                                 propertyType,
-                                isMultiValued(kprop),
-                                annotation.exampleValues)
+                                isMultiValued(kprop))
+                PropertyType.STRING ->
+                    when {
+                        isNullableEnum(containedType) -> PropertyDef(annotation.name,
+                                                                     annotation.description,
+                                                                     propertyType,
+                                                                     isMultiValued(kprop),
+                                                                     enumValues(containedType.classifier as KClass<Enum<*>>))
+                        else -> PropertyDef(annotation.name,
+                                            annotation.description,
+                                            propertyType,
+                                            isMultiValued(kprop))
+                    }
                 PropertyType.NESTED -> {
                     val nestedClass = toClass(kprop.returnType)
                     PropertyDef(annotation.name,
                                 annotation.description,
                                 PropertyType.NESTED,
                                 isMultiValued(kprop),
-                                annotation.exampleValues,
+                                emptySet(),
                                 toPropertyDefs(nestedClass),
                                 toAssociationDefs(nestedClass))
                 }
@@ -402,5 +414,15 @@ object ResourceDefReflectionUtil {
      */
     fun toClass(ktype: KType): KClass<*> {
         return guessContainedType(ktype).classifier as KClass<*>
+    }
+
+    /**
+     * Get values of a generic enum class.
+     *
+     * @param kclass Kotlin class.
+     * @return Array of enums
+     */
+    fun enumValues(enumClass: KClass<out Enum<*>>): Set<String> {
+        return enumClass.java.enumConstants.map { it.toString() }.toSet()
     }
 }
