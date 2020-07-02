@@ -24,6 +24,8 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.LogDestinationType
+import software.amazon.awssdk.services.ec2.model.TrafficType
 import java.time.Instant
 
 @ResourceDefinition(
@@ -35,8 +37,7 @@ import java.time.Instant
 data class EC2FlowLog(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -60,8 +61,7 @@ data class EC2FlowLog(
 
         @property:PropertyDefinition(
                 name = PROP_DELIVER_LOGS_STATUS,
-                description = PROP_DELIVER_LOGS_STATUS_D,
-                exampleValues = "SUCCESS | FAILED"
+                description = PROP_DELIVER_LOGS_STATUS_D
         )
         val deliverLogsStatus: String?,
 
@@ -74,8 +74,7 @@ data class EC2FlowLog(
 
         @property:PropertyDefinition(
                 name = PROP_FLOW_LOG_STATUS,
-                description = PROP_FLOW_LOG_STATUS_D,
-                exampleValues = "ACTIVE"
+                description = PROP_FLOW_LOG_STATUS_D
         )
         val flowLogStatus: String?,
 
@@ -93,22 +92,19 @@ data class EC2FlowLog(
 
         @property:PropertyDefinition(
                 name = PROP_TRAFFIC_TYPE,
-                description = PROP_TRAFFIC_TYPE_D,
-                exampleValues = "ACCEPT | REJECT | ALL"
+                description = PROP_TRAFFIC_TYPE_D
         )
-        val trafficType: String?,
+        val trafficType: TrafficType?,
 
         @property:PropertyDefinition(
                 name = PROP_LOG_DESTINATION_TYPE,
-                description = PROP_LOG_DESTINATION_TYPE_D,
-                exampleValues = "cloud-watch-logs | s3"
+                description = PROP_LOG_DESTINATION_TYPE_D
         )
-        val logDestinationType: String?,
+        val logDestinationType: LogDestinationType?,
 
         @property:PropertyDefinition(
                 name = PROP_LOG_DESTINATION,
-                description = PROP_LOG_DESTINATION_D,
-                exampleValues = "ARN of CloudWatch Logs Group | ARN of S3 Bucket"
+                description = PROP_LOG_DESTINATION_D
         )
         val logDestination: String?,
 

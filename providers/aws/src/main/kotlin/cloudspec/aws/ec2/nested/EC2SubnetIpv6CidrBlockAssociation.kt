@@ -20,6 +20,7 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.SubnetCidrBlockStateCode
 
 data class EC2SubnetIpv6CidrBlockAssociation(
         @property:PropertyDefinition(
@@ -30,10 +31,9 @@ data class EC2SubnetIpv6CidrBlockAssociation(
 
         @property:PropertyDefinition(
                 name = PROP_IPV6_CIDR_BLOCK_STATE,
-                description = PROP_IPV6_CIDR_BLOCK_STATE_D,
-                exampleValues = "associating | associated | disassociating | disassociated | failing | failed"
+                description = PROP_IPV6_CIDR_BLOCK_STATE_D
         )
-        val ipv6CidrBlockState: String?
+        val ipv6CidrBlockState: SubnetCidrBlockStateCode?
 ) {
     companion object {
         const val PROP_IPV6_CIDR_BLOCK = "ipv6_cidr_block"

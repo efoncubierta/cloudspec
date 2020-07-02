@@ -24,6 +24,7 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2InternetGateway
 import cloudspec.aws.ec2.EC2RouteTable
 import cloudspec.aws.ec2.EC2Subnet
+import software.amazon.awssdk.services.ec2.model.RouteTableAssociationStateCode
 
 data class EC2RouteTableAssociation(
         @property:PropertyDefinition(
@@ -61,10 +62,9 @@ data class EC2RouteTableAssociation(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "associating | associated | disassociating | disassociated | failed"
+                description = PROP_STATE_D
         )
-        val associationState: String?
+        val associationState: RouteTableAssociationStateCode?
 ) {
     companion object {
         const val PROP_MAIN = "main"

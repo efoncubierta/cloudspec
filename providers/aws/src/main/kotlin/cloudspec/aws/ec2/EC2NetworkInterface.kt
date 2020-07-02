@@ -28,6 +28,8 @@ import cloudspec.aws.ec2.nested.EC2NetworkInterfaceAssociation
 import cloudspec.aws.ec2.nested.EC2NetworkInterfaceAttachment
 import cloudspec.aws.ec2.nested.EC2NetworkInterfacePrivateIpAddress
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.NetworkInterfaceStatus
+import software.amazon.awssdk.services.ec2.model.NetworkInterfaceType
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
@@ -38,8 +40,7 @@ import cloudspec.model.KeyValue
 data class EC2NetworkInterface(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -72,7 +73,7 @@ data class EC2NetworkInterface(
                 name = PROP_INTERFACE_TYPE,
                 description = PROP_INTERFACE_TYPE_D
         )
-        val interfaceType: String?,
+        val interfaceType: NetworkInterfaceType?,
 
         @property:PropertyDefinition(
                 name = PROP_IPV6_ADDRESSES,
@@ -132,10 +133,9 @@ data class EC2NetworkInterface(
 
         @property:PropertyDefinition(
                 name = PROP_STATUS,
-                description = PROP_STATUS_D,
-                exampleValues = "available | associated | attaching | in-use | detaching"
+                description = PROP_STATUS_D
         )
-        val status: String?,
+        val status: NetworkInterfaceStatus?,
 
         @property:AssociationDefinition(
                 name = ASSOC_SUBNET,

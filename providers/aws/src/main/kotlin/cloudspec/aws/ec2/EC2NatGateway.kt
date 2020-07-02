@@ -26,6 +26,7 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2NatGatewayAddress
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.NatGatewayState
 import java.time.Instant
 
 @ResourceDefinition(
@@ -37,8 +38,7 @@ import java.time.Instant
 data class EC2NatGateway(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -75,10 +75,9 @@ data class EC2NatGateway(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "pending | failed | available | deleting | deleted"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: NatGatewayState?,
 
         @property:AssociationDefinition(
                 name = ASSOC_SUBNET,

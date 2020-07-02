@@ -20,6 +20,7 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.RecurringChargeFrequency
 
 data class EC2RecurringCharge(
         @property:PropertyDefinition(
@@ -30,10 +31,9 @@ data class EC2RecurringCharge(
 
         @property:PropertyDefinition(
                 name = PROP_FREQUENCY,
-                description = PROP_FREQUENCY_D,
-                exampleValues = "Hourly"
+                description = PROP_FREQUENCY_D
         )
-        val frequency: String?
+        val frequency: RecurringChargeFrequency?
 ) {
     companion object {
         const val PROP_AMOUNT = "amount"

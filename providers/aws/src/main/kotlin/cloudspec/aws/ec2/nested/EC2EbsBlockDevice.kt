@@ -22,6 +22,7 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Snapshot
+import software.amazon.awssdk.services.ec2.model.VolumeType
 
 data class EC2EbsBlockDevice(
         @property:PropertyDefinition(
@@ -51,10 +52,9 @@ data class EC2EbsBlockDevice(
 
         @property:PropertyDefinition(
                 name = PROP_VOLUME_TYPE,
-                description = PROP_VOLUME_TYPE_D,
-                exampleValues = "gp2, st1, sc1, standard"
+                description = PROP_VOLUME_TYPE_D
         )
-        val volumeType: String?,
+        val volumeType: VolumeType?,
 
         @property:PropertyDefinition(
                 name = PROP_ENCRYPTED,

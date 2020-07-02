@@ -25,6 +25,7 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2RecurringCharge
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.*
 import java.time.Instant
 
 @ResourceDefinition(
@@ -36,8 +37,7 @@ import java.time.Instant
 data class EC2ReservedInstances(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -75,7 +75,7 @@ data class EC2ReservedInstances(
                 name = PROP_INSTANCE_TYPE,
                 description = PROP_INSTANCE_TYPE_D
         )
-        val instanceType: String?,
+        val instanceType: InstanceType?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
@@ -92,10 +92,9 @@ data class EC2ReservedInstances(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "payment-pending | active | payment-failed | retired | queued | queue-deleted"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: ReservedInstanceState?,
 
         @property:PropertyDefinition(
                 name = PROP_USAGE_PRICE,
@@ -105,31 +104,27 @@ data class EC2ReservedInstances(
 
         @property:PropertyDefinition(
                 name = PROP_CURRENCY_CODE,
-                description = PROP_CURRENCY_CODE_D,
-                exampleValues = "USD"
+                description = PROP_CURRENCY_CODE_D
         )
-        val currencyCode: String?,
+        val currencyCode: CurrencyCodeValues?,
 
         @property:PropertyDefinition(
                 name = PROP_INSTANCE_TENANCY,
-                description = PROP_INSTANCE_TENANCY_D,
-                exampleValues = "default | dedicated | host"
+                description = PROP_INSTANCE_TENANCY_D
         )
-        val instanceTenancy: String?,
+        val instanceTenancy: Tenancy?,
 
         @property:PropertyDefinition(
                 name = PROP_OFFERING_CLASS,
-                description = PROP_OFFERING_CLASS_D,
-                exampleValues = "standard | convertible"
+                description = PROP_OFFERING_CLASS_D
         )
-        val offeringClass: String?,
+        val offeringClass: OfferingClassType?,
 
         @property:PropertyDefinition(
                 name = PROP_OFFERING_TYPE,
-                description = PROP_OFFERING_TYPE_D,
-                exampleValues = "Heavy Utilization | Medium Utilization | Light Utilization | No Upfront | Partial Upfront | All Upfront"
+                description = PROP_OFFERING_TYPE_D
         )
-        val offeringType: String?,
+        val offeringType: OfferingTypeValues?,
 
         @property:PropertyDefinition(
                 name = PROP_RECURRING_CHARGES,
@@ -141,7 +136,7 @@ data class EC2ReservedInstances(
                 name = PROP_SCOPE,
                 description = PROP_SCOPE_D
         )
-        val scope: String?,
+        val scope: Scope?,
 
         @property:PropertyDefinition(
                 name = PROP_TAGS,

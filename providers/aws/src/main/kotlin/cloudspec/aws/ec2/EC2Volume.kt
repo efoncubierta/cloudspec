@@ -26,6 +26,8 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2VolumeAttachment
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.VolumeState
+import software.amazon.awssdk.services.ec2.model.VolumeType
 import java.time.Instant
 
 @ResourceDefinition(
@@ -37,8 +39,7 @@ import java.time.Instant
 data class EC2Volume(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -93,10 +94,9 @@ data class EC2Volume(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "creating | available | in-use | deleting | deleted | error"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: VolumeState?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
@@ -119,10 +119,9 @@ data class EC2Volume(
 
         @property:PropertyDefinition(
                 name = PROP_VOLUME_TYPE,
-                description = PROP_VOLUME_TYPE_D,
-                exampleValues = "standard | io1 | gp2 | sc1 | st1"
+                description = PROP_VOLUME_TYPE_D
         )
-        val volumeType: String?,
+        val volumeType: VolumeType?,
 
         @property:PropertyDefinition(
                 name = PROP_FAST_RESTORED,

@@ -25,6 +25,7 @@ import cloudspec.aws.ec2.EC2NetworkInterface
 import cloudspec.aws.ec2.EC2SecurityGroup
 import cloudspec.aws.ec2.EC2Subnet
 import cloudspec.aws.ec2.EC2Vpc
+import software.amazon.awssdk.services.ec2.model.NetworkInterfaceStatus
 
 data class EC2InstanceNetworkInterface(
         @property:AssociationDefinition(
@@ -79,10 +80,9 @@ data class EC2InstanceNetworkInterface(
 
         @property:PropertyDefinition(
                 name = PROP_STATUS,
-                description = PROP_STATUS_D,
-                exampleValues = "available | associated | attached | in-use | detaching"
+                description = PROP_STATUS_D
         )
-        val status: String?,
+        val status: NetworkInterfaceStatus?,
 
         @property:AssociationDefinition(
                 name = ASSOC_SUBNET,
@@ -100,8 +100,7 @@ data class EC2InstanceNetworkInterface(
 
         @property:PropertyDefinition(
                 name = PROP_INTERFACE_TYPE,
-                description = PROP_INTERFACE_TYPE_D,
-                exampleValues = "interface | efa"
+                description = PROP_INTERFACE_TYPE_D
         )
         val interfaceType: String?
 ) {

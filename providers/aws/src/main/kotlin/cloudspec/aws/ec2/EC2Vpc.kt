@@ -27,6 +27,8 @@ import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2VpcCidrBlockAssociation
 import cloudspec.aws.ec2.nested.EC2VpcIpv6CidrBlockAssociation
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.Tenancy
+import software.amazon.awssdk.services.ec2.model.VpcState
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
@@ -37,8 +39,7 @@ import cloudspec.model.KeyValue
 data class EC2Vpc(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -59,7 +60,7 @@ data class EC2Vpc(
                 name = PROP_STATE,
                 description = PROP_STATE_D
         )
-        val state: String?,
+        val state: VpcState?,
 
         @property:IdDefinition
         @property:PropertyDefinition(
@@ -76,10 +77,9 @@ data class EC2Vpc(
 
         @property:PropertyDefinition(
                 name = PROP_INSTANCE_TENANCY,
-                description = PROP_INSTANCE_TENANCY_D,
-                exampleValues = "default | dedicated | host"
+                description = PROP_INSTANCE_TENANCY_D
         )
-        val instanceTenancy: String?,
+        val instanceTenancy: Tenancy?,
 
         @property:PropertyDefinition(
                 name = PROP_IPV6_CIDR_BLOCK_ASSOCIATIONS,

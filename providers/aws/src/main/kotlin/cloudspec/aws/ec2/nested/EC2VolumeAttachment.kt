@@ -23,6 +23,7 @@ import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Instance
 import cloudspec.aws.ec2.EC2Volume
+import software.amazon.awssdk.services.ec2.model.VolumeAttachmentState
 import java.time.Instant
 
 data class EC2VolumeAttachment(
@@ -47,10 +48,9 @@ data class EC2VolumeAttachment(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "attaching | attached | detaching | detached | busy"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: VolumeAttachmentState?,
 
         @property:AssociationDefinition(
                 name = ASSOC_VOLUME,

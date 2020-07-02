@@ -27,6 +27,7 @@ import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.*
 import java.time.Instant
 
 @ResourceDefinition(
@@ -38,8 +39,7 @@ import java.time.Instant
 data class EC2Instance constructor(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -61,7 +61,7 @@ data class EC2Instance constructor(
                 name = PROP_INSTANCE_TYPE,
                 description = PROP_INSTANCE_TYPE_D
         )
-        val instanceType: String?,
+        val instanceType: InstanceType?,
 
         @property:PropertyDefinition(
                 name = PROP_KERNEL_ID,
@@ -97,7 +97,7 @@ data class EC2Instance constructor(
                 name = PROP_PLATFORM,
                 description = PROP_PLATFORM_D
         )
-        val platform: String?,
+        val platform: PlatformValues?,
 
         @property:PropertyDefinition(
                 name = PROP_PRIVATE_DNS_NAME,
@@ -133,7 +133,7 @@ data class EC2Instance constructor(
                 name = PROP_STATE,
                 description = PROP_STATE_D
         )
-        val state: String?,
+        val state: InstanceStateName?,
 
         @property:AssociationDefinition(
                 name = ASSOC_SUBNET,
@@ -153,7 +153,7 @@ data class EC2Instance constructor(
                 name = PROP_ARCHITECTURE,
                 description = PROP_ARCHITECTURE_D
         )
-        val architecture: String?,
+        val architecture: ArchitectureValues?,
 
         @property:PropertyDefinition(
                 name = PROP_BLOCK_DEVICE_MAPPINGS,
@@ -175,10 +175,9 @@ data class EC2Instance constructor(
 
         @property:PropertyDefinition(
                 name = PROP_HYPERVISOR,
-                description = PROP_HYPERVISOR_D,
-                exampleValues = "ovm | xen"
+                description = PROP_HYPERVISOR_D
         )
-        val hypervisor: String?,
+        val hypervisor: HypervisorType?,
 
         @property:AssociationDefinition(
                 name = ASSOC_IAM_INSTANCE_PROFILE,
@@ -189,10 +188,9 @@ data class EC2Instance constructor(
 
         @property:PropertyDefinition(
                 name = PROP_INSTANCE_LIFECYCLE,
-                description = PROP_INSTANCE_LIFECYCLE_D,
-                exampleValues = "spot | scheduled"
+                description = PROP_INSTANCE_LIFECYCLE_D
         )
-        val instanceLifecycle: String?,
+        val instanceLifecycle: InstanceLifecycleType?,
 
         @property:AssociationDefinition(
                 name = ASSOC_ELASTIC_GPUS,
@@ -229,7 +227,7 @@ data class EC2Instance constructor(
                 name = PROP_ROOT_DEVICE_TYPE,
                 description = PROP_ROOT_DEVICE_TYPE_D
         )
-        val rootDeviceType: String?,
+        val rootDeviceType: DeviceType?,
 
         @property:AssociationDefinition(
                 name = ASSOC_SECURITY_GROUPS,
@@ -258,10 +256,9 @@ data class EC2Instance constructor(
 
         @property:PropertyDefinition(
                 name = PROP_VIRTUALIZATION_TYPE,
-                description = PROP_VIRTUALIZATION_TYPE_D,
-                exampleValues = "hvm | paravirtual"
+                description = PROP_VIRTUALIZATION_TYPE_D
         )
-        val virtualizationType: String?,
+        val virtualizationType: VirtualizationType?,
 
         @property:PropertyDefinition(
                 name = PROP_CPU_OPTIONS,

@@ -22,6 +22,7 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Volume
+import software.amazon.awssdk.services.ec2.model.AttachmentStatus
 import java.time.Instant
 
 data class EC2EbsInstanceBlockDevice(
@@ -39,10 +40,9 @@ data class EC2EbsInstanceBlockDevice(
 
         @property:PropertyDefinition(
                 name = PROP_STATUS,
-                description = PROP_STATUS_D,
-                exampleValues = "attaching | attached | detaching | detached"
+                description = PROP_STATUS_D
         )
-        val status: String?,
+        val status: AttachmentStatus?,
 
         @property:AssociationDefinition(
                 name = ASSOC_VOLUME,

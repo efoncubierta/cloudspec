@@ -25,6 +25,7 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.SnapshotState
 import java.time.Instant
 
 @ResourceDefinition(
@@ -36,8 +37,7 @@ import java.time.Instant
 data class EC2Snapshot(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -80,7 +80,7 @@ data class EC2Snapshot(
                 name = PROP_STATE,
                 description = PROP_STATE_D
         )
-        val state: String?,
+        val state: SnapshotState?,
 
         @property:AssociationDefinition(
                 name = ASSOC_VOLUME,

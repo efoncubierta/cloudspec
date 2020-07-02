@@ -20,6 +20,7 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.VpcCidrBlockStateCode
 
 data class EC2VpcCidrBlockAssociation(
         @property:PropertyDefinition(
@@ -32,7 +33,7 @@ data class EC2VpcCidrBlockAssociation(
                 name = PROP_CIDR_BLOCK_STATE,
                 description = PROP_CIDR_BLOCK_STATE_D
         )
-        val cidrBlockState: String?
+        val cidrBlockState: VpcCidrBlockStateCode?
 ) {
     companion object {
         const val PROP_CIDR_BLOCK = "cidr_block"

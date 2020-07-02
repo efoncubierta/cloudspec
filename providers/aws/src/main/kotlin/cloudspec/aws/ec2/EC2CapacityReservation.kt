@@ -24,6 +24,7 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.*
 import java.time.Instant
 
 @ResourceDefinition(
@@ -35,8 +36,7 @@ import java.time.Instant
 data class EC2CapacityReservation(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -69,7 +69,7 @@ data class EC2CapacityReservation(
                 name = PROP_INSTANCE_PLATFORM,
                 description = PROP_INSTANCE_PLATFORM_D
         )
-        val instancePlatform: String?,
+        val instancePlatform: CapacityReservationInstancePlatform?,
 
         @property:PropertyDefinition(
                 name = PROP_AVAILABILITY_ZONE,
@@ -79,10 +79,9 @@ data class EC2CapacityReservation(
 
         @property:PropertyDefinition(
                 name = PROP_TENANCY,
-                description = PROP_TENANCY_D,
-                exampleValues = "default | dedicated"
+                description = PROP_TENANCY_D
         )
-        val tenancy: String?,
+        val tenancy: CapacityReservationTenancy?,
 
         @property:PropertyDefinition(
                 name = PROP_TOTAL_INSTANCE_COUNT,
@@ -110,10 +109,9 @@ data class EC2CapacityReservation(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "active | expired | cancelled | pending | failed"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: CapacityReservationState?,
 
         @property:PropertyDefinition(
                 name = PROP_END_DATE,
@@ -123,17 +121,15 @@ data class EC2CapacityReservation(
 
         @property:PropertyDefinition(
                 name = PROP_END_DATE_TYPE,
-                description = PROP_END_DATE_TYPE_D,
-                exampleValues = "unlimited | limited"
+                description = PROP_END_DATE_TYPE_D
         )
-        val endDateType: String?,
+        val endDateType: EndDateType?,
 
         @property:PropertyDefinition(
                 name = PROP_INSTANCE_MATCH_CRITERIA,
-                description = PROP_INSTANCE_MATCH_CRITERIA_D,
-                exampleValues = "open | targeted"
+                description = PROP_INSTANCE_MATCH_CRITERIA_D
         )
-        val instanceMatchCriteria: String?,
+        val instanceMatchCriteria: InstanceMatchCriteria?,
 
         @property:PropertyDefinition(
                 name = PROP_CREATE_DATE,

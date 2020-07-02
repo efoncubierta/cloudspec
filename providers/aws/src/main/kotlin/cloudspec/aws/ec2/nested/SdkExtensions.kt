@@ -58,7 +58,7 @@ fun EbsBlockDevice.toEC2EbsBlockDevice(): EC2EbsBlockDevice {
             iops(),
             snapshotId(),
             volumeSize(),
-            volumeTypeAsString(),
+            volumeType(),
             encrypted()
     )
 }
@@ -67,7 +67,7 @@ fun EbsInstanceBlockDevice.toEC2EbsInstanceBlockDevice(): EC2EbsInstanceBlockDev
     return EC2EbsInstanceBlockDevice(
             attachTime(),
             deleteOnTermination(),
-            statusAsString(),
+            status(),
             volumeId()
     )
 }
@@ -119,7 +119,7 @@ fun InstanceNetworkInterface.toEC2InstanceNetworkInterface(): EC2InstanceNetwork
             privateIpAddress(),
             privateIpAddresses()?.toEC2InstancePrivateIpAddresses(),
             sourceDestCheck(),
-            statusAsString(),
+            status(),
             subnetId(),
             vpcId(),
             interfaceType()
@@ -144,7 +144,7 @@ fun List<InternetGatewayAttachment>.toEC2InternetGatewayAttachments(): List<EC2I
 
 fun InternetGatewayAttachment.toEC2InternetGatewayAttachment(): EC2InternetGatewayAttachment {
     return EC2InternetGatewayAttachment(
-            stateAsString(),
+            state(),
             vpcId()
     )
 }
@@ -192,7 +192,7 @@ fun List<LicenseConfiguration>.toLicenseConfigurationArns(): List<String> {
 }
 
 fun Monitoring.toEC2Monitoring(): EC2Monitoring {
-    return EC2Monitoring(stateAsString())
+    return EC2Monitoring(state())
 }
 
 fun Placement.toEC2Placement(): EC2Placement {
@@ -201,7 +201,7 @@ fun Placement.toEC2Placement(): EC2Placement {
             affinity(),
             groupName(),
             partitionNumber(),
-            tenancyAsString()
+            tenancy()
     )
 }
 
@@ -216,7 +216,7 @@ fun List<ProductCode>.toEC2ProductCodes(): List<EC2ProductCode> {
 fun ProductCode.toEC2ProductCode(): EC2ProductCode {
     return EC2ProductCode(
             productCodeId(),
-            productCodeTypeAsString()
+            productCodeType()
     )
 }
 
@@ -245,7 +245,7 @@ fun NetworkAclEntry.toEC2NetworkAclEntry(): EC2NetworkAclEntry {
             ipv6CidrBlock(),
             portRange()?.toEC2PortRange(),
             protocol(),
-            ruleActionAsString()
+            ruleAction()
     )
 }
 
@@ -263,7 +263,7 @@ fun NetworkInterfaceAttachment.toEC2NetworkInterfaceAttachment(): EC2NetworkInte
             deleteOnTermination(),
             instanceId(),
             instanceOwnerId(),
-            statusAsString()
+            status()
     )
 }
 
@@ -294,7 +294,7 @@ fun List<RecurringCharge>.toEC2RecurringCharges(): List<EC2RecurringCharge> {
 fun RecurringCharge.toEC2RecurringCharge(): EC2RecurringCharge {
     return EC2RecurringCharge(
             amount(),
-            frequencyAsString()
+            frequency()
     )
 }
 
@@ -315,8 +315,8 @@ fun Route.toEC2Route(): EC2Route {
             transitGatewayId(),
             localGatewayId(),
             networkInterfaceId(),
-            originAsString(),
-            stateAsString(),
+            origin(),
+            state(),
             vpcPeeringConnectionId()
     )
 }
@@ -332,7 +332,7 @@ fun RouteTableAssociation.toEC2RouteTableAssociation(): EC2RouteTableAssociation
             routeTableId(),
             subnetId(),
             gatewayId(),
-            associationState()?.stateAsString()
+            associationState()?.state()
     )
 }
 
@@ -343,7 +343,7 @@ fun List<SubnetIpv6CidrBlockAssociation>.toEC2SubnetIpv6CidrBlockAssociations():
 fun SubnetIpv6CidrBlockAssociation.toEC2SubnetIpv6CidrBlockAssociation(): EC2SubnetIpv6CidrBlockAssociation {
     return EC2SubnetIpv6CidrBlockAssociation(
             ipv6CidrBlock(),
-            ipv6CidrBlockState()?.stateAsString()
+            ipv6CidrBlockState()?.state()
     )
 }
 
@@ -384,7 +384,7 @@ fun VolumeAttachment.toEC2VolumeAttachment(): EC2VolumeAttachment {
             attachTime(),
             device(),
             instanceId(),
-            stateAsString(),
+            state(),
             volumeId(),
             deleteOnTermination()
     )
@@ -397,7 +397,7 @@ fun List<VpcCidrBlockAssociation>.toEC2VpcCidrBlockAssociation(): List<EC2VpcCid
 fun VpcCidrBlockAssociation.toEC2VpcCidrBlockAssociation(): EC2VpcCidrBlockAssociation {
     return EC2VpcCidrBlockAssociation(
             cidrBlock(),
-            cidrBlockState()?.stateAsString()
+            cidrBlockState()?.state()
     )
 }
 
@@ -408,7 +408,7 @@ fun List<VpcIpv6CidrBlockAssociation>.toEC2VpcIpv6CidrBlockAssociations(): List<
 fun VpcIpv6CidrBlockAssociation.toEC2VpcIpv6CidrBlockAssociation(): EC2VpcIpv6CidrBlockAssociation {
     return EC2VpcIpv6CidrBlockAssociation(
             ipv6CidrBlock(),
-            ipv6CidrBlockState()?.stateAsString(),
+            ipv6CidrBlockState()?.state(),
             networkBorderGroup(),
             ipv6Pool()
     )

@@ -25,6 +25,7 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2VpcPeeringConnectionVpcInfo
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.VpcPeeringConnectionStateReasonCode
 import java.time.Instant
 
 @ResourceDefinition(
@@ -36,8 +37,7 @@ import java.time.Instant
 data class EC2VpcPeeringConnection(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -61,10 +61,9 @@ data class EC2VpcPeeringConnection(
 
         @property:PropertyDefinition(
                 name = PROP_STATUS,
-                description = PROP_STATUS_D,
-                exampleValues = "initiating-request | pending-acceptance | active | deleted | rejected | failed | expired | provisioning | deleting"
+                description = PROP_STATUS_D
         )
-        val status: String?,
+        val status: VpcPeeringConnectionStateReasonCode?,
 
         @property:PropertyDefinition(
                 name = PROP_TAGS,

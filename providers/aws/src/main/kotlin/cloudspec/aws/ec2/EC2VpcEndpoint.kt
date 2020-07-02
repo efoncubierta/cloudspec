@@ -25,6 +25,8 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.State
+import software.amazon.awssdk.services.ec2.model.VpcEndpointType
 import java.time.Instant
 
 @ResourceDefinition(
@@ -36,8 +38,7 @@ import java.time.Instant
 data class EC2VpcEndpoint(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -50,10 +51,9 @@ data class EC2VpcEndpoint(
 
         @property:PropertyDefinition(
                 name = PROP_VPC_ENDPOINT_TYPE,
-                description = PROP_VPC_ENDPOINT_TYPE_D,
-                exampleValues = "Interface | Gateway"
+                description = PROP_VPC_ENDPOINT_TYPE_D
         )
-        val vpcEndpointType: String?,
+        val vpcEndpointType: VpcEndpointType?,
 
         @property:AssociationDefinition(
                 name = ASSOC_VPC,
@@ -72,7 +72,7 @@ data class EC2VpcEndpoint(
                 name = PROP_STATE,
                 description = PROP_STATE_D
         )
-        val state: String?,
+        val state: State?,
 
         @property:AssociationDefinition(
                 name = ASSOC_ROUTE_TABLES,

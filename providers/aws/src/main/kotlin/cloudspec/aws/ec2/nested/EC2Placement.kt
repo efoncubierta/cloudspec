@@ -20,6 +20,7 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.Tenancy
 
 data class EC2Placement(
         @property:PropertyDefinition(
@@ -48,10 +49,9 @@ data class EC2Placement(
 
         @property:PropertyDefinition(
                 name = PROP_TENANCY,
-                description = PROP_TENANCY_D,
-                exampleValues = "default | dedicated | host"
+                description = PROP_TENANCY_D
         )
-        val tenancy: String?
+        val tenancy: Tenancy?
 ) {
     companion object {
         const val PROP_AVAILABILITY_ZONE = "availability_zone"

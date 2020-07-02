@@ -20,20 +20,20 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.ProductCodeValues
 
 data class EC2ProductCode(
         @property:PropertyDefinition(
                 name = PROP_ID,
                 description = PROP_ID_D
         )
-        val productCodeId: String,
+        val productCodeId: String?,
 
         @property:PropertyDefinition(
                 name = PROP_TYPE,
-                description = PROP_TYPE_D,
-                exampleValues = "devpay | marketplace"
+                description = PROP_TYPE_D
         )
-        val productCodeType: String
+        val productCodeType: ProductCodeValues?
 ) {
     companion object {
         const val PROP_ID = "id"

@@ -25,6 +25,7 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2TransitGatewayOptions
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.TransitGatewayState
 import java.time.Instant
 
 @ResourceDefinition(
@@ -36,8 +37,7 @@ import java.time.Instant
 data class EC2TransitGateway(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -56,10 +56,9 @@ data class EC2TransitGateway(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "pending | available | modifying | deleting | deleted"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: TransitGatewayState?,
 
         @property:PropertyDefinition(
                 name = PROP_OWNER_ID,

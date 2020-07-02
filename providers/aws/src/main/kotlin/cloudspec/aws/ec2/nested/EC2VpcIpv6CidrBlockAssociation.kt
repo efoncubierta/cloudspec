@@ -20,6 +20,7 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.VpcCidrBlockStateCode
 
 data class EC2VpcIpv6CidrBlockAssociation(
         @property:PropertyDefinition(
@@ -32,7 +33,7 @@ data class EC2VpcIpv6CidrBlockAssociation(
                 name = PROP_IPV6_CIDR_BLOCK_STATE,
                 description = PROP_IPV6_CIDR_BLOCK_STATE_D
         )
-        val ipv6CidrBlockState: String?,
+        val ipv6CidrBlockState: VpcCidrBlockStateCode?,
 
         @property:PropertyDefinition(
                 name = PROP_NETWORK_BORDER_GROUP,

@@ -22,6 +22,8 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.*
+import software.amazon.awssdk.services.ec2.model.RouteOrigin
+import software.amazon.awssdk.services.ec2.model.RouteState
 
 data class EC2Route(
         @property:PropertyDefinition(
@@ -99,17 +101,15 @@ data class EC2Route(
 
         @property:PropertyDefinition(
                 name = PROP_ORIGIN,
-                description = PROP_ORIGIN_D,
-                exampleValues = "CreateRouteTable | CreateRoute | EnableVgwRoutePropagation"
+                description = PROP_ORIGIN_D
         )
-        val origin: String?,
+        val origin: RouteOrigin?,
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "active | blackhole"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: RouteState?,
 
         @property:AssociationDefinition(
                 name = ASSOC_VPC_PEERING_CONNECTION,

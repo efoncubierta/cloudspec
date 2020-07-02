@@ -24,8 +24,7 @@ import cloudspec.annotation.PropertyDefinition
 data class EC2BlockDeviceMapping(
         @property:PropertyDefinition(
                 name = PROP_DEVICE_NAME,
-                description = PROP_DEVICE_NAME_D,
-                exampleValues = "/dev/sdh"
+                description = PROP_DEVICE_NAME_D
         )
         val deviceName: String?,
 

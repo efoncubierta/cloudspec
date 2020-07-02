@@ -25,6 +25,8 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.ElasticGpuState
+import software.amazon.awssdk.services.ec2.model.ElasticGpuStatus
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
@@ -35,8 +37,7 @@ import cloudspec.model.KeyValue
 data class EC2ElasticGpu(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -61,17 +62,15 @@ data class EC2ElasticGpu(
 
         @property:PropertyDefinition(
                 name = PROP_ELASTIC_GPU_HEALTH,
-                description = PROP_ELASTIC_GPU_HEALTH_D,
-                exampleValues = "OK | IMPAIRED"
+                description = PROP_ELASTIC_GPU_HEALTH_D
         )
-        val elasticGpuHealth: String?,
+        val elasticGpuHealth: ElasticGpuStatus?,
 
         @property:PropertyDefinition(
                 name = PROP_ELASTIC_GPU_STATE,
-                description = PROP_ELASTIC_GPU_STATE_D,
-                exampleValues = "ATTACHED"
+                description = PROP_ELASTIC_GPU_STATE_D
         )
-        val elasticGpuState: String?,
+        val elasticGpuState: ElasticGpuState?,
 
         @property:AssociationDefinition(
                 name = ASSOC_INSTANCE,

@@ -22,14 +22,14 @@ package cloudspec.aws.ec2.nested
 import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.aws.ec2.EC2Vpc
+import software.amazon.awssdk.services.ec2.model.AttachmentStatus
 
 data class EC2InternetGatewayAttachment(
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "attaching | attached | detaching | detached"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: AttachmentStatus?,
 
         @property:AssociationDefinition(
                 name = ASSOC_VPC,

@@ -20,6 +20,7 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.RuleAction
 
 data class EC2NetworkAclEntry(
         @property:PropertyDefinition(
@@ -60,10 +61,9 @@ data class EC2NetworkAclEntry(
 
         @property:PropertyDefinition(
                 name = PROP_RULE_ACTION,
-                description = PROP_RULE_ACTION_D,
-                exampleValues = "allow | deny"
+                description = PROP_RULE_ACTION_D
         )
-        val ruleAction: String
+        val ruleAction: RuleAction?
 ) {
     companion object {
         const val PROP_CIDR_BLOCK = "cidr_block"

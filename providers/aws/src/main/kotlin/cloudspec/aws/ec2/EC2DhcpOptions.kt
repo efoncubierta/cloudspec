@@ -35,8 +35,7 @@ import cloudspec.model.KeyValue
 data class EC2DhcpOptions(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 

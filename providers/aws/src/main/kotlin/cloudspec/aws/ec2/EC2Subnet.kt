@@ -26,6 +26,7 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2SubnetIpv6CidrBlockAssociation
 import cloudspec.model.KeyValue
+import software.amazon.awssdk.services.ec2.model.SubnetState
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
@@ -36,8 +37,7 @@ import cloudspec.model.KeyValue
 data class EC2Subnet(
         @property:PropertyDefinition(
                 name = PROP_REGION,
-                description = PROP_REGION_D,
-                exampleValues = "us-east-1 | eu-west-1"
+                description = PROP_REGION_D
         )
         override val region: String?,
 
@@ -73,10 +73,9 @@ data class EC2Subnet(
 
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "pending | available"
+                description = PROP_STATE_D
         )
-        val state: String?,
+        val state: SubnetState?,
 
         @property:IdDefinition
         @property:PropertyDefinition(

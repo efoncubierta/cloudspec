@@ -20,14 +20,14 @@
 package cloudspec.aws.ec2.nested
 
 import cloudspec.annotation.PropertyDefinition
+import software.amazon.awssdk.services.ec2.model.MonitoringState
 
 data class EC2Monitoring(
         @property:PropertyDefinition(
                 name = PROP_STATE,
-                description = PROP_STATE_D,
-                exampleValues = "disabled | disabling | enabled | pending"
+                description = PROP_STATE_D
         )
-        val state: String?
+        val state: MonitoringState?
 ) {
     companion object {
         const val PROP_STATE = "state"
