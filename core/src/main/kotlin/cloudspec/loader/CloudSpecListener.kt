@@ -68,8 +68,9 @@ class CloudSpecListener : CloudSpecBaseListener() {
     }
 
     override fun exitSetDecl(ctx: SetDeclContext) {
-        currentSets.peek().push(SetDecl(ctx.CONFIG_REF().text,
-                                        currentValues.pop()))
+        val values = if (currentValues.size > 1) currentValues.toList() else currentValues[0]
+        currentSets.peek().push(SetDecl(ctx.CONFIG_REF().text, values))
+        currentValues.clear()
     }
 
     override fun exitUseDecl(ctx: UseDeclContext) {

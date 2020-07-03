@@ -24,32 +24,50 @@ import arrow.core.firstOrNone
 
 typealias SetValues = List<SetValue<*>>
 
+fun SetValues.plusValues(values: SetValues): SetValues {
+    return values.fold(this) { acc, value -> acc.plusValue(value) }
+}
+
+fun SetValues.plusValue(value: SetValue<*>): SetValues {
+    val vs = filter { value.ref == it.ref }
+    return vs.plus(value)
+}
+
 fun SetValues.getNumber(ref: ConfigRef): Option<Number> {
-    return this.getNumbers(ref).firstOrNone()
+    return filter { it.ref == ref }
+        .filterIsInstance<NumberSetValue>()
+        .map { it.value }
+        .firstOrNone()
 }
 
 fun SetValues.getNumbers(ref: ConfigRef): List<Number> {
-    return this.filter { it.ref == ref }
-        .filterIsInstance<NumberSetValue>()
-        .map { it.value }
+    return filter { it.ref == ref }
+        .filterIsInstance<NumberArraySetValue>()
+        .flatMap { it.value }
 }
 
 fun SetValues.getString(ref: ConfigRef): Option<String> {
-    return this.getStrings(ref).firstOrNone()
+    return filter { it.ref == ref }
+        .filterIsInstance<StringSetValue>()
+        .map { it.value }
+        .firstOrNone()
 }
 
 fun SetValues.getStrings(ref: ConfigRef): List<String> {
-    return this.filter { it.ref == ref }
-        .filterIsInstance<StringSetValue>()
-        .map { it.value }
+    return filter { it.ref == ref }
+        .filterIsInstance<StringArraySetValue>()
+        .flatMap { it.value }
 }
 
 fun SetValues.getBoolean(ref: ConfigRef): Option<Boolean> {
-    return this.getBooleans(ref).firstOrNone()
+    return filter { it.ref == ref }
+        .filterIsInstance<BooleanSetValue>()
+        .map { it.value }
+        .firstOrNone()
 }
 
 fun SetValues.getBooleans(ref: ConfigRef): List<Boolean> {
-    return this.filter { it.ref == ref }
-        .filterIsInstance<BooleanSetValue>()
-        .map { it.value }
+    return filter { it.ref == ref }
+        .filterIsInstance<BooleanArraySetValue>()
+        .flatMap { it.value }
 }

@@ -37,8 +37,17 @@ sealed class SetValue<T> {
 data class NumberSetValue(override val ref: ConfigRef,
                           override val value: Number) : SetValue<Number>()
 
+data class NumberArraySetValue(override val ref: ConfigRef,
+                               override val value: List<Number>) : SetValue<List<Number>>()
+
 data class StringSetValue(override val ref: ConfigRef,
                           override val value: String) : SetValue<String>()
 
+data class StringArraySetValue(override val ref: ConfigRef,
+                               override val value: List<String>) : SetValue<List<String>>()
+
 data class BooleanSetValue(override val ref: ConfigRef,
                            override val value: Boolean) : SetValue<Boolean>()
+
+data class BooleanArraySetValue(override val ref: ConfigRef,
+                                override val value: List<Boolean>) : SetValue<List<Boolean>>()

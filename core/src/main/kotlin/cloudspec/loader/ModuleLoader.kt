@@ -247,24 +247,29 @@ class ModuleLoader {
          * Set values.
          */
         private fun loadSetDecls(setDecls: List<SetDecl>): SetValues {
-            return setDecls.mapNotNull { c ->
-                when (val configRefOpt = ConfigRef.fromString(c.configRef)) {
-                    is Some ->
-                        when (c.value) {
-                            is Number -> NumberSetValue(configRefOpt.t, c.value)
-                            is String -> StringSetValue(configRefOpt.t, c.value)
-                            is Boolean -> BooleanSetValue(configRefOpt.t, c.value)
+            return emptyList<SetValue<*>>().plusValues(
+                    setDecls.mapNotNull { c ->
+                        when (val configRefOpt = ConfigRef.fromString(c.configRef)) {
+                            is Some ->
+                                when {
+                                    c.value is Number -> NumberSetValue(configRefOpt.t, c.value)
+                                    c.value is String -> StringSetValue(configRefOpt.t, c.value)
+                                    c.value is Boolean -> BooleanSetValue(configRefOpt.t, c.value)
+                                    c.value is List<*> && c.value.filterIsInstance<Number>().isNotEmpty() -> NumberArraySetValue(configRefOpt.t, c.value as List<Number>)
+                                    c.value is List<*> && c.value.filterIsInstance<String>().isNotEmpty() -> StringArraySetValue(configRefOpt.t, c.value as List<String>)
+                                    c.value is List<*> && c.value.filterIsInstance<Boolean>().isNotEmpty() -> BooleanArraySetValue(configRefOpt.t, c.value as List<Boolean>)
+                                    else -> {
+                                        logger.error("Unsupported type of config '${c.configRef}'. Ignoring it.")
+                                        null
+                                    }
+                                }
                             else -> {
-                                logger.error("Unsupported type of config '${c.configRef}'. Ignoring it.")
+                                logger.error("Malformed config definition '${c.configRef}'. Ignoring it.")
                                 null
                             }
                         }
-                    else -> {
-                        logger.error("Malformed config definition '${c.configRef}'. Ignoring it.")
-                        null
                     }
-                }
-            }
+            )
         }
     }
 }
