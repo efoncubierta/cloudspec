@@ -40,8 +40,7 @@ class DDBBackupLoader(clientsProvider: IAWSClientsProvider) :
                 // https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DescribeBackup.html
                 client.describeBackup { builder -> builder.backupArn(arn.toString()) }
             }
-            val (tags) = listTags(region, res.backupDescription().backupDetails().backupArn())
-            Option.fromNullable(res.backupDescription()?.toDDBBackup(region, tags))
+            Option.fromNullable(res.backupDescription()?.toDDBBackup(region))
         }
     }
 

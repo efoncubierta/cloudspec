@@ -26,7 +26,7 @@ import software.amazon.awssdk.services.dynamodb.model.BackupDescription
 import software.amazon.awssdk.services.dynamodb.model.GlobalTableDescription
 import software.amazon.awssdk.services.dynamodb.model.TableDescription
 
-fun BackupDescription.toDDBBackup(region: Region, tags: List<KeyValue>): DDBBackup {
+fun BackupDescription.toDDBBackup(region: Region): DDBBackup {
     return DDBBackup(
             region.id(),
             backupDetails().backupArn(),
@@ -36,8 +36,7 @@ fun BackupDescription.toDDBBackup(region: Region, tags: List<KeyValue>): DDBBack
             backupDetails().backupType(),
             backupDetails().backupCreationDateTime(),
             backupDetails().backupExpiryDateTime(),
-            sourceTableDetails().tableArn(),
-            tags
+            sourceTableDetails().tableArn()
     )
 }
 

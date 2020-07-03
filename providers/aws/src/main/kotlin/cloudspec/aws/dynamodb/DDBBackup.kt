@@ -24,7 +24,6 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
-import cloudspec.model.KeyValue
 import software.amazon.awssdk.services.dynamodb.model.BackupStatus
 import software.amazon.awssdk.services.dynamodb.model.BackupType
 import java.time.Instant
@@ -90,13 +89,7 @@ data class DDBBackup(
                 description = ASSOC_TABLE_NAME_D,
                 targetClass = DDBTable::class
         )
-        val tableArn: String?,
-
-        @property:PropertyDefinition(
-                name = PROP_TAGS,
-                description = PROP_TAGS_D
-        )
-        val tags: List<KeyValue>?
+        val tableArn: String?
 ) : DDBResource() {
     companion object {
         const val RESOURCE_NAME = "backup"
@@ -120,7 +113,5 @@ data class DDBBackup(
         const val PROP_BACKUP_EXPIRY_DATE_D = "Time at which the automatic on-demand backup created by DynamoDB will expire"
         const val ASSOC_TABLE = "table"
         const val ASSOC_TABLE_NAME_D = "The source table"
-        const val PROP_TAGS = "tags"
-        const val PROP_TAGS_D = "The tags attached to the table"
     }
 }
