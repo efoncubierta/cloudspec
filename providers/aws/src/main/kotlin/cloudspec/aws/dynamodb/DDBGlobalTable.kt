@@ -25,12 +25,13 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.dynamodb.nested.DDBReplicaDescription
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.dynamodb.model.GlobalTableStatus
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = DDBResource.GROUP_NAME,
+        group = DDBGroup.GROUP_NAME,
         name = DDBGlobalTable.RESOURCE_NAME,
         description = DDBGlobalTable.RESOURCE_DESCRIPTION
 )
@@ -75,6 +76,9 @@ data class DDBGlobalTable(
     companion object {
         const val RESOURCE_NAME = "global_table"
         const val RESOURCE_DESCRIPTION = "Global Table"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          DDBGroup.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REPLICAS = "replicas"
         const val PROP_REPLICAS_D = "The Regions where the global table has replicas"

@@ -27,12 +27,13 @@ import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.*
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2Instance.RESOURCE_NAME,
         description = EC2Instance.RESOURCE_DESCRIPTION
 )
@@ -288,6 +289,9 @@ data class EC2Instance constructor(
     companion object {
         const val RESOURCE_NAME = "instance"
         const val RESOURCE_DESCRIPTION = "EC2 Instance"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

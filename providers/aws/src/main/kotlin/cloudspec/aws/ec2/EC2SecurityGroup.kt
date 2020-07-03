@@ -26,10 +26,11 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2IpPermission
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2SecurityGroup.RESOURCE_NAME,
         description = EC2SecurityGroup.RESOURCE_DESCRIPTION
 )
@@ -87,6 +88,9 @@ data class EC2SecurityGroup(
     companion object {
         const val RESOURCE_NAME = "security_group"
         const val RESOURCE_DESCRIPTION = "Security Group"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

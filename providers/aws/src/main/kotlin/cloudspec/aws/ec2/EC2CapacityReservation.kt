@@ -24,12 +24,13 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.*
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2CapacityReservation.RESOURCE_NAME,
         description = EC2CapacityReservation.RESOURCE_DESCRIPTION
 )
@@ -146,6 +147,9 @@ data class EC2CapacityReservation(
     companion object {
         const val RESOURCE_NAME = "capacity_reservation"
         const val RESOURCE_DESCRIPTION = "Capacity Reservation"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

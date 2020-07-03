@@ -41,6 +41,13 @@ abstract class Provider {
     abstract val description: String
 
     /**
+     * Get all group definitions the provider provides.
+     *
+     * @return list of group definitions.
+     */
+    abstract val groupDefs: GroupDefs
+
+    /**
      * Get all resource definitions the provider provides.
      *
      * @return List of resource definitions.
@@ -58,10 +65,10 @@ abstract class Provider {
      * Get all resources of a particular resource definition.
      *
      * @param sets CloudSpec config.
-     * @param ref Resource definition reference.
+     * @param defRef Resource definition reference.
      * @return List of resources.
      */
-    abstract fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Resource>
+    abstract fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): List<Resource>
 
     /**
      * Get a resource by resource definition and id.

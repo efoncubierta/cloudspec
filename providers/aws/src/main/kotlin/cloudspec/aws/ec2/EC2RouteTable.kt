@@ -27,10 +27,11 @@ import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2Route
 import cloudspec.aws.ec2.nested.EC2RouteTableAssociation
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2RouteTable.RESOURCE_NAME,
         description = EC2RouteTable.RESOURCE_DESCRIPTION
 )
@@ -88,6 +89,9 @@ data class EC2RouteTable(
     companion object {
         const val RESOURCE_NAME = "route_table"
         const val RESOURCE_DESCRIPTION = "Route Table"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

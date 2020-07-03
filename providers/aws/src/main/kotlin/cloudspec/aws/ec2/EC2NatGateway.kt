@@ -26,12 +26,13 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2NatGatewayAddress
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.NatGatewayState
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2NatGateway.RESOURCE_NAME,
         description = EC2NatGateway.RESOURCE_DESCRIPTION
 )
@@ -102,6 +103,9 @@ data class EC2NatGateway(
     companion object {
         const val RESOURCE_NAME = "nat_gateway"
         const val RESOURCE_DESCRIPTION = "NAT Gateway"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

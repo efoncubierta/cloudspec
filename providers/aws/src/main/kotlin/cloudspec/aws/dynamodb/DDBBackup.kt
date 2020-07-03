@@ -24,13 +24,14 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.dynamodb.model.BackupStatus
 import software.amazon.awssdk.services.dynamodb.model.BackupType
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = DDBResource.GROUP_NAME,
+        group = DDBGroup.GROUP_NAME,
         name = DDBBackup.RESOURCE_NAME,
         description = DDBBackup.RESOURCE_DESCRIPTION
 )
@@ -94,6 +95,9 @@ data class DDBBackup(
     companion object {
         const val RESOURCE_NAME = "backup"
         const val RESOURCE_DESCRIPTION = "Backup"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          DDBGroup.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

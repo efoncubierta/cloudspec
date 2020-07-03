@@ -20,6 +20,7 @@
 package cloudspec.docgen;
 
 import cloudspec.ProvidersRegistry;
+import cloudspec.model.GroupDef;
 import cloudspec.model.Provider;
 import cloudspec.model.ResourceDef;
 import freemarker.template.Configuration;
@@ -122,14 +123,52 @@ public class CloudSpecDocGenProcess {
         }
 
         // write provider resources
-        provider.getResourceDefs().forEach(resourceDef ->
+        provider.getGroupDefs().forEach(groupDef ->
                 {
                     try {
-                        writeResourceInMarkdown(providerDir, resourceDef);
+                        writeGroupInMarkdown(providerDir, groupDef);
                     } catch (IOException | TemplateException e) {
                         System.out.println(
                                 String.format(
-                                        "Error generating doc for resource '%s': %s",
+                                        "Error generating doc for group '%s': %s",
+                                        groupDef.getName(),
+                                        e.getMessage()
+                                )
+                        );
+                    }
+                }
+        );
+    }
+
+    private void writeGroupInMarkdown(File providerDir, GroupDef groupDef) throws IOException, TemplateException {
+        // create group directory
+        File groupDir = new File(providerDir, groupDef.getName());
+        if (!groupDir.exists() && !groupDir.mkdirs()) {
+            throw new RuntimeException("Cannot create group directory " + groupDir.getAbsolutePath());
+        }
+
+        File groupFile = new File(groupDir, "_index.md");
+        try (Writer out = new OutputStreamWriter(new FileOutputStream(groupFile))) {
+            // create data dictionary
+            Map<String, Object> data = new HashMap<>();
+            data.put("groupDef", groupDef);
+
+            // get provider template
+            Template groupTpl = freemarkerCfg.getTemplate("group.ftl");
+
+            // write file
+            groupTpl.process(data, out);
+        }
+
+        // write provider resources
+        groupDef.getResourceDefs().forEach(resourceDef ->
+                {
+                    try {
+                        writeResourceInMarkdown(groupDir, resourceDef);
+                    } catch (IOException | TemplateException e) {
+                        System.out.println(
+                                String.format(
+                                        "Error generating doc for group '%s': %s",
                                         resourceDef.getRef(),
                                         e.getMessage()
                                 )
@@ -139,15 +178,9 @@ public class CloudSpecDocGenProcess {
         );
     }
 
-    private void writeResourceInMarkdown(File providerDir, ResourceDef resourceDef) throws IOException, TemplateException {
-        // create group directory
-//        File groupDir = new File(providerDir, resourceDef.getRef().getGroupName());
-//        if (!groupDir.exists() && !groupDir.mkdirs()) {
-//            throw new RuntimeException("Cannot create group directory " + groupDir.getAbsolutePath());
-//        }
-
+    private void writeResourceInMarkdown(File groupDir, ResourceDef resourceDef) throws IOException, TemplateException {
         // create resource file
-        File resourceFile = new File(providerDir, resourceDef.getRef().getGroupName() + "_" + resourceDef.getRef().getResourceName() + ".md");
+        File resourceFile = new File(groupDir, resourceDef.getRef().getResourceName() + ".md");
         try (Writer out = new OutputStreamWriter(new FileOutputStream(resourceFile))) {
             // create data dictionary
             Map<String, Object> data = new HashMap<>();

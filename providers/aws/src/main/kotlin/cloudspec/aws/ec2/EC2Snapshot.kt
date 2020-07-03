@@ -25,12 +25,13 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.SnapshotState
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2Snapshot.RESOURCE_NAME,
         description = EC2Snapshot.RESOURCE_DESCRIPTION
 )
@@ -104,6 +105,9 @@ data class EC2Snapshot(
     companion object {
         const val RESOURCE_NAME = "snapshot"
         const val RESOURCE_DESCRIPTION = "Snapshot"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

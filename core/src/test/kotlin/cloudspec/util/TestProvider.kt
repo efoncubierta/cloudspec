@@ -32,12 +32,18 @@ class TestProvider : Provider() {
     override val description
         get() = ProviderDataUtil.PROVIDER_DESCRIPTION
 
-    override val resourceDefs
-        get() = listOf(TestResource::class)
-            .map { ResourceDefReflectionUtil.toResourceDef(it) }
-            .flatten()
+    override val groupDefs: GroupDefs
+        get() = listOf(GroupDef("test",
+                                "test",
+                                listOf(TestResource::class)
+                                    .map { ResourceDefReflectionUtil.toResourceDef(it) }
+                                    .flatten()))
 
-    override val configDefs: ConfigDefs
+    override val resourceDefs
+        get() = groupDefs.flatMap { it.resourceDefs }
+
+    override
+    val configDefs: ConfigDefs
         get() = setOf(
                 ConfigDef(ConfigRef(ProviderDataUtil.PROVIDER_NAME, "myconfig"),
                           "My config",
@@ -45,7 +51,7 @@ class TestProvider : Provider() {
                           false)
         )
 
-    override fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Resource> {
+    override fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): List<Resource> {
         return emptyList()
     }
 

@@ -25,12 +25,13 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.dynamodb.nested.*
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.dynamodb.model.TableStatus
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = DDBResource.GROUP_NAME,
+        group = DDBGroup.GROUP_NAME,
         name = DDBTable.RESOURCE_NAME,
         description = DDBTable.RESOURCE_DESCRIPTION
 )
@@ -173,6 +174,9 @@ data class DDBTable(
     companion object {
         const val RESOURCE_NAME = "table"
         const val RESOURCE_DESCRIPTION = "Table"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          DDBGroup.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

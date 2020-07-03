@@ -24,10 +24,11 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2LocalGateway.RESOURCE_NAME,
         description = EC2LocalGateway.RESOURCE_DESCRIPTION
 )
@@ -72,6 +73,9 @@ data class EC2LocalGateway(
     companion object {
         const val RESOURCE_NAME = "local_gateway"
         const val RESOURCE_DESCRIPTION = "Local Gateway"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

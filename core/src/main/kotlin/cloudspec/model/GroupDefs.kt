@@ -1,6 +1,6 @@
 /*-
  * #%L
- * CloudSpec AWS Provider
+ * CloudSpec Core Library
  * %%
  * Copyright (C) 2020 Ezequiel Foncubierta
  * %%
@@ -17,8 +17,6 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.aws.ec2
+package cloudspec.model
 
-import cloudspec.aws.AWSResource
-
-abstract class EC2Resource(open val region: String?) : AWSResource()
+typealias GroupDefs = List<GroupDef>

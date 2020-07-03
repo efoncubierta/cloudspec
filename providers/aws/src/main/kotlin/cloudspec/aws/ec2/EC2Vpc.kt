@@ -27,12 +27,13 @@ import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2VpcCidrBlockAssociation
 import cloudspec.aws.ec2.nested.EC2VpcIpv6CidrBlockAssociation
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.Tenancy
 import software.amazon.awssdk.services.ec2.model.VpcState
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2Vpc.RESOURCE_NAME,
         description = EC2Vpc.RESOURCE_DESCRIPTION
 )
@@ -108,6 +109,9 @@ data class EC2Vpc(
     companion object {
         const val RESOURCE_NAME = "vpc"
         const val RESOURCE_DESCRIPTION = "Virtual Private Cloud"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

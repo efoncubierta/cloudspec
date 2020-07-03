@@ -21,8 +21,4 @@ package cloudspec.aws.dynamodb
 
 import cloudspec.aws.AWSResource
 
-abstract class DDBResource : AWSResource() {
-    companion object {
-        const val GROUP_NAME = "dynamodb"
-    }
-}
+abstract class DDBResource : AWSResource()

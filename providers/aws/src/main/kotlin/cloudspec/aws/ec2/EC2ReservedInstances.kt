@@ -25,12 +25,13 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2RecurringCharge
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.*
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2ReservedInstances.RESOURCE_NAME,
         description = EC2ReservedInstances.RESOURCE_DESCRIPTION
 )
@@ -147,6 +148,9 @@ data class EC2ReservedInstances(
     companion object {
         const val RESOURCE_NAME = "reserved_instances"
         const val RESOURCE_DESCRIPTION = "Reserved Instances"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

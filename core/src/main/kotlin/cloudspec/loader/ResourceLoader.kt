@@ -22,9 +22,7 @@ package cloudspec.loader
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
-import arrow.syntax.collections.flatten
 import cloudspec.ProvidersRegistry
-import cloudspec.annotation.ResourceReflectionUtil
 import cloudspec.lang.AssociationStatement
 import cloudspec.lang.NestedStatement
 import cloudspec.lang.Statement
@@ -131,7 +129,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
 
             providersRegistry.getProvider(resourceDefRef.providerName)
                 .map { provider ->
-                    provider.resourcesByRef(sets, resourceDefRef)
+                    provider.resourcesByDef(sets, resourceDefRef)
                         .onEach { (ref, properties, associations) ->
                             resourceStore.saveResource(ref, properties, associations)
                         }

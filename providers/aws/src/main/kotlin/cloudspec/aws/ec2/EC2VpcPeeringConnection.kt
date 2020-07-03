@@ -25,12 +25,13 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2VpcPeeringConnectionVpcInfo
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.VpcPeeringConnectionStateReasonCode
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2VpcPeeringConnection.RESOURCE_NAME,
         description = EC2VpcPeeringConnection.RESOURCE_DESCRIPTION
 )
@@ -81,6 +82,9 @@ data class EC2VpcPeeringConnection(
     companion object {
         const val RESOURCE_NAME = "vpc_peering_connection"
         const val RESOURCE_DESCRIPTION = "VPC Peering Connection"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

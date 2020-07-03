@@ -23,7 +23,7 @@ Allowed values: `${propertyDef.allowedValues?join("`, `")}`
 <#macro associationDefinitionsList associationDefs spaces=0>
   <#list associationDefs as associationDef>
 <#if spaces gt 0>${''?left_pad(spaces, ' ')}</#if>* **&gt;${associationDef.name}**
-([${associationDef.defRef}](../../${associationDef.defRef.providerName}/${associationDef.defRef.groupName}_${associationDef.defRef.resourceName})${associationDef.isMany()?string('[]', '')}):
+([${associationDef.defRef}](../../${associationDef.defRef.providerName}/${associationDef.defRef.groupName}/${associationDef.defRef.resourceName})${associationDef.isMany()?string('[]', '')}):
 ${associationDef.description}
   </#list>
 </#macro>

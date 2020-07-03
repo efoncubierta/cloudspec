@@ -25,12 +25,13 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2TransitGatewayOptions
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.TransitGatewayState
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2TransitGateway.RESOURCE_NAME,
         description = EC2TransitGateway.RESOURCE_DESCRIPTION
 )
@@ -87,6 +88,9 @@ data class EC2TransitGateway(
     companion object {
         const val RESOURCE_NAME = "transit_gateway"
         const val RESOURCE_DESCRIPTION = "Transit Gateway"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

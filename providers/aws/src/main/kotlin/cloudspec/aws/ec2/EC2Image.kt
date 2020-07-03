@@ -26,12 +26,13 @@ import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2BlockDeviceMapping
 import cloudspec.aws.ec2.nested.EC2ProductCode
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.*
 import java.time.Instant
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2Image.RESOURCE_NAME,
         description = EC2Image.RESOURCE_DESCRIPTION
 )
@@ -166,6 +167,9 @@ data class EC2Image(
     companion object {
         const val RESOURCE_NAME = "image"
         const val RESOURCE_DESCRIPTION = "Amazon Machine Image"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

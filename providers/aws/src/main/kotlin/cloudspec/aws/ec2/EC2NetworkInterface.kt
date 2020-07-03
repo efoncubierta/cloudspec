@@ -28,12 +28,13 @@ import cloudspec.aws.ec2.nested.EC2NetworkInterfaceAssociation
 import cloudspec.aws.ec2.nested.EC2NetworkInterfaceAttachment
 import cloudspec.aws.ec2.nested.EC2NetworkInterfacePrivateIpAddress
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.NetworkInterfaceStatus
 import software.amazon.awssdk.services.ec2.model.NetworkInterfaceType
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2NetworkInterface.RESOURCE_NAME,
         description = EC2NetworkInterface.RESOURCE_DESCRIPTION
 )
@@ -160,6 +161,9 @@ data class EC2NetworkInterface(
     companion object {
         const val RESOURCE_NAME = "network_interface"
         const val RESOURCE_DESCRIPTION = "Network Interface"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"

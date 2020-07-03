@@ -26,11 +26,12 @@ import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2SubnetIpv6CidrBlockAssociation
 import cloudspec.model.KeyValue
+import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.SubnetState
 
 @ResourceDefinition(
         provider = AWSProvider.PROVIDER_NAME,
-        group = EC2Resource.GROUP_NAME,
+        group = EC2Group.GROUP_NAME,
         name = EC2Subnet.RESOURCE_NAME,
         description = EC2Subnet.RESOURCE_DESCRIPTION
 )
@@ -130,6 +131,9 @@ data class EC2Subnet(
     companion object {
         const val RESOURCE_NAME = "subnet"
         const val RESOURCE_DESCRIPTION = "Subnet"
+        val RESOURCE_DEF = ResourceDefRef(AWSProvider.PROVIDER_NAME,
+                                          EC2Group.GROUP_NAME,
+                                          RESOURCE_NAME)
 
         const val PROP_REGION = "region"
         const val PROP_REGION_D = "The AWS region"
