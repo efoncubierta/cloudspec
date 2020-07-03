@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2LocalGatewayLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2LocalGateway>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2LocalGateway> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_LOCAL_GATEWAY_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2LocalGateway>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_LOCAL_GATEWAY_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeLocalGateways.html
-                .describeLocalGateways { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeLocalGateways.html
+                    .describeLocalGateways { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .localGateways()
-                .stream()
-                .map { it.toEC2LocalGateway(region) }
-                .toList()
-        }
-    }
+                    .localGateways()
+                    .stream()
+                    .map { it.toEC2LocalGateway(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_LOCAL_GATEWAY_ID = "local-gateway-id"

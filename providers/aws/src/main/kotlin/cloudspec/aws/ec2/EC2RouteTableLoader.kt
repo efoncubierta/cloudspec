@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2RouteTableLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2RouteTable>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2RouteTable> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_ROUTE_TABLE_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2RouteTable>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_ROUTE_TABLE_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeRouteTables.html
-                .describeRouteTables { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeRouteTables.html
+                    .describeRouteTables { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .routeTables()
-                .stream()
-                .map { it.toEC2RouteTable(region) }
-                .toList()
-        }
-    }
+                    .routeTables()
+                    .stream()
+                    .map { it.toEC2RouteTable(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_ROUTE_TABLE_ID = "route-table-id"

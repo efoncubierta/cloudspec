@@ -20,50 +20,63 @@
 package cloudspec.aws.ec2
 
 import arrow.core.Option
+import arrow.core.extensions.list.traverse.sequence
+import arrow.core.extensions.listk.functorFilter.filter
 import arrow.core.firstOrNone
+import arrow.fx.IO
+import arrow.fx.extensions.fx
+import arrow.fx.extensions.io.applicative.applicative
 import cloudspec.aws.AWSConfig
 import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
 import cloudspec.model.SetValues
 import cloudspec.model.getStrings
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.Filter
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
     override fun byId(sets: SetValues, id: String): Option<T> = runBlocking {
-        resources(sets, listOf(id)).firstOrNone()
+        resources(sets, listOf(id)).unsafeRunSync().firstOrNone()
     }
 
-    override fun all(sets: SetValues): List<T> = runBlocking { resources(sets) }
+    override fun all(sets: SetValues): List<T> = resources(sets).unsafeRunSync()
 
-    private suspend fun resources(sets: SetValues,
-                                  ids: List<String> = emptyList()): List<T> = coroutineScope {
-        sets.getStrings(AWSConfig.REGIONS_REF)
-            .let { if (it.isEmpty()) availableRegions(sets) else it }
-            .map { async { resourcesInRegion(it, ids) } }
-            .awaitAll()
-            .flatten()
+    private fun resources(sets: SetValues,
+                          ids: List<String> = emptyList()): IO<List<T>> {
+        return IO.fx {
+            val (regions) = sets.getStrings(AWSConfig.REGIONS_REF)
+                .let { if (it.isEmpty()) availableRegions(sets) else IO.just(it) }
+
+            val (resources) = regions.map { resourcesInRegion(it, ids) }.sequence(IO.applicative())
+            resources.filter { it.isNotEmpty() }.flatten()
+        }
     }
 
-    abstract suspend fun resourcesInRegion(region: String, ids: List<String>): List<T>
+    abstract fun resourcesInRegion(region: String, ids: List<String>): IO<List<T>>
 
-    protected suspend fun requestInRegion(region: String,
-                                          handler: (client: Ec2Client) -> List<T>): List<T> = coroutineScope {
-        clientsProvider.ec2ClientForRegion(region).use { client ->
-            withContext(Dispatchers.Default) {
+    protected fun <V> requestGlobal(handler: (client: Ec2Client) -> V): IO<V> {
+        return IO.effect {
+            clientsProvider.ec2Client.use { client ->
                 handler(client)
             }
         }
     }
 
-    protected suspend fun availableRegions(sets: SetValues): List<String> = coroutineScope {
-        clientsProvider.ec2Client.use { ec2Client ->
-            withContext(Dispatchers.Default) {
-                ec2Client.describeRegions()
-                    .regions()
-                    .map { it.regionName() }
+    protected fun <V> requestInRegion(region: String,
+                                      handler: (client: Ec2Client) -> V): IO<V> {
+        return IO.effect {
+            clientsProvider.ec2ClientForRegion(region).use { client ->
+                handler(client)
             }
+        }
+    }
+
+    protected fun availableRegions(sets: SetValues): IO<List<String>> {
+        return requestGlobal { client ->
+            client.describeRegions()
+                .regions()
+                .map { it.regionName() }
         }
     }
 

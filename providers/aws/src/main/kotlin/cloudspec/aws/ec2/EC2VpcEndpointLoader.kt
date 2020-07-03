@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2VpcEndpointLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2VpcEndpoint>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2VpcEndpoint> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_VPC_ENDPOINT_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2VpcEndpoint>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_VPC_ENDPOINT_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcEndpoints.html
-                .describeVpcEndpoints { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcEndpoints.html
+                    .describeVpcEndpoints { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .vpcEndpoints()
-                .stream()
-                .map { it.toEC2VpcEndpoint(region) }
-                .toList()
-        }
-    }
+                    .vpcEndpoints()
+                    .stream()
+                    .map { it.toEC2VpcEndpoint(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_VPC_ENDPOINT_ID = "vpc-endpoint-id"

@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2NatGatewayLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2NatGateway>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2NatGateway> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_NAT_GATEWAY_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2NatGateway>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_NAT_GATEWAY_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNatGateways.html
-                .describeNatGateways { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filter(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNatGateways.html
+                    .describeNatGateways { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filter(filters)
+                        }
                     }
-                }
-                .natGateways()
-                .stream()
-                .map { it.toEC2NatGateway(region) }
-                .toList()
-        }
-    }
+                    .natGateways()
+                    .stream()
+                    .map { it.toEC2NatGateway(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_NAT_GATEWAY_ID = "nat-gateway-id"

@@ -19,36 +19,35 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2InstanceLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2Instance>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2Instance> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_INSTANCE_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2Instance>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_INSTANCE_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
-                .describeInstances { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
+                    .describeInstances { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .reservations()
-                .stream()
-                .flatMap { it.instances().stream() }
-                .map { it.toEC2Instance(region) }
-                .toList()
-        }
-    }
+                    .reservations()
+                    .stream()
+                    .flatMap { it.instances().stream() }
+                    .map { it.toEC2Instance(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_INSTANCE_ID = "instance-id"

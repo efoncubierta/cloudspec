@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2NetworkAclLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2NetworkAcl>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2NetworkAcl> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_NETWORK_ACL_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2NetworkAcl>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_NETWORK_ACL_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkAcls.html
-                .describeNetworkAcls { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkAcls.html
+                    .describeNetworkAcls { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .networkAcls()
-                .stream()
-                .map { it.toEC2NetworkAcl(region) }
-                .toList()
-        }
-    }
+                    .networkAcls()
+                    .stream()
+                    .map { it.toEC2NetworkAcl(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_NETWORK_ACL_ID = "network-acl-id"

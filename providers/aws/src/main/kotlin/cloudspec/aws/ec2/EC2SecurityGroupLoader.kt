@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2SecurityGroupLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2SecurityGroup>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2SecurityGroup> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_SECURITY_GROUP_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2SecurityGroup>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_SECURITY_GROUP_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSecurityGroups.html
-                .describeSecurityGroups { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSecurityGroups.html
+                    .describeSecurityGroups { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .securityGroups()
-                .stream()
-                .map { it.toEC2SecurityGroup(region) }
-                .toList()
-        }
-    }
+                    .securityGroups()
+                    .stream()
+                    .map { it.toEC2SecurityGroup(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_SECURITY_GROUP_ID = "security-group-id"

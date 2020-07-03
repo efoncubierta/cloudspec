@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2TransitGatewayLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2TransitGateway>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2TransitGateway> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_TRANSIT_GATEWAY_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2TransitGateway>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_TRANSIT_GATEWAY_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeTransitGateways.html
-                .describeTransitGateways { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeTransitGateways.html
+                    .describeTransitGateways { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .transitGateways()
-                .stream()
-                .map { it.toEC2TransitGateway(region) }
-                .toList()
-        }
-    }
+                    .transitGateways()
+                    .stream()
+                    .map { it.toEC2TransitGateway(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_TRANSIT_GATEWAY_ID = "transit-gateway-id"

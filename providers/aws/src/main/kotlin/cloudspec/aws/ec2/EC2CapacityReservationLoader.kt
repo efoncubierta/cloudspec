@@ -19,27 +19,26 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2CapacityReservationLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2CapacityReservation>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2CapacityReservation> = coroutineScope {
-        requestInRegion(region) { client ->
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeCapacityReservations.html
-                .describeCapacityReservations { builder ->
-                    if (ids.isNotEmpty()) {
-                        builder.capacityReservationIds(ids)
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2CapacityReservation>> =
+            requestInRegion(region) { client ->
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeCapacityReservations.html
+                    .describeCapacityReservations { builder ->
+                        if (ids.isNotEmpty()) {
+                            builder.capacityReservationIds(ids)
+                        }
                     }
-                }
-                .capacityReservations()
-                .stream()
-                .map { it.toEC2CapacityReservation(region) }
-                .toList()
-        }
-    }
+                    .capacityReservations()
+                    .stream()
+                    .map { it.toEC2CapacityReservation(region) }
+                    .toList()
+            }
 }

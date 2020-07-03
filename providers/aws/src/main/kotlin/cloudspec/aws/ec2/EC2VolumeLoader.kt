@@ -19,34 +19,32 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 
 class EC2VolumeLoader(clientsProvider: IAWSClientsProvider) : EC2ResourceLoader<EC2Volume>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2Volume> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_VOLUME_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2Volume>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_VOLUME_ID to ids
+                        )
+                )
 
-            // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
-            client
-                .describeVolumes { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+                client
+                    .describeVolumes { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .volumes()
-                .map {
-                    it.toEC2Volume(region)
-                }
-        }
-    }
-
+                    .volumes()
+                    .map {
+                        it.toEC2Volume(region)
+                    }
+            }
 
     companion object {
         private const val FILTER_VOLUME_ID = "volume-id"

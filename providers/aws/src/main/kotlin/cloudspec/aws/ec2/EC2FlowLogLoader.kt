@@ -19,34 +19,33 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2FlowLogLoader(clientsProvider: IAWSClientsProvider) : EC2ResourceLoader<EC2FlowLog>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2FlowLog> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_FLOW_LOG_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2FlowLog>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_FLOW_LOG_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeFlowLogs.html
-                .describeFlowLogs { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filter(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeFlowLogs.html
+                    .describeFlowLogs { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filter(filters)
+                        }
                     }
-                }
-                .flowLogs()
-                .stream()
-                .map { it.toEC2FlowLog(region) }
-                .toList()
-        }
-    }
+                    .flowLogs()
+                    .stream()
+                    .map { it.toEC2FlowLog(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_FLOW_LOG_ID = "flow-log-id"

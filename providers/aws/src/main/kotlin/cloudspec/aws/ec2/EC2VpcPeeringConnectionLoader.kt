@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2VpcPeeringConnectionLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2VpcPeeringConnection>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2VpcPeeringConnection> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_VPC_PEERING_CONNECTION_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2VpcPeeringConnection>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_VPC_PEERING_CONNECTION_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcPeeringConnections.html
-                .describeVpcPeeringConnections { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcPeeringConnections.html
+                    .describeVpcPeeringConnections { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .vpcPeeringConnections()
-                .stream()
-                .map { it.toEC2VpcPeeringConnection(region) }
-                .toList()
-        }
-    }
+                    .vpcPeeringConnections()
+                    .stream()
+                    .map { it.toEC2VpcPeeringConnection(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_VPC_PEERING_CONNECTION_ID = "vpc-peering-connection-id"

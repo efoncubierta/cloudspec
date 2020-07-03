@@ -19,35 +19,34 @@
  */
 package cloudspec.aws.ec2
 
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
-import kotlinx.coroutines.coroutineScope
 import kotlin.streams.toList
 
 class EC2NetworkInterfaceLoader(clientsProvider: IAWSClientsProvider) :
         EC2ResourceLoader<EC2NetworkInterface>(clientsProvider) {
 
-    override suspend fun resourcesInRegion(region: String,
-                                           ids: List<String>): List<EC2NetworkInterface> = coroutineScope {
-        requestInRegion(region) { client ->
-            val filters = buildFilters(
-                    mapOf(
-                            FILTER_NETWORK_INTERFACE_ID to ids
-                    )
-            )
+    override fun resourcesInRegion(region: String,
+                                   ids: List<String>): IO<List<EC2NetworkInterface>> =
+            requestInRegion(region) { client ->
+                val filters = buildFilters(
+                        mapOf(
+                                FILTER_NETWORK_INTERFACE_ID to ids
+                        )
+                )
 
-            client
-                // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkInterfaces.html
-                .describeNetworkInterfaces { builder ->
-                    if (filters.isNotEmpty()) {
-                        builder.filters(filters)
+                client
+                    // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeNetworkInterfaces.html
+                    .describeNetworkInterfaces { builder ->
+                        if (filters.isNotEmpty()) {
+                            builder.filters(filters)
+                        }
                     }
-                }
-                .networkInterfaces()
-                .stream()
-                .map { it.toEC2NetworkInterface(region) }
-                .toList()
-        }
-    }
+                    .networkInterfaces()
+                    .stream()
+                    .map { it.toEC2NetworkInterface(region) }
+                    .toList()
+            }
 
     companion object {
         private const val FILTER_NETWORK_INTERFACE_ID = "network-interface-id"
