@@ -22,13 +22,12 @@ package cloudspec.aws.ec2
 import arrow.syntax.collections.flatten
 import cloudspec.annotation.ResourceDefReflectionUtil
 import cloudspec.aws.AWSGroup
-import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
 import cloudspec.model.GroupDef
 import cloudspec.model.ResourceDefRef
 
 class EC2Group(clientsProvider: IAWSClientsProvider) : AWSGroup {
-    override val loaders: Map<ResourceDefRef, AWSResourceLoader<*>> = mapOf(
+    override val loaders: Map<ResourceDefRef, EC2ResourceLoader<*>> = mapOf(
             EC2CapacityReservation.RESOURCE_DEF to EC2CapacityReservationLoader(clientsProvider),
             EC2DhcpOptions.RESOURCE_DEF to EC2DhcpOptionsLoader(clientsProvider),
             EC2ElasticGpu.RESOURCE_DEF to EC2ElasticGpuLoader(clientsProvider),

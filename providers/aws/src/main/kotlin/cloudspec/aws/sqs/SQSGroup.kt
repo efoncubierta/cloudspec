@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package cloudspec.aws.dynamodb
+package cloudspec.aws.sqs
 
 import arrow.syntax.collections.flatten
 import cloudspec.annotation.ResourceDefReflectionUtil
@@ -25,27 +25,22 @@ import cloudspec.aws.AWSGroup
 import cloudspec.aws.IAWSClientsProvider
 import cloudspec.model.GroupDef
 import cloudspec.model.ResourceDefRef
+import kotlin.reflect.KClass
 
-class DDBGroup(clientsProvider: IAWSClientsProvider) : AWSGroup {
-    override val loaders: Map<ResourceDefRef, DDBResourceLoader<*>> = mapOf(
-            DDBBackup.RESOURCE_DEF to DDBBackupLoader(clientsProvider),
-            DDBGlobalTable.RESOURCE_DEF to DDBGlobalTableLoader(clientsProvider),
-            DDBTable.RESOURCE_DEF to DDBTableLoader(clientsProvider)
-    )
+class SQSGroup(clientsProvider: IAWSClientsProvider) : AWSGroup {
+    override val loaders: Map<ResourceDefRef, SQSResourceLoader<*>> = emptyMap()
 
     override val definition: GroupDef
         get() = GROUP_DEF
 
 
     companion object {
-        const val GROUP_NAME = "dynamodb"
-        const val GROUP_DESCRIPTION = "DynamoDB"
+        const val GROUP_NAME = "sqs"
+        const val GROUP_DESCRIPTION = "SQS"
 
         private val GROUP_DEF = GroupDef(GROUP_NAME,
                                          GROUP_DESCRIPTION,
-                                         listOf(DDBBackup::class,
-                                                DDBGlobalTable::class,
-                                                DDBTable::class)
+                                         emptyList<KClass<*>>()
                                              .map { ResourceDefReflectionUtil.toResourceDef(it) }
                                              .flatten())
     }
