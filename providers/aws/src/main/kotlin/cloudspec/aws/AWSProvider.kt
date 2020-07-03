@@ -26,6 +26,7 @@ import arrow.core.toOption
 import arrow.syntax.collections.flatten
 import cloudspec.annotation.ResourceDefReflectionUtil
 import cloudspec.annotation.ResourceReflectionUtil
+import cloudspec.aws.dynamodb.*
 import cloudspec.aws.ec2.*
 import cloudspec.aws.iam.IAMInstanceProfileResource
 import cloudspec.aws.s3.S3BucketLoader
@@ -63,6 +64,9 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
                        EC2Volume::class,
                        EC2VpcPeeringConnection::class,
                        EC2Vpc::class,
+                       DDBBackup::class,
+                       DDBGlobalTable::class,
+                       DDBTable::class,
                        IAMInstanceProfileResource::class,
                        S3BucketResource::class)
             .map { ResourceDefReflectionUtil.toResourceDef(it) }
@@ -114,6 +118,9 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
         loaders["aws:ec2:volume"] = EC2VolumeLoader(clientsProvider)
         loaders["aws:ec2:vpc_peering_connection"] = EC2VpcPeeringConnectionLoader(clientsProvider)
         loaders["aws:ec2:vpc"] = EC2VpcLoader(clientsProvider)
+        loaders["aws:dynamodb:backup"] = DDBBackupLoader(clientsProvider)
+        loaders["aws:dynamodb:global_table"] = DDBGlobalTableLoader(clientsProvider)
+        loaders["aws:dynamodb:table"] = DDBTableLoader(clientsProvider)
         loaders["aws:s3:bucket"] = S3BucketLoader(clientsProvider)
     }
 

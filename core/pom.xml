@@ -55,6 +55,11 @@
 
         <dependency>
             <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-fx</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-syntax</artifactId>
         </dependency>
 

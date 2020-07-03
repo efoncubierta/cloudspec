@@ -33,7 +33,7 @@ data class ModuleResult(override val name: String,
         get() = results.all { it.success }
 
     override val stats
-        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
+        get() = if(results.isEmpty()) Stats() else results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
 }
 
 data class RuleResult(override val name: String,
@@ -43,7 +43,7 @@ data class RuleResult(override val name: String,
         get() = error == null && results.all { it.success }
 
     override val stats
-        get() = results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
+        get() = if(results.isEmpty()) Stats() else results.map { it.stats }.reduce { acc, stats -> acc.sum(stats) }
 }
 
 data class ResourceResult(val ref: ResourceRef,

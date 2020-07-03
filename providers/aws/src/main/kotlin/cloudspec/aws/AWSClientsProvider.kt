@@ -21,6 +21,7 @@ package cloudspec.aws
 
 import software.amazon.awssdk.core.retry.RetryMode
 import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.iam.IamClient
 import software.amazon.awssdk.services.s3.S3Client
@@ -28,35 +29,47 @@ import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sqs.SqsClient
 
 class AWSClientsProvider : IAWSClientsProvider {
-    override val iamClient: IamClient
-        get() = IamClient.builder()
-                .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
-                .build()
+    override val dynamoDbClient: DynamoDbClient
+        get() = DynamoDbClient.builder()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .build()
+
+    override fun dynamoDbClientForRegion(region: Region): DynamoDbClient {
+        return DynamoDbClient.builder()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .region(region)
+            .build()
+    }
 
     override val ec2Client: Ec2Client
         get() = Ec2Client.builder()
-                .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
-                .build()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .build()
 
     override fun ec2ClientForRegion(region: String): Ec2Client {
         return Ec2Client.builder()
-                .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
-                .region(Region.of(region))
-                .build()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .region(Region.of(region))
+            .build()
     }
+
+    override val iamClient: IamClient
+        get() = IamClient.builder()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .build()
 
     override val s3Client: S3Client
         get() = S3Client.builder()
-                .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
-                .build()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .build()
 
     override val sqsClient: SqsClient
         get() = SqsClient.builder()
-                .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
-                .build()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .build()
 
     override val snsClient: SnsClient
         get() = SnsClient.builder()
-                .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
-                .build()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .build()
 }

@@ -79,6 +79,12 @@
 
             <dependency>
                 <groupId>io.arrow-kt</groupId>
+                <artifactId>arrow-fx</artifactId>
+                <version>${arrow.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.arrow-kt</groupId>
                 <artifactId>arrow-syntax</artifactId>
                 <version>${arrow.version}</version>
             </dependency>
