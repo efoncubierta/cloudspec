@@ -58,7 +58,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
 
         val resources = loader.all(emptyList())
         assertNotNull(resources)
-        assertEquals(vpcs.size, resources.size)
+        assertEquals(vpcs.size, resources.unsafeRunSync().size)
     }
 
     @Test
@@ -79,7 +79,7 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
         }
 
         val resourceOpt = loader.byId(emptyList(), vpcId())
-        assertTrue(resourceOpt is None)
+        assertTrue(resourceOpt.unsafeRunSync() is None)
     }
 
     @Test
@@ -104,6 +104,6 @@ class EC2VpcLoaderTest : EC2LoaderTest() {
 
         val vpc = vpcs[0]
         val resourceOpt = loader.byId(emptyList(), vpc.vpcId())
-        assertTrue(resourceOpt is Some<*>)
+        assertTrue(resourceOpt.unsafeRunSync() is Some<*>)
     }
 }

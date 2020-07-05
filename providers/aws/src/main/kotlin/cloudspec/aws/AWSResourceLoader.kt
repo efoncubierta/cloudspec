@@ -20,9 +20,10 @@
 package cloudspec.aws
 
 import arrow.core.Option
+import arrow.fx.IO
 import cloudspec.model.SetValues
 
 interface AWSResourceLoader<T : AWSResource> {
-    fun byId(sets: SetValues, id: String): Option<T>
-    fun all(sets: SetValues): List<T>
+    fun byId(sets: SetValues, id: String): IO<Option<T>>
+    fun all(sets: SetValues): IO<List<T>>
 }

@@ -37,8 +37,8 @@ import cloudspec.aws.ecs.ECSGroup
 import cloudspec.aws.efs.EFSGroup
 import cloudspec.aws.eks.EKSGroup
 import cloudspec.aws.elasticache.ElastiCacheGroup
-import cloudspec.aws.es.ESGroup
 import cloudspec.aws.elb.ELBGroup
+import cloudspec.aws.es.ESGroup
 import cloudspec.aws.iam.IAMGroup
 import cloudspec.aws.kinesis.KinesisGroup
 import cloudspec.aws.kms.KMSGroup
@@ -100,14 +100,14 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
 
     override fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): List<Resource> {
         return getGroup(defRef).map { group ->
-            group.resourcesByRef(sets, defRef)
+            group.resourcesByRef(sets, defRef).unsafeRunSync()
         }.getOrElse { emptyList() }
     }
 
     override fun resource(sets: SetValues, ref: ResourceRef): Option<Resource> {
         return Option.fx {
             val (group) = getGroup(ref.defRef)
-            val (resource) = group.resource(sets, ref)
+            val (resource) = group.resource(sets, ref).unsafeRunSync()
 
             resource
         }

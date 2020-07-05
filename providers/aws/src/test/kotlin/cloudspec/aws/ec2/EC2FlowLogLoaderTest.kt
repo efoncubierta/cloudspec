@@ -58,7 +58,7 @@ class EC2FlowLogLoaderTest : EC2LoaderTest() {
 
         val resources = loader.all(emptyList())
         assertNotNull(resources)
-        assertEquals(flowLogs.size, resources.size)
+        assertEquals(flowLogs.size, resources.unsafeRunSync().size)
     }
 
     @Test
@@ -79,7 +79,7 @@ class EC2FlowLogLoaderTest : EC2LoaderTest() {
         }
 
         val resourceOpt = loader.byId(emptyList(), flowLogId())
-        assertTrue(resourceOpt is None)
+        assertTrue(resourceOpt.unsafeRunSync() is None)
     }
 
     @Test
@@ -104,6 +104,6 @@ class EC2FlowLogLoaderTest : EC2LoaderTest() {
 
         val flowLog = flowLogs[0]
         val resourceOpt = loader.byId(emptyList(), flowLog.flowLogId())
-        assertTrue(resourceOpt is Some<*>)
+        assertTrue(resourceOpt.unsafeRunSync() is Some<*>)
     }
 }

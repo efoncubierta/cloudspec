@@ -58,7 +58,7 @@ class EC2CapacityReservationLoaderTest : EC2LoaderTest() {
 
         val resources = loader.all(emptyList())
         assertNotNull(resources)
-        assertEquals(capacityReservations.size, resources.size)
+        assertEquals(capacityReservations.size, resources.unsafeRunSync().size)
     }
 
     @Test
@@ -79,7 +79,7 @@ class EC2CapacityReservationLoaderTest : EC2LoaderTest() {
         }
 
         val resourceOpt = loader.byId(emptyList(), capacityReservationId())
-        assertTrue(resourceOpt is None)
+        assertTrue(resourceOpt.unsafeRunSync() is None)
     }
 
     @Test
@@ -104,6 +104,6 @@ class EC2CapacityReservationLoaderTest : EC2LoaderTest() {
 
         val capacityReservation = capacityReservations[0]
         val resourceOpt = loader.byId(emptyList(), capacityReservation.capacityReservationId())
-        assertTrue(resourceOpt is Some<*>)
+        assertTrue(resourceOpt.unsafeRunSync() is Some<*>)
     }
 }

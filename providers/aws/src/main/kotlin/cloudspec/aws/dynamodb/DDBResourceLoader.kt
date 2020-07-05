@@ -34,17 +34,19 @@ import cloudspec.aws.dynamodb.nested.toKeyValues
 import cloudspec.model.KeyValue
 import cloudspec.model.SetValues
 import cloudspec.model.getStrings
-import kotlinx.coroutines.runBlocking
 import software.amazon.awssdk.arns.Arn
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
 abstract class DDBResourceLoader<T : DDBResource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
-    override fun byId(sets: SetValues, id: String): Option<T> = runBlocking {
-        resources(sets, listOf(id)).unsafeRunSync().firstOrNone()
+    override fun byId(sets: SetValues, id: String): IO<Option<T>> {
+        return IO.fx {
+            val (resources) = resources(sets, listOf(id))
+            resources.firstOrNone()
+        }
     }
 
-    override fun all(sets: SetValues): List<T> = resources(sets, emptyList()).unsafeRunSync()
+    override fun all(sets: SetValues): IO<List<T>> = resources(sets, emptyList())
 
     protected fun resources(sets: SetValues,
                             ids: List<String>): IO<List<T>> {

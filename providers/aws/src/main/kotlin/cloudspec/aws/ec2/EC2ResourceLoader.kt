@@ -31,16 +31,18 @@ import cloudspec.aws.AWSResourceLoader
 import cloudspec.aws.IAWSClientsProvider
 import cloudspec.model.SetValues
 import cloudspec.model.getStrings
-import kotlinx.coroutines.runBlocking
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.ec2.model.Filter
 
 abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider: IAWSClientsProvider) : AWSResourceLoader<T> {
-    override fun byId(sets: SetValues, id: String): Option<T> = runBlocking {
-        resources(sets, listOf(id)).unsafeRunSync().firstOrNone()
+    override fun byId(sets: SetValues, id: String): IO<Option<T>> {
+        return IO.fx {
+            val (resources) = resources(sets, listOf(id))
+            resources.firstOrNone()
+        }
     }
 
-    override fun all(sets: SetValues): List<T> = resources(sets).unsafeRunSync()
+    override fun all(sets: SetValues): IO<List<T>> = resources(sets)
 
     private fun resources(sets: SetValues,
                           ids: List<String> = emptyList()): IO<List<T>> {

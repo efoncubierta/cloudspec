@@ -58,7 +58,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
 
         val resources = loader.all(emptyList())
         assertNotNull(resources)
-        assertEquals(localGateways.size, resources.size)
+        assertEquals(localGateways.size, resources.unsafeRunSync().size)
     }
 
     @Test
@@ -79,7 +79,7 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
         }
 
         val resourceOpt = loader.byId(emptyList(), localGatewayId())
-        assertTrue(resourceOpt is None)
+        assertTrue(resourceOpt.unsafeRunSync() is None)
     }
 
     @Test
@@ -104,6 +104,6 @@ class EC2LocalGatewayLoaderTest : EC2LoaderTest() {
 
         val localGateway = localGateways[0]
         val resourceOpt = loader.byId(emptyList(), localGateway.localGatewayId())
-        assertTrue(resourceOpt is Some<*>)
+        assertTrue(resourceOpt.unsafeRunSync() is Some<*>)
     }
 }

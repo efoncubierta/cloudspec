@@ -58,7 +58,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
 
         val resources = loader.all(emptyList())
         assertNotNull(resources)
-        assertEquals(snapshots.size, resources.size)
+        assertEquals(snapshots.size, resources.unsafeRunSync().size)
     }
 
     @Test
@@ -79,7 +79,7 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
         }
 
         val resourceOpt = loader.byId(emptyList(), snapshotId())
-        assertTrue(resourceOpt is None)
+        assertTrue(resourceOpt.unsafeRunSync() is None)
     }
 
     @Test
@@ -104,6 +104,6 @@ class EC2SnapshotLoaderTest : EC2LoaderTest() {
 
         val snapshot = snapshots[0]
         val resourceOpt = loader.byId(emptyList(), snapshot.snapshotId())
-        assertTrue(resourceOpt is Some<*>)
+        assertTrue(resourceOpt.unsafeRunSync() is Some<*>)
     }
 }

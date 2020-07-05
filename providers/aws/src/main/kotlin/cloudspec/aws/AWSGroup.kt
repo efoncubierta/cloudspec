@@ -21,8 +21,13 @@ package cloudspec.aws
 
 import arrow.core.Option
 import arrow.core.extensions.fx
+import arrow.core.extensions.option.monad.flatten
+import arrow.core.extensions.sequence
 import arrow.core.getOrElse
 import arrow.core.toOption
+import arrow.fx.IO
+import arrow.fx.extensions.fx
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.syntax.collections.flatten
 import cloudspec.annotation.ResourceReflectionUtil
 import cloudspec.model.*
@@ -31,21 +36,25 @@ interface AWSGroup {
     val definition: GroupDef
     val loaders: Map<ResourceDefRef, AWSResourceLoader<*>>
 
-    fun resourcesByRef(sets: SetValues, ref: ResourceDefRef): List<Resource> {
-        return getLoader(ref).map { loader ->
-            loader.all(sets).map {
-                ResourceReflectionUtil.toResource(it)
-            }.flatten()
-        }.getOrElse { emptyList() }
+    fun resourcesByRef(sets: SetValues, defRef: ResourceDefRef): IO<List<Resource>> {
+        return IO.fx {
+            val (awsResources) = getLoader(defRef)
+                .map { loader -> loader.all(sets) }
+                .sequence(IO.applicative())
+                .map { it.getOrElse { emptyList() } }
+
+            awsResources.map { ResourceReflectionUtil.toResource(it) }.flatten()
+        }
     }
 
-    fun resource(sets: SetValues, ref: ResourceRef): Option<Resource> {
-        return Option.fx {
-            val (loader) = getLoader(ref.defRef)
-            val (awsResource) = loader.byId(sets, ref.id)
-            val (resource) = ResourceReflectionUtil.toResource(awsResource)
+    fun resource(sets: SetValues, ref: ResourceRef): IO<Option<Resource>> {
+        return IO.fx {
+            val (awsResource) = getLoader(ref.defRef)
+                .map { loader -> loader.byId(sets, ref.id) }
+                .sequence(IO.applicative())
+                .map { it.flatten() }
 
-            resource
+            awsResource.flatMap { ResourceReflectionUtil.toResource(it) }
         }
     }
 

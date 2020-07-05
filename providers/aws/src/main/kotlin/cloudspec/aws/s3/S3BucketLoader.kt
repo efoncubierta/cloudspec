@@ -21,16 +21,17 @@ package cloudspec.aws.s3
 
 import arrow.core.Option
 import arrow.core.firstOrNone
+import arrow.fx.IO
 import cloudspec.aws.IAWSClientsProvider
 import cloudspec.model.SetValues
 import software.amazon.awssdk.services.s3.S3Client
 
 class S3BucketLoader(private val clientsProvider: IAWSClientsProvider) : S3ResourceLoader<S3BucketResource> {
-    override fun byId(sets: SetValues, id: String): Option<S3BucketResource> {
-        return getBuckets(listOf(id)).firstOrNone()
+    override fun byId(sets: SetValues, id: String): IO<Option<S3BucketResource>> {
+        return IO { getBuckets(listOf(id)).firstOrNone() }
     }
 
-    override fun all(sets: SetValues): List<S3BucketResource> = getBuckets(emptyList())
+    override fun all(sets: SetValues): IO<List<S3BucketResource>> = IO { getBuckets(emptyList()) }
 
     fun getBuckets(bucketNames: List<String>): List<S3BucketResource> {
         clientsProvider.s3Client.use { client ->
