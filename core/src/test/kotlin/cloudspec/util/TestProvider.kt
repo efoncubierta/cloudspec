@@ -21,6 +21,7 @@ package cloudspec.util
 
 import arrow.core.Option
 import arrow.core.none
+import arrow.fx.IO
 import arrow.syntax.collections.flatten
 import cloudspec.annotation.ResourceDefReflectionUtil
 import cloudspec.model.*
@@ -51,11 +52,11 @@ class TestProvider : Provider() {
                           false)
         )
 
-    override fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): List<Resource> {
-        return emptyList()
+    override fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): IO<Resources> {
+        return IO { emptyList<Resource>() }
     }
 
-    override fun resource(sets: SetValues, ref: ResourceRef): Option<Resource> {
-        return none()
+    override fun resource(sets: SetValues, ref: ResourceRef): IO<ResourceO> {
+        return IO { none<Resource>() }
     }
 }

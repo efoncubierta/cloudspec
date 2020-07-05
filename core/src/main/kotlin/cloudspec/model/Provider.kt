@@ -20,6 +20,7 @@
 package cloudspec.model
 
 import arrow.core.Option
+import arrow.fx.IO
 
 /**
  * Define a CloudSpec's provider.
@@ -68,7 +69,7 @@ abstract class Provider {
      * @param defRef Resource definition reference.
      * @return List of resources.
      */
-    abstract fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): List<Resource>
+    abstract fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): IO<List<Resource>>
 
     /**
      * Get a resource by resource definition and id.
@@ -77,5 +78,5 @@ abstract class Provider {
      * @param ref Resource reference.
      * @return Optional resource.
      */
-    abstract fun resource(sets: SetValues, ref: ResourceRef): Option<Resource>
+    abstract fun resource(sets: SetValues, ref: ResourceRef): IO<Option<Resource>>
 }

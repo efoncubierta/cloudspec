@@ -20,9 +20,13 @@
 package cloudspec.aws
 
 import arrow.core.Option
-import arrow.core.extensions.fx
+import arrow.core.extensions.option.monad.flatten
+import arrow.core.extensions.sequence
 import arrow.core.getOrElse
 import arrow.core.toOption
+import arrow.fx.IO
+import arrow.fx.extensions.fx
+import arrow.fx.extensions.io.applicative.applicative
 import cloudspec.aws.acm.ACMGroup
 import cloudspec.aws.apigateway.APIGatewayGroup
 import cloudspec.aws.cloudfront.CloudFrontGroup
@@ -98,18 +102,25 @@ class AWSProvider(clientsProvider: IAWSClientsProvider) : Provider() {
     override val configDefs: ConfigDefs
         get() = AWSConfig.CONFIG_DEFS
 
-    override fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): List<Resource> {
-        return getGroup(defRef).map { group ->
-            group.resourcesByRef(sets, defRef).unsafeRunSync()
-        }.getOrElse { emptyList() }
+    override fun resourcesByDef(sets: SetValues, defRef: ResourceDefRef): IO<List<Resource>> {
+        return IO.fx {
+            val (awsResources) = getGroup(defRef)
+                .map { it.resourcesByRef(sets, defRef) }
+                .sequence(IO.applicative())
+                .map { it.getOrElse { emptyList() } }
+
+            awsResources
+        }
     }
 
-    override fun resource(sets: SetValues, ref: ResourceRef): Option<Resource> {
-        return Option.fx {
-            val (group) = getGroup(ref.defRef)
-            val (resource) = group.resource(sets, ref).unsafeRunSync()
+    override fun resource(sets: SetValues, ref: ResourceRef): IO<Option<Resource>> {
+        return IO.fx {
+            val (awsResource) = getGroup(ref.defRef)
+                .map { it.resource(sets, ref) }
+                .sequence(IO.applicative())
+                .map { it.flatten() }
 
-            resource
+            awsResource
         }
     }
 
