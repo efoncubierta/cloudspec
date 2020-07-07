@@ -19,10 +19,12 @@
  */
 package cloudspec.loader
 
+import arrow.core.Either
 import arrow.core.Some
 import arrow.core.extensions.option.monad.flatten
 import arrow.core.extensions.sequence
 import arrow.core.getOrElse
+import arrow.core.none
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
@@ -39,6 +41,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
                      private val resourceStore: ResourceStore) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    private val loadedResources = mutableMapOf<ResourceRef, IO<ResourceO>>()
     private val loadedResourceDefs = mutableMapOf<ResourceDefRef, IO<Resources>>()
 
     fun load(module: Module) {
@@ -129,6 +132,7 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
         }
     }
 
+    @Synchronized
     private fun getAllResources(sets: SetValues, resourceDefRef: ResourceDefRef): IO<Resources> {
         if (!loadedResourceDefs.containsKey(resourceDefRef)) {
             logger.debug("Loading all resources of type '{}'", resourceDefRef)
@@ -142,34 +146,48 @@ class ResourceLoader(private val providersRegistry: ProvidersRegistry,
                 resources.onEach { (ref, properties, associations) ->
                     resourceStore.saveResource(ref, properties, associations)
                 }
+            }.attempt().map {
+                when (it) {
+                    is Either.Left -> {
+                        logger.error(it.a.message)
+                        emptyList()
+                    }
+                    is Either.Right -> it.b
+                }
             }
         }
 
         return loadedResourceDefs[resourceDefRef]!!
     }
 
+    @Synchronized
     private fun getResource(sets: SetValues, ref: ResourceRef): IO<ResourceO> {
-        // TODO load incomplete resource from store
-//        Optional<Resource> resourceOpt = resourceStore.getResource(resourceDefRef, resourceId);
-//        if (!resourceOpt.isPresent()) {
-        logger.debug("Loading resource of type '${ref}'")
+        if (!loadedResources.containsKey(ref)) {
+            logger.debug("Loading resource of type '${ref}'")
 
-        return IO.fx {
-            val (resource) = providersRegistry.getProvider(ref.defRef)
-                .map { provider ->
-                    provider.resource(sets, ref)
+            loadedResources[ref] = IO.fx {
+                val (resource) = providersRegistry.getProvider(ref.defRef)
+                    .map { provider ->
+                        provider.resource(sets, ref)
+                    }
+                    .sequence(IO.applicative())
+                    .map { it.flatten() }
+                resource.also {
+                    if (it is Some) {
+                        resourceStore.saveResource(ref, it.t.properties, it.t.associations)
+                    }
                 }
-                .sequence(IO.applicative())
-                .map { it.flatten() }
-            resource.also {
-                if (it is Some) {
-                    resourceStore.saveResource(ref, it.t.properties, it.t.associations)
+            }.attempt().map {
+                when (it) {
+                    is Either.Left -> {
+                        logger.error(it.a.message)
+                        none()
+                    }
+                    is Either.Right -> it.b
                 }
             }
         }
 
-        //        }
-//        return resourceOpt;
+        return loadedResources[ref]!!
     }
-
 }

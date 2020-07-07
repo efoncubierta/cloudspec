@@ -50,8 +50,8 @@ abstract class EC2ResourceLoader<T : EC2Resource>(protected val clientsProvider:
             val (regions) = sets.getStrings(AWSConfig.REGIONS_REF)
                 .let { if (it.isEmpty()) availableRegions(sets) else IO.just(it) }
 
-            val (resources) = regions.map { resourcesInRegion(it, ids) }.sequence(IO.applicative())
-            resources.filter { it.isNotEmpty() }.flatten()
+            val (resources) = regions.map { resourcesInRegion(it, ids) }.parSequence()
+            resources.flatten()
         }
     }
 

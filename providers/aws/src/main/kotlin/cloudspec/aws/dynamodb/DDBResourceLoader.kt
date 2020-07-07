@@ -72,9 +72,9 @@ abstract class DDBResourceLoader<T : DDBResource>(protected val clientsProvider:
             val (tables) = sets.getStrings(AWSConfig.REGIONS_REF)
                 .let { regions -> if (regions.isEmpty()) Region.regions() else regions.map { Region.of(it) } }
                 .map { resourcesByRegion(it) }
-                .sequence(IO.applicative())
+                .parSequence()
 
-            tables.filter { it.isNotEmpty() }.flatten()
+            tables.flatten()
         }
     }
 

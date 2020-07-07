@@ -20,7 +20,6 @@
 package cloudspec.aws
 
 import arrow.core.Option
-import arrow.core.extensions.fx
 import arrow.core.extensions.option.monad.flatten
 import arrow.core.extensions.sequence
 import arrow.core.getOrElse

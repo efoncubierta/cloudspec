@@ -81,11 +81,13 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         }
     }
 
+    @Synchronized
     override fun saveResource(ref: ResourceRef) {
         // default to empty properties and associations
         saveResource(ref, emptySet(), emptySet())
     }
 
+    @Synchronized
     override fun saveResource(ref: ResourceRef, properties: Properties, associations: Associations) {
         logger.debug("Saving resource '${ref}'")
 
@@ -99,6 +101,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         saveAssociationsFromVertex(resourceV, associations)
     }
 
+    @Synchronized
     override fun saveProperties(ref: ResourceRef, properties: Properties) {
         logger.debug("Saving ${properties.size} properties on resource '${ref}'")
 
@@ -110,6 +113,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         }
     }
 
+    @Synchronized
     override fun saveProperty(ref: ResourceRef, property: Property<*>) {
         logger.debug("Saving property '${property.name}' on resource '${ref}'")
 
@@ -122,6 +126,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         }
     }
 
+    @Synchronized
     override fun saveAssociations(ref: ResourceRef, associations: Associations) {
         logger.debug("Saving ${associations.size} associations on resource '${ref}'")
 
@@ -133,6 +138,7 @@ class GraphResourceStore(val graph: Graph) : ResourceStore {
         }
     }
 
+    @Synchronized
     override fun saveAssociation(ref: ResourceRef, association: Association) {
         logger.debug("Saving association '${association.name}' on resource '${ref}'")
 
