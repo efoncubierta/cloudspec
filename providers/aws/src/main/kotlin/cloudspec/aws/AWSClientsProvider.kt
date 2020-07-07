@@ -24,6 +24,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.iam.IamClient
+import software.amazon.awssdk.services.kms.KmsClient
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sqs.SqsClient
@@ -58,13 +59,20 @@ class AWSClientsProvider : IAWSClientsProvider {
             .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
             .build()
 
-    override val s3Client: S3Client
-        get() = S3Client.builder()
+    override val kmsClient: KmsClient
+        get() = KmsClient.builder()
             .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
             .build()
 
-    override val sqsClient: SqsClient
-        get() = SqsClient.builder()
+    override fun kmsClientForRegion(region: Region): KmsClient {
+        return KmsClient.builder()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .region(region)
+            .build()
+    }
+
+    override val s3Client: S3Client
+        get() = S3Client.builder()
             .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
             .build()
 
@@ -72,4 +80,23 @@ class AWSClientsProvider : IAWSClientsProvider {
         get() = SnsClient.builder()
             .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
             .build()
+
+    override fun snsClientForRegion(region: Region): SnsClient {
+        return SnsClient.builder()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .region(region)
+            .build()
+    }
+
+    override val sqsClient: SqsClient
+        get() = SqsClient.builder()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .build()
+
+    override fun sqsClientForRegion(region: Region): SqsClient {
+        return SqsClient.builder()
+            .overrideConfiguration { builder -> builder.retryPolicy(RetryMode.STANDARD) }
+            .region(region)
+            .build()
+    }
 }

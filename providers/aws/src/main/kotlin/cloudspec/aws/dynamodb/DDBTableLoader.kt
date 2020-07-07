@@ -55,8 +55,8 @@ class DDBTableLoader(clientsProvider: IAWSClientsProvider) :
                 client.listTables().tableNames()
             }
 
-            val (tables) = tableNames.map { resourceByName(region, it) }.sequence(IO.applicative())
-            tables.filter { it.isDefined() }.flatten()
+            val (tables) = tableNames.map { resourceByName(region, it) }.parSequence()
+            tables.flatten()
         }
     }
 }

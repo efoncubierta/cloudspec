@@ -24,6 +24,7 @@ import cloudspec.annotation.IdDefinition
 import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
+import cloudspec.aws.kms.KMSKey
 import cloudspec.model.KeyValue
 import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.SnapshotState
@@ -50,7 +51,12 @@ data class EC2Snapshot(
         )
         val encrypted: Boolean?,
 
-        // private final String kmsKeyId;
+        @property:AssociationDefinition(
+                name = PROP_KMS_KEY,
+                description = PROP_KMS_KEY_D,
+                targetClass = KMSKey::class
+        )
+        val kmsKeyId: String?,
 
         @property:PropertyDefinition(
                 name = PROP_OWNER_ID,
@@ -113,6 +119,8 @@ data class EC2Snapshot(
         const val PROP_REGION_D = "The AWS region"
         const val PROP_ENCRYPTED = "encrypted"
         const val PROP_ENCRYPTED_D = "Indicates whether the snapshot is encrypted"
+        const val PROP_KMS_KEY = "kms_key"
+        const val PROP_KMS_KEY_D = "The AWS Key Management Service (AWS KMS) customer master key (CMK)"
         const val PROP_OWNER_ID = "owner_id"
         const val PROP_OWNER_ID_D = "The AWS account ID of the EBS snapshot owner"
         const val PROP_PROGRESS = "progress"

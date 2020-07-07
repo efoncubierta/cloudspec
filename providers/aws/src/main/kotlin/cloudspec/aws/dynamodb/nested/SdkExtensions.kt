@@ -121,6 +121,7 @@ fun ReplicaDescription.toDDBReplicaDescription(): DDBReplicaDescription {
             regionName(),
             replicaStatus(),
             replicaStatusPercentProgress(),
+            kmsMasterKeyId(),
             provisionedThroughputOverride()?.toDDBProvisionedThroughputOverride(),
             globalSecondaryIndexes()?.toDDBReplicaGlobalSecondaryIndexDescriptions()
     )
@@ -150,6 +151,7 @@ fun SSEDescription.toDDBSSEDescription(): DDBSSEDescription {
     return DDBSSEDescription(
             status(),
             sseType(),
+            kmsMasterKeyArn(),
             inaccessibleEncryptionDateTime()
     )
 }

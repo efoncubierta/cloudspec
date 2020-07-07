@@ -20,11 +20,8 @@
 package cloudspec.aws.dynamodb
 
 import arrow.core.Option
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.extensions.listk.functorFilter.filter
 import arrow.fx.IO
 import arrow.fx.extensions.fx
-import arrow.fx.extensions.io.applicative.applicative
 import arrow.syntax.collections.flatten
 import cloudspec.aws.IAWSClientsProvider
 import software.amazon.awssdk.arns.Arn
@@ -51,8 +48,8 @@ class DDBBackupLoader(clientsProvider: IAWSClientsProvider) :
                 client.listBackups().backupSummaries()
             }
 
-            val (tables) = tableNames.map { resourceByArn(Arn.fromString(it.backupArn())) }.sequence(IO.applicative())
-            tables.filter { it.isDefined() }.flatten()
+            val (tables) = tableNames.map { resourceByArn(Arn.fromString(it.backupArn())) }.parSequence()
+            tables.flatten()
         }
     }
 }

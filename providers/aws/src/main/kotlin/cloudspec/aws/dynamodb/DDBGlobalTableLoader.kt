@@ -20,11 +20,8 @@
 package cloudspec.aws.dynamodb
 
 import arrow.core.Option
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.extensions.listk.functorFilter.filter
 import arrow.fx.IO
 import arrow.fx.extensions.fx
-import arrow.fx.extensions.io.applicative.applicative
 import arrow.syntax.collections.flatten
 import cloudspec.aws.IAWSClientsProvider
 import software.amazon.awssdk.arns.Arn
@@ -55,8 +52,8 @@ class DDBGlobalTableLoader(clientsProvider: IAWSClientsProvider) :
                 client.listGlobalTables().globalTables()
             }
 
-            val (tables) = tableNames.map { resourceByName(region, it.globalTableName()) }.sequence(IO.applicative())
-            tables.filter { it.isDefined() }.flatten()
+            val (tables) = tableNames.map { resourceByName(region, it.globalTableName()) }.parSequence()
+            tables.flatten()
         }
     }
 }

@@ -23,17 +23,22 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.ec2.Ec2Client
 import software.amazon.awssdk.services.iam.IamClient
+import software.amazon.awssdk.services.kms.KmsClient
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sqs.SqsClient
 
 interface IAWSClientsProvider {
-    val iamClient: IamClient
     val ec2Client: Ec2Client
     fun ec2ClientForRegion(region: String): Ec2Client
     val dynamoDbClient: DynamoDbClient
     fun dynamoDbClientForRegion(region: Region): DynamoDbClient
+    val iamClient: IamClient
+    val kmsClient: KmsClient
+    fun kmsClientForRegion(region: Region): KmsClient
     val s3Client: S3Client
-    val sqsClient: SqsClient
     val snsClient: SnsClient
+    fun snsClientForRegion(region: Region): SnsClient
+    val sqsClient: SqsClient
+    fun sqsClientForRegion(region: Region): SqsClient
 }

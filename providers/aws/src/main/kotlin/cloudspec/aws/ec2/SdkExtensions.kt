@@ -297,6 +297,7 @@ fun Snapshot.toEC2Snapshot(region: String): EC2Snapshot {
     return EC2Snapshot(
             region,
             encrypted(),
+            kmsKeyId(),
             ownerId(),
             progress(),
             snapshotId(),

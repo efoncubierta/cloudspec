@@ -19,7 +19,9 @@
  */
 package cloudspec.aws.dynamodb.nested
 
+import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
+import cloudspec.aws.kms.KMSKey
 import software.amazon.awssdk.services.dynamodb.model.ReplicaStatus
 
 data class DDBReplicaDescription(
@@ -41,7 +43,12 @@ data class DDBReplicaDescription(
         )
         val replicaStatusPercentProgress: String?,
 
-//        val kmsMasterKeyId: String?,
+        @property:AssociationDefinition(
+                name = PROP_KMS_KEY,
+                description = PROP_KMS_KEY_D,
+                targetClass = KMSKey::class
+        )
+        val kmsMasterKeyId: String?,
 
         @property:PropertyDefinition(
                 name = PROP_PROVISIONED_THROUGHPUT_OVERRIDE,
@@ -62,6 +69,8 @@ data class DDBReplicaDescription(
         const val PROP_REPLICA_STATUS_D = "The current state of the replica"
         const val PROP_REPLICA_PROGRESS = "replica_progress"
         const val PROP_REPLICA_PROGRESS_D = "Specifies the progress of a Create, Update, or Delete action on the replica as a percentage"
+        const val PROP_KMS_KEY = "kms_key"
+        const val PROP_KMS_KEY_D = "The AWS KMS customer master key (CMK) of the replica that will be used for AWS KMS encryption"
         const val PROP_PROVISIONED_THROUGHPUT_OVERRIDE = "provisioned_throughput_override"
         const val PROP_PROVISIONED_THROUGHPUT_OVERRIDE_D = "Replica-specific provisioned throughput"
         const val PROP_GLOBAL_SECONDARY_INDEXES = "global_secondary_indexes"

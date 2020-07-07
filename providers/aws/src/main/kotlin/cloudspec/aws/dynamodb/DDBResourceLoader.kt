@@ -20,12 +20,9 @@
 package cloudspec.aws.dynamodb
 
 import arrow.core.Option
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.extensions.listk.functorFilter.filter
 import arrow.core.firstOrNone
 import arrow.fx.IO
 import arrow.fx.extensions.fx
-import arrow.fx.extensions.io.applicative.applicative
 import arrow.syntax.collections.flatten
 import cloudspec.aws.AWSConfig
 import cloudspec.aws.AWSResourceLoader
@@ -60,8 +57,8 @@ abstract class DDBResourceLoader<T : DDBResource>(protected val clientsProvider:
 
     private fun resourcesByArns(arns: List<Arn>): IO<List<T>> {
         return IO.fx {
-            val (tables) = arns.map { resourceByArn(it) }.sequence(IO.applicative())
-            tables.filter { it.isDefined() }.flatten()
+            val (tables) = arns.map { resourceByArn(it) }.parSequence()
+            tables.flatten()
         }
     }
 

@@ -19,7 +19,9 @@
  */
 package cloudspec.aws.dynamodb.nested
 
+import cloudspec.annotation.AssociationDefinition
 import cloudspec.annotation.PropertyDefinition
+import cloudspec.aws.kms.KMSKey
 import software.amazon.awssdk.services.dynamodb.model.SSEStatus
 import software.amazon.awssdk.services.dynamodb.model.SSEType
 import java.time.Instant
@@ -37,7 +39,12 @@ data class DDBSSEDescription(
         )
         val sseType: SSEType?,
 
-        // val kmsMasterKeyArn: String?,
+        @property:AssociationDefinition(
+                name = PROP_KMS_KEY,
+                description = PROP_KMS_KEY_D,
+                targetClass = KMSKey::class
+        )
+        val kmsMasterKeyArn: String?,
 
         @property:PropertyDefinition(
                 name = PROP_INACCESSIBLE_ENCRYPTION_DATE,
@@ -50,6 +57,8 @@ data class DDBSSEDescription(
         const val PROP_STATUS_D = "Represents the current state of server-side encryption"
         const val PROP_SSE_TYPE = "sse_type"
         const val PROP_SSE_TYPE_D = "Server-side encryption type"
+        const val PROP_KMS_KEY = "kms_key"
+        const val PROP_KMS_KEY_D = "The AWS KMS customer master key (CMK) used for the AWS KMS encryption"
         const val PROP_INACCESSIBLE_ENCRYPTION_DATE = "inaccessible_encryption_date"
         const val PROP_INACCESSIBLE_ENCRYPTION_DATE_D = "Indicates the time, in UNIX epoch date format, when DynamoDB detected that the table's AWS KMS key was inaccessible"
     }

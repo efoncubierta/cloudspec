@@ -25,6 +25,7 @@ import cloudspec.annotation.PropertyDefinition
 import cloudspec.annotation.ResourceDefinition
 import cloudspec.aws.AWSProvider
 import cloudspec.aws.ec2.nested.EC2VolumeAttachment
+import cloudspec.aws.kms.KMSKey
 import cloudspec.model.KeyValue
 import cloudspec.model.ResourceDefRef
 import software.amazon.awssdk.services.ec2.model.VolumeState
@@ -68,10 +69,11 @@ data class EC2Volume(
         )
         val encrypted: Boolean?,
 
-        //    @property:AssociationDefinition(
-        //            name = ASSOC_KMS_KEY,
-        //            description = "The Amazon Resource Name (ARN) of the AWS Key Management Service (AWS KMS) customer master key (CMK)"
-        //    )
+        @property:AssociationDefinition(
+                name = ASSOC_KMS_KEY,
+                description = ASSOC_KMS_KEY_D,
+                targetClass = KMSKey::class
+        )
         val kmsKeyId: String?,
 
         @property:PropertyDefinition(
@@ -154,7 +156,7 @@ data class EC2Volume(
         const val PROP_ENCRYPTED = "encrypted"
         const val PROP_ENCRYPTED_D = "Indicates whether the volume is encrypted"
         const val ASSOC_KMS_KEY = "kms_key"
-        const val ASSOC_KMS_KEY_D = "The Amazon Resource Name (ARN) of the AWS Key Management Service (AWS KMS) customer master key (CMK)"
+        const val ASSOC_KMS_KEY_D = "The AWS Key Management Service (AWS KMS) customer master key (CMK)"
         const val PROP_OUTPOST_ARN = "outpost_arn"
         const val PROP_OUTPOST_ARN_D = "The Amazon Resource Name (ARN) of the Outpost"
         const val PROP_SIZE = "size"
