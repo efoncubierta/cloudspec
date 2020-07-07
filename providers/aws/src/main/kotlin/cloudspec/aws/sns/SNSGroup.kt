@@ -25,10 +25,11 @@ import cloudspec.aws.AWSGroup
 import cloudspec.aws.IAWSClientsProvider
 import cloudspec.model.GroupDef
 import cloudspec.model.ResourceDefRef
-import kotlin.reflect.KClass
 
 class SNSGroup(clientsProvider: IAWSClientsProvider) : AWSGroup {
-    override val loaders: Map<ResourceDefRef, SNSResourceLoader<*>> = emptyMap()
+    override val loaders: Map<ResourceDefRef, SNSResourceLoader<*>> = mapOf(
+            SNSTopic.RESOURCE_DEF to SNSTopicLoader(clientsProvider)
+    )
 
     override val definition: GroupDef
         get() = GROUP_DEF
@@ -40,7 +41,9 @@ class SNSGroup(clientsProvider: IAWSClientsProvider) : AWSGroup {
 
         private val GROUP_DEF = GroupDef(GROUP_NAME,
                                          GROUP_DESCRIPTION,
-                                         emptyList<KClass<*>>()
+                                         listOf(
+                                                 SNSTopic::class
+                                         )
                                              .map { ResourceDefReflectionUtil.toResourceDef(it) }
                                              .flatten())
     }
