@@ -33,7 +33,7 @@
         <jcdp.version>4.0.1</jcdp.version>
         <antlr4.version>4.8-1</antlr4.version>
 
-        <log4j.version>2.13.2</log4j.version>
+        <log4j.version>2.15.0</log4j.version>
         <junit.version>4.13</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <mockk.version>1.10.0</mockk.version>
